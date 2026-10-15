@@ -17,8 +17,15 @@
 <header>
 <h1><?php the_title(); ?></h1> 
 <div class="stars_ratings_box">
-<?php include_once(ABSPATH .'wp-admin/includes/plugin.php');
-if(is_plugin_active('kk-star-ratings/index.php')){ echo kk_star_ratings(); } ?>
+<?php /* v3.1.0 — محافظ خطای کشنده: include و توابع اداری فقط در صورت وجود؛ ستاره‌دهی هم فقط اگر تابعش موجود باشد (قبلاً همین خط می‌توانست کل بلوک محتوا را نصفه‌کاره بکشد) */
+if ( ! function_exists( 'is_plugin_active' ) ) {
+	$ab_plug_api = ABSPATH . 'wp-admin/includes/plugin.php';
+	if ( is_readable( $ab_plug_api ) ) {
+		include_once $ab_plug_api;
+	}
+	unset( $ab_plug_api );
+}
+if ( function_exists( 'is_plugin_active' ) && is_plugin_active( 'kk-star-ratings/index.php' ) && function_exists( 'kk_star_ratings' ) ) { echo kk_star_ratings(); } ?>
 </div>
 <div class="liner clear"></div>
 <div class="tarlanweb_post_ft"><i class="icofont-folder-open"></i> <?php the_category(' , '); ?></div>

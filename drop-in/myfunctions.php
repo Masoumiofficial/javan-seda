@@ -9,6 +9,13 @@ if ( is_readable( $_javan_seda_sidebars ) ) {
 	require_once $_javan_seda_sidebars;
 }
 unset( $_javan_seda_sidebars );
+/* v3.1.0 — لایهٔ سازگاری ACF: فقط وقتی ACF فعال نباشد توابع را تعریف می‌کند
+   و از خطای کشندهٔ «Call to undefined function get_field()» در single.php جلوگیری می‌کند. */
+$_javan_seda_acf = trailingslashit( get_template_directory() ) . 'inc/acf-compat.php';
+if ( is_readable( $_javan_seda_acf ) ) {
+	require_once $_javan_seda_acf;
+}
+unset( $_javan_seda_acf );
 add_theme_support( 'post-thumbnails' );
 if (function_exists('add_image_size')){
 add_image_size( 'thumb4', 150, 150, true);

@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.0.5
+Version: 3.1.0
 */
 /*
 ==================================================================================
@@ -2538,9 +2538,19 @@ body:not(.ab-has-mh){padding-top:0 !important;}
 
 /* همان قاعده‌ها به‌صورت inline در header.php هم آمده‌اند (نسخهٔ ضدّ‌کش) — مقدارها یکسان است */
 
-/* ایمنی موبایل: ظرف ثابت‌عرض نباید محتوا را در عرض باریک ببُرد + جلوگیری از برش عمودی */
+/* ایمنی موبایل: ظرف ثابت‌عرض نباید محتوا را در عرض باریک ببُرد + جلوگیری از برش عمودی
+   (قالب در @mediaهای ۲۵۰ تا ۴۵۰ پیکسل، عرضِ ثابتِ ۲۵۰/۳۵۰/۴۵۰ می‌دهد؛ روی گوشی‌های
+    ۳۲۰ و ۳۶۰ پیکسلی + body{overflow-x:hidden} بخشی از محتوا بیرونِ برش می‌افتاد) */
 .tarlanweb_center{max-width:100% !important;}
 #centers_box,.single_content_box{overflow:visible;}
+@media (max-width: 800px){
+	.tarlanweb_center{width:auto !important;max-width:100% !important;margin-right:12px;margin-left:12px;}
+	.single_posts_right,.single_posts_left{width:100% !important;float:none !important;}
+	#centers_box{width:100% !important;}
+	.single_featured_image{max-width:100% !important;height:auto !important;}
+	.single_content_box img{max-width:100% !important;height:auto;}
+	.single_content_box iframe{max-width:100% !important;}
+}
 
 /* حالت ریسک: کاربر دسکتاپ با پنجرهٔ باریک (یا موبایل با «نسخهٔ دسکتاپ») — هدر اصلی نباید غیب شود */
 @media (max-width: 800px){

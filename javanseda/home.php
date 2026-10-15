@@ -2,9 +2,36 @@
 <!-- centers_box -->
 <div class="tarlanweb_center">
 <div id="centers_box">
+
+<!-- نوار دسترسی سریع صفحه اصلی آهنگ‌بان -->
+<nav class="ab-quickbar" aria-label="دسترسی سریع صفحه اصلی">
+	<ul class="ab-quickbar__list">
+		<li class="ab-quickbar__item">
+			<a href="#new-songs" class="ab-quickbar__link">
+				<i class="icofont-music-notes"></i>
+				<span>تازه‌ترین آهنگ‌ها</span>
+			</a>
+		</li>
+		<li class="ab-quickbar__item">
+			<a href="<?php echo esc_url(home_url('/singers/')); ?>" class="ab-quickbar__link">
+				<i class="icofont-microphone-alt"></i>
+				<span>همهٔ خواننده‌ها</span>
+			</a>
+		</li>
+		<li class="ab-quickbar__item">
+			<a href="#popular-songs" class="ab-quickbar__link">
+				<i class="icofont-fire-alt"></i>
+				<span>پربازدیدترین‌ها</span>
+			</a>
+		</li>
+	</ul>
+</nav>
+
 <?php get_template_part('inc/vip_slider'); ?>
 <?php get_template_part('inc/tarlanweb_player'); ?>
+<div id="new-songs" class="ab-section-anchor"></div>
 <?php get_template_part('inc/new_posts'); ?>
+<div id="popular-songs" class="ab-section-anchor"></div>
 <?php get_template_part('inc/mostviews_posts'); ?>
 <?php $artista = ot_get_option('hty',array()); foreach($artista as $artise){ ?>	
 <!-- song_boxs -->

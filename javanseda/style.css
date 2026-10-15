@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.0
+Version: 3.0.1
 */
 /*
 ==================================================================================
@@ -1825,51 +1825,604 @@ body{padding-top:0;}
 	.ab-related__item{font-size:12px;padding:5px 10px;}
 }
 
-/* --------------------------------------------------------------------------------------------
-   ادامهٔ بخش ۱۶ — اصلاح فاصله‌ها و چیدمان سرتیتر پروفایل خواننده
-   (روی لپ‌تاپ، نشان‌های «۶ آهنگ / ۶ آلبوم» و خط «آخرین به‌روزرسانی» به هم چسبیده بودند)
-   همهٔ انتخابگرها یا مخصوص همین صفحه‌اند (ab-artist-page / ab-resume) یا مثل
-   .artist_name_head فقط در همین باکس استفاده می‌شوند.
-   -------------------------------------------------------------------------------------------- */
 
-.artist_box_detss .artist_name_head{float:none;width:auto;margin:0 0 12px;padding:0;
-	font-size:21px;line-height:1.65;text-align:right;}
-.artist_box_detss .artist_resume_box{float:none;width:auto;display:flex;flex-wrap:wrap;gap:8px;
-	margin:0 0 12px;padding:0;text-align:right;list-style:none;}
-.artist_box_detss .artist_resume_box li{display:inline-flex;align-items:center;gap:5px;margin:0;
-	padding:5px 13px;background:var(--ab-blue-soft);color:var(--ab-blue);border-radius:999px;
-	font-size:13px;line-height:1.9;}
-.artist_box_detss .artist_resume_box li .ab-resume__num{font-weight:700;font-size:14px;line-height:1;}
-.artist_box_detss .ab-artist-page__meta{margin:0 0 6px;font-size:13px;line-height:2;color:var(--ab-muted);}
-.artist_box_detss .ab-artist-page__links{margin:12px 0 0;}
-.artist_box_detss .clear2{padding:2px 0;}
+/* ============================================================================================
+   ۱۷) «فوتر چهار ستونی سازمانی آهنگ‌بان» — نسخهٔ 3.0.1
+   مربوط به فایل قالب: footer.php
+   - حل مشکل رنگ متن لینک‌ها (اجبار رنگ تیره در حالت روز با !important و رنگ روشن در حالت شب)
+   ============================================================================================ */
 
-.night .artist_box_detss .artist_resume_box li{background:rgba(24,90,219,.22);color:#EAF1FE;}
+#footer.ab-footer{
+	width:100% !important;
+	padding:48px 0 24px !important;
+	background:#FFFFFF !important;
+	color:var(--ab-text) !important;
+	border-top:1px solid var(--ab-line) !important;
+	text-align:right !important;
+	direction:rtl !important;
+	box-shadow:none !important;
+	float:none !important;
+	clear:both !important;
+}
+.night #footer.ab-footer{
+	background:#111111 !important;
+	color:#EEEEEE !important;
+	border-top-color:rgba(255,255,255,0.08) !important;
+}
+
+#footer.ab-footer a{
+	color:var(--ab-text) !important;
+}
+.night #footer.ab-footer a{
+	color:var(--ab-muted) !important;
+}
+
+.ab-footer__grid{
+	display:grid !important;
+	grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
+	gap:32px !important;
+	margin-bottom:36px !important;
+}
+
+.ab-footer__col{
+	display:flex !important;
+	flex-direction:column !important;
+}
+
+.ab-footer__title{
+	position:relative !important;
+	margin:0 0 16px 0 !important;
+	padding-bottom:10px !important;
+	font-size:16px !important;
+	font-weight:700 !important;
+	color:#111111 !important;
+	border-bottom:2px solid var(--ab-blue) !important;
+	display:inline-block !important;
+}
+.night .ab-footer__title{
+	color:#FFFFFF !important;
+	border-bottom-color:var(--ab-blue) !important;
+}
+
+.ab-footer__text{
+	font-size:13.5px !important;
+	line-height:1.9 !important;
+	color:var(--ab-text) !important;
+	margin:0 !important;
+	text-align:justify !important;
+}
+.night .ab-footer__text{
+	color:var(--ab-muted) !important;
+}
+
+.ab-footer__menu,
+.ab-footer__cats{
+	list-style:none !important;
+	margin:0 !important;
+	padding:0 !important;
+	display:flex !important;
+	flex-direction:column !important;
+	gap:8px !important;
+}
+
+.ab-footer__menu li,
+.ab-footer__cats li{
+	display:block !important;
+	margin:0 !important;
+	padding:0 !important;
+}
+
+.ab-footer__menu li a,
+.ab-footer__cats li a{
+	display:inline-flex !important;
+	align-items:center !important;
+	gap:6px !important;
+	font-size:13.5px !important;
+	line-height:1.8 !important;
+	color:var(--ab-text) !important;
+	text-decoration:none !important;
+	padding:2px 0 !important;
+	transition:color 0.2s ease, transform 0.2s ease !important;
+	background:transparent !important;
+}
+.ab-footer__menu li a:hover,
+.ab-footer__cats li a:hover{
+	color:var(--ab-blue) !important;
+	background:transparent !important;
+	transform:translateX(-3px) !important;
+}
+.night .ab-footer__menu li a,
+.night .ab-footer__cats li a{
+	color:var(--ab-muted) !important;
+}
+.night .ab-footer__menu li a:hover,
+.night .ab-footer__cats li a:hover{
+	color:var(--ab-blue-accent) !important;
+}
+
+.ab-footer__cat-featured{
+	font-weight:700 !important;
+	color:var(--ab-blue) !important;
+}
+.ab-footer__cat-featured i{
+	font-size:14px !important;
+}
+
+.ab-footer__count{
+	font-size:11.5px !important;
+	color:var(--ab-muted) !important;
+	font-weight:400 !important;
+}
+
+.ab-footer__socials{
+	float:none !important;
+	margin:0 0 16px 0 !important;
+	padding:0 !important;
+	display:flex !important;
+	flex-wrap:wrap !important;
+	gap:8px !important;
+	direction:ltr !important;
+	justify-content:flex-end !important;
+	position:static !important;
+	background:transparent !important;
+}
+.ab-footer__socials a{
+	display:inline-flex !important;
+	align-items:center !important;
+	justify-content:center !important;
+	width:36px !important;
+	height:36px !important;
+	background:var(--ab-blue-soft) !important;
+	color:var(--ab-blue) !important;
+	border-radius:8px !important;
+	font-size:16px !important;
+	text-decoration:none !important;
+	transition:background 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
+}
+.ab-footer__socials a:hover{
+	background:var(--ab-blue) !important;
+	color:#FFFFFF !important;
+	transform:translateY(-2px) !important;
+}
+.night .ab-footer__socials a{
+	background:#222222 !important;
+	color:var(--ab-blue-accent) !important;
+}
+.night .ab-footer__socials a:hover{
+	background:var(--ab-blue) !important;
+	color:#FFFFFF !important;
+}
+
+.ab-footer__search{
+	position:relative !important;
+	display:flex !important;
+	align-items:center !important;
+	width:100% !important;
+	margin-top:4px !important;
+}
+.ab-footer__search-input{
+	width:100% !important;
+	height:40px !important;
+	padding:0 38px 0 12px !important;
+	background:var(--ab-page) !important;
+	border:1px solid var(--ab-line) !important;
+	border-radius:8px !important;
+	font-size:12.5px !important;
+	color:var(--ab-text) !important;
+	outline:none !important;
+	transition:border-color 0.2s ease !important;
+}
+.ab-footer__search-input:focus{
+	border-color:var(--ab-blue) !important;
+}
+.night .ab-footer__search-input{
+	background:#222222 !important;
+	border-color:rgba(255,255,255,0.12) !important;
+	color:#EEEEEE !important;
+}
+.night .ab-footer__search-input:focus{
+	border-color:var(--ab-blue-accent) !important;
+}
+.ab-footer__search-btn{
+	position:absolute !important;
+	right:4px !important;
+	top:50% !important;
+	transform:translateY(-50%) !important;
+	width:32px !important;
+	height:32px !important;
+	border:none !important;
+	background:transparent !important;
+	color:var(--ab-muted) !important;
+	cursor:pointer !important;
+	display:inline-flex !important;
+	align-items:center !important;
+	justify-content:center !important;
+	font-size:14px !important;
+	transition:color 0.2s ease !important;
+}
+.ab-footer__search-btn:hover{
+	color:var(--ab-blue) !important;
+}
+
+.ab-footer__bottom{
+	display:flex !important;
+	align-items:center !important;
+	justify-content:space-between !important;
+	flex-wrap:wrap !important;
+	gap:16px !important;
+	padding-top:20px !important;
+	border-top:1px solid var(--ab-line) !important;
+	font-size:12.5px !important;
+}
+.night .ab-footer__bottom{
+	border-top-color:rgba(255,255,255,0.08) !important;
+}
+
+.ab-footer__copyright p{
+	margin:0 !important;
+	color:var(--ab-muted) !important;
+	font-size:12.5px !important;
+}
+
+.ab-footer__policy-links{
+	display:inline-flex !important;
+	align-items:center !important;
+	gap:16px !important;
+}
+.ab-footer__policy-links a{
+	color:var(--ab-muted) !important;
+	text-decoration:none !important;
+	transition:color 0.2s ease !important;
+}
+.ab-footer__policy-links a:hover{
+	color:var(--ab-blue) !important;
+}
+.night .ab-footer__policy-links a:hover{
+	color:var(--ab-blue-accent) !important;
+}
+
+
+/* ============================================================================================
+   ۱۸) «صفحهٔ اصلی + اسلایدر سبک ویژه» — نسخهٔ 3.0.1
+   مربوط به فایل‌های: home.php و inc/vip_slider.php
+   ============================================================================================ */
+
+/* نوار دسترسی سریع ابتدای صفحه */
+.ab-quickbar{
+	margin:0 0 24px 0 !important;
+	padding:10px 16px !important;
+	background:var(--ab-blue-soft) !important;
+	border:1px solid var(--ab-line) !important;
+	border-radius:12px !important;
+}
+.night .ab-quickbar{
+	background:#222222 !important;
+	border-color:rgba(255,255,255,0.08) !important;
+}
+.ab-quickbar__list{
+	display:flex !important;
+	align-items:center !important;
+	justify-content:center !important;
+	flex-wrap:wrap !important;
+	gap:16px 28px !important;
+	list-style:none !important;
+	margin:0 !important;
+	padding:0 !important;
+}
+.ab-quickbar__item{
+	margin:0 !important;
+}
+.ab-quickbar__link{
+	display:inline-flex !important;
+	align-items:center !important;
+	gap:8px !important;
+	font-size:13.5px !important;
+	font-weight:600 !important;
+	color:var(--ab-blue) !important;
+	text-decoration:none !important;
+	transition:color 0.2s ease, transform 0.2s ease !important;
+}
+.ab-quickbar__link i{
+	font-size:16px !important;
+}
+.ab-quickbar__link:hover{
+	color:var(--ab-blue-dark) !important;
+	transform:translateY(-1px) !important;
+}
+.night .ab-quickbar__link{
+	color:var(--ab-blue-accent) !important;
+}
+.night .ab-quickbar__link:hover{
+	color:#FFFFFF !important;
+}
+
+/* اسلایدر ویژه VIP */
+.vip_img_box.ab-vip-slider-box{
+	margin:0 0 24px 0 !important;
+	position:relative !important;
+	width:100% !important;
+}
+.vip_post.ab-vip-post{
+	position:relative !important;
+	border-radius:12px !important;
+	overflow:hidden !important;
+	margin:0 !important;
+	background:#111111 !important;
+	aspect-ratio:16 / 9 !important;
+}
+.vip_post.ab-vip-post figure{
+	margin:0 !important;
+	width:100% !important;
+	height:100% !important;
+	position:relative !important;
+}
+.vip_post.ab-vip-post figure a{
+	display:block !important;
+	width:100% !important;
+	height:100% !important;
+}
+.vip_post.ab-vip-post .ab-vip-img{
+	width:100% !important;
+	height:100% !important;
+	object-fit:cover !important;
+	display:block !important;
+	border-radius:12px !important;
+	transition:transform 0.4s ease !important;
+}
+.vip_post.ab-vip-post:hover .ab-vip-img{
+	transform:scale(1.03) !important;
+}
+
+/* نوار عنوان روی اسلاید: تخت و بدون گرادینت */
+.vip_post.ab-vip-post header h2{
+	position:absolute !important;
+	bottom:0 !important;
+	right:0 !important;
+	left:0 !important;
+	margin:0 !important;
+	padding:12px 16px !important;
+	background:rgba(17,17,17,0.72) !important;
+	border-radius:0 0 12px 12px !important;
+	z-index:2 !important;
+}
+.vip_post.ab-vip-post header h2 a{
+	display:block !important;
+	color:#FFFFFF !important;
+	font-size:14.5px !important;
+	font-weight:700 !important;
+	line-height:1.6 !important;
+	text-decoration:none !important;
+	text-shadow:none !important;
+}
+.vip_post.ab-vip-post header h2 a span{
+	display:inline !important;
+	font-weight:400 !important;
+	color:#EAF1FE !important;
+}
+.vip_post.ab-vip-post header h2 a:hover{
+	color:var(--ab-blue-accent) !important;
+}
+
+/* بج فرمت/نوع محتوا */
+.vip_post.ab-vip-post footer{
+	position:absolute !important;
+	top:12px !important;
+	right:12px !important;
+	z-index:3 !important;
+}
+.vip_post.ab-vip-post .ab-format-badge{
+	display:inline-block !important;
+	padding:4px 10px !important;
+	background:var(--ab-blue) !important;
+	color:#FFFFFF !important;
+	font-size:11.5px !important;
+	font-weight:700 !important;
+	line-height:1.4 !important;
+	border-radius:6px !important;
+	box-shadow:none !important;
+}
+
+/* فلش‌های ناوبری اسلایدر: دایره‌ای سفید با هاور آبی */
+.vip_top_slider.owl-theme .owl-nav [class*="owl-"]{
+	width:38px !important;
+	height:38px !important;
+	line-height:36px !important;
+	font-size:20px !important;
+	background:#FFFFFF !important;
+	color:#111111 !important;
+	border-radius:50% !important;
+	box-shadow:0 3px 10px rgba(0,0,0,0.2) !important;
+	border:1px solid rgba(0,0,0,0.06) !important;
+	display:inline-flex !important;
+	align-items:center !important;
+	justify-content:center !important;
+	top:50% !important;
+	transform:translateY(-50%) !important;
+	opacity:0.95 !important;
+	transition:background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.vip_top_slider.owl-theme .owl-nav [class*="owl-"]:hover{
+	background:var(--ab-blue) !important;
+	color:#FFFFFF !important;
+	box-shadow:0 4px 14px rgba(24,90,219,0.35) !important;
+	transform:translateY(-50%) scale(1.06) !important;
+}
+.vip_top_slider .owl-nav button.owl-prev{
+	right:10px !important;
+	left:auto !important;
+}
+.vip_top_slider .owl-nav button.owl-next{
+	left:10px !important;
+	right:auto !important;
+}
+.night .vip_top_slider.owl-theme .owl-nav [class*="owl-"]{
+	background:#222222 !important;
+	color:#FFFFFF !important;
+	border-color:rgba(255,255,255,0.12) !important;
+}
+.night .vip_top_slider.owl-theme .owl-nav [class*="owl-"]:hover{
+	background:var(--ab-blue) !important;
+}
+
+/* نقطه‌های ناوبری نازک میله‌ای */
+.vip_top_slider.owl-theme .owl-dots{
+	display:block !important;
+	margin-top:12px !important;
+	text-align:center !important;
+}
+.vip_top_slider.owl-theme .owl-dots .owl-dot{
+	display:inline-block !important;
+	margin:0 4px !important;
+	padding:0 !important;
+}
+.vip_top_slider.owl-theme .owl-dots .owl-dot span{
+	width:24px !important;
+	height:4px !important;
+	margin:0 !important;
+	background:rgba(0,0,0,0.15) !important;
+	border-radius:2px !important;
+	transition:width 0.25s ease, background 0.25s ease !important;
+}
+.night .vip_top_slider.owl-theme .owl-dots .owl-dot span{
+	background:rgba(255,255,255,0.22) !important;
+}
+.vip_top_slider.owl-theme .owl-dots .owl-dot.active span,
+.vip_top_slider.owl-theme .owl-dots .owl-dot:hover span{
+	width:36px !important;
+	background:var(--ab-blue) !important;
+}
+.night .vip_top_slider.owl-theme .owl-dots .owl-dot.active span,
+.night .vip_top_slider.owl-theme .owl-dots .owl-dot:hover span{
+	background:var(--ab-blue-accent) !important;
+}
+
+/* هماهنگی فواصل منظم ۲۴px در صفحه اصلی */
+#centers_box .song_boxs{
+	margin:0 0 24px 0 !important;
+}
+.ab-section-anchor{
+	position:relative !important;
+	top:-20px !important;
+	visibility:hidden !important;
+}
+
+/* شبکه کارتهای ۶ستونی دسکتاپ، ۳ تبلت، ۲ موبایل */
+.song_boxs_posts ul{
+	display:grid !important;
+	grid-template-columns:repeat(6, minmax(0, 1fr)) !important;
+	gap:16px !important;
+	margin:0 !important;
+	padding:0 !important;
+	list-style:none !important;
+}
+.song_boxs_posts ul li{
+	width:auto !important;
+	float:none !important;
+	padding:0 !important;
+	margin:0 !important;
+}
+.song_boxs_posts ul li .songs_post{
+	height:100% !important;
+	display:flex !important;
+	flex-direction:column !important;
+	border-radius:8px !important;
+}
+.song_boxs_posts ul li .songs_post header figure img{
+	width:100% !important;
+	aspect-ratio:1 / 1 !important;
+	object-fit:cover !important;
+	border-radius:8px 8px 0 0 !important;
+}
+.song_boxs_posts ul li .songs_post header h2 a{
+	font-size:13.5px !important;
+	line-height:1.6 !important;
+	padding:8px 10px !important;
+}
+.song_boxs_posts ul li .songs_post footer{
+	margin-top:auto !important;
+	padding:0 10px 10px !important;
+}
+
+/* حالت تبلت و موبایل */
+@media (max-width: 991px){
+	.ab-footer__grid{
+		grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+		gap:24px !important;
+	}
+	.song_boxs_posts ul{
+		grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+		gap:14px !important;
+	}
+}
 
 @media (max-width: 767px){
-	body.tax-singer .artist_box_tarlanweb .artists_imsf{float:none;margin:0 auto 16px;}
-	.artist_box_detss .artist_name_head{font-size:18px;line-height:1.7;margin-bottom:10px;}
-	.artist_box_detss .artist_resume_box{gap:6px;margin-bottom:10px;}
-	.artist_box_detss .ab-artist-page__meta{line-height:1.9;}
+	#footer.ab-footer{
+		padding:32px 0 20px !important;
+	}
+	.ab-footer__grid{
+		grid-template-columns:1fr !important;
+		gap:24px !important;
+		margin-bottom:24px !important;
+	}
+	.ab-footer__bottom{
+		flex-direction:column !important;
+		text-align:center !important;
+		justify-content:center !important;
+	}
+	.ab-footer__socials{
+		justify-content:flex-start !important;
+	}
+	.ab-quickbar{
+		margin-bottom:16px !important;
+		padding:8px 12px !important;
+	}
+	.ab-quickbar__list{
+		gap:10px 16px !important;
+	}
+	.ab-quickbar__link{
+		font-size:12.5px !important;
+	}
+	#centers_box .song_boxs{
+		margin-bottom:16px !important;
+	}
+	.song_boxs_posts ul{
+		grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+		gap:10px !important;
+	}
+	.vip_post.ab-vip-post header h2{
+		padding:8px 12px !important;
+	}
+	.vip_post.ab-vip-post header h2 a{
+		font-size:13px !important;
+	}
+	.vip_top_slider.owl-theme .owl-nav [class*="owl-"]{
+		width:32px !important;
+		height:32px !important;
+		font-size:16px !important;
+	}
 }
 
-@media (max-width: 480px){
-	.artist_box_detss .artist_resume_box li{padding:4px 10px;font-size:12.5px;}
-	.artist_box_detss .artist_resume_box li .ab-resume__num{font-size:13px;}
+/* ترجیح کاهش حرکت (prefers-reduced-motion) */
+@media (prefers-reduced-motion: reduce){
+	.ab-vip-post .ab-vip-img,
+	.vip_top_slider.owl-theme .owl-nav [class*="owl-"],
+	.ab-footer__menu li a,
+	.ab-footer__cats li a,
+	.ab-footer__socials a,
+	.ab-quickbar__link{
+		transition:none !important;
+		transform:none !important;
+	}
 }
 
-/* حالت فوکوس برای همهٔ عناصر تعاملیِ کارهای ما (پیمایش با کیبورد) */
-.ab-artist-page__sortitem:focus-visible,
-.ab-artist-page__links a:focus-visible,
-.ab-related__item:focus-visible,
-.ab-artists__chip:focus-visible,
-.ab-artists__pill:focus-visible,
-.ab-artists__search-btn:focus-visible,
-.ab-artists__loadmore-btn:focus-visible,
-.ab-artists__az a:focus-visible,
-.ab-artists__search input:focus-visible{
-	outline:2px solid var(--ab-blue);outline-offset:2px;}
-.night .ab-artist-page__sortitem:focus-visible,
-.night .ab-related__item:focus-visible,
-.night .ab-artists__chip:focus-visible,
-.night .ab-artists__pill:focus-visible{outline-color:#4C8BFF;}
+
+/* جلوگیری قطعی از نمایش ناخواسته هدر موبایل روی دسکتاپ */
+@media (min-width: 801px){
+	#mobiles_header{
+		display:none !important;
+		visibility:hidden !important;
+		height:0 !important;
+		overflow:hidden !important;
+	}
+}
+

@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa-IR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پیش‌نمایش قالب جوان‌صدا (آهنگ‌بان) - نسخه 3.0.1</title>
+<link rel="stylesheet" href="../javanseda/css/icofont.min.css">
+<link rel="stylesheet" href="../javanseda/style.css">
+<style>
+/* استایل‌های راهنمای پیش‌نمایش و نوار تعاملی دارک‌مود */
+.ab-preview-toolbar{
+	position:sticky;
+	top:0;
+	z-index:9999;
+	background:#185ADB;
+	color:#FFFFFF;
+	padding:10px 20px;
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	box-shadow:0 2px 10px rgba(0,0,0,0.15);
+	font-family:inherit;
+}
+.ab-preview-toolbar strong{font-size:14px;}
+.ab-preview-btn{
+	background:#FFFFFF;
+	color:#185ADB;
+	border:none;
+	padding:6px 14px;
+	border-radius:6px;
+	font-weight:700;
+	cursor:pointer;
+	font-family:inherit;
+	display:inline-flex;
+	align-items:center;
+	gap:6px;
+	transition:background 0.2s ease, color 0.2s ease;
+}
+.ab-preview-btn:hover{
+	background:#EAF1FE;
+}
+</style>
+</head>
+<body>
+
+<!-- نوار بالای پیش‌نمایش برای تست تعاملی حالت شب -->
+<aside class="ab-preview-toolbar" aria-label="ابزار پیش‌نمایش">
+	<div>
+		<strong>پیش‌نمایش زنده و آفلاین قالب جوان‌صدا (نسخه 3.0.1)</strong>
+		<span style="opacity:0.85; margin-right:12px; font-size:12.5px;">فوتر چهارستونی + اسلایدر ۱۶:۹ + دسترسی سریع + شبکه ۶ ستونه</span>
+	</div>
+	<button id="toggle-night-btn" class="ab-preview-btn" type="button">
+		<i class="icofont-moon"></i>
+		<span>تغییر به حالت شب (Night Mode)</span>
+	</button>
+</aside>
+
+<!-- هدر ساده برای کامل بودن صفحه -->
+<header id="header" style="background:var(--ab-surface); border-bottom:1px solid var(--ab-line); padding:16px 0;">
+	<div class="tarlanweb_center" style="display:flex; align-items:center; justify-content:space-between;">
+		<div class="logo_top" style="float:none;">
+			<a href="#" style="font-size:22px; font-weight:800; color:var(--ab-blue); text-decoration:none;">
+				<i class="icofont-music-disk"></i> آهنگ‌بان <span style="font-size:12px; color:var(--ab-muted); font-weight:400;">(جوان‌صدا)</span>
+			</a>
+		</div>
+		<nav class="menu_right" style="float:none;">
+			<ul style="display:flex; gap:20px; list-style:none; margin:0; padding:0;">
+				<li><a href="#" style="color:var(--ab-text); text-decoration:none; font-weight:600;">صفحه اصلی</a></li>
+				<li><a href="#" style="color:var(--ab-text); text-decoration:none; font-weight:600;">همهٔ خواننده‌ها</a></li>
+				<li><a href="#" style="color:var(--ab-text); text-decoration:none; font-weight:600;">آهنگ جدید</a></li>
+				<li><a href="#" style="color:var(--ab-text); text-decoration:none; font-weight:600;">تماس با ما</a></li>
+			</ul>
+		</nav>
+	</div>
+</header>
+
+<main>
+<!-- centers_box -->
+<div class="tarlanweb_center" style="margin-top:24px;">
+<div id="centers_box">
+
+<!-- نوار دسترسی سریع صفحه اصلی آهنگ‌بان -->
+<nav class="ab-quickbar" aria-label="دسترسی سریع صفحه اصلی">
+	<ul class="ab-quickbar__list">
+		<li class="ab-quickbar__item">
+			<a href="#new-songs" class="ab-quickbar__link">
+				<i class="icofont-music-notes"></i>
+				<span>تازه‌ترین آهنگ‌ها</span>
+			</a>
+		</li>
+		<li class="ab-quickbar__item">
+			<a href="#artists-archive" class="ab-quickbar__link">
+				<i class="icofont-microphone-alt"></i>
+				<span>همهٔ خواننده‌ها</span>
+			</a>
+		</li>
+		<li class="ab-quickbar__item">
+			<a href="#popular-songs" class="ab-quickbar__link">
+				<i class="icofont-fire-alt"></i>
+				<span>پربازدیدترین‌ها</span>
+			</a>
+		</li>
+	</ul>
+</nav>
+
+<!-- vip_img_box (اسلایدر ویژه ۱۶:۹ با گوشه‌های گرد و نوار تخت) -->
+<div class="vip_img_box ab-vip-slider-box">
+	<div class="vip_top_slider owl-carousel owl-theme" style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+		
+		<article class="vip_post ab-vip-post">
+			<header>
+				<figure><a href="#">
+					<img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=640&auto=format&fit=crop&q=80" width="640" height="360" alt="محسن یگانه - بهت قول میدم" class="ab-vip-img">
+				</a></figure>
+				<h2><a href="#">محسن یگانه - <span>بهت قول میدم</span></a></h2>
+			</header>	
+			<footer>
+				<span class="ft_box_format ab-format-badge">تک آهنگ</span>
+			</footer>
+		</article>
+
+		<article class="vip_post ab-vip-post">
+			<header>
+				<figure><a href="#">
+					<img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=640&auto=format&fit=crop&q=80" width="640" height="360" alt="شادمهر عقیلی - تقدیر" class="ab-vip-img">
+				</a></figure>
+				<h2><a href="#">شادمهر عقیلی - <span>تقدیر</span></a></h2>
+			</header>	
+			<footer>
+				<span class="ft_box_format ab-format-badge">موزیک ویدیو</span>
+			</footer>
+		</article>
+
+	</div>
+</div>
+
+<div id="new-songs" class="ab-section-anchor"></div>
+
+<!-- سکشن تازه‌ترین آهنگ‌ها -->
+<div class="song_boxs">
+	<div class="songs_title_box">
+		<h3>جدیدترین آهنگ‌ها</h3> 
+		<a href="#">مشاهده بیشتر</a>
+		<div class="clear"></div>
+		<div class="liner"></div>
+	</div>
+	<div class="song_boxs_posts">
+		<ul>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="آهنگ ۱"></a></figure>
+						<h2><a href="#">علی یاسینی<span>نصف شب</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">آهنگ</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="آهنگ ۲"></a></figure>
+						<h2><a href="#">رضا بهرام<span>هوای دل</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">آهنگ</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="آهنگ ۳"></a></figure>
+						<h2><a href="#">مهراد جم<span>شیک و پیک</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">آهنگ</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="آهنگ ۴"></a></figure>
+						<h2><a href="#">سیروان خسروی<span>تنها نذار</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">آهنگ</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="آهنگ ۵"></a></figure>
+						<h2><a href="#">بهنام بانی<span>قرص قمر ۲</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">آهنگ</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="آهنگ ۶"></a></figure>
+						<h2><a href="#">ماکان بند<span>ناخدا</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">آهنگ</span>
+					</footer>
+				</article>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div id="popular-songs" class="ab-section-anchor"></div>
+
+<!-- سکشن پربازدیدترین مطالب ماه -->
+<div class="song_boxs">
+	<div class="songs_title_box">
+		<h3>پربازدیدترین مطالب ماه</h3> 
+		<a href="#">مشاهده بیشتر</a>
+		<div class="clear"></div>
+		<div class="liner"></div>
+	</div>
+	<div class="song_boxs_posts">
+		<ul>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="پربازدید ۱"></a></figure>
+						<h2><a href="#">همایون شجریان<span>یک‌نفس آرزوی تو</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">سنتی</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="پربازدید ۲"></a></figure>
+						<h2><a href="#">احسان خواجه‌امیری<span>سلام آخر</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">پاپ</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="پربازدید ۳"></a></figure>
+						<h2><a href="#">فرزاد فرزین<span>عاشقانه</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">پاپ</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="پربازدید ۴"></a></figure>
+						<h2><a href="#">محسن چاوشی<span>سنگ صبور</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">پاپ</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1465847899084-d164df4dedc6?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="پربازدید ۵"></a></figure>
+						<h2><a href="#">مهدی احمدوند<span>هوای تو</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">پاپ</span>
+					</footer>
+				</article>
+			</li>
+			<li>
+				<article class="songs_post">
+					<header>
+						<figure><a href="#"><img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=240&auto=format&fit=crop&q=80" width="190" height="190" alt="پربازدید ۶"></a></figure>
+						<h2><a href="#">مازیار فلاحی<span>دروغه</span></a></h2>
+					</header>
+					<footer>
+						<span class="ft_box_format">پاپ</span>
+					</footer>
+				</article>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="clear"></div>
+</div>
+</div>
+<div class="clear"></div>
+</main>
+
+<!-- دکمه شناور بازگشت به بالا -->
+<div class="top_page boxes_shadows" style="display:flex; align-items:center; justify-content:center; cursor:pointer;" onclick="window.scrollTo({top:0, behavior:'smooth'})"><i class="icofont-thin-up"></i></div>
+
+<!-- فوتر چهار ستونی سازمانی آهنگ‌بان -->
+<footer id="footer" class="ab-footer" role="contentinfo">
+<div class="tarlanweb_center">
+	<div class="ab-footer__grid">
+		<!-- ستون ۱: درباره ما -->
+		<div class="ab-footer__col ab-footer__col--about">
+			<h4 class="ab-footer__title">درباره ما</h4>
+			<div class="ab-footer__content">
+				<p class="ab-footer__text">
+					رسانه موسیقی جوان‌صدا (آهنگ‌بان) مرجع رسمی دانلود آهنگ جدید ایرانی، فول آلبوم خوانندگان، موزیک ویدیو و ترانه‌های باکیفیت به همراه متن کامل شعر و پخش آنلاین.
+				</p>
+			</div>
+		</div>
+
+		<!-- ستون ۲: لینک‌های مفید -->
+		<div class="ab-footer__col ab-footer__col--links">
+			<h4 class="ab-footer__title">لینک‌های مفید</h4>
+			<nav class="ab-footer__nav" aria-label="لینک‌های مفید فوتر">
+				<ul id="tarlanweb_ir" class="ab-footer__menu">
+					<li><a href="#">صفحه اصلی سایت</a></li>
+					<li><a href="#">فهرست الفبایی خواننده‌ها</a></li>
+					<li><a href="#">جدیدترین آلبوم‌ها</a></li>
+					<li><a href="#">آهنگ‌های پربازدید</a></li>
+					<li><a href="#">قوانین انتشار اثر</a></li>
+					<li><a href="#">تماس و پشتیبانی</a></li>
+				</ul>
+			</nav>
+		</div>
+
+		<!-- ستون ۳: دسته‌های پرطرفدار -->
+		<div class="ab-footer__col ab-footer__col--cats">
+			<h4 class="ab-footer__title">دسته‌های پرطرفدار</h4>
+			<ul class="ab-footer__cats">
+				<li><a href="#" class="ab-footer__cat-featured"><i class="icofont-microphone-alt"></i> همهٔ خواننده‌ها</a></li>
+				<li><a href="#new-songs" class="ab-footer__cat-featured"><i class="icofont-music-notes"></i> تازه‌ترین آهنگ‌ها</a></li>
+				<li><a href="#">آهنگ پاپ <span class="ab-footer__count">(۱,۲۴۰)</span></a></li>
+				<li><a href="#">موسیقی سنتی <span class="ab-footer__count">(۴۸۰)</span></a></li>
+				<li><a href="#">آهنگ شاد عروسی <span class="ab-footer__count">(۳۲۰)</span></a></li>
+				<li><a href="#">ریمیکس جدید <span class="ab-footer__count">(۲۱۰)</span></a></li>
+				<li><a href="#">موزیک ویدیو <span class="ab-footer__count">(۱۶۵)</span></a></li>
+				<li><a href="#">تک آهنگ ویژه <span class="ab-footer__count">(۹۴)</span></a></li>
+			</ul>
+		</div>
+
+		<!-- ستون ۴: ما را دنبال کنید -->
+		<div class="ab-footer__col ab-footer__col--social">
+			<h4 class="ab-footer__title">ما را دنبال کنید</h4>
+			<div class="socials_box ab-footer__socials">
+				<a target="_blank" rel="noreferrer noopener" href="https://instagram.com" aria-label="اینستاگرام" class="icofont-instagram"></a>
+				<a target="_blank" rel="noreferrer noopener" href="https://t.me" aria-label="تلگرام" class="icofont-paper-plane"></a>
+				<a target="_blank" rel="noreferrer noopener" href="https://twitter.com" aria-label="توییتر" class="icofont-twitter"></a>
+				<a target="_blank" rel="noreferrer noopener" href="https://youtube.com" aria-label="یوتیوب" class="icofont-youtube-play"></a>
+				<a target="_blank" rel="noreferrer noopener" href="https://aparat.com" aria-label="آپارات" class="icofont-movie"></a>
+				<div class="clear"></div>
+			</div>
+
+			<form class="ab-footer__search" method="get" action="#" role="search" onsubmit="event.preventDefault(); alert('جستجو برای: ' + document.getElementById('ab-footer-search-input').value);">
+				<label for="ab-footer-search-input" class="screen-reader-text">جستجو در سایت</label>
+				<input id="ab-footer-search-input" class="ab-footer__search-input" name="s" placeholder="جستجوی ترانه، خواننده..." type="text" required>
+				<button type="submit" class="ab-footer__search-btn" aria-label="جستجو"><i class="icofont-search"></i></button>
+			</form>
+		</div>
+	</div>
+
+	<!-- ردیف پایین: کپی‌رایت + لینک‌های سیاست‌ها -->
+	<div class="ab-footer__bottom">
+		<div class="ab-footer__copyright">
+			<p>© تمامی حقوق برای رسانه موسیقی جوان‌صدا (آهنگ‌بان) محفوظ است. طراحی و توسعه اختصاصی.</p>
+		</div>
+		<div class="ab-footer__policy-links">
+			<a href="#">قوانین و مقررات</a>
+			<a href="#">سفارش تبلیغات</a>
+			<a href="#">ارتباط با مدیریت</a>
+		</div>
+		<div class="clear"></div>
+	</div>
+
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org",
+		"@type": "Organization",
+		"name": "آهنگ‌بان - جوان‌صدا",
+		"url": "https://ahangban.ir/",
+		"sameAs": [
+			"https://t.me/javanseda",
+			"https://instagram.com/javanseda"
+		]
+	}
+	</script>
+	<div class="clear"></div>
+</div>
+</footer>
+
+<script>
+// اسکریپت تعاملی سوئیچ دارک‌مود برای پیش‌نمایش آفلاین
+const toggleBtn = document.getElementById('toggle-night-btn');
+toggleBtn.addEventListener('click', () => {
+	document.body.classList.toggle('night');
+	const isNight = document.body.classList.contains('night');
+	toggleBtn.querySelector('span').textContent = isNight ? 'تغییر به حالت روز (Light Mode)' : 'تغییر به حالت شب (Night Mode)';
+	toggleBtn.querySelector('i').className = isNight ? 'icofont-sun' : 'icofont-moon';
+});
+</script>
+
+</body>
+</html>

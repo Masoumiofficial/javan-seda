@@ -2534,6 +2534,7 @@ body:not(.ab-has-mh) #mobiles_header{display:none !important;visibility:hidden !
 
 /* فاصلهٔ بالای صفحه فقط وقتی لازم است که هدرِ fixed (موبایل) وجود دارد — ۶۵px = ارتفاع نوار */
 body.ab-has-mh{padding-top:65px;}
+/* هدر قدیمیِ قالب (padding inline 60pxِ اصلی) + style.css کهنه ⇒ جبرانِ ۵ پیکسل */
 body:not(.ab-has-mh){padding-top:0 !important;}
 
 /* همان قاعده‌ها به‌صورت inline در header.php هم آمده‌اند (نسخهٔ ضدّ‌کش) — مقدارها یکسان است */

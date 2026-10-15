@@ -244,17 +244,17 @@ if ( ! function_exists( 'javan_seda_sidebar' ) ) {
  * ------------------------------------------------------------------------- */
 if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 	function javan_seda_expected_hashes() {
-		return array(
-			'single.php'         => '40748d997791260756cb4bf72aab584553eaa903050bd891fb05ee67a0ba3a17',
-			'page.php'           => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
-			'myfunctions.php'    => 'e15d4a13b8006ed704c17011fe9ba1f09e662d1f68158515f57ab4f04724d840',
-			'style.css'          => '9cd1c034a42f5f8409a85256aa6796f10ee4c7483a722b8aff3ac7e7ed15630a',
-			'footer.php'         => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
-			'header.php'         => 'ceb04a069a6d2e04620f042f73131bfc821fbe8963e5c9f5d8f23136f2a1cb2a',
-			'home.php'           => '78df0d9a104c44ff22901cd07f732aaed9f9a6370ba1305c75afd7440d2527e6',
-			'inc/vip_slider.php' => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
-		);
-	}
+	return array(
+		'single.php'          => '40748d997791260756cb4bf72aab584553eaa903050bd891fb05ee67a0ba3a17',
+		'page.php'            => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
+		'myfunctions.php'     => 'e15d4a13b8006ed704c17011fe9ba1f09e662d1f68158515f57ab4f04724d840',
+		'style.css'           => 'ca432fb0bd2fe8f2429d2048e59c7bb41c91fe59219310050c7deb087246003b',
+		'footer.php'          => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
+		'header.php'          => '23e6c334f5b33627876bb9c4f56397725720a6dc7aea26e71bfe498e67ce454a',
+		'home.php'            => '78df0d9a104c44ff22901cd07f732aaed9f9a6370ba1305c75afd7440d2527e6',
+		'inc/vip_slider.php'  => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
+	);
+}
 }
 
 if ( ! function_exists( 'javan_seda_file_hash' ) ) {

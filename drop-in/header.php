@@ -22,6 +22,9 @@ if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-r
 <style id="ab-header-critical">
 body{padding-top:0;}
 body.ab-has-mh{padding-top:65px;}
+/* اگر هدرِ ۳.۰.x روی هاست باشد ولی style.css کهنه، باز هم ۵ پیکسلِ هم‌پوشانی رفع شود */
+body:not(.ab-has-mh){padding-top:65px;}
+@media (min-width: 801px){body:not(.ab-has-mh){padding-top:0;}}
 body.ab-has-mh #mobiles_header{display:block !important;visibility:visible !important;height:65px !important;overflow:visible !important;}
 body:not(.ab-has-mh) #mobiles_header{display:none !important;}
 body.ab-has-mh #header{display:none !important;}

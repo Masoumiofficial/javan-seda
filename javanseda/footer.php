@@ -1,6 +1,6 @@
 <div class="clear"></div>
 </main>
-<?php get_template_part('inc/mobiles_header'); ?>
+<?php if(wp_is_mobile()){ get_template_part('inc/mobiles_header'); } ?>
 
 <?php $upbs = ot_get_option('upb'); if('off' != $upbs){ ?>
 <div class="top_page boxes_shadows"><i class="icofont-thin-up"></i></div>

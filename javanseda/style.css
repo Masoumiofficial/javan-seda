@@ -2415,3 +2415,14 @@ body{padding-top:0;}
 	}
 }
 
+
+/* جلوگیری قطعی از نمایش ناخواسته هدر موبایل روی دسکتاپ */
+@media (min-width: 801px){
+	#mobiles_header{
+		display:none !important;
+		visibility:hidden !important;
+		height:0 !important;
+		overflow:hidden !important;
+	}
+}
+

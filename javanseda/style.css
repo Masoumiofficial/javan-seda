@@ -1825,445 +1825,401 @@ body{padding-top:0;}
 	.ab-related__item{font-size:12px;padding:5px 10px;}
 }
 
-/* --------------------------------------------------------------------------------------------
-   ادامهٔ بخش ۱۶ — اصلاح فاصله‌ها و چیدمان سرتیتر پروفایل خواننده
-   (روی لپ‌تاپ، نشان‌های «۶ آهنگ / ۶ آلبوم» و خط «آخرین به‌روزرسانی» به هم چسبیده بودند)
-   همهٔ انتخابگرها یا مخصوص همین صفحه‌اند (ab-artist-page / ab-resume) یا مثل
-   .artist_name_head فقط در همین باکس استفاده می‌شوند.
-   -------------------------------------------------------------------------------------------- */
-
-.artist_box_detss .artist_name_head{float:none;width:auto;margin:0 0 12px;padding:0;
-	font-size:21px;line-height:1.65;text-align:right;}
-.artist_box_detss .artist_resume_box{float:none;width:auto;display:flex;flex-wrap:wrap;gap:8px;
-	margin:0 0 12px;padding:0;text-align:right;list-style:none;}
-.artist_box_detss .artist_resume_box li{display:inline-flex;align-items:center;gap:5px;margin:0;
-	padding:5px 13px;background:var(--ab-blue-soft);color:var(--ab-blue);border-radius:999px;
-	font-size:13px;line-height:1.9;}
-.artist_box_detss .artist_resume_box li .ab-resume__num{font-weight:700;font-size:14px;line-height:1;}
-.artist_box_detss .ab-artist-page__meta{margin:0 0 6px;font-size:13px;line-height:2;color:var(--ab-muted);}
-.artist_box_detss .ab-artist-page__links{margin:12px 0 0;}
-.artist_box_detss .clear2{padding:2px 0;}
-
-.night .artist_box_detss .artist_resume_box li{background:rgba(24,90,219,.22);color:#EAF1FE;}
-
-@media (max-width: 767px){
-	body.tax-singer .artist_box_tarlanweb .artists_imsf{float:none;margin:0 auto 16px;}
-	.artist_box_detss .artist_name_head{font-size:18px;line-height:1.7;margin-bottom:10px;}
-	.artist_box_detss .artist_resume_box{gap:6px;margin-bottom:10px;}
-	.artist_box_detss .ab-artist-page__meta{line-height:1.9;}
-}
-
-@media (max-width: 480px){
-	.artist_box_detss .artist_resume_box li{padding:4px 10px;font-size:12.5px;}
-	.artist_box_detss .artist_resume_box li .ab-resume__num{font-size:13px;}
-}
-
-/* حالت فوکوس برای همهٔ عناصر تعاملیِ کارهای ما (پیمایش با کیبورد) */
-.ab-artist-page__sortitem:focus-visible,
-.ab-artist-page__links a:focus-visible,
-.ab-related__item:focus-visible,
-.ab-artists__chip:focus-visible,
-.ab-artists__pill:focus-visible,
-.ab-artists__search-btn:focus-visible,
-.ab-artists__loadmore-btn:focus-visible,
-.ab-artists__az a:focus-visible,
-.ab-artists__search input:focus-visible{
-	outline:2px solid var(--ab-blue);outline-offset:2px;}
-.night .ab-artist-page__sortitem:focus-visible,
-.night .ab-related__item:focus-visible,
-.night .ab-artists__chip:focus-visible,
-.night .ab-artists__pill:focus-visible{outline-color:#4C8BFF;}
-
 
 /* ============================================================================================
    ۱۷) «فوتر چهار ستونی سازمانی آهنگ‌بان» — نسخهٔ 3.0.1
    مربوط به فایل قالب: footer.php
-   - ستون ۱: درباره ما (متن رسمی بدون اختراع محتوا)
-   - ستون ۲: لینک‌های مفید (فهرست ft_menu)
-   - ستون ۳: دسته‌های پرطرفدار (get_categories + لینک خواننده‌ها و تازه‌ترین آهنگ‌ها)
-   - ستون ۴: شبکه‌های اجتماعی + فرم جستجوی سبک فوتر
-   - نوار پایین: کپی‌رایت + لینک‌های قوانین/تبلیغات/تماس + اسکیما
-   - حالت شب (#111111) و حالت موبایل (تک‌ستونی پشته‌ای بدون آکاردئون پیچیده)
-   - کاملاً تخت (بدون گرادینت) با پالت #FFFFFF، #185ADB، #1246AD، #EAF1FE، #222222، #111111
+   - حل مشکل رنگ متن لینک‌ها (اجبار رنگ تیره در حالت روز با !important و رنگ روشن در حالت شب)
    ============================================================================================ */
 
 #footer.ab-footer{
-	width:100%;
-	padding:48px 0 24px;
-	background:#FFFFFF;
-	color:var(--ab-text);
-	border-top:1px solid var(--ab-line);
-	text-align:right;
-	direction:rtl;
-	box-shadow:none;
+	width:100% !important;
+	padding:48px 0 24px !important;
+	background:#FFFFFF !important;
+	color:var(--ab-text) !important;
+	border-top:1px solid var(--ab-line) !important;
+	text-align:right !important;
+	direction:rtl !important;
+	box-shadow:none !important;
+	float:none !important;
+	clear:both !important;
 }
 .night #footer.ab-footer{
-	background:#111111;
-	color:#EEEEEE;
-	border-top-color:rgba(255,255,255,0.08);
+	background:#111111 !important;
+	color:#EEEEEE !important;
+	border-top-color:rgba(255,255,255,0.08) !important;
+}
+
+#footer.ab-footer a{
+	color:var(--ab-text) !important;
+}
+.night #footer.ab-footer a{
+	color:var(--ab-muted) !important;
 }
 
 .ab-footer__grid{
-	display:grid;
-	grid-template-columns:repeat(4, minmax(0, 1fr));
-	gap:32px;
-	margin-bottom:36px;
+	display:grid !important;
+	grid-template-columns:repeat(4, minmax(0, 1fr)) !important;
+	gap:32px !important;
+	margin-bottom:36px !important;
 }
 
 .ab-footer__col{
-	display:flex;
-	flex-direction:column;
+	display:flex !important;
+	flex-direction:column !important;
 }
 
 .ab-footer__title{
-	position:relative;
-	margin:0 0 16px 0;
-	padding-bottom:10px;
-	font-size:16px;
-	font-weight:700;
-	color:#111111;
-	border-bottom:2px solid var(--ab-blue);
-	display:inline-block;
+	position:relative !important;
+	margin:0 0 16px 0 !important;
+	padding-bottom:10px !important;
+	font-size:16px !important;
+	font-weight:700 !important;
+	color:#111111 !important;
+	border-bottom:2px solid var(--ab-blue) !important;
+	display:inline-block !important;
 }
 .night .ab-footer__title{
-	color:#FFFFFF;
-	border-bottom-color:var(--ab-blue);
+	color:#FFFFFF !important;
+	border-bottom-color:var(--ab-blue) !important;
 }
 
 .ab-footer__text{
-	font-size:13.5px;
-	line-height:1.9;
-	color:var(--ab-text);
-	margin:0;
-	text-align:justify;
+	font-size:13.5px !important;
+	line-height:1.9 !important;
+	color:var(--ab-text) !important;
+	margin:0 !important;
+	text-align:justify !important;
 }
 .night .ab-footer__text{
-	color:var(--ab-muted);
+	color:var(--ab-muted) !important;
 }
 
 .ab-footer__menu,
 .ab-footer__cats{
-	list-style:none;
-	margin:0;
-	padding:0;
-	display:flex;
-	flex-direction:column;
-	gap:8px;
+	list-style:none !important;
+	margin:0 !important;
+	padding:0 !important;
+	display:flex !important;
+	flex-direction:column !important;
+	gap:8px !important;
+}
+
+.ab-footer__menu li,
+.ab-footer__cats li{
+	display:block !important;
+	margin:0 !important;
+	padding:0 !important;
 }
 
 .ab-footer__menu li a,
 .ab-footer__cats li a{
-	display:inline-flex;
-	align-items:center;
-	gap:6px;
-	font-size:13.5px;
-	line-height:1.8;
-	color:var(--ab-text);
-	text-decoration:none;
-	padding:2px 0;
-	transition:color 0.2s ease, transform 0.2s ease;
+	display:inline-flex !important;
+	align-items:center !important;
+	gap:6px !important;
+	font-size:13.5px !important;
+	line-height:1.8 !important;
+	color:var(--ab-text) !important;
+	text-decoration:none !important;
+	padding:2px 0 !important;
+	transition:color 0.2s ease, transform 0.2s ease !important;
+	background:transparent !important;
 }
 .ab-footer__menu li a:hover,
 .ab-footer__cats li a:hover{
-	color:var(--ab-blue);
-	transform:translateX(-3px);
+	color:var(--ab-blue) !important;
+	background:transparent !important;
+	transform:translateX(-3px) !important;
 }
 .night .ab-footer__menu li a,
 .night .ab-footer__cats li a{
-	color:var(--ab-muted);
+	color:var(--ab-muted) !important;
 }
 .night .ab-footer__menu li a:hover,
 .night .ab-footer__cats li a:hover{
-	color:var(--ab-blue-accent);
+	color:var(--ab-blue-accent) !important;
 }
 
 .ab-footer__cat-featured{
-	font-weight:700;
+	font-weight:700 !important;
 	color:var(--ab-blue) !important;
 }
 .ab-footer__cat-featured i{
-	font-size:14px;
+	font-size:14px !important;
 }
 
 .ab-footer__count{
-	font-size:11.5px;
-	color:var(--ab-muted);
-	font-weight:400;
+	font-size:11.5px !important;
+	color:var(--ab-muted) !important;
+	font-weight:400 !important;
 }
 
 .ab-footer__socials{
-	float:none;
-	margin:0 0 16px 0;
-	padding:0;
-	display:flex;
-	flex-wrap:wrap;
-	gap:8px;
-	direction:ltr;
-	justify-content:flex-end;
+	float:none !important;
+	margin:0 0 16px 0 !important;
+	padding:0 !important;
+	display:flex !important;
+	flex-wrap:wrap !important;
+	gap:8px !important;
+	direction:ltr !important;
+	justify-content:flex-end !important;
+	position:static !important;
+	background:transparent !important;
 }
 .ab-footer__socials a{
-	display:inline-flex;
-	align-items:center;
-	justify-content:center;
-	width:36px;
-	height:36px;
-	background:var(--ab-blue-soft);
-	color:var(--ab-blue);
-	border-radius:8px;
-	font-size:16px;
-	text-decoration:none;
-	transition:background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+	display:inline-flex !important;
+	align-items:center !important;
+	justify-content:center !important;
+	width:36px !important;
+	height:36px !important;
+	background:var(--ab-blue-soft) !important;
+	color:var(--ab-blue) !important;
+	border-radius:8px !important;
+	font-size:16px !important;
+	text-decoration:none !important;
+	transition:background 0.2s ease, color 0.2s ease, transform 0.2s ease !important;
 }
 .ab-footer__socials a:hover{
-	background:var(--ab-blue);
+	background:var(--ab-blue) !important;
 	color:#FFFFFF !important;
-	transform:translateY(-2px);
+	transform:translateY(-2px) !important;
 }
 .night .ab-footer__socials a{
-	background:#222222;
-	color:var(--ab-blue-accent);
+	background:#222222 !important;
+	color:var(--ab-blue-accent) !important;
 }
 .night .ab-footer__socials a:hover{
-	background:var(--ab-blue);
+	background:var(--ab-blue) !important;
 	color:#FFFFFF !important;
 }
 
 .ab-footer__search{
-	position:relative;
-	display:flex;
-	align-items:center;
-	width:100%;
-	margin-top:4px;
+	position:relative !important;
+	display:flex !important;
+	align-items:center !important;
+	width:100% !important;
+	margin-top:4px !important;
 }
 .ab-footer__search-input{
-	width:100%;
-	height:40px;
-	padding:0 38px 0 12px;
-	background:var(--ab-page);
-	border:1px solid var(--ab-line);
-	border-radius:8px;
-	font-size:12.5px;
-	color:var(--ab-text);
-	outline:none;
-	transition:border-color 0.2s ease;
+	width:100% !important;
+	height:40px !important;
+	padding:0 38px 0 12px !important;
+	background:var(--ab-page) !important;
+	border:1px solid var(--ab-line) !important;
+	border-radius:8px !important;
+	font-size:12.5px !important;
+	color:var(--ab-text) !important;
+	outline:none !important;
+	transition:border-color 0.2s ease !important;
 }
 .ab-footer__search-input:focus{
-	border-color:var(--ab-blue);
+	border-color:var(--ab-blue) !important;
 }
 .night .ab-footer__search-input{
-	background:#222222;
-	border-color:rgba(255,255,255,0.12);
-	color:#EEEEEE;
+	background:#222222 !important;
+	border-color:rgba(255,255,255,0.12) !important;
+	color:#EEEEEE !important;
 }
 .night .ab-footer__search-input:focus{
-	border-color:var(--ab-blue-accent);
+	border-color:var(--ab-blue-accent) !important;
 }
 .ab-footer__search-btn{
-	position:absolute;
-	right:4px;
-	top:50%;
-	transform:translateY(-50%);
-	width:32px;
-	height:32px;
-	border:none;
-	background:transparent;
-	color:var(--ab-muted);
-	cursor:pointer;
-	display:inline-flex;
-	align-items:center;
-	justify-content:center;
-	font-size:14px;
-	transition:color 0.2s ease;
+	position:absolute !important;
+	right:4px !important;
+	top:50% !important;
+	transform:translateY(-50%) !important;
+	width:32px !important;
+	height:32px !important;
+	border:none !important;
+	background:transparent !important;
+	color:var(--ab-muted) !important;
+	cursor:pointer !important;
+	display:inline-flex !important;
+	align-items:center !important;
+	justify-content:center !important;
+	font-size:14px !important;
+	transition:color 0.2s ease !important;
 }
 .ab-footer__search-btn:hover{
-	color:var(--ab-blue);
+	color:var(--ab-blue) !important;
 }
 
 .ab-footer__bottom{
-	display:flex;
-	align-items:center;
-	justify-content:space-between;
-	flex-wrap:wrap;
-	gap:16px;
-	padding-top:20px;
-	border-top:1px solid var(--ab-line);
-	font-size:12.5px;
+	display:flex !important;
+	align-items:center !important;
+	justify-content:space-between !important;
+	flex-wrap:wrap !important;
+	gap:16px !important;
+	padding-top:20px !important;
+	border-top:1px solid var(--ab-line) !important;
+	font-size:12.5px !important;
 }
 .night .ab-footer__bottom{
-	border-top-color:rgba(255,255,255,0.08);
+	border-top-color:rgba(255,255,255,0.08) !important;
 }
 
 .ab-footer__copyright p{
-	margin:0;
-	color:var(--ab-muted);
-	font-size:12.5px;
+	margin:0 !important;
+	color:var(--ab-muted) !important;
+	font-size:12.5px !important;
 }
 
 .ab-footer__policy-links{
-	display:inline-flex;
-	align-items:center;
-	gap:16px;
+	display:inline-flex !important;
+	align-items:center !important;
+	gap:16px !important;
 }
 .ab-footer__policy-links a{
-	color:var(--ab-muted);
-	text-decoration:none;
-	transition:color 0.2s ease;
+	color:var(--ab-muted) !important;
+	text-decoration:none !important;
+	transition:color 0.2s ease !important;
 }
 .ab-footer__policy-links a:hover{
-	color:var(--ab-blue);
+	color:var(--ab-blue) !important;
 }
 .night .ab-footer__policy-links a:hover{
-	color:var(--ab-blue-accent);
+	color:var(--ab-blue-accent) !important;
 }
 
 
 /* ============================================================================================
    ۱۸) «صفحهٔ اصلی + اسلایدر سبک ویژه» — نسخهٔ 3.0.1
    مربوط به فایل‌های: home.php و inc/vip_slider.php
-   - نوار دسترسی سریع کوتاه (ab-quickbar) با ۳ لینک کاربردی
-   - اسلایدر بدون پرش ارتفاع (نسبت تصویر ثابت ۱۶:۹)
-   - گوشه‌های گرد ۱۲px، بدون گرادینت
-   - نوار عنوان تیره نیمه‌شفاف rgba(17,17,17,.72)
-   - نشان نوع محتوا با آبی سازمانی #185ADB
-   - فلش‌های دایره‌ای سفید با هاور آبی
-   - نقطه‌های میله‌ای نازک
-   - شبکه کارت‌های ۶ ستونه دسکتاپ، ۳ تبلت، ۲ موبایل با فاصله منظم ۲۴px / ۱۶px
-   - فواصل متقارن و یکپارچگی خط و تیتر liner / songs_title_box
    ============================================================================================ */
 
 /* نوار دسترسی سریع ابتدای صفحه */
 .ab-quickbar{
-	margin:0 0 24px 0;
-	padding:10px 16px;
-	background:var(--ab-blue-soft);
-	border:1px solid var(--ab-line);
-	border-radius:12px;
+	margin:0 0 24px 0 !important;
+	padding:10px 16px !important;
+	background:var(--ab-blue-soft) !important;
+	border:1px solid var(--ab-line) !important;
+	border-radius:12px !important;
 }
 .night .ab-quickbar{
-	background:#222222;
-	border-color:rgba(255,255,255,0.08);
+	background:#222222 !important;
+	border-color:rgba(255,255,255,0.08) !important;
 }
 .ab-quickbar__list{
-	display:flex;
-	align-items:center;
-	justify-content:center;
-	flex-wrap:wrap;
-	gap:16px 28px;
-	list-style:none;
-	margin:0;
-	padding:0;
+	display:flex !important;
+	align-items:center !important;
+	justify-content:center !important;
+	flex-wrap:wrap !important;
+	gap:16px 28px !important;
+	list-style:none !important;
+	margin:0 !important;
+	padding:0 !important;
 }
 .ab-quickbar__item{
-	margin:0;
+	margin:0 !important;
 }
 .ab-quickbar__link{
-	display:inline-flex;
-	align-items:center;
-	gap:8px;
-	font-size:13.5px;
-	font-weight:600;
-	color:var(--ab-blue);
-	text-decoration:none;
-	transition:color 0.2s ease, transform 0.2s ease;
+	display:inline-flex !important;
+	align-items:center !important;
+	gap:8px !important;
+	font-size:13.5px !important;
+	font-weight:600 !important;
+	color:var(--ab-blue) !important;
+	text-decoration:none !important;
+	transition:color 0.2s ease, transform 0.2s ease !important;
 }
 .ab-quickbar__link i{
-	font-size:16px;
+	font-size:16px !important;
 }
 .ab-quickbar__link:hover{
-	color:var(--ab-blue-dark);
-	transform:translateY(-1px);
+	color:var(--ab-blue-dark) !important;
+	transform:translateY(-1px) !important;
 }
 .night .ab-quickbar__link{
-	color:var(--ab-blue-accent);
+	color:var(--ab-blue-accent) !important;
 }
 .night .ab-quickbar__link:hover{
-	color:#FFFFFF;
+	color:#FFFFFF !important;
 }
 
 /* اسلایدر ویژه VIP */
 .vip_img_box.ab-vip-slider-box{
-	margin:0 0 24px 0;
-	position:relative;
-	width:100%;
+	margin:0 0 24px 0 !important;
+	position:relative !important;
+	width:100% !important;
 }
 .vip_post.ab-vip-post{
-	position:relative;
-	border-radius:12px;
-	overflow:hidden;
-	margin:0;
-	background:#111111;
-	aspect-ratio:16 / 9;
+	position:relative !important;
+	border-radius:12px !important;
+	overflow:hidden !important;
+	margin:0 !important;
+	background:#111111 !important;
+	aspect-ratio:16 / 9 !important;
 }
 .vip_post.ab-vip-post figure{
-	margin:0;
-	width:100%;
-	height:100%;
-	position:relative;
+	margin:0 !important;
+	width:100% !important;
+	height:100% !important;
+	position:relative !important;
 }
 .vip_post.ab-vip-post figure a{
-	display:block;
-	width:100%;
-	height:100%;
+	display:block !important;
+	width:100% !important;
+	height:100% !important;
 }
 .vip_post.ab-vip-post .ab-vip-img{
-	width:100%;
-	height:100%;
-	object-fit:cover;
-	display:block;
-	border-radius:12px;
-	transition:transform 0.4s ease;
+	width:100% !important;
+	height:100% !important;
+	object-fit:cover !important;
+	display:block !important;
+	border-radius:12px !important;
+	transition:transform 0.4s ease !important;
 }
 .vip_post.ab-vip-post:hover .ab-vip-img{
-	transform:scale(1.03);
+	transform:scale(1.03) !important;
 }
 
 /* نوار عنوان روی اسلاید: تخت و بدون گرادینت */
 .vip_post.ab-vip-post header h2{
-	position:absolute;
-	bottom:0;
-	right:0;
-	left:0;
-	margin:0;
-	padding:12px 16px;
-	background:rgba(17,17,17,0.72);
-	border-radius:0 0 12px 12px;
-	z-index:2;
+	position:absolute !important;
+	bottom:0 !important;
+	right:0 !important;
+	left:0 !important;
+	margin:0 !important;
+	padding:12px 16px !important;
+	background:rgba(17,17,17,0.72) !important;
+	border-radius:0 0 12px 12px !important;
+	z-index:2 !important;
 }
 .vip_post.ab-vip-post header h2 a{
-	display:block;
-	color:#FFFFFF;
-	font-size:14.5px;
-	font-weight:700;
-	line-height:1.6;
-	text-decoration:none;
-	text-shadow:none;
+	display:block !important;
+	color:#FFFFFF !important;
+	font-size:14.5px !important;
+	font-weight:700 !important;
+	line-height:1.6 !important;
+	text-decoration:none !important;
+	text-shadow:none !important;
 }
 .vip_post.ab-vip-post header h2 a span{
-	display:inline;
-	font-weight:400;
-	color:#EAF1FE;
+	display:inline !important;
+	font-weight:400 !important;
+	color:#EAF1FE !important;
 }
 .vip_post.ab-vip-post header h2 a:hover{
-	color:var(--ab-blue-accent);
+	color:var(--ab-blue-accent) !important;
 }
 
 /* بج فرمت/نوع محتوا */
 .vip_post.ab-vip-post footer{
-	position:absolute;
-	top:12px;
-	right:12px;
-	z-index:3;
+	position:absolute !important;
+	top:12px !important;
+	right:12px !important;
+	z-index:3 !important;
 }
 .vip_post.ab-vip-post .ab-format-badge{
-	display:inline-block;
-	padding:4px 10px;
-	background:var(--ab-blue);
-	color:#FFFFFF;
-	font-size:11.5px;
-	font-weight:700;
-	line-height:1.4;
-	border-radius:6px;
-	box-shadow:none;
+	display:inline-block !important;
+	padding:4px 10px !important;
+	background:var(--ab-blue) !important;
+	color:#FFFFFF !important;
+	font-size:11.5px !important;
+	font-weight:700 !important;
+	line-height:1.4 !important;
+	border-radius:6px !important;
+	box-shadow:none !important;
 }
 
 /* فلش‌های ناوبری اسلایدر: دایره‌ای سفید با هاور آبی */
@@ -2282,7 +2238,7 @@ body{padding-top:0;}
 	justify-content:center !important;
 	top:50% !important;
 	transform:translateY(-50%) !important;
-	opacity:0.95;
+	opacity:0.95 !important;
 	transition:background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
 }
 .vip_top_slider.owl-theme .owl-nav [class*="owl-"]:hover{
@@ -2311,33 +2267,33 @@ body{padding-top:0;}
 /* نقطه‌های ناوبری نازک میله‌ای */
 .vip_top_slider.owl-theme .owl-dots{
 	display:block !important;
-	margin-top:12px;
-	text-align:center;
+	margin-top:12px !important;
+	text-align:center !important;
 }
 .vip_top_slider.owl-theme .owl-dots .owl-dot{
-	display:inline-block;
-	margin:0 4px;
+	display:inline-block !important;
+	margin:0 4px !important;
 	padding:0 !important;
 }
 .vip_top_slider.owl-theme .owl-dots .owl-dot span{
-	width:24px;
-	height:4px;
-	margin:0;
-	background:rgba(0,0,0,0.15);
-	border-radius:2px;
-	transition:width 0.25s ease, background 0.25s ease;
+	width:24px !important;
+	height:4px !important;
+	margin:0 !important;
+	background:rgba(0,0,0,0.15) !important;
+	border-radius:2px !important;
+	transition:width 0.25s ease, background 0.25s ease !important;
 }
 .night .vip_top_slider.owl-theme .owl-dots .owl-dot span{
-	background:rgba(255,255,255,0.22);
+	background:rgba(255,255,255,0.22) !important;
 }
 .vip_top_slider.owl-theme .owl-dots .owl-dot.active span,
 .vip_top_slider.owl-theme .owl-dots .owl-dot:hover span{
-	width:36px;
-	background:var(--ab-blue);
+	width:36px !important;
+	background:var(--ab-blue) !important;
 }
 .night .vip_top_slider.owl-theme .owl-dots .owl-dot.active span,
 .night .vip_top_slider.owl-theme .owl-dots .owl-dot:hover span{
-	background:var(--ab-blue-accent);
+	background:var(--ab-blue-accent) !important;
 }
 
 /* هماهنگی فواصل منظم ۲۴px در صفحه اصلی */
@@ -2345,9 +2301,9 @@ body{padding-top:0;}
 	margin:0 0 24px 0 !important;
 }
 .ab-section-anchor{
-	position:relative;
-	top:-20px;
-	visibility:hidden;
+	position:relative !important;
+	top:-20px !important;
+	visibility:hidden !important;
 }
 
 /* شبکه کارتهای ۶ستونی دسکتاپ، ۳ تبلت، ۲ موبایل */
@@ -2390,8 +2346,8 @@ body{padding-top:0;}
 /* حالت تبلت و موبایل */
 @media (max-width: 991px){
 	.ab-footer__grid{
-		grid-template-columns:repeat(2, minmax(0, 1fr));
-		gap:24px;
+		grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+		gap:24px !important;
 	}
 	.song_boxs_posts ul{
 		grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
@@ -2401,30 +2357,30 @@ body{padding-top:0;}
 
 @media (max-width: 767px){
 	#footer.ab-footer{
-		padding:32px 0 20px;
+		padding:32px 0 20px !important;
 	}
 	.ab-footer__grid{
-		grid-template-columns:1fr;
-		gap:24px;
-		margin-bottom:24px;
+		grid-template-columns:1fr !important;
+		gap:24px !important;
+		margin-bottom:24px !important;
 	}
 	.ab-footer__bottom{
-		flex-direction:column;
-		text-align:center;
-		justify-content:center;
+		flex-direction:column !important;
+		text-align:center !important;
+		justify-content:center !important;
 	}
 	.ab-footer__socials{
-		justify-content:flex-start;
+		justify-content:flex-start !important;
 	}
 	.ab-quickbar{
-		margin-bottom:16px;
-		padding:8px 12px;
+		margin-bottom:16px !important;
+		padding:8px 12px !important;
 	}
 	.ab-quickbar__list{
-		gap:10px 16px;
+		gap:10px 16px !important;
 	}
 	.ab-quickbar__link{
-		font-size:12.5px;
+		font-size:12.5px !important;
 	}
 	#centers_box .song_boxs{
 		margin-bottom:16px !important;
@@ -2434,10 +2390,10 @@ body{padding-top:0;}
 		gap:10px !important;
 	}
 	.vip_post.ab-vip-post header h2{
-		padding:8px 12px;
+		padding:8px 12px !important;
 	}
 	.vip_post.ab-vip-post header h2 a{
-		font-size:13px;
+		font-size:13px !important;
 	}
 	.vip_top_slider.owl-theme .owl-nav [class*="owl-"]{
 		width:32px !important;
@@ -2457,144 +2413,5 @@ body{padding-top:0;}
 		transition:none !important;
 		transform:none !important;
 	}
-}
-
-
-/* --------------------------------------------------------------------------------------------
-   اصلاح و متناسب‌سازی هدر سایت (تنظیم ابعاد، فاصله‌ها و فاصله استاندارد با بخش پایینی)
-   -------------------------------------------------------------------------------------------- */
-#header{
-	padding:14px 0 !important;
-	background:#FFFFFF !important;
-	border-bottom:1px solid var(--ab-line) !important;
-	box-shadow:0 2px 10px rgba(17,17,17,0.05) !important;
-}
-.night #header{
-	background:#111111 !important;
-	border-bottom-color:rgba(255,255,255,0.08) !important;
-	box-shadow:none !important;
-}
-
-#header .tarlanweb_center{
-	display:flex !important;
-	align-items:center !important;
-	justify-content:space-between !important;
-	flex-wrap:nowrap !important;
-}
-
-#header .logo_top{
-	width:auto !important;
-	height:auto !important;
-	float:none !important;
-	margin:0 0 0 20px !important;
-	flex-shrink:0 !important;
-}
-#header .logo_top img{
-	max-height:42px !important;
-	width:auto !important;
-	height:auto !important;
-	object-fit:contain !important;
-	display:block !important;
-}
-
-#header .menu_right{
-	width:auto !important;
-	float:none !important;
-	margin:0 auto 0 0 !important;
-	flex-grow:1 !important;
-}
-#header .menu_right > ul{
-	display:flex !important;
-	align-items:center !important;
-	flex-wrap:wrap !important;
-	gap:6px !important;
-	list-style:none !important;
-	margin:0 !important;
-	padding:0 !important;
-}
-#header .menu_right > ul > li{
-	float:none !important;
-	margin:0 !important;
-}
-#header .menu_right > ul > li > a{
-	padding:6px 12px !important;
-	font-size:14px !important;
-	font-weight:600 !important;
-	color:var(--ab-text) !important;
-	border-radius:6px !important;
-	transition:color 0.2s ease, background 0.2s ease !important;
-}
-#header .menu_right > ul > li > a:hover{
-	background:var(--ab-blue-soft) !important;
-	color:var(--ab-blue) !important;
-}
-.night #header .menu_right > ul > li > a{
-	color:#EEEEEE !important;
-}
-.night #header .menu_right > ul > li > a:hover{
-	background:rgba(24,90,219,0.22) !important;
-	color:var(--ab-blue-accent) !important;
-}
-
-#header #searches{
-	float:none !important;
-	margin:0 12px !important;
-	width:240px !important;
-	height:38px !important;
-	position:relative !important;
-	flex-shrink:0 !important;
-}
-#header #searches input#lsds{
-	width:100% !important;
-	height:38px !important;
-	border-radius:20px !important;
-	background:var(--ab-page) !important;
-	border:1px solid var(--ab-line) !important;
-	padding:0 38px 0 14px !important;
-	font-size:12.5px !important;
-	outline:none !important;
-	color:var(--ab-text) !important;
-	transition:border-color 0.2s ease !important;
-}
-#header #searches input#lsds:focus{
-	border-color:var(--ab-blue) !important;
-}
-.night #header #searches input#lsds{
-	background:#222222 !important;
-	border-color:rgba(255,255,255,0.12) !important;
-	color:#EEEEEE !important;
-}
-.night #header #searches input#lsds:focus{
-	border-color:var(--ab-blue-accent) !important;
-}
-#header #searches button{
-	position:absolute !important;
-	right:4px !important;
-	top:50% !important;
-	transform:translateY(-50%) !important;
-	width:30px !important;
-	height:30px !important;
-	border-radius:50% !important;
-	background:transparent !important;
-	color:var(--ab-muted) !important;
-	line-height:30px !important;
-	font-size:15px !important;
-	transition:color 0.2s ease !important;
-}
-#header #searches button:hover{
-	color:var(--ab-blue) !important;
-	background:transparent !important;
-}
-
-#header .dark_light_mode{
-	float:none !important;
-	margin:0 0 0 6px !important;
-	flex-shrink:0 !important;
-}
-
-/* فاصله استاندارد تمیز بین هدر و محتوای اصلی سایت */
-main{
-	display:block !important;
-	padding-top:24px !important;
 }
 

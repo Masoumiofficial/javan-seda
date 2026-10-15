@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.0.1
+Version: 3.0.2
 */
 /*
 ==================================================================================
@@ -2470,3 +2470,52 @@ body{padding-top:0;}
 	margin:8px 0 0 0 !important;
 }
 
+
+/* ============================================================================================
+   ۲۰) سایدبارِ نوشته‌ها/برگه‌ها — پایداری نمایش ابزارک‌ها (نسخهٔ 3.0.2)
+   مربوط به: single.php، page.php، myfunctions.php، inc/ab-sidebars.php
+   پالت سازمانی: #FFFFFF / #185ADB / #111111 — بدون هیچ گرادینت
+   ============================================================================================ */
+
+/* اطمینان از اینکه ستون چپ همیشه بلوک‌مانند و در جریان صفحه است */
+#left_side{display:block;float:left;width:23.5%;}
+
+/* اگر ناحیهٔ ابزارک کاملاً خالی باشد، ستون فضای خالیِ زشت نمی‌سازد */
+#left_side:empty{display:none;}
+#left_side .related_posts:empty{display:none;}
+@media (max-width: 1100px){
+	.single #left_side:empty ~ *,.single #centers_box:has(#left_side:empty) .single_posts_right{width:100%;}
+}
+
+/* فاصلهٔ استاندارد میان ابزارک‌ها */
+#left_side > .related_posts{margin-bottom:20px;}
+#left_side > *:last-child{margin-bottom:0;}
+
+/* استایل پایه برای ابزارک‌های هستهٔ وردپرس (تاریخ‌واره، دسته‌ها، جستجو و…) */
+#left_side .tarlanweb_side_titles{color:#111111;margin:0 0 10px 0;line-height:24px;}
+#left_side .related_posts ul,#left_side .related_posts ol{list-style:none;margin:0;padding:0;}
+#left_side .related_posts li{line-height:22px;}
+#left_side .related_posts a{color:#222222;}
+#left_side .related_posts a:hover{color:#185ADB;}
+#left_side .related_posts select,
+#left_side .related_posts input[type="text"],
+#left_side .related_posts input[type="search"]{
+	width:100%;max-width:100%;box-sizing:border-box;
+	border:1px solid var(--ab-line);border-radius:6px;padding:7px 10px;
+	background:#FFFFFF;color:#111111;}
+#left_side .related_posts .screen-reader-text{
+	position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+
+/* حالت شب — تنها تغییر سطح رنگ؛ بدون گرادینت */
+.night #left_side .tarlanweb_side_titles{color:#EEEEEE;}
+.night #left_side .related_posts a{color:#DDDDDD;}
+.night #left_side .related_posts a:hover{color:#FFFFFF;}
+.night #left_side .related_posts select,
+.night #left_side .related_posts input[type="text"],
+.night #left_side .related_posts input[type="search"]{
+	background:#222222;color:#EEEEEE;border-color:rgba(255,255,255,0.10);}
+
+/* موبایل/تبلت: ستون ابزارک زیر محتوا و بدون چپ‌اندازی */
+@media (max-width: 900px){
+	#left_side{width:100%;float:none;margin-top:20px;}
+}

@@ -563,7 +563,15 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 <!-- single_posts_right -->
 	
 <div id="left_side">
-<?php if (!function_exists('dynamic_sidebar') || !dynamic_sidebar('left_side')) : endif; ?>
+<?php
+/* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
+if ( function_exists( 'javan_seda_sidebar' ) ) {
+	javan_seda_sidebar( 'left_side' );
+} else {
+	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side' ) ) :
+	endif;
+}
+?>
 <?php $reltag1 = ot_get_option('reltag1'); if('off' == $reltag1){
 $reltag = ot_get_option('reltag'); if('off' != $reltag){ ?>	
 <?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist=get_field('artist');
@@ -633,7 +641,15 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 <?php } ?>
 <?php }
 	} ?>
-<?php if (!function_exists('dynamic_sidebar') || !dynamic_sidebar('left_side2')) : endif; ?>
+<?php
+/* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
+if ( function_exists( 'javan_seda_sidebar' ) ) {
+	javan_seda_sidebar( 'left_side2' );
+} else {
+	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side2' ) ) :
+	endif;
+}
+?>
 <div class="clear"></div>
 </div>	
 

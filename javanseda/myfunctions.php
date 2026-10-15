@@ -1,4 +1,14 @@
 <?php
+/* ---------------------------------------------------------------------------
+   لایهٔ ایمنی «سایدبار / ابزارک نوشته‌ها» (v3.0.2)
+   اگر این include حذف شود، ناحیه‌های left_side / left_side2 / left_side1
+   فقط به فایل رمزنگاری‌شدهٔ functions.php وابسته می‌مانند.
+   ------------------------------------------------------------------------- */
+$_javan_seda_sidebars = trailingslashit( get_template_directory() ) . 'inc/ab-sidebars.php';
+if ( is_readable( $_javan_seda_sidebars ) ) {
+	require_once $_javan_seda_sidebars;
+}
+unset( $_javan_seda_sidebars );
 add_theme_support( 'post-thumbnails' );
 if (function_exists('add_image_size')){
 add_image_size( 'thumb4', 150, 150, true);
@@ -31,9 +41,9 @@ function leftsides(){
 $args = array(
 'id'            => 'left_side',
 'class'         => 'leftside',
-'name'          => 'ابزارک بالا ستون چپ سینگل',
-'description'   => 'ابزارک بالا نوشته های مرتبط خواننده در ستون چپ سینگل را در این بخش قرار دهید.',
-'before_widget' => '<aside class="related_posts %2$s">',
+'name'          => 'سایدبار نوشته‌ها — بالا (single.php)',
+'description'   => 'ابزارک‌های بالای ستون چپ صفحهٔ نوشته/آهنگ را اینجا بگذارید. شناسه: left_side',
+'before_widget' => '<aside id="%1$s" class="related_posts %2$s">',
 'before_title'  => '<h3 class="tarlanweb_side_titles">',
 'after_title'   => '</h3><div class="liner clear"></div><div class="tarlanweb_side_box">',
 'after_widget'  => '<div class="clear"></div></div></aside>',
@@ -45,9 +55,9 @@ function leftsides2(){
 $args = array(
 'id'            => 'left_side2',
 'class'         => 'leftside2',
-'name'          => 'ابزارک پایین ستون چپ سینگل',
-'description'   => 'ابزارک پایین نوشته های مرتبط خواننده در ستون چپ سینگل را در این بخش قرار دهید.',
-'before_widget' => '<aside class="related_posts %2$s">',
+'name'          => 'سایدبار نوشته‌ها — پایین (single.php)',
+'description'   => 'ابزارک‌های پایین ستون چپ صفحهٔ نوشته (بعد از نوشته‌های مرتبط). شناسه: left_side2',
+'before_widget' => '<aside id="%1$s" class="related_posts %2$s">',
 'before_title'  => '<h3 class="tarlanweb_side_titles">',
 'after_title'   => '</h3><div class="liner clear"></div><div class="tarlanweb_side_box">',
 'after_widget'  => '<div class="clear"></div></div></aside>',
@@ -59,9 +69,9 @@ function leftsides1(){
 $args = array(
 'id'            => 'left_side1',
 'class'         => 'leftside1',
-'name'          => 'ابزارک ستون چپ برگه',
-'description'   => 'ابزارک ستون چپ  برگه ها را در این بخش قرار دهید.',
-'before_widget' => '<aside class="related_posts %2$s">',
+'name'          => 'سایدبار برگه‌ها (page.php)',
+'description'   => 'ستون چپ «برگه‌ها» — روی صفحهٔ نوشته/آهنگ نمایش داده نمی‌شود! شناسه: left_side1',
+'before_widget' => '<aside id="%1$s" class="related_posts %2$s">',
 'before_title'  => '<h3 class="tarlanweb_side_titles">',
 'after_title'   => '</h3><div class="liner clear"></div><div class="tarlanweb_side_box">',
 'after_widget'  => '<div class="clear"></div></div></aside>',

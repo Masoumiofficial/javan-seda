@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا (آهنگ‌بان) — لایهٔ ایمنی و بازرسی «سایدبار / ابزارک» نسخهٔ 3.0.2
+ * جوان‌صدا (آهنگ‌بان) — لایهٔ ایمنی و بازرسی «سایدبار / ابزارک» نسخهٔ 3.0.3
  * ---------------------------------------------------------------------------
  * هدف: ابزارک‌های ستون چپِ صفحهٔ نوشته (single.php) باید همیشه نمایش داده
  * شوند، حتی اگر یکی از حلقه‌های ثبت قالب قطع شده باشد.
@@ -264,9 +264,9 @@ function javan_seda_expected_hashes() {
 		'single.php'          => 'edfa7b63cfb648c39ea13653555ce48e0cc2100214334e07641105c7e2a04235',
 		'page.php'            => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
 		'myfunctions.php'     => '5559e9f13cab429db0eeefa2b48b18b9dfcbedf552a3d77ea8b96c7b51bc845a',
-		'style.css'           => '1dfce838900e2ebd75804c6ee6a0e4d1ab0e05a2b9eebf26e06193069344f6ce',
+		'style.css'           => '286beb90f7b5e5cc85190a1c4031c52f981292a14ab108cb2004f45016f2f8cb',
 		'footer.php'          => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
-		'header.php'          => '1b83aa32e1b10626229923ebac76fdb258932ebcc4a967ec6a9bf572850d3cbd',
+		'header.php'          => 'ae2fffd7b96fceb014d5178fbf01cfa3488ab370d4b5f153c5849333341c34f1',
 		'home.php'            => '78df0d9a104c44ff22901cd07f732aaed9f9a6370ba1305c75afd7440d2527e6',
 		'inc/vip_slider.php'  => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
 	);

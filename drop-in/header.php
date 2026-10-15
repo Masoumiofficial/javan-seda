@@ -15,12 +15,16 @@
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
 <?php if(wp_is_mobile('')){ ?><style>body{padding-top: 60px;}</style><?php } ?>
 </head>
-<?php $darks = ot_get_option('dark_modes'); if('off' != $darks){ ?>
-<body <?php body_class('night'); ?>>
-<?php } else{ ?> 
-<body <?php body_class(''); ?>>
+<?php
+/* v3.0.3 — تک‌منبع تشخیص موبایل: همین متغیر هم رندر را کنترل می‌کند و هم کلاس بدنه را */
+$ab_mobile_ua = wp_is_mobile();
+$darks = ot_get_option('dark_modes');
+if ( 'off' != $darks ) { ?>
+<body <?php body_class( $ab_mobile_ua ? 'night ab-has-mh' : 'night' ); ?>>
+<?php } else { ?>
+<body <?php body_class( $ab_mobile_ua ? 'ab-has-mh' : '' ); ?>>
 <?php } ?>
-<?php if(wp_is_mobile()){} else{ ?> 
+<?php if ( ! $ab_mobile_ua ) { ?> 
 <header id="header">
 <div class="tarlanweb_center">
 <?php if(is_home()){ ?> <h1 class="h1_hidden_home"><?php echo ot_get_option('head_h1'); ?></h1> <?php } ?>
@@ -47,5 +51,11 @@ if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-r
 </div>
 </header>
 <?php } ?>
-<?php get_template_part('inc/mobiles_header'); ?>
+<?php
+/* هدر موبایل: فقط روی موبایل رندر می‌شود (قانون ۵) ولی اگر این خط حذف شود،
+   سایت روی موبایل «هیچ» هدری نخواهد داشت — رندرِ مشروط، نه حذف. */
+if ( $ab_mobile_ua ) {
+	get_template_part( 'inc/mobiles_header' );
+}
+?>
 <main>

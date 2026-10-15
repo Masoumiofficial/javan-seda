@@ -14,7 +14,7 @@
 <?php wp_enqueue_script("jquery"); wp_head('');
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
 <?php
-/* v3.0.4 — CSS حیاتیِ هدر، به‌صورت inline در <head>:
+/* v3.0.5 — CSS حیاتیِ هدر + محتوا، به‌صورت inline در <head>:
    اگر style.css روی هاست قدیمی بماند یا CDN/کش نسخهٔ کهنهٔ آن را سرو کند،
    نمایش هدر موبایل باز هم درست کار می‌کند. کلاس ab-has-mh یعنی «هدر موبایل رندر شد».
    ارتفاع هدر موبایل ۶۵px است؛ پس padding هم ۶۵px (رفع ۵ پیکسل پوشاندن محتوا). */
@@ -33,6 +33,9 @@ body.ab-has-mh #mobiles_header{display:block !important;}
 body:not(.ab-has-mh) #header{display:block !important;padding:12px 0 !important;}
 body:not(.ab-has-mh) #header .menu_right{max-width:60% !important;}
 }
+/* ایمنی موبایل: ظرف ثابت‌عرضِ قالب نباید محتوا را در عرض‌های باریک (RTL) ببُرد */
+.tarlanweb_center{max-width:100% !important;}
+#centers_box,.single_content_box{overflow:visible;}
 </style>
 </head>
 <?php

@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا (آهنگ‌بان) — لایهٔ ایمنی و بازرسی «سایدبار / ابزارک / هدر» نسخهٔ 3.0.4
+ * جوان‌صدا (آهنگ‌بان) — لایهٔ ایمنی و بازرسی «سایدبار / ابزارک / هدر» نسخهٔ 3.0.5
  * ---------------------------------------------------------------------------
  * هدف: ابزارک‌های ستون چپِ صفحهٔ نوشته (single.php) باید همیشه نمایش داده
  * شوند، حتی اگر یکی از حلقه‌های ثبت قالب قطع شده باشد.
@@ -264,9 +264,9 @@ function javan_seda_expected_hashes() {
 		'single.php'          => 'edfa7b63cfb648c39ea13653555ce48e0cc2100214334e07641105c7e2a04235',
 		'page.php'            => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
 		'myfunctions.php'     => '5559e9f13cab429db0eeefa2b48b18b9dfcbedf552a3d77ea8b96c7b51bc845a',
-		'style.css'           => 'be860507ad03f36ac5be6699e343d3b629c1de0c61e54859036ed2b415ea6cdd',
+		'style.css'           => '451ca35af97bf132e99d073af7b1abd9826938568ec312f48afef78c9d5e3e69',
 		'footer.php'          => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
-		'header.php'          => 'd02f3517254dce0f1a9bea643673561a866fb8b3a196d77cf80f320511484cfe',
+		'header.php'          => 'fe70e2bacf669e536faf13d3c04be317e93d1418b955f24d2657d5a6339b4bf8',
 		'home.php'            => '78df0d9a104c44ff22901cd07f732aaed9f9a6370ba1305c75afd7440d2527e6',
 		'inc/vip_slider.php'  => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
 	);
@@ -282,6 +282,211 @@ function javan_seda_file_hash( $path ) {
 	}
 	$c = str_replace( array( "\r\n", "\r" ), "\n", $c );
 	return hash( 'sha256', $c );
+}
+
+/* ---------------------------------------------------------------------------
+ * ۹) نجات محتوا: اگر فیلتری (پلاگین/قالب) خروجیِ نوشته را در حالت موبایل
+ *    خالی کرد، فقط در همان حالتِ «خالی بودن» از خودِ پست بازیابی می‌شود.
+ *    هیچ اثری روی نوشته‌های سالم ندارد. غیرفعال‌سازی:
+ *      define( 'JAVANSEDA_CONTENT_RESCUE', false );
+ * ------------------------------------------------------------------------- */
+if ( ! defined( 'JAVANSEDA_CONTENT_RESCUE' ) ) {
+	define( 'JAVANSEDA_CONTENT_RESCUE', true );
+}
+
+function javan_seda_content_rescue( $content ) {
+	if ( ! JAVANSEDA_CONTENT_RESCUE || ! is_singular() || ! is_main_query() || ! in_the_loop() ) {
+		return $content;
+	}
+	if ( is_string( $content ) && '' !== trim( wp_strip_all_tags( $content ) ) ) {
+		return $content; // محتوا هست؛ کاری نداریم
+	}
+	$post = get_post();
+	if ( ! $post || '' === trim( (string) $post->post_content ) ) {
+		return $content;
+	}
+	$GLOBALS['javan_seda_content_rescued'] = array(
+		'post_id' => $post->ID,
+		'ua'      => isset( $_SERVER['HTTP_USER_AGENT'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_USER_AGENT'] ) ) : '',
+		'mobile'  => wp_is_mobile(),
+	);
+	$restored = do_shortcode( $post->post_content );
+	return has_filter( 'wpautop' ) ? wpautop( $restored ) : $restored;
+}
+add_filter( 'the_content', 'javan_seda_content_rescue', 9999 );
+
+/* ---------------------------------------------------------------------------
+ * ۱۰) کاوشگرِ موبایل — همان URL را روی سرورِ خودِ سایت با UA موبایل و دسکتاپ
+ *     رندر می‌کند و خروجی را مقایسه می‌کند. فقط‌خواندنی، فقط برای مدیر.
+ *     مسیر مستقیم:  ?ab_mobile_probe=1
+ * ------------------------------------------------------------------------- */
+function javan_seda_probe_url() {
+	$uri      = isset( $_SERVER['REQUEST_URI'] ) ? (string) $_SERVER['REQUEST_URI'] : '/';
+	$home_path = (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+	if ( '' !== $home_path && 0 === strpos( $uri, $home_path ) ) {
+		$uri = substr( $uri, strlen( $home_path ) );
+	}
+	$uri       = remove_query_arg( array( 'ab_mobile_probe', 'ab_sidebars_diag', 'ab_nocache', 'nocache' ), $uri );
+	$url       = home_url( '/' . ltrim( $uri, '/' ) );
+	return add_query_arg( 'ab_probe_ts', time(), $url );
+}
+
+function javan_seda_probe_fetch( $url, $ua, $label ) {
+	$args = array(
+		'timeout'     => 25,
+		'redirection' => 3,
+		'sslverify'   => false,
+		'user-agent'  => $ua,
+		'headers'     => array(
+			'Cache-Control' => 'no-cache, no-store, must-revalidate',
+			'Pragma'         => 'no-cache',
+		),
+		'cookies'     => array(),
+	);
+	$r = wp_remote_get( $url, $args );
+	if ( is_wp_error( $r ) ) {
+		return array( 'error' => $r->get_error_message(), 'label' => $label );
+	}
+	$html = (string) wp_remote_retrieve_body( $r );
+	$code = (int) wp_remote_retrieve_response_code( $r );
+
+	$out                 = array();
+	$out['label']        = $label;
+	$out['code']         = $code;
+	$out['bytes']        = strlen( $html );
+	$out['wp_is_mobile'] = ( false !== preg_match( '/android|iphone|ipod|ipad|mobile|windows phone/i', $ua ) ) ? 'بله (انتظار: هدر موبایل)' : 'نه (انتظار: هدر دسکتاپ)';
+
+	$marks = array(
+		'<article'                => 'article (باکس نوشته)',
+		'single_content_box'      => 'single_content_box (محتوا)',
+		'single_featured_cover'   => 'کاور پست',
+		'music_lyrics_box'        => 'باکس متن ترانه',
+		'dl_links_box'            => 'لینک‌های دانلود 128/320',
+		'dl_linksv_box'           => 'لینک‌های دانلود آلبوم/ویدیو',
+		'music_box_player'        => 'پلیر',
+		'id="left_side"'          => 'ستون ابزارک',
+		'id="mobiles_header"'     => 'هدر موبایل',
+		'ab-has-mh'               => 'کلاس بدنهٔ موبایل',
+		'ab-header-critical'      => 'CSS ضدّکش هدر',
+		'id="footer"'             => 'فوتر',
+		'wp-content/themes'       => 'ارجاع به فایل‌های قالب',
+	);
+	$out['marks'] = array();
+	foreach ( $marks as $needle => $pretty ) {
+		$out['marks'][ $pretty ] = substr_count( $html, $needle );
+	}
+
+	$open  = preg_match_all( '/<div\b/i', $html );
+	$close = substr_count( $html, '</div>' );
+	$out['balance'] = array(
+		'div'    => $open . ' باز / ' . $close . ' بسته → ' . ( $open - $close ),
+		'header' => preg_match_all( '/<header\b/i', $html ) . ' / ' . substr_count( $html, '</header>' ),
+		'main'   => preg_match_all( '/<main\b/i', $html ) . ' / ' . substr_count( $html, '</main>' ),
+		'article'=> preg_match_all( '/<article\b/i', $html ) . ' / ' . substr_count( $html, '</article>' ),
+	);
+
+	// تودرتویی: آیا </header>ِ هدر موبایل قبل از شروع <article> می‌آید؟ (نباید داخل هم باشند)
+	$mh_close   = strpos( $html, '</header>' );
+	$art_open   = strpos( $html, '<article' );
+	$out['nest'] = ( false === $mh_close || false === $art_open )
+		? '(قابل تشخیص نیست)'
+		: ( $mh_close < $art_open ? 'سالم: هدر موبایل قبل از محتوا بسته شده' : '⚠ مشکل: محتوا داخل هدر موبایی مانده (تگِ بسته‌نشده)' );
+
+	// هدرهای کش/CDN
+	$hdrs       = wp_remote_retrieve_headers( $r );
+	$cache_info = array();
+	$all        = is_object( $hdrs ) ? $hdrs->getAll() : (array) $hdrs;
+	foreach ( $all as $k => $v ) {
+		if ( preg_match( '/^(x-cache|cf-cache-status|x-litespeed-cache|x-varnish|x-proxy-cache|x-served-by|age|cache-control|x-dracarys|x-cache-lookup)$/i', $k ) ) {
+			$cache_info[] = $k . ': ' . ( is_array( $v ) ? implode( ' ', $v ) : $v );
+		}
+	}
+	$out['cache_headers'] = $cache_info ? $cache_info : array( '(هیچ هدر کش/CDN برگردانده نشد)' );
+
+	// برش کوتاه از اطراف single_content_box تا وضعیت واقعی دیده شود
+	$pos = strpos( $html, 'single_content_box' );
+	if ( false !== $pos ) {
+		$snip        = substr( $html, max( 0, $pos - 60 ), 420 );
+		$out['snippet'] = preg_replace( '/\s+/', ' ', $snip );
+	} else {
+		$out['snippet'] = '(single_content_box در HTML پیدا نشد)';
+	}
+	return $out;
+}
+
+function javanseda_probe_into( &$L_ref ) {
+	javan_seda_probe_print( $L_ref ); // ارجاع به‌همان آرایهٔ گزارش
+}
+
+function javan_seda_probe_print( &$L_ref ) { // ارجاعی: خطوط مستقیم در گزارشِ فراخواننده می‌نشینند
+	$url = javan_seda_probe_url();
+	$L    = &$L_ref;
+	$L[] = 'URL کاوش: ' . $url;
+	$uas = array(
+		'دسکتاپ' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36',
+		'موبایل' => 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+	);
+	$res = array();
+	foreach ( $uas as $label => $ua ) {
+		$res[ $label ] = javan_seda_probe_fetch( $url, $ua, $label );
+	}
+	foreach ( $res as $label => $r ) {
+		$L[] = '';
+		$L[] = '  ===== رندر با UA ' . $label . ' =====';
+		if ( isset( $r['error'] ) ) {
+			$L[] = '  ✗ درخواست داخلی ناموفق بود: ' . $r['error'];
+			$L[] = '    (اگر هاست اجازهٔ loopback نمی‌دهد، همین صفحه را با ?ab_nocache=1 روی گوشی باز کنید)';
+			continue;
+		}
+		$L[] = '  HTTP ' . $r['code'] . ' | حجم HTML: ' . number_format_i18n( $r['bytes'] ) . ' بایت | wp_is_mobile: ' . $r['wp_is_mobile'];
+		foreach ( $r['marks'] as $pretty => $n ) {
+			$L[] = sprintf( '    %-32s %d', $pretty, $n );
+		}
+		$L[] = '  تقارن تگ‌ها: ' . implode( ' | ', $r['balance'] );
+		$L[] = '  تودرتویی  : ' . $r['nest'];
+		$L[] = '  هدرهای کش : ' . implode( ' · ', $r['cache_headers'] );
+		$L[] = '  نمونهٔ HTML: ' . $r['snippet'];
+	}
+	$L[] = '';
+	$L[] = '  --- نتیجه‌گیری کاوشگر ---';
+	$d = $res['دسکتاپ'];
+	$m = $res['موبایل'];
+	if ( isset( $d['error'], $m['error'] ) ) {
+		$L[] = '  کاوش انجام نشد (درخواست داخلی مسدود).';
+	} else {
+		$dc = isset( $d['marks']['single_content_box (محتوا)'] ) ? $d['marks']['single_content_box (محتوا)'] : 0;
+		$mc = isset( $m['marks']['single_content_box (محتوا)'] ) ? $m['marks']['single_content_box (محتوا)'] : 0;
+		if ( $dc > 0 && 0 === $mc ) {
+			$L[] = '  ⇒ محتوا در HTMLِ موبایل اصلاً تولید نمی‌شود: مشکل سمت PHP است (فیلتر the_content یا حلقه).';
+			$L[] = '    اگر «نجات محتوا» فعال باشد، همین حالا بازیابی شده و عدد 1 می‌بینید؛ پس پرچم را چک کنید:';
+			$L[] = '    پرچم نجات در همین درخواستِ والد: ' . ( empty( $GLOBALS['javan_seda_content_rescued'] ) ? '(فعال نشد — یعنی در رندرِ واقعیِ شما محتوا خالی نبوده)' : 'فعال شده: ' . wp_json_encode( $GLOBALS['javan_seda_content_rescued'] ) );
+		} elseif ( $dc > 0 && $mc > 0 ) {
+			$L[] = '  ⇒ محتوا در HTMLِ موبایل هست؛ یعنی چیزی آن را می‌پوشاند/پنهان می‌کند:';
+			$L[] = '    ۱) اگر عددِ «هدر موبایل» در هر دو ۰ است، هدر موبایل رندر نمی‌شود (header.php قدیمی).';
+			$L[] = '    ۲) اگر تقارن تگ‌ها در موبایل صفر نیست، یک تگِ بسته‌نشده محتوا را می‌بلعد (تودرتویی را ببینید).';
+			$L[] = '    ۳) اگر هدرهای کش چیزی مثل HIT/x-cache داد، نسخهٔ کهنه سرو می‌شود: کشِ استاتیک + CDN را پاک کنید.';
+		} elseif ( 0 === $dc && 0 === $mc ) {
+			$L[] = '  ⇒ در هیچ‌کدام محتوا نیست؛ احتمالاً درخواست به single.php نرسیده (کش/redirect/۴۰۴). کد HTTP را ببینید.';
+		} else {
+			$L[] = '  ⇒ حالت غیرمنتظره؛ خروجی را بفرستید.';
+		}
+	}
+	return $res;
+}
+
+add_filter( 'template_include', 'javan_seda_mobile_probe_route', 7 );
+function javan_seda_mobile_probe_route( $template ) {
+	if ( empty( $_GET['ab_mobile_probe'] ) || ! current_user_can( 'manage_options' ) ) {
+		return $template;
+	}
+	nocache_headers();
+	header( 'Content-Type: text/plain; charset=utf-8' );
+	$L = array();
+	$L[] = '=== کاوشگرِ رندر موبایل ↔ دسکتاپ — قالب جوان‌صدا 3.0.5 ===';
+	$L[] = 'PHP: ' . PHP_VERSION . ' | WP: ' . get_bloginfo( 'version' ) . ' | wp_is_mobile(همین درخواست): ' . ( wp_is_mobile() ? 'true' : 'false' );
+	javan_seda_probe_print( $L );
+	echo esc_html( implode( "\n", $L ) );
+	exit;
 }
 
 add_filter( 'template_include', 'javan_seda_sidebars_diag_route', 8 );
@@ -445,7 +650,10 @@ function javan_seda_sidebars_diag_route( $template ) {
 	$line( 'تأیید بصری: در حالت موبایل باید <body class="… ab-has-mh"> و <header id="mobiles_header"> هر دو در HTML باشند.' );
 	$line( '' );
 
-	$line( '--- ۹) نتیجه‌گیری خودکار ---' );
+	$line( '' );
+	$line( '--- ۹.۵) کاوشگرِ رندر (موبایل ↔ دسکتاپ) ---' );
+	javanseda_probe_into( $L );
+	$line( '--- ۱۰) نتیجه‌گیری خودکار ---' );
 	$verdict = 'نامشخص — خروجی را برای توسعه‌دهنده بفرستید.';
 	if ( ! function_exists( 'leftsides' ) ) {
 		$verdict = '۱) myfunctions.php روی سرور بارگذاری نمی‌شود (یا فایل قدیمی است). لایهٔ ایمنیِ این فایل ناحیه‌ها را ثبت می‌کند؛ فایل را بازگردانی/جایگزین کنید.';

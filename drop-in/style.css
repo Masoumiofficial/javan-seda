@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.0.4
+Version: 3.0.5
 */
 /*
 ==================================================================================
@@ -2536,7 +2536,11 @@ body:not(.ab-has-mh) #mobiles_header{display:none !important;visibility:hidden !
 body.ab-has-mh{padding-top:65px;}
 body:not(.ab-has-mh){padding-top:0 !important;}
 
-/* همان قاعده‌ها به‌صورت inline در header.php هم آمده‌اند (نسخهٔ ضدّ کش) — مقدارها یکسان است */
+/* همان قاعده‌ها به‌صورت inline در header.php هم آمده‌اند (نسخهٔ ضدّ‌کش) — مقدارها یکسان است */
+
+/* ایمنی موبایل: ظرف ثابت‌عرض نباید محتوا را در عرض باریک ببُرد + جلوگیری از برش عمودی */
+.tarlanweb_center{max-width:100% !important;}
+#centers_box,.single_content_box{overflow:visible;}
 
 /* حالت ریسک: کاربر دسکتاپ با پنجرهٔ باریک (یا موبایل با «نسخهٔ دسکتاپ») — هدر اصلی نباید غیب شود */
 @media (max-width: 800px){

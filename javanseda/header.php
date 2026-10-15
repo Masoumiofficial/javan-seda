@@ -47,4 +47,5 @@ if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-r
 </div>
 </header>
 <?php } ?>
+<?php get_template_part('inc/mobiles_header'); ?>
 <main>

@@ -2426,3 +2426,47 @@ body{padding-top:0;}
 	}
 }
 
+
+/* --------------------------------------------------------------------------------------------
+   تنظیم دقیق هدر دسکتاپ: فاصله، هماهنگی المان‌ها و رفع پرش
+   -------------------------------------------------------------------------------------------- */
+#header{
+	margin-bottom:28px !important;
+}
+
+#header .logo_top{
+	width:150px !important;
+	height:40px !important;
+	float:right !important;
+	line-height:0 !important;
+	margin:0 0 0 15px !important;
+}
+#header .logo_top img{
+	max-height:40px !important;
+	width:auto !important;
+	height:auto !important;
+	display:block !important;
+}
+
+#header .menu_right{
+	float:right !important;
+	width:auto !important;
+	max-width:55% !important;
+	margin-top:4px !important;
+}
+#header .menu_right > ul > li{
+	float:right !important;
+	margin-left:5px !important;
+}
+
+#header #searches{
+	float:left !important;
+	width:200px !important;
+	margin:5px 0 0 15px !important;
+}
+
+#header .dark_light_mode{
+	float:left !important;
+	margin:8px 0 0 0 !important;
+}
+

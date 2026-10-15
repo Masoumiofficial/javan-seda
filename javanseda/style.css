@@ -2459,3 +2459,142 @@ body{padding-top:0;}
 	}
 }
 
+
+/* --------------------------------------------------------------------------------------------
+   اصلاح و متناسب‌سازی هدر سایت (تنظیم ابعاد، فاصله‌ها و فاصله استاندارد با بخش پایینی)
+   -------------------------------------------------------------------------------------------- */
+#header{
+	padding:14px 0 !important;
+	background:#FFFFFF !important;
+	border-bottom:1px solid var(--ab-line) !important;
+	box-shadow:0 2px 10px rgba(17,17,17,0.05) !important;
+}
+.night #header{
+	background:#111111 !important;
+	border-bottom-color:rgba(255,255,255,0.08) !important;
+	box-shadow:none !important;
+}
+
+#header .tarlanweb_center{
+	display:flex !important;
+	align-items:center !important;
+	justify-content:space-between !important;
+	flex-wrap:nowrap !important;
+}
+
+#header .logo_top{
+	width:auto !important;
+	height:auto !important;
+	float:none !important;
+	margin:0 0 0 20px !important;
+	flex-shrink:0 !important;
+}
+#header .logo_top img{
+	max-height:42px !important;
+	width:auto !important;
+	height:auto !important;
+	object-fit:contain !important;
+	display:block !important;
+}
+
+#header .menu_right{
+	width:auto !important;
+	float:none !important;
+	margin:0 auto 0 0 !important;
+	flex-grow:1 !important;
+}
+#header .menu_right > ul{
+	display:flex !important;
+	align-items:center !important;
+	flex-wrap:wrap !important;
+	gap:6px !important;
+	list-style:none !important;
+	margin:0 !important;
+	padding:0 !important;
+}
+#header .menu_right > ul > li{
+	float:none !important;
+	margin:0 !important;
+}
+#header .menu_right > ul > li > a{
+	padding:6px 12px !important;
+	font-size:14px !important;
+	font-weight:600 !important;
+	color:var(--ab-text) !important;
+	border-radius:6px !important;
+	transition:color 0.2s ease, background 0.2s ease !important;
+}
+#header .menu_right > ul > li > a:hover{
+	background:var(--ab-blue-soft) !important;
+	color:var(--ab-blue) !important;
+}
+.night #header .menu_right > ul > li > a{
+	color:#EEEEEE !important;
+}
+.night #header .menu_right > ul > li > a:hover{
+	background:rgba(24,90,219,0.22) !important;
+	color:var(--ab-blue-accent) !important;
+}
+
+#header #searches{
+	float:none !important;
+	margin:0 12px !important;
+	width:240px !important;
+	height:38px !important;
+	position:relative !important;
+	flex-shrink:0 !important;
+}
+#header #searches input#lsds{
+	width:100% !important;
+	height:38px !important;
+	border-radius:20px !important;
+	background:var(--ab-page) !important;
+	border:1px solid var(--ab-line) !important;
+	padding:0 38px 0 14px !important;
+	font-size:12.5px !important;
+	outline:none !important;
+	color:var(--ab-text) !important;
+	transition:border-color 0.2s ease !important;
+}
+#header #searches input#lsds:focus{
+	border-color:var(--ab-blue) !important;
+}
+.night #header #searches input#lsds{
+	background:#222222 !important;
+	border-color:rgba(255,255,255,0.12) !important;
+	color:#EEEEEE !important;
+}
+.night #header #searches input#lsds:focus{
+	border-color:var(--ab-blue-accent) !important;
+}
+#header #searches button{
+	position:absolute !important;
+	right:4px !important;
+	top:50% !important;
+	transform:translateY(-50%) !important;
+	width:30px !important;
+	height:30px !important;
+	border-radius:50% !important;
+	background:transparent !important;
+	color:var(--ab-muted) !important;
+	line-height:30px !important;
+	font-size:15px !important;
+	transition:color 0.2s ease !important;
+}
+#header #searches button:hover{
+	color:var(--ab-blue) !important;
+	background:transparent !important;
+}
+
+#header .dark_light_mode{
+	float:none !important;
+	margin:0 0 0 6px !important;
+	flex-shrink:0 !important;
+}
+
+/* فاصله استاندارد تمیز بین هدر و محتوای اصلی سایت */
+main{
+	display:block !important;
+	padding-top:24px !important;
+}
+

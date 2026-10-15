@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.1.0
+Version: 3.1.2
 */
 /*
 ==================================================================================
@@ -2527,15 +2527,15 @@ body{padding-top:0;}
    ============================================================================================ */
 
 /* هدر موبایل هر جا رندر شد، دیده می‌شود (نه فقط زیر ۸۰۰px) */
-body.ab-has-mh #mobiles_header{display:block !important;visibility:visible !important;height:65px !important;overflow:visible !important;}
+body.ab-has-mh #mobiles_header{display:block !important;visibility:visible !important;height:70px !important;overflow:visible !important;}
 
 /* اگر هدر موبایل رندر نشده باشد، هیچ ردپایی از آن در صفحه نمی‌ماند */
 body:not(.ab-has-mh) #mobiles_header{display:none !important;visibility:hidden !important;height:0 !important;overflow:hidden !important;}
 
 /* فاصلهٔ بالای صفحه فقط وقتی لازم است که هدرِ fixed (موبایل) وجود دارد — ۶۵px = ارتفاع نوار */
-body.ab-has-mh{padding-top:65px;}
-/* هدر قدیمیِ قالب (padding inline 60pxِ اصلی) + style.css کهنه ⇒ جبرانِ ۵ پیکسل */
-body:not(.ab-has-mh){padding-top:0 !important;}
+body.ab-has-mh{padding-top:90px;}
+/* هدر قدیمیِ قالب (padding inline 60pxِ اصلی) ⇒ جبرانِ هم‌پوشانی در موبایل (v3.1.2) */
+@media (max-width: 800px){ body:not(.ab-has-mh){padding-top:90px !important;} #mobiles_header{height:70px !important;} }
 
 /* همان قاعده‌ها به‌صورت inline در header.php هم آمده‌اند (نسخهٔ ضدّ‌کش) — مقدارها یکسان است */
 
@@ -2562,3 +2562,81 @@ body:not(.ab-has-mh){padding-top:0 !important;}
 /* هدر دسکتاپ: همان حالت فلت تمیز با فاصلهٔ >= 28px از بخش زیرین */
 #header{margin-bottom:28px !important;}
 body.ab-has-mh #header{display:none !important;}
+
+/* ============================================================================================
+   ۲۲) «اخبار روز» (جایگزین نوار دسترسی سریع زیر هدر) + فضای بیشترِ هدر در موبایل — نسخهٔ 3.1.2
+   فایل‌های مرتبط: home.php · inc/ab-news-ticker.php · myfunctions.php · header.php
+   پالت سازمانی: #FFFFFF / #185ADB / #111111 — بدون هیچ گرادینت
+   ============================================================================================ */
+
+/* برچسب «اخبار روز» در ابتدای نوار */
+.ab-news .ab-news-title-label{
+	display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;
+	font-weight:700;font-size:13px;color:#FFFFFF;background:#185ADB;
+	padding:5px 12px;border-radius:999px;line-height:1.6;white-space:nowrap;
+}
+.night .ab-news .ab-news-title-label{background:#185ADB;color:#FFFFFF;}
+
+/* ردیف‌ها: برچسب | مسیرِ متحرک | دکمهٔ «همهٔ اخبار» */
+.ab-news .ab-news-bar{
+	display:flex !important;align-items:center;gap:14px;
+	justify-content:flex-start !important;flex-wrap:nowrap !important;
+}
+.ab-news .ab-news-viewport{
+	flex:1 1 auto;min-width:0;overflow:hidden;position:relative;padding:0 2px;
+}
+.ab-news .ab-news-track{
+	display:flex;align-items:center;gap:0;list-style:none;margin:0;padding:0;
+	width:max-content;will-change:transform;
+}
+.ab-news .ab-news-set{
+	display:flex;align-items:center;gap:0;list-style:none;margin:0;padding:0;
+}
+.ab-news ul.ab-news-set li{margin:0 !important;}
+.ab-news ul.ab-news-set{background:transparent;border:0;}
+.ab-news .ab-news-item{
+	margin:0 !important;flex:0 0 auto;max-width:360px;
+}
+.ab-news .ab-news-item + .ab-news-item{border-right:1px solid var(--ab-line);padding-right:22px;}
+.ab-news .ab-news-link{
+	display:inline-flex;align-items:baseline;gap:8px;max-width:100%;
+	font-size:13.5px;font-weight:600;color:#111111;text-decoration:none;
+}
+.ab-news .ab-news-link:hover{color:#185ADB;text-decoration:underline;}
+.night .ab-news .ab-news-link{color:#EEEEEE;}
+.night .ab-news .ab-news-link:hover{color:#FFFFFF;}
+.ab-news .ab-news-date{
+	font-size:11.5px;font-weight:700;color:#185ADB;flex:0 0 auto;white-space:nowrap;
+}
+.ab-news .ab-news-title{
+	white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ab-news .ab-news-more{
+	flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;
+	font-size:12.5px;font-weight:700;color:#185ADB;text-decoration:none;
+	border:1px solid #185ADB;border-radius:999px;padding:4px 12px;
+}
+.ab-news .ab-news-more:hover{background:#185ADB;color:#FFFFFF;}
+.night .ab-news .ab-news-more{color:#FFFFFF;border-color:#185ADB;}
+.night .ab-news .ab-news-more:hover{background:#185ADB;}
+
+/* حرکت بی‌درز فقط در دسکتاپ (پهنای ≥801px) — با توقف روی هاور */
+@media (min-width: 801px){
+	.ab-news .ab-news-track{animation:ab-news-marquee 30s linear infinite;}
+	.ab-news:hover .ab-news-track{animation-play-state:paused;}
+	@keyframes ab-news-marquee{from{transform:translateX(0);}to{transform:translateX(50%);}}
+}
+
+/* موبایل: اسکرول لمسیِ افقی (بدون انیمیشن) + کمی فضای بیشتر زیر هدرِ ۷۰ پیکسلی */
+@media (max-width: 800px){
+	.ab-news{padding:8px 10px !important;margin-bottom:18px !important;}
+	.ab-news .ab-news-bar{gap:10px;}
+	.ab-news .ab-news-viewport{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;}
+	.ab-news .ab-news-track{gap:0;}
+	.ab-news .ab-news-item{max-width:74vw;}
+	.ab-news .ab-news-link{font-size:12.5px;}
+	.ab-news .ab-news-more{display:none;}
+}
+@media (prefers-reduced-motion: reduce){
+	.ab-news .ab-news-track{animation:none !important;}
+}

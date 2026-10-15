@@ -14,18 +14,18 @@
 <?php wp_enqueue_script("jquery"); wp_head('');
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
 <?php
-/* v3.1.0 — CSS حیاتیِ هدر + محتوا، به‌صورت inline در <head>:
+/* v3.1.2 — CSS حیاتیِ هدر + محتوا + فاصلهٔ اخبار روز */، به‌صورت inline در <head>:
    اگر style.css روی هاست قدیمی بماند یا CDN/کش نسخهٔ کهنهٔ آن را سرو کند،
    نمایش هدر موبایل باز هم درست کار می‌کند. کلاس ab-has-mh یعنی «هدر موبایل رندر شد».
    ارتفاع هدر موبایل ۶۵px است؛ پس padding هم ۶۵px (رفع ۵ پیکسل پوشاندن محتوا). */
 ?>
 <style id="ab-header-critical">
 body{padding-top:0;}
-body.ab-has-mh{padding-top:65px;}
-/* اگر هدرِ ۳.۰.x روی هاست باشد ولی style.css کهنه، باز هم ۵ پیکسلِ هم‌پوشانی رفع شود */
-body:not(.ab-has-mh){padding-top:65px;}
+body.ab-has-mh{padding-top:90px;} /* v3.1.2: ۷۰پیکسل نوار + ۲۰پیکسل فاصله */
+/* هدر قدیمی (padding 60pxِ اصلی) + style.css کهنه ⇒ همان فاصله در موبایل (v3.1.2) */
+@media (max-width: 800px){body:not(.ab-has-mh){padding-top:90px;} #mobiles_header{height:70px !important;}}
 @media (min-width: 801px){body:not(.ab-has-mh){padding-top:0;}}
-body.ab-has-mh #mobiles_header{display:block !important;visibility:visible !important;height:65px !important;overflow:visible !important;}
+body.ab-has-mh #mobiles_header{display:block !important;visibility:visible !important;height:70px !important;overflow:visible !important;}
 body:not(.ab-has-mh) #mobiles_header{display:none !important;}
 body.ab-has-mh #header{display:none !important;}
 #header{margin-bottom:28px !important;}

@@ -386,7 +386,7 @@ abp_ln();
 abp_out( '۱) فایل‌های قالب روی هاست (همان چیزی که گوشی شما اجرا می‌کند)' );
 
 $abp_expect = function_exists( 'javan_seda_expected_hashes' ) ? javan_seda_expected_hashes() : array();
-$abp_files  = array( 'single.php', 'header.php', 'footer.php', 'style.css', 'page.php', 'home.php', 'myfunctions.php', 'inc/ab-sidebars.php', 'inc/vip_slider.php' );
+$abp_files  = array( 'single.php', 'header.php', 'footer.php', 'style.css', 'page.php', 'home.php', 'myfunctions.php', 'inc/ab-sidebars.php', 'inc/vip_slider.php', 'inc/ab-news-ticker.php' );
 foreach ( $abp_files as $rel ) {
 	$p   = trailingslashit( $theme_dir ) . $rel;
 	$st  = @filesize( $p );
@@ -521,6 +521,25 @@ if ( $pid ) {
 abp_ln();
 
 /* ---------------------------------------------------- بخش ۵: رندر با سه UA */
+/* --- ۴.۱) منبع «اخبار روز» --- */
+abp_ln();
+abp_out( '۴.۱) نوار «اخبار روز» (home.php زیر هدر)' );
+$ncat = 0;
+if ( function_exists( 'javan_seda_news_category_id' ) ) {
+	$ncat = (int) javan_seda_news_category_id();
+} else {
+	$t = get_term_by( 'slug', 'news', 'category' );
+	$ncat = ( $t && ! is_wp_error( $t ) ) ? (int) $t->term_id : 0;
+}
+abp_out( '  تابع جاوا_سِدا موجود است؟ : ' . ( function_exists( 'javan_seda_news_ticker' ) ? '✓ بله (inc/ab-news-ticker.php بارگذاری شده)' : '✗ نه ⇒ home.php نوار قدیمی را چاپ می‌کند (fallback)' ) );
+abp_out( '  دستهٔ اخبار (slug=news)   : ' . ( $ncat ? 'id=' . $ncat . ' → ' . ( ( $ti = get_term( $ncat, 'category' ) ) && ! is_wp_error( $ti ) ? $ti->name . ' (' . $ti->count . ' نوشته)' : '?' ) : '✗ دسته‌ای با slug=news پیدا نشد ⇒ آخرین نوشته‌ها نمایش داده می‌شود' ) );
+if ( function_exists( 'javan_seda_news_posts' ) ) {
+	$nn = javan_seda_news_posts( 3 );
+	abp_out( '  سه خبرِ اول            : ' . ( ! empty( $nn['items'] ) ? implode( ' | ', array_map( function ( $x ) { return $x['date'] . ' ' . $x['title']; }, $nn['items'] ) ) : '(خالی)' ) );
+	abp_out( '  حالت داده             : ' . ( empty( $nn['fallback'] ) ? 'عادی' : ( 1 == $nn['fallback'] ? 'دسته پیدا نشد → آخرین نوشته‌ها' : 'دسته خالی بود → آخرین نوشته‌ها' ) ) );
+}
+abp_out( '  تنظیم‌ها                : JAVANSEDA_NEWS_CATEGORY=' . ( defined( 'JAVANSEDA_NEWS_CATEGORY' ) ? JAVANSEDA_NEWS_CATEGORY : "'news' (پیش‌فرض)" ) . ' | JAVANSEDA_NEWS_COUNT=' . ( defined( 'JAVANSEDA_NEWS_COUNT' ) ? JAVANSEDA_NEWS_COUNT : '8' ) );
+
 abp_ln();
 abp_out( '۴.۵) سلامتِ فایل‌ها از نظر «خطرِ خطای کشنده» (علتِ احتمالیِ باکسِ خالی)' );
 $abp_single = trailingslashit( $theme_dir ) . 'single.php';

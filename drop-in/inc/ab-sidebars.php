@@ -1,7 +1,7 @@
 <?php
 /**
  * جوان‌صدا (آهنگ‌بان) — لایهٔ ایمنی «سایدبار / ابزارک» — نسخهٔ 3.1.0 (بازمهندسی‌شده)
- * امضای نسخه برای تشخیص خودکار کاوشگر: JAVANSEDA_SIDE_LAYER = 3.1.0
+ * امضای نسخه برای تشخیص خودکار کاوشگر: JAVANSEDA_SIDE_LAYER = 3.1.0 (کمینه؛ بدون هوکِ رندر) — بستهٔ 3.1.2
  * ==================================================================================
  * چرا این بازنویسی؟  نسخهٔ ۳.۰.۵ روی هاستِ شما باعث خرابیِ صفحه شد و شما کلاً
  * محتوای فایل را حذف کردید. آن نسخه سه کار «پرخطر» می‌کرد که در خطِ رندرِ صفحه
@@ -247,11 +247,11 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 	return array(
 		'single.php'          => '40748d997791260756cb4bf72aab584553eaa903050bd891fb05ee67a0ba3a17',
 		'page.php'            => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
-		'myfunctions.php'     => 'e15d4a13b8006ed704c17011fe9ba1f09e662d1f68158515f57ab4f04724d840',
-		'style.css'           => 'ca432fb0bd2fe8f2429d2048e59c7bb41c91fe59219310050c7deb087246003b',
+		'myfunctions.php'     => 'a1e1dd1b38613a373759c5e663530b873a30d61fe465c4efd135939df2fc2dc9',
+		'style.css'           => 'c942486fc567642eff34c544b1eb931cb744276b3cc86bf52938601398806083',
 		'footer.php'          => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
-		'header.php'          => '23e6c334f5b33627876bb9c4f56397725720a6dc7aea26e71bfe498e67ce454a',
-		'home.php'            => '78df0d9a104c44ff22901cd07f732aaed9f9a6370ba1305c75afd7440d2527e6',
+		'header.php'          => 'c5231ff7bba20b93887f809ef1716e0f336234f4357e69287ebc0842b3cc0fd5',
+		'home.php'            => 'e1237170bba2752362befac9d05d6c74a4a303a52af5b5a9114b62ea1d721b9e',
 		'inc/vip_slider.php'  => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
 	);
 }

@@ -9,6 +9,12 @@ if ( is_readable( $_javan_seda_sidebars ) ) {
 	require_once $_javan_seda_sidebars;
 }
 unset( $_javan_seda_sidebars );
+/* v3.1.2 — لایهٔ «اخبار روز»: فقط تابع/شورت‌کد [ab_news] را تعریف می‌کند (بدون هوکِ رندر) */
+$_javan_seda_news = trailingslashit( get_template_directory() ) . 'inc/ab-news-ticker.php';
+if ( is_readable( $_javan_seda_news ) ) {
+	require_once $_javan_seda_news;
+}
+unset( $_javan_seda_news );
 /* v3.1.0 — لایهٔ سازگاری ACF: فقط وقتی ACF فعال نباشد توابع را تعریف می‌کند
    و از خطای کشندهٔ «Call to undefined function get_field()» در single.php جلوگیری می‌کند. */
 $_javan_seda_acf = trailingslashit( get_template_directory() ) . 'inc/acf-compat.php';

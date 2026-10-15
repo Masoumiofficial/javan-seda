@@ -3,7 +3,21 @@
 <div class="tarlanweb_center">
 <div id="centers_box">
 
-<!-- نوار دسترسی سریع صفحه اصلی آهنگ‌بان -->
+<!-- نوار زیر هدر — در نسخهٔ 3.1.2 به «اخبار روز» تبدیل شد (منبع: نوشته‌های دستهٔ news) -->
+<?php
+/* لایهٔ سازگاری: اگر myfunctions.php اعمال نشده باشد، همین‌جا فایل اخبار را بارگذاری می‌کند */
+if ( ! function_exists( 'javan_seda_news_ticker' ) ) {
+	$_ab_news = trailingslashit( get_template_directory() ) . 'inc/ab-news-ticker.php';
+	if ( is_readable( $_ab_news ) ) {
+		require_once $_ab_news;
+	}
+	unset( $_ab_news );
+}
+if ( function_exists( 'javan_seda_news_ticker' ) ) {
+	javan_seda_news_ticker();   // خروجی: <nav class="ab-quickbar ab-news" id="ab-news">
+} else {
+?>
+<!-- fallback — همان نوار دسترسی سریعِ نسخهٔ 3.0.1 (اگر فایل اخبار روی هاست نبود) -->
 <nav class="ab-quickbar" aria-label="دسترسی سریع صفحه اصلی">
 	<ul class="ab-quickbar__list">
 		<li class="ab-quickbar__item">
@@ -26,6 +40,7 @@
 		</li>
 	</ul>
 </nav>
+<?php } ?>
 
 <?php get_template_part('inc/vip_slider'); ?>
 <?php get_template_part('inc/tarlanweb_player'); ?>

@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.0.3
+Version: 3.0.4
 */
 /*
 ==================================================================================
@@ -2532,9 +2532,11 @@ body.ab-has-mh #mobiles_header{display:block !important;visibility:visible !impo
 /* اگر هدر موبایل رندر نشده باشد، هیچ ردپایی از آن در صفحه نمی‌ماند */
 body:not(.ab-has-mh) #mobiles_header{display:none !important;visibility:hidden !important;height:0 !important;overflow:hidden !important;}
 
-/* فاصلهٔ بالای صفحه فقط وقتی لازم است که هدرِ fixed (موبایل) وجود دارد */
-body.ab-has-mh{padding-top:60px;}
+/* فاصلهٔ بالای صفحه فقط وقتی لازم است که هدرِ fixed (موبایل) وجود دارد — ۶۵px = ارتفاع نوار */
+body.ab-has-mh{padding-top:65px;}
 body:not(.ab-has-mh){padding-top:0 !important;}
+
+/* همان قاعده‌ها به‌صورت inline در header.php هم آمده‌اند (نسخهٔ ضدّ کش) — مقدارها یکسان است */
 
 /* حالت ریسک: کاربر دسکتاپ با پنجرهٔ باریک (یا موبایل با «نسخهٔ دسکتاپ») — هدر اصلی نباید غیب شود */
 @media (max-width: 800px){

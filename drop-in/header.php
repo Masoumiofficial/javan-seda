@@ -13,7 +13,27 @@
 <link rel="apple-touch-icon" href="<?php echo ot_get_option('logo'); ?>">
 <?php wp_enqueue_script("jquery"); wp_head('');
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
-<?php if(wp_is_mobile('')){ ?><style>body{padding-top: 60px;}</style><?php } ?>
+<?php
+/* v3.0.4 — CSS حیاتیِ هدر، به‌صورت inline در <head>:
+   اگر style.css روی هاست قدیمی بماند یا CDN/کش نسخهٔ کهنهٔ آن را سرو کند،
+   نمایش هدر موبایل باز هم درست کار می‌کند. کلاس ab-has-mh یعنی «هدر موبایل رندر شد».
+   ارتفاع هدر موبایل ۶۵px است؛ پس padding هم ۶۵px (رفع ۵ پیکسل پوشاندن محتوا). */
+?>
+<style id="ab-header-critical">
+body{padding-top:0;}
+body.ab-has-mh{padding-top:65px;}
+body.ab-has-mh #mobiles_header{display:block !important;visibility:visible !important;height:65px !important;overflow:visible !important;}
+body:not(.ab-has-mh) #mobiles_header{display:none !important;}
+body.ab-has-mh #header{display:none !important;}
+#header{margin-bottom:28px !important;}
+@media (min-width: 801px){
+body.ab-has-mh #mobiles_header{display:block !important;}
+}
+@media (max-width: 800px){
+body:not(.ab-has-mh) #header{display:block !important;padding:12px 0 !important;}
+body:not(.ab-has-mh) #header .menu_right{max-width:60% !important;}
+}
+</style>
 </head>
 <?php
 /* v3.0.3 — تک‌منبع تشخیص موبایل: همین متغیر هم رندر را کنترل می‌کند و هم کلاس بدنه را */

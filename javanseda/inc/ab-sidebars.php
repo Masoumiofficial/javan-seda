@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا (آهنگ‌بان) — لایهٔ ایمنی و بازرسی «سایدبار / ابزارک» نسخهٔ 3.0.3
+ * جوان‌صدا (آهنگ‌بان) — لایهٔ ایمنی و بازرسی «سایدبار / ابزارک / هدر» نسخهٔ 3.0.4
  * ---------------------------------------------------------------------------
  * هدف: ابزارک‌های ستون چپِ صفحهٔ نوشته (single.php) باید همیشه نمایش داده
  * شوند، حتی اگر یکی از حلقه‌های ثبت قالب قطع شده باشد.
@@ -264,9 +264,9 @@ function javan_seda_expected_hashes() {
 		'single.php'          => 'edfa7b63cfb648c39ea13653555ce48e0cc2100214334e07641105c7e2a04235',
 		'page.php'            => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
 		'myfunctions.php'     => '5559e9f13cab429db0eeefa2b48b18b9dfcbedf552a3d77ea8b96c7b51bc845a',
-		'style.css'           => '286beb90f7b5e5cc85190a1c4031c52f981292a14ab108cb2004f45016f2f8cb',
+		'style.css'           => 'be860507ad03f36ac5be6699e343d3b629c1de0c61e54859036ed2b415ea6cdd',
 		'footer.php'          => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
-		'header.php'          => 'ae2fffd7b96fceb014d5178fbf01cfa3488ab370d4b5f153c5849333341c34f1',
+		'header.php'          => 'd02f3517254dce0f1a9bea643673561a866fb8b3a196d77cf80f320511484cfe',
 		'home.php'            => '78df0d9a104c44ff22901cd07f732aaed9f9a6370ba1305c75afd7440d2527e6',
 		'inc/vip_slider.php'  => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
 	);
@@ -302,7 +302,7 @@ function javan_seda_sidebars_diag_route( $template ) {
 
 	$theme = wp_get_theme();
 
-	$line( '=== گزارش تشخیص «ابزارک / سایدبار نوشته‌ها» — قالب جوان‌صدا ===' );
+	$line( '=== گزارش تشخیص «ابزارک / سایدبار / هدر» — قالب جوان‌صدا ===' );
 	$line( 'WordPress: ' . get_bloginfo( 'version' ) . ' | PHP: ' . PHP_VERSION . ' | نسخهٔ قالب: ' . $theme->get( 'Version' ) );
 	$line( 'stylesheet: ' . $theme->get_stylesheet() . ' | template: ' . $theme->get_template() . ( $theme->get_stylesheet() !== $theme->get_template() ? '  <<< چایلد‌تیم فعال است؛ فایل‌ها را در چایلد بررسی کنید' : '' ) );
 	$line( 'قالبِ درخواست‌شده در این درخواست: ' . ( $template ? $template : '(خالی)' ) );
@@ -431,7 +431,21 @@ function javan_seda_sidebars_diag_route( $template ) {
 	}
 	$line( '' );
 
-	$line( '--- ۸) نتیجه‌گیری خودکار ---' );
+	$line( '--- ۸) هدر (دسکتاپ / موبایل) ---' );
+	$ab_hdr    = $tdir . '/header.php';
+	$ab_hdr_c  = is_readable( $ab_hdr ) ? (string) file_get_contents( $ab_hdr ) : '';
+	$ab_css    = $tdir . '/style.css';
+	$ab_css_c  = is_readable( $ab_css ) ? (string) file_get_contents( $ab_css ) : '';
+	$ab_ver    = preg_match( '/Version:\s*([0-9.]+)/', $ab_css_c, $ab_mv ) ? $ab_mv[1] : '(نامعلوم)';
+	$line( 'wp_is_mobile() برای این درخواست      : ' . ( wp_is_mobile() ? 'true (هدر موبایل رندر می‌شود)' : 'false (هدر دسکتاپ رندر می‌شود)' ) );
+	$line( 'header.php خط رندر mobiles_header را دارد: ' . ( false !== strpos( $ab_hdr_c, 'mobiles_header' ) ? 'بله' : 'نه  ⇒ علت اصلیِ حذف‌شدن هدر در موبایل، همین است' ) );
+	$line( 'header.php بلوک ab-header-critical را دارد: ' . ( false !== strpos( $ab_hdr_c, 'ab-header-critical' ) ? 'بله (نسخهٔ ضدّ‌کش نصب است)' : 'نه  ⇒ CSS حیاتیِ هدر روی هاست نیست' ) );
+	$line( 'style.css نسخه                          : ' . $ab_ver . ' | دارای بلوک ab-has-mh: ' . ( false !== strpos( $ab_css_c, 'ab-has-mh' ) ? 'بله' : 'نه  ⇒ style.css روی هاست کهنه است (آپلود نشسته یا CDN کش کرده)' ) );
+	$line( 'mtime header.php / style.css            : ' . ( is_readable( $ab_hdr ) ? date_i18n( 'Y-m-d H:i', (int) filemtime( $ab_hdr ) ) : '?' ) . ' | ' . ( is_readable( $ab_css ) ? date_i18n( 'Y-m-d H:i', (int) filemtime( $ab_css ) ) : '?' ) );
+	$line( 'تأیید بصری: در حالت موبایل باید <body class="… ab-has-mh"> و <header id="mobiles_header"> هر دو در HTML باشند.' );
+	$line( '' );
+
+	$line( '--- ۹) نتیجه‌گیری خودکار ---' );
 	$verdict = 'نامشخص — خروجی را برای توسعه‌دهنده بفرستید.';
 	if ( ! function_exists( 'leftsides' ) ) {
 		$verdict = '۱) myfunctions.php روی سرور بارگذاری نمی‌شود (یا فایل قدیمی است). لایهٔ ایمنیِ این فایل ناحیه‌ها را ثبت می‌کند؛ فایل را بازگردانی/جایگزین کنید.';

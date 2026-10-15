@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.0
+Version: 3.0.1
 */
 /*
 ==================================================================================
@@ -1873,3 +1873,589 @@ body{padding-top:0;}
 .night .ab-related__item:focus-visible,
 .night .ab-artists__chip:focus-visible,
 .night .ab-artists__pill:focus-visible{outline-color:#4C8BFF;}
+
+
+/* ============================================================================================
+   ۱۷) «فوتر چهار ستونی سازمانی آهنگ‌بان» — نسخهٔ 3.0.1
+   مربوط به فایل قالب: footer.php
+   - ستون ۱: درباره ما (متن رسمی بدون اختراع محتوا)
+   - ستون ۲: لینک‌های مفید (فهرست ft_menu)
+   - ستون ۳: دسته‌های پرطرفدار (get_categories + لینک خواننده‌ها و تازه‌ترین آهنگ‌ها)
+   - ستون ۴: شبکه‌های اجتماعی + فرم جستجوی سبک فوتر
+   - نوار پایین: کپی‌رایت + لینک‌های قوانین/تبلیغات/تماس + اسکیما
+   - حالت شب (#111111) و حالت موبایل (تک‌ستونی پشته‌ای بدون آکاردئون پیچیده)
+   - کاملاً تخت (بدون گرادینت) با پالت #FFFFFF، #185ADB، #1246AD، #EAF1FE، #222222، #111111
+   ============================================================================================ */
+
+#footer.ab-footer{
+	width:100%;
+	padding:48px 0 24px;
+	background:#FFFFFF;
+	color:var(--ab-text);
+	border-top:1px solid var(--ab-line);
+	text-align:right;
+	direction:rtl;
+	box-shadow:none;
+}
+.night #footer.ab-footer{
+	background:#111111;
+	color:#EEEEEE;
+	border-top-color:rgba(255,255,255,0.08);
+}
+
+.ab-footer__grid{
+	display:grid;
+	grid-template-columns:repeat(4, minmax(0, 1fr));
+	gap:32px;
+	margin-bottom:36px;
+}
+
+.ab-footer__col{
+	display:flex;
+	flex-direction:column;
+}
+
+.ab-footer__title{
+	position:relative;
+	margin:0 0 16px 0;
+	padding-bottom:10px;
+	font-size:16px;
+	font-weight:700;
+	color:#111111;
+	border-bottom:2px solid var(--ab-blue);
+	display:inline-block;
+}
+.night .ab-footer__title{
+	color:#FFFFFF;
+	border-bottom-color:var(--ab-blue);
+}
+
+.ab-footer__text{
+	font-size:13.5px;
+	line-height:1.9;
+	color:var(--ab-text);
+	margin:0;
+	text-align:justify;
+}
+.night .ab-footer__text{
+	color:var(--ab-muted);
+}
+
+.ab-footer__menu,
+.ab-footer__cats{
+	list-style:none;
+	margin:0;
+	padding:0;
+	display:flex;
+	flex-direction:column;
+	gap:8px;
+}
+
+.ab-footer__menu li a,
+.ab-footer__cats li a{
+	display:inline-flex;
+	align-items:center;
+	gap:6px;
+	font-size:13.5px;
+	line-height:1.8;
+	color:var(--ab-text);
+	text-decoration:none;
+	padding:2px 0;
+	transition:color 0.2s ease, transform 0.2s ease;
+}
+.ab-footer__menu li a:hover,
+.ab-footer__cats li a:hover{
+	color:var(--ab-blue);
+	transform:translateX(-3px);
+}
+.night .ab-footer__menu li a,
+.night .ab-footer__cats li a{
+	color:var(--ab-muted);
+}
+.night .ab-footer__menu li a:hover,
+.night .ab-footer__cats li a:hover{
+	color:var(--ab-blue-accent);
+}
+
+.ab-footer__cat-featured{
+	font-weight:700;
+	color:var(--ab-blue) !important;
+}
+.ab-footer__cat-featured i{
+	font-size:14px;
+}
+
+.ab-footer__count{
+	font-size:11.5px;
+	color:var(--ab-muted);
+	font-weight:400;
+}
+
+.ab-footer__socials{
+	float:none;
+	margin:0 0 16px 0;
+	padding:0;
+	display:flex;
+	flex-wrap:wrap;
+	gap:8px;
+	direction:ltr;
+	justify-content:flex-end;
+}
+.ab-footer__socials a{
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	width:36px;
+	height:36px;
+	background:var(--ab-blue-soft);
+	color:var(--ab-blue);
+	border-radius:8px;
+	font-size:16px;
+	text-decoration:none;
+	transition:background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+.ab-footer__socials a:hover{
+	background:var(--ab-blue);
+	color:#FFFFFF !important;
+	transform:translateY(-2px);
+}
+.night .ab-footer__socials a{
+	background:#222222;
+	color:var(--ab-blue-accent);
+}
+.night .ab-footer__socials a:hover{
+	background:var(--ab-blue);
+	color:#FFFFFF !important;
+}
+
+.ab-footer__search{
+	position:relative;
+	display:flex;
+	align-items:center;
+	width:100%;
+	margin-top:4px;
+}
+.ab-footer__search-input{
+	width:100%;
+	height:40px;
+	padding:0 38px 0 12px;
+	background:var(--ab-page);
+	border:1px solid var(--ab-line);
+	border-radius:8px;
+	font-size:12.5px;
+	color:var(--ab-text);
+	outline:none;
+	transition:border-color 0.2s ease;
+}
+.ab-footer__search-input:focus{
+	border-color:var(--ab-blue);
+}
+.night .ab-footer__search-input{
+	background:#222222;
+	border-color:rgba(255,255,255,0.12);
+	color:#EEEEEE;
+}
+.night .ab-footer__search-input:focus{
+	border-color:var(--ab-blue-accent);
+}
+.ab-footer__search-btn{
+	position:absolute;
+	right:4px;
+	top:50%;
+	transform:translateY(-50%);
+	width:32px;
+	height:32px;
+	border:none;
+	background:transparent;
+	color:var(--ab-muted);
+	cursor:pointer;
+	display:inline-flex;
+	align-items:center;
+	justify-content:center;
+	font-size:14px;
+	transition:color 0.2s ease;
+}
+.ab-footer__search-btn:hover{
+	color:var(--ab-blue);
+}
+
+.ab-footer__bottom{
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	flex-wrap:wrap;
+	gap:16px;
+	padding-top:20px;
+	border-top:1px solid var(--ab-line);
+	font-size:12.5px;
+}
+.night .ab-footer__bottom{
+	border-top-color:rgba(255,255,255,0.08);
+}
+
+.ab-footer__copyright p{
+	margin:0;
+	color:var(--ab-muted);
+	font-size:12.5px;
+}
+
+.ab-footer__policy-links{
+	display:inline-flex;
+	align-items:center;
+	gap:16px;
+}
+.ab-footer__policy-links a{
+	color:var(--ab-muted);
+	text-decoration:none;
+	transition:color 0.2s ease;
+}
+.ab-footer__policy-links a:hover{
+	color:var(--ab-blue);
+}
+.night .ab-footer__policy-links a:hover{
+	color:var(--ab-blue-accent);
+}
+
+
+/* ============================================================================================
+   ۱۸) «صفحهٔ اصلی + اسلایدر سبک ویژه» — نسخهٔ 3.0.1
+   مربوط به فایل‌های: home.php و inc/vip_slider.php
+   - نوار دسترسی سریع کوتاه (ab-quickbar) با ۳ لینک کاربردی
+   - اسلایدر بدون پرش ارتفاع (نسبت تصویر ثابت ۱۶:۹)
+   - گوشه‌های گرد ۱۲px، بدون گرادینت
+   - نوار عنوان تیره نیمه‌شفاف rgba(17,17,17,.72)
+   - نشان نوع محتوا با آبی سازمانی #185ADB
+   - فلش‌های دایره‌ای سفید با هاور آبی
+   - نقطه‌های میله‌ای نازک
+   - شبکه کارت‌های ۶ ستونه دسکتاپ، ۳ تبلت، ۲ موبایل با فاصله منظم ۲۴px / ۱۶px
+   - فواصل متقارن و یکپارچگی خط و تیتر liner / songs_title_box
+   ============================================================================================ */
+
+/* نوار دسترسی سریع ابتدای صفحه */
+.ab-quickbar{
+	margin:0 0 24px 0;
+	padding:10px 16px;
+	background:var(--ab-blue-soft);
+	border:1px solid var(--ab-line);
+	border-radius:12px;
+}
+.night .ab-quickbar{
+	background:#222222;
+	border-color:rgba(255,255,255,0.08);
+}
+.ab-quickbar__list{
+	display:flex;
+	align-items:center;
+	justify-content:center;
+	flex-wrap:wrap;
+	gap:16px 28px;
+	list-style:none;
+	margin:0;
+	padding:0;
+}
+.ab-quickbar__item{
+	margin:0;
+}
+.ab-quickbar__link{
+	display:inline-flex;
+	align-items:center;
+	gap:8px;
+	font-size:13.5px;
+	font-weight:600;
+	color:var(--ab-blue);
+	text-decoration:none;
+	transition:color 0.2s ease, transform 0.2s ease;
+}
+.ab-quickbar__link i{
+	font-size:16px;
+}
+.ab-quickbar__link:hover{
+	color:var(--ab-blue-dark);
+	transform:translateY(-1px);
+}
+.night .ab-quickbar__link{
+	color:var(--ab-blue-accent);
+}
+.night .ab-quickbar__link:hover{
+	color:#FFFFFF;
+}
+
+/* اسلایدر ویژه VIP */
+.vip_img_box.ab-vip-slider-box{
+	margin:0 0 24px 0;
+	position:relative;
+	width:100%;
+}
+.vip_post.ab-vip-post{
+	position:relative;
+	border-radius:12px;
+	overflow:hidden;
+	margin:0;
+	background:#111111;
+	aspect-ratio:16 / 9;
+}
+.vip_post.ab-vip-post figure{
+	margin:0;
+	width:100%;
+	height:100%;
+	position:relative;
+}
+.vip_post.ab-vip-post figure a{
+	display:block;
+	width:100%;
+	height:100%;
+}
+.vip_post.ab-vip-post .ab-vip-img{
+	width:100%;
+	height:100%;
+	object-fit:cover;
+	display:block;
+	border-radius:12px;
+	transition:transform 0.4s ease;
+}
+.vip_post.ab-vip-post:hover .ab-vip-img{
+	transform:scale(1.03);
+}
+
+/* نوار عنوان روی اسلاید: تخت و بدون گرادینت */
+.vip_post.ab-vip-post header h2{
+	position:absolute;
+	bottom:0;
+	right:0;
+	left:0;
+	margin:0;
+	padding:12px 16px;
+	background:rgba(17,17,17,0.72);
+	border-radius:0 0 12px 12px;
+	z-index:2;
+}
+.vip_post.ab-vip-post header h2 a{
+	display:block;
+	color:#FFFFFF;
+	font-size:14.5px;
+	font-weight:700;
+	line-height:1.6;
+	text-decoration:none;
+	text-shadow:none;
+}
+.vip_post.ab-vip-post header h2 a span{
+	display:inline;
+	font-weight:400;
+	color:#EAF1FE;
+}
+.vip_post.ab-vip-post header h2 a:hover{
+	color:var(--ab-blue-accent);
+}
+
+/* بج فرمت/نوع محتوا */
+.vip_post.ab-vip-post footer{
+	position:absolute;
+	top:12px;
+	right:12px;
+	z-index:3;
+}
+.vip_post.ab-vip-post .ab-format-badge{
+	display:inline-block;
+	padding:4px 10px;
+	background:var(--ab-blue);
+	color:#FFFFFF;
+	font-size:11.5px;
+	font-weight:700;
+	line-height:1.4;
+	border-radius:6px;
+	box-shadow:none;
+}
+
+/* فلش‌های ناوبری اسلایدر: دایره‌ای سفید با هاور آبی */
+.vip_top_slider.owl-theme .owl-nav [class*="owl-"]{
+	width:38px !important;
+	height:38px !important;
+	line-height:36px !important;
+	font-size:20px !important;
+	background:#FFFFFF !important;
+	color:#111111 !important;
+	border-radius:50% !important;
+	box-shadow:0 3px 10px rgba(0,0,0,0.2) !important;
+	border:1px solid rgba(0,0,0,0.06) !important;
+	display:inline-flex !important;
+	align-items:center !important;
+	justify-content:center !important;
+	top:50% !important;
+	transform:translateY(-50%) !important;
+	opacity:0.95;
+	transition:background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.vip_top_slider.owl-theme .owl-nav [class*="owl-"]:hover{
+	background:var(--ab-blue) !important;
+	color:#FFFFFF !important;
+	box-shadow:0 4px 14px rgba(24,90,219,0.35) !important;
+	transform:translateY(-50%) scale(1.06) !important;
+}
+.vip_top_slider .owl-nav button.owl-prev{
+	right:10px !important;
+	left:auto !important;
+}
+.vip_top_slider .owl-nav button.owl-next{
+	left:10px !important;
+	right:auto !important;
+}
+.night .vip_top_slider.owl-theme .owl-nav [class*="owl-"]{
+	background:#222222 !important;
+	color:#FFFFFF !important;
+	border-color:rgba(255,255,255,0.12) !important;
+}
+.night .vip_top_slider.owl-theme .owl-nav [class*="owl-"]:hover{
+	background:var(--ab-blue) !important;
+}
+
+/* نقطه‌های ناوبری نازک میله‌ای */
+.vip_top_slider.owl-theme .owl-dots{
+	display:block !important;
+	margin-top:12px;
+	text-align:center;
+}
+.vip_top_slider.owl-theme .owl-dots .owl-dot{
+	display:inline-block;
+	margin:0 4px;
+	padding:0 !important;
+}
+.vip_top_slider.owl-theme .owl-dots .owl-dot span{
+	width:24px;
+	height:4px;
+	margin:0;
+	background:rgba(0,0,0,0.15);
+	border-radius:2px;
+	transition:width 0.25s ease, background 0.25s ease;
+}
+.night .vip_top_slider.owl-theme .owl-dots .owl-dot span{
+	background:rgba(255,255,255,0.22);
+}
+.vip_top_slider.owl-theme .owl-dots .owl-dot.active span,
+.vip_top_slider.owl-theme .owl-dots .owl-dot:hover span{
+	width:36px;
+	background:var(--ab-blue);
+}
+.night .vip_top_slider.owl-theme .owl-dots .owl-dot.active span,
+.night .vip_top_slider.owl-theme .owl-dots .owl-dot:hover span{
+	background:var(--ab-blue-accent);
+}
+
+/* هماهنگی فواصل منظم ۲۴px در صفحه اصلی */
+#centers_box .song_boxs{
+	margin:0 0 24px 0 !important;
+}
+.ab-section-anchor{
+	position:relative;
+	top:-20px;
+	visibility:hidden;
+}
+
+/* شبکه کارتهای ۶ستونی دسکتاپ، ۳ تبلت، ۲ موبایل */
+.song_boxs_posts ul{
+	display:grid !important;
+	grid-template-columns:repeat(6, minmax(0, 1fr)) !important;
+	gap:16px !important;
+	margin:0 !important;
+	padding:0 !important;
+	list-style:none !important;
+}
+.song_boxs_posts ul li{
+	width:auto !important;
+	float:none !important;
+	padding:0 !important;
+	margin:0 !important;
+}
+.song_boxs_posts ul li .songs_post{
+	height:100% !important;
+	display:flex !important;
+	flex-direction:column !important;
+	border-radius:8px !important;
+}
+.song_boxs_posts ul li .songs_post header figure img{
+	width:100% !important;
+	aspect-ratio:1 / 1 !important;
+	object-fit:cover !important;
+	border-radius:8px 8px 0 0 !important;
+}
+.song_boxs_posts ul li .songs_post header h2 a{
+	font-size:13.5px !important;
+	line-height:1.6 !important;
+	padding:8px 10px !important;
+}
+.song_boxs_posts ul li .songs_post footer{
+	margin-top:auto !important;
+	padding:0 10px 10px !important;
+}
+
+/* حالت تبلت و موبایل */
+@media (max-width: 991px){
+	.ab-footer__grid{
+		grid-template-columns:repeat(2, minmax(0, 1fr));
+		gap:24px;
+	}
+	.song_boxs_posts ul{
+		grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+		gap:14px !important;
+	}
+}
+
+@media (max-width: 767px){
+	#footer.ab-footer{
+		padding:32px 0 20px;
+	}
+	.ab-footer__grid{
+		grid-template-columns:1fr;
+		gap:24px;
+		margin-bottom:24px;
+	}
+	.ab-footer__bottom{
+		flex-direction:column;
+		text-align:center;
+		justify-content:center;
+	}
+	.ab-footer__socials{
+		justify-content:flex-start;
+	}
+	.ab-quickbar{
+		margin-bottom:16px;
+		padding:8px 12px;
+	}
+	.ab-quickbar__list{
+		gap:10px 16px;
+	}
+	.ab-quickbar__link{
+		font-size:12.5px;
+	}
+	#centers_box .song_boxs{
+		margin-bottom:16px !important;
+	}
+	.song_boxs_posts ul{
+		grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+		gap:10px !important;
+	}
+	.vip_post.ab-vip-post header h2{
+		padding:8px 12px;
+	}
+	.vip_post.ab-vip-post header h2 a{
+		font-size:13px;
+	}
+	.vip_top_slider.owl-theme .owl-nav [class*="owl-"]{
+		width:32px !important;
+		height:32px !important;
+		font-size:16px !important;
+	}
+}
+
+/* ترجیح کاهش حرکت (prefers-reduced-motion) */
+@media (prefers-reduced-motion: reduce){
+	.ab-vip-post .ab-vip-img,
+	.vip_top_slider.owl-theme .owl-nav [class*="owl-"],
+	.ab-footer__menu li a,
+	.ab-footer__cats li a,
+	.ab-footer__socials a,
+	.ab-quickbar__link{
+		transition:none !important;
+		transform:none !important;
+	}
+}
+

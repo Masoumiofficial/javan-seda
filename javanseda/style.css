@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.1.4
+Version: 3.2.0
 */
 /*
 ==================================================================================
@@ -2710,3 +2710,66 @@ body.ab-has-mh{padding-top:90px;}
 	.ab-404-art{margin-bottom:16px;}
 }
 /* --- انتهای بلوک ۲۳ (v3.1.4) --- */
+
+/* ==========================================================================
+   بلوک ۲۴ (نسخۀ 3.2.0) — باکس «ما را دنبال کنید» + نوارِ چسبانِ پخش
+   فایل: inc/ab-post-extras.php  ·  فراخوانی: single.php (بالای باکس پلیر)
+   پالت سازمانی: #FFFFFF · #185ADB · #111111 — بدون گرادینت، بدون رنگ جدید
+   خاموشی: JAVANSEDA_POST_EXTRAS / JAVANSEDA_STICKY_PLAYER یا گزینهٔ fixbtn
+   اگر فایل لایه حذف شود، این قواعد بی‌مصرف می‌مانند ولی چیزی را نمی‌شکنند.
+   ========================================================================== */
+.ab-social-box{display:block;margin:14px 0 8px;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:12px;box-shadow:0 1px 2px rgba(17,17,17,.04);overflow:hidden}
+.ab-social-box__head{display:flex;align-items:center;flex-wrap:wrap;padding:11px 14px;border-bottom:1px solid #eef1f6}
+.ab-social-box__head>i{font-size:16px;color:#185ADB;margin-left:8px}
+.ab-social-box__title{font-size:14px;font-weight:700;color:#111111}
+.ab-social-box__hint{margin-right:auto;font-size:11.5px;color:#8a92a6}
+.ab-social-box__row{display:block;padding:11px 11px 13px}
+.ab-social{display:inline-flex;align-items:center;margin:0 8px 8px 0;padding:7px 11px 7px 9px;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:10px;color:#111111;text-decoration:none;transition:border-color .16s ease,background-color .16s ease}
+.ab-social__icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:30px;height:30px;margin-left:9px;border-radius:8px;background:#f2f5fb;color:#185ADB;font-size:16px;transition:background-color .16s ease,color .16s ease}
+.ab-social__txt{display:block;min-width:0;line-height:1.35}
+.ab-social__txt b{display:block;font-size:12.5px;font-weight:700;color:#111111;white-space:nowrap}
+.ab-social__txt em{display:block;max-width:150px;overflow:hidden;font-size:10.5px;font-style:normal;font-weight:400;color:#8a92a6;white-space:nowrap;text-overflow:ellipsis;direction:ltr;unicode-bidi:embed}
+.ab-social__arrow{font-size:13px;color:#c3cbd9;transition:color .16s ease}
+.ab-social:hover,.ab-social:focus{border-color:#185ADB;background:#f7f9fd;color:#185ADB;text-decoration:none}
+.ab-social:hover .ab-social__icon,.ab-social:focus .ab-social__icon{background:#185ADB;color:#FFFFFF}
+.ab-social:hover .ab-social__arrow,.ab-social:focus .ab-social__arrow{color:#185ADB}
+/* --- نوار چسبانِ پخش (کنترل همان <audio id="audio"> قالب) --- */
+.ab-sticky{position:fixed;right:0;left:0;bottom:0;z-index:9999;background:#FFFFFF;border-top:1px solid #e6e9ef;box-shadow:0 -2px 10px rgba(17,17,17,.07);padding-bottom:env(safe-area-inset-bottom)}
+#ab-sticky-player[hidden]{display:none}
+.ab-sticky[hidden]{display:none}
+body.ab-sticky-on{padding-bottom:84px}
+.ab-sp__in{display:flex;align-items:center;max-width:1080px;margin:0 auto;padding:8px 12px}
+.ab-sp-thumb{display:block;flex:0 0 auto;width:46px;height:46px;border-radius:8px;overflow:hidden;background:#f2f5fb}
+.ab-sp-thumb img{display:block;width:46px;height:46px;object-fit:cover}
+.ab-sp-thumb--none{display:flex;align-items:center;justify-content:center;color:#185ADB;font-size:19px}
+.ab-sp-play{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;margin:0 10px;padding:0;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:50%;color:#185ADB;font-size:16px;line-height:1;cursor:pointer}
+.ab-sp-play:hover,.ab-sp-play:focus{background:#185ADB;border-color:#185ADB;color:#FFFFFF}
+.ab-sp__meta{flex:1 1 auto;min-width:0}
+.ab-sp__title{display:block;font-size:13px;font-weight:700;color:#111111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab-sp__artist{display:block;font-size:11px;color:#8a92a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab-sp__bar{display:flex;align-items:center;margin-top:5px}
+.ab-sp-range{flex:1 1 auto;width:100%;height:4px;margin:0 8px;-webkit-appearance:none;appearance:none;background:#e9edf4;border:0;border-radius:2px;outline:none;cursor:pointer;direction:ltr}
+.ab-sp-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border:2px solid #FFFFFF;border-radius:50%;background:#185ADB;box-shadow:0 0 0 1px #dfe4ee}
+.ab-sp-range::-moz-range-thumb{width:12px;height:12px;border:2px solid #FFFFFF;border-radius:50%;background:#185ADB}
+.ab-sp-range:disabled{opacity:.55;cursor:default}
+.ab-sp-time{flex:0 0 auto;font-size:10.5px;color:#8a92a6;white-space:nowrap;direction:ltr;unicode-bidi:embed}
+.ab-sp__dl{display:inline-flex;align-items:center;flex:0 0 auto;margin:0 8px;padding:7px 10px;border:1px solid #e6ebf3;border-radius:8px;background:#FFFFFF;color:#111111;font-size:12px}
+.ab-sp__dl i{margin-left:5px;color:#185ADB;font-size:15px}
+.ab-sp__dl:hover,.ab-sp__dl:focus{border-color:#185ADB;color:#185ADB;text-decoration:none}
+.ab-sp-close{flex:0 0 auto;width:30px;height:30px;padding:0;border:0;background:none;color:#8a92a6;font-size:15px;line-height:1;cursor:pointer}
+.ab-sp-close:hover,.ab-sp-close:focus{color:#111111}
+@media (max-width:767px){
+	.ab-social-box__row{padding:9px 9px 10px}
+	.ab-social{display:flex;width:100%;margin:0 0 7px}
+	.ab-social:last-child{margin-bottom:0}
+	.ab-social__txt em{max-width:none}
+	.ab-social__arrow{margin-right:auto}
+	.ab-sp__in{padding:6px 8px}
+	.ab-sp-thumb,.ab-sp-thumb img{width:38px;height:38px}
+	.ab-sp__artist{display:none}
+	.ab-sp__dl span{display:none}
+	.ab-sp__dl{padding:7px 8px;margin:0 6px}
+	body.ab-sticky-on{padding-bottom:72px}
+}
+@media print{.ab-sticky,.ab-social-box{display:none}}
+/* --- انتهای بلوک ۲۴ (v3.2.0) --- */

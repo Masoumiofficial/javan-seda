@@ -29,6 +29,14 @@ if ( is_readable( $_javan_seda_perf ) ) {
 	require_once $_javan_seda_perf;
 }
 unset( $_javan_seda_perf );
+/* v3.2.0 — لایۀ «باکس اجتماعیِ صفحهٔ پست + نوارِ چسبانِ پخش» (inc/ab-post-extras.php).
+   خاموشی کامل:  define( 'JAVANSEDA_POST_EXTRAS', false );  ·  فقط نوارِ پخش:  define( 'JAVANSEDA_STICKY_PLAYER', false ); */
+$_javan_seda_extras = trailingslashit( get_template_directory() ) . 'inc/ab-post-extras.php';
+if ( is_readable( $_javan_seda_extras ) ) {
+	require_once $_javan_seda_extras;
+}
+unset( $_javan_seda_extras );
+
 /* v3.1.0 — لایهٔ سازگاری ACF: فقط وقتی ACF فعال نباشد توابع را تعریف می‌کند
    و از خطای کشندهٔ «Call to undefined function get_field()» در single.php جلوگیری می‌کند. */
 $_javan_seda_acf = trailingslashit( get_template_directory() ) . 'inc/acf-compat.php';

@@ -275,6 +275,13 @@ if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
 ?>
 <div class="clear"></div>
 
+<?php /* v3.2.0 — باکس «ما را دنبال کنید» (تلگرام · اینستاگرام · بله · روبیکا): بالای باکس پلیر،
+   زیر متن/ترانه و پیش از ویدیو و پلیر. تابع در inc/ab-post-extras.php است و با function_exists محافظت
+   شده؛ نبودن فایل ⇒ صفر خروجی و صفر خطا. لینک‌ها و متن دکمه‌ها از تنظیمات قالب → «شبکه‌های اجتماعی»
+   می‌آیند و با همان گزینهٔ fixbtn روشن/خاموش می‌شوند. */
+if ( function_exists( 'javan_seda_social_box' ) ) { javan_seda_social_box( get_the_ID() ); }
+?>
+
 <?php if(get_field('video720') || get_field('video1080') || get_field('video480')){ ?> 
 <div class="video_player">
 <video width="640" height="360" controls>

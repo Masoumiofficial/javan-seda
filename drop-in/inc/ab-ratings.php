@@ -189,7 +189,7 @@ if ( ! function_exists( 'javan_seda_rate_handle' ) ) {
 		wp_safe_redirect( add_query_arg( 'ab_rate', 'ok', $back ) );
 		exit;
 	}
-	add_action( 'init', 'javan_seda_rate_handle', 2 );
+	if ( function_exists( 'javan_seda_rate_handle' ) ) { add_action( 'init', 'javan_seda_rate_handle', 2 ); }
 }
 
 if ( ! function_exists( 'javan_seda_rate_shortcode' ) ) {
@@ -197,7 +197,7 @@ if ( ! function_exists( 'javan_seda_rate_shortcode' ) ) {
 		$a = shortcode_atts( array( 'id' => 0 ), $atts, 'ab_rating' );
 		return javan_seda_rating_block( (int) $a['id'], false );
 	}
-	add_action( 'init', 'javan_seda_rate_add_shortcode' );
+	if ( function_exists( 'javan_seda_rate_add_shortcode' ) ) { add_action( 'init', 'javan_seda_rate_add_shortcode' ); }
 }
 if ( ! function_exists( 'javan_seda_rate_add_shortcode' ) ) {
 	function javan_seda_rate_add_shortcode() {
@@ -238,7 +238,7 @@ if ( ! function_exists( 'javan_seda_rate_ld' ) ) {
 			)
 			. '</script>' . "\n";
 	}
-	add_action( 'wp_head', 'javan_seda_rate_ld', 9 );
+	if ( function_exists( 'javan_seda_rate_ld' ) ) { add_action( 'wp_head', 'javan_seda_rate_ld', 9 ); }
 }
 
 if ( ! function_exists( 'javan_seda_rating_report' ) ) {

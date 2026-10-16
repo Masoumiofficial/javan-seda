@@ -245,7 +245,7 @@ if ( ! function_exists( 'javan_seda_seo_head' ) ) {
 			}
 		}
 	}
-	add_action( 'wp_head', 'javan_seda_seo_head', 4 );
+	if ( function_exists( 'javan_seda_seo_head' ) ) { add_action( 'wp_head', 'javan_seda_seo_head', 4 ); }
 }
 
 /* -------------------------------------------------------------------------
@@ -274,7 +274,7 @@ if ( ! function_exists( 'javan_seda_seo_canonical_backstop' ) ) {
 			echo '<link rel="canonical" href="' . esc_url( $u ) . '">' . "\n";
 		}
 	}
-	add_action( 'wp_head', 'javan_seda_seo_canonical_backstop', 5 );
+	if ( function_exists( 'javan_seda_seo_canonical_backstop' ) ) { add_action( 'wp_head', 'javan_seda_seo_canonical_backstop', 5 ); }
 }
 
 /* -------------------------------------------------------------------------
@@ -350,7 +350,7 @@ if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) )
 			)
 			. '</script>' . "\n";
 	}
-	add_action( 'wp_head', 'javan_seda_seo_breadcrumbs', 8 );
+	if ( function_exists( 'javan_seda_seo_breadcrumbs' ) ) { add_action( 'wp_head', 'javan_seda_seo_breadcrumbs', 8 ); }
 }
 
 /* -------------------------------------------------------------------------
@@ -367,7 +367,7 @@ if ( ! function_exists( 'javan_seda_seo_title_parts' ) ) {
 		}
 		return $parts;
 	}
-	add_filter( 'document_title_parts', 'javan_seda_seo_title_parts', 20 );
+	if ( function_exists( 'javan_seda_seo_title_parts' ) ) { add_filter( 'document_title_parts', 'javan_seda_seo_title_parts', 20 ); }
 }
 
 /* -------------------------------------------------------------------------
@@ -403,7 +403,7 @@ if ( JAVANSEDA_SEO_ROBOTS && ! function_exists( 'javan_seda_seo_robots' ) ) {
 		}
 		return $robots;
 	}
-	add_filter( 'wp_robots', 'javan_seda_seo_robots', 20 );
+	if ( function_exists( 'javan_seda_seo_robots' ) ) { add_filter( 'wp_robots', 'javan_seda_seo_robots', 20 ); }
 }
 
 /* -------------------------------------------------------------------------

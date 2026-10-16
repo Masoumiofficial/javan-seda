@@ -121,7 +121,7 @@ if ( ! function_exists( 'javan_seda_register_missing_sidebars' ) ) {
 		}
 	}
 }
-add_action( 'widgets_init', 'javan_seda_register_missing_sidebars', 20 );
+if ( function_exists( 'javan_seda_register_missing_sidebars' ) ) { add_action( 'widgets_init', 'javan_seda_register_missing_sidebars', 20 ); }
 
 /**
  * (اختیاری و خاموش) بازگردانی ابزارک از «ابزارک‌های غیرفعال».
@@ -185,7 +185,7 @@ if ( JAVANSEDA_SIDEBAR_RECOVERY && ! function_exists( 'javan_seda_recover_sideba
 
 		return $sidebars_widgets;
 	}
-	add_filter( 'sidebars_widgets', 'javan_seda_recover_sidebars', 20 );
+	if ( function_exists( 'javan_seda_recover_sidebars' ) ) { add_filter( 'sidebars_widgets', 'javan_seda_recover_sidebars', 20 ); }
 }
 
 /* ---------------------------------------------------------------------------
@@ -246,8 +246,8 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 	function javan_seda_expected_hashes() {
 	return array(
 		'header.php'                => '9807921341cccde44f702cedec6cdeecff490f86d51fd518d4bf80489da080c1',
-		'style.css'                 => '3057dfeeb15a1217dccd97df3b8d2939eb4143df59bd12409743c5e752933321',
-		'myfunctions.php'           => '5a9deee1e76b006c09706c9d3f7125b4121535870db21847c175116c0c029fa4',
+		'style.css'                 => 'c943639a06d4e5af06f4226fc93ff584f7b5c6de0fbbb33593d8764c23ac7de7',
+		'myfunctions.php'           => '9712de791b3bfba427b212ea2ebeb2005b771c3bed6d74e72bc0d1c6f6772a69',
 		'home.php'                  => '6bf766679e28f87c5f9a6d64291c318257051ea8fbe45cf2a43b2214417a12c9',
 		'single.php'                => '03d49214211e9b138a709d178fafe920ac8e67b70a40efd34f2494143518b9d1',
 		'page.php'                  => 'b83d394588a1cbce37f075dcb7c679497ab19b20975488af07637419aa27da8a',
@@ -255,15 +255,15 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 		'404.php'                   => 'd1be37361a79299155cc397b70f8ad0c68bd70bc60328c1f874ed73658a604e3',
 		'search.php'                => 'd668da0b149b312c73f9a57dccf0f1c206eaebc8e8e87778a4d514a4a6a3e2b0',
 		'inc/ab-news-ticker.php'    => 'b9eebd2bc03497b9011a134e8cf7325a8952a2df18eea67ba9e010422b914d0e',
-		'inc/ab-perf.php'           => 'a04053e34aad2ba3a17aace914a438232a62c28c3084a7cba561a7c07a8695a6',
-		'inc/ab-seo.php'            => '6fead0b0d3bdcaaf9181ac363e971b822bd7f1e91d4d2e14901561e05d690403',
+		'inc/ab-perf.php'           => 'b4b91567398e649b5ba0a4ca40d0f72862afc90ce2089c862701721241527d3d',
+		'inc/ab-seo.php'            => '26045f63648c2f8bdc51957c4d5f7dc867c471d30ebdf78d9897b5aa96c60d5e',
 		'inc/acf-compat.php'        => 'a80e945dcfc128fa39d400c6e950f04ca6a0c6e7665f9e11d5ad36c667e30068',
 		'inc/vip_slider.php'        => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
 		'inc/songs_post.php'        => '96e75daba47f8a1b740867306fafd382ce08904ab1406dc678d645c92ccd2107',
 		'inc/tarlanweb_player.php'  => '6764721f6a569baa1b6b1f6c05c4fe2956cbe195382a6351276397431fc8d57d',
 		'inc/mostviews_posts.php'   => '539de6f68edbbdec2ef3a9686b0eed902f04fa6020ae51a7c2f176c32f420635',
-		'inc/ab-views.php'          => '6800d5c8f5ee72c89f2adf3c8a621d4bf6ead033d85a25aefe7cb8f125b31428',
-		'inc/ab-ratings.php'        => 'd3964a3c64f42cfd773d7c96e483dd70d808ceab0ddd253675553d97e11295c0'
+		'inc/ab-views.php'          => '633cd5d01defbdae4763eebce003cc23c086acc088f1077a6c12e2eeb1fbe859',
+		'inc/ab-ratings.php'        => '8bdaec5ccb40e6fee7df195c2d5d7e4765eee886140dfc9de1b1fb3fb0399a40'
 	);
 }
 }

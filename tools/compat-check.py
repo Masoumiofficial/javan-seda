@@ -91,5 +91,37 @@ for arg in (sys.argv[1:] or ['javanseda']):
                 tag = 'OURS' if mine.search(path) else 'theme'
                 print('[%s] %s:%d  %s  …%s…' % (tag, path, ln, label, frag))
                 hits += 1
+# --- بررسی دوم (v3.1.7): «dangling callback» — همان چیزی که سایت را خواباند ---
+# هر add_action/add_filter/add_shortcode که callback رشته‌ایِ javan_seda_* دارد باید
+# تابعش در همان فایل تعریف شده باشد (یا با function_exists پوشیده شده باشد).
+CB = re.compile(r"add_(?:action|filter|shortcode)\(\s*'[^']+'\s*,\s*'(javan_seda_[A-Za-z0-9_]+)'")
+declared_all = set()
+for dp, dn, fn in os.walk(sys.argv[1] if len(sys.argv) > 1 else 'javanseda'):
+    if 'option-tree' in dp:
+        continue
+    for f in fn:
+        if f.endswith('.php'):
+            src = io.open(os.path.join(dp, f), encoding='utf-8', errors='ignore').read()
+            declared_all |= set(re.findall(r'function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(', src))
+for arg in (sys.argv[1:] or ['javanseda']):
+    for path in files_of(arg):
+        src = io.open(path, encoding='utf-8', errors='ignore').read()
+        scan = code_only(src)
+        for m in CB.finditer(scan):
+            cb = m.group(1)
+            if re.search(r'function\s+%s\s*\(' % re.escape(cb), scan):
+                continue
+            if ("function_exists( '%s' )" % cb) in scan:
+                continue
+            ln = src[:m.start()].count('\n') + 1
+            print('[OURS] %s:%d  dangling callback (WP will fatal in PHP 8)  →  %s' % (path, ln, cb))
+            hits += 1
+        for m in re.finditer(r"add_(?:action|filter|shortcode)\(\s*'[^']+'\s*,\s*'(javan_seda_[A-Za-z0-9_]+)'", scan):
+            cb = m.group(1)
+            if cb not in declared_all and ("function_exists( '%s' )" % cb) not in scan:
+                ln = src[:m.start()].count('\n') + 1
+                print('[OURS] %s:%d  callback not declared anywhere in theme  →  %s' % (path, ln, cb))
+                hits += 1
+
 print('compat-check: %d hit(s)' % hits)
 sys.exit(1 if hits else 0)

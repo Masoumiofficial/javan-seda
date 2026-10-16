@@ -1,33 +1,104 @@
 <?php
 /* ---------------------------------------------------------------------------
-   دروازۀ سازگاری (v3.1.6) — قبل از require هر لایه، فایل را سریع می‌خواند و اگر
-   ساختاری تازه‌تر از PHPِ جاری داشت (بستنۀ static ، fn() ، ??= ، ?-> ، ??) آن لایه را
-   بارگذاری نمی‌کند. چرا؟ چون یک syntax error در یک فایل لایه، کل سایت را با صفحهٔ
-   «یک خطای مهم در این وب سایت رخ داده است» می‌خواباند و هیچ flag/define‌ای هم نجاتش
-   نمی‌دهد (خطای زمان پارس را نمی‌شود خاموش کرد). با این دروازه، بدترین حالت فقط
-   غیرفعال‌شدن همان لایه است. روی PHP 7.4+ هیچ هزینه‌ای ندارد (اولین شرط کوتاه می‌شود).
+   دروازۀ محافظتِ لایه‌ها (v3.1.7) — قبل از require هر لایه، همان فایل را (فقط وقتی عوض شده)
+   می‌خواند و دو چیز را می‌سنجد:
+     ۱) ساختاری تازه‌تر از PHPِ جاری: بستۀ static ، fn() ، ??= ، ?-> ، ??
+     ۲) «dangling callback»: add_action/add_filter روی نامِ تابعی که در همان فایل تعریف نشده.
+        همان بند ۲ علت خطای گزارش‌شدۀ 3.1.5 بود (debug.log):
+        call_user_func_array(): Argument #1 ($callback) must be a valid callback — function not found
+        که در PHP 8 یک TypeError کشنده است و کل سایت + wp-cron را می‌خواباند.
+   اگر لایه‌ای رد شود، فقط همان لایه خاموش می‌ماند و سایت کار می‌کند.
+   هزینه: یک get_option + چند filemtime در هر درخواست؛ متن فایل فقط هنگام عوض‌شدن mtime خوانده
+   و بررسی می‌شود (پس جابه‌جایی فایل روی هاست خودکار دوباره ارزیابی می‌شود).
+   خاموش‌کردنِ خودِ این محافظ:  define( 'JAVANSEDA_GATE_OFF', true );
    ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+   تفکیک‌کنندهٔ کد/کامنت/رشته (v3.1.7) — از token_get_all() استفاده می‌کند تا هیچ‌گاه
+   یک آپوستروف داخل کامنت (مثلاً «define( 'JAVANSEDA_SEO', false );» در خطوط توضیح)
+   باعث نشود تویعات واقعیِ فایل «تعریف‌نشده» به نظر برسند. اگر tokenizer نبود، به
+   preg برمی‌گردد. خروجی: array( کد+رشته‌ها , کد-بدون-رشته )
+   ------------------------------------------------------------------------- */
+if ( ! function_exists( 'javan_seda_layer_split' ) ) {
+	function javan_seda_layer_split( $src ) {
+		if ( function_exists( 'token_get_all' ) ) {
+			$nc = '';
+			$bare = '';
+			foreach ( (array) @token_get_all( $src ) as $tok ) {
+				if ( is_array( $tok ) ) {
+					if ( T_COMMENT === $tok[0] || T_DOC_COMMENT === $tok[0] ) {
+						$nc   .= "\n";
+						$bare .= "\n";
+						continue;
+					}
+					$nc   .= $tok[1];
+					$bare .= ( T_CONSTANT_ENCAPSED_STRING === $tok[0] || T_ENCAPSED_AND_WHITESPACE === $tok[0] ) ? "''" : $tok[1];
+					continue;
+				}
+				$nc   .= (string) $tok;
+				$bare .= (string) $tok;
+			}
+			return array( $nc, $bare );
+		}
+		$nc = (string) preg_replace( '/\/\*.*?\*\//s', ' ', $src );
+		$nc = (string) preg_replace( '/(^|\n)[ \t]*(\/\/|#)[^\n]*/', '$1', $nc );
+		$bare = (string) preg_replace( '/"(?:\\\\.|[^"\\\\])*"/', '""', $nc );
+		$bare = (string) preg_replace( "/'(?:\\\\.|[^'\\\\])*'/", "''", $bare );
+		return array( $nc, $bare );
+	}
+}
+
 if ( ! function_exists( 'javan_seda_layer_loadable' ) ) {
 	function javan_seda_layer_loadable( $file ) {
-		if ( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID >= 70400 ) {
+		static $javan_seda_gate_seen = array();
+		if ( isset( $javan_seda_gate_seen[ $file ] ) ) {
+			return $javan_seda_gate_seen[ $file ];
+		}
+		if ( defined( 'JAVANSEDA_GATE_OFF' ) && JAVANSEDA_GATE_OFF ) {
 			return true;
 		}
-		static $javan_seda_gate_cache = array();
-		if ( isset( $javan_seda_gate_cache[ $file ] ) ) {
-			return $javan_seda_gate_cache[ $file ];
+		if ( ! is_readable( $file ) ) {
+			return true; /* نبودن فایل را خودِ is_readable() در فراخوان مدیریت می‌کند */
 		}
-		$ok  = true;
+		$ok    = true;
+		$mtime = (int) @filemtime( $file );
+		$cache = function_exists( 'get_option' ) ? (array) get_option( 'javan_seda_gate_cache', array() ) : array();
+		$key   = basename( $file );
+		if ( isset( $cache[ $key ] ) && is_array( $cache[ $key ] ) && isset( $cache[ $key ]['m'] ) && (int) $cache[ $key ]['m'] === $mtime ) {
+			$javan_seda_gate_seen[ $file ] = ! empty( $cache[ $key ]['ok'] );
+			return $javan_seda_gate_seen[ $file ];
+		}
 		$src = @file_get_contents( $file );
-		if ( is_string( $src ) && preg_match( '/\bstatic\s+function\s*\(|(?:^|[^$\w>])fn\s*\(|\?\?=|\?->/', $src ) ) {
-			$ok = false;
+		if ( is_string( $src ) && '' !== $src ) {
+			/* $nc = کد + رشته‌ها (برای دیدنِ نامِ callbackهای ثبت‌شده) · $bare = کد خالص (برای ساختارِ نسخه‌ای) */
+			list( $nc, $bare ) = javan_seda_layer_split( $src );
+			if ( ! ( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID >= 70400 ) ) {
+				if ( preg_match( '/\bstatic\s+function\s*\(|(?:^|[^$\w>])fn\s*\(|\?\?=|\?->/', $bare ) ) {
+					$ok = false;
+				}
+				if ( $ok && defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID < 70000 && false !== strpos( $bare, '??' ) ) {
+					$ok = false;
+				}
+			}
+			if ( $ok && preg_match_all( '/add_(?:action|filter|shortcode)\(\s*\'[^\']+\'\s*,\s*\'(javan_seda_[A-Za-z0-9_]+)\'/', $nc, $mm ) && ! empty( $mm[1] ) ) {
+				foreach ( array_unique( $mm[1] ) as $cb ) {
+					if ( false !== strpos( $nc, "function_exists( '" . $cb . "' )" ) ) {
+						continue; /* ثبت با function_exists پیچیده شده ⇒ نبودنِ تابع خطا نمی‌سازد */
+					}
+					if ( ! preg_match( '/function\s+' . preg_quote( $cb, '/' ) . '\s*\(/', $bare ) ) {
+						$ok = false;
+						break;
+					}
+				}
+			}
 		}
-		if ( $ok && is_string( $src ) && defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID < 70000 && false !== strpos( $src, '??' ) ) {
-			$ok = false;
+		if ( ! $ok && function_exists( 'error_log' ) && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( '[javan-seda] لایه خاموش شد (ناسازگار با PHP یا ارجاع به تابع تعریف‌نشده): ' . $file );
 		}
-		if ( ! $ok && defined( 'WP_DEBUG' ) && WP_DEBUG && function_exists( 'error_log' ) ) {
-			error_log( '[javan-seda] لایه بارگذاری نشد (نیازمند PHP 7.4+): ' . $file );
+		$javan_seda_gate_seen[ $file ] = $ok;
+		if ( function_exists( 'update_option' ) ) {
+			$cache[ $key ] = array( 'm' => $mtime, 'ok' => $ok );
+			update_option( 'javan_seda_gate_cache', $cache, false );
 		}
-		$javan_seda_gate_cache[ $file ] = $ok;
 		return $ok;
 	}
 }

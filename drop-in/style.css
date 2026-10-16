@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.1.6
+Version: 3.1.7
 */
 /*
 ==================================================================================
@@ -2787,6 +2787,12 @@ body.ab-has-mh{padding-top:90px;}
 .icofont-fire-alt:before{content:"\ef21";}
 /* --- انتهای بلوک ۲۴ (v3.1.5) --- */
 
-/* v3.1.6 (دور ۱۲.۱ — hotfix): دروازۀ سازگاری در myfunctions.php · حذف بستۀ static در inc/ab-perf.php
+/* v3.1.7 (دور ۱۲.۲ — hotfix دوم، علتِ قطعیِ debug.log):
+   علت خطا: در inc/ab-views.php شورت‌کد [ab_charts] با add_action('init', نامِ تابعی) ثبت می‌شد که
+   آن تابع هیچ‌جا تعریف نشده بود ⇒ در PHP 8 خطای کشندۀ call_user_func_array() روی هر درخواست و wp-cron.
+   اصلاح: ثبت مستقیم add_shortcode (بدون init، بدون نامِ معلق) + همهٔ ثبت‌های هوکِ لایه‌ها با
+   function_exists پیچیده شدند + دروازۀ myfunctions.php حالا «dangling callback» را هم می‌گیرد.
+
+   v3.1.6 (دور ۱۲.۱ — hotfix): دروازۀ سازگاری در myfunctions.php · حذف بستۀ static در inc/ab-perf.php
    · محافظت WP_Error از نشانیِ ترم‌ها در inc/ab-seo.php. هیچ قانون ظاهری عوض نشد؛ فقط شمارۀ نسخه برای
    cache-bust کردن استایل. انتهای فایل. */

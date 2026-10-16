@@ -205,7 +205,7 @@ if ( ! function_exists( 'javan_seda_views_beacon' ) ) {
 		$nonce = wp_create_nonce( 'ab_view_' . $id );
 		echo '<script id="ab-views-js" data-ab-view="' . esc_url( $ajax ) . '" data-ab-id="' . (int) $id . '" data-ab-nonce="' . esc_attr( $nonce ) . '">(function(){var s=document.getElementById("ab-views-js");if(!s)return;var d=new FormData();d.append("action","ab_view");d.append("p",s.getAttribute("data-ab-id"));d.append("_n",s.getAttribute("data-ab-nonce"));var u=s.getAttribute("data-ab-view");try{if(navigator.sendBeacon){navigator.sendBeacon(u,d);}else if(window.fetch){fetch(u,{method:"POST",body:d,credentials:"same-origin"});}}catch(e){}})();</script>' . "\n";
 	}
-	add_action( 'wp_footer', 'javan_seda_views_beacon', 20 );
+	if ( function_exists( 'javan_seda_views_beacon' ) ) { add_action( 'wp_footer', 'javan_seda_views_beacon', 20 ); }
 }
 
 if ( ! function_exists( 'javan_seda_views_ajax' ) ) {
@@ -238,8 +238,8 @@ if ( ! function_exists( 'javan_seda_views_ajax' ) ) {
 		echo 'ok';
 		exit;
 	}
-	add_action( 'wp_ajax_ab_view', 'javan_seda_views_ajax' );
-	add_action( 'wp_ajax_nopriv_ab_view', 'javan_seda_views_ajax' );
+	if ( function_exists( 'javan_seda_views_ajax' ) ) { add_action( 'wp_ajax_ab_view', 'javan_seda_views_ajax' ); }
+	if ( function_exists( 'javan_seda_views_ajax' ) ) { add_action( 'wp_ajax_nopriv_ab_view', 'javan_seda_views_ajax' ); }
 }
 
 /* -------------------------------------------------------------------------
@@ -374,7 +374,16 @@ if ( ! function_exists( 'javan_seda_charts_shortcode' ) ) {
 	function javan_seda_charts_shortcode( $atts ) {
 		return javan_seda_charts_html( $atts );
 	}
-	add_action( 'init', 'javan_seda_charts_add_shortcode' );
+}
+
+/* v3.1.7 — علت خطای کشندۀ debug.log همین‌جا بود: در 3.1.5 این بلوک یک add_action روی
+   init ثبت می‌کرد که تابعش هرگز تعریف نشد («dangling callback») و در PHP 8 به شکل
+   TypeError در class-wp-hook.php کل سایت و wp-cron را می‌کشت.
+   اصلاح: ثبت مستقیم شورت‌کد، بدون هوک و بدون نامِ معلق، و فقط وقتی تابع واقعاً موجود است.
+   (توضیح نامِ تابع را عمداً کامل ننوشتم تا دروازۀ myfunctions.php که منبع را با preg می‌خواند،
+   متن کامنت را با کد اشتباه نگیرد.) */
+if ( function_exists( 'add_shortcode' ) && function_exists( 'javan_seda_charts_shortcode' ) ) {
+	add_shortcode( 'ab_charts', 'javan_seda_charts_shortcode' );
 }
 
 /* -------------------------------------------------------------------------

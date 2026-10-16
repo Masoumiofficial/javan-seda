@@ -57,59 +57,85 @@ $modern = array(
 	'return type → PHP 7.0+'          => '/\)\s*:\s*(?:void|bool|string|int|float|array|self|mixed)\s*[\{;]/',
 );
 
-/** هر چیزی داخل نقل‌قول یا کامنت را با فاصله جایگزین می‌کند. */
-function abr_blind( $src ) {
-	$out = str_split( $src );
-	$i = 0;
-	$n = strlen( $src );
-	while ( $i < $n ) {
-		$c = $src[ $i ];
-		if ( "'" === $c || '"' === $c || '`' === $c ) {
-			$i++;
-			while ( $i < $n ) {
-				if ( '\\' === $src[ $i ] ) {
-					$out[ $i ] = ' ';
-					if ( $i + 1 < $n ) {
-						$out[ $i + 1 ] = ' ';
+/* ---------------------------------------------------------------------------
+   abr_split() — تفکیک دقیق کد/رشته/کامنت با token_get_all() (پشتکار: preg)
+   چرا tokenizer؟ چون یک آپوستروف داخل کامنت (مثل «define( 'JAVANSEDA_SEO', false );»)
+   اگر با preg متن را بشکافد، نصف فایل «ناپدید» می‌شود و توابع سالم «تعریف‌نشده»
+   گزارش می‌شدند. آرایۀ بازگشتی: 0 => کد + رشته‌ها (برای دیدن نام callbackها)
+   و 1 => کدِ خالصِ بدون‌رشته (برای دیدن ساختارهای نسخه‌بسته).
+   ------------------------------------------------------------------------- */
+if ( ! function_exists( 'abr_split' ) ) {
+	function abr_split( $src ) {
+		if ( function_exists( 'token_get_all' ) ) {
+			$nc   = '';
+			$bare = '';
+			foreach ( (array) @token_get_all( $src ) as $tok ) {
+				if ( is_array( $tok ) ) {
+					if ( T_COMMENT === $tok[0] || T_DOC_COMMENT === $tok[0] ) {
+						$nc   .= "\n";
+						$bare .= "\n";
+						continue;
 					}
-					$i += 2;
+					$nc    .= $tok[1];
+					$bare  .= ( T_CONSTANT_ENCAPSED_STRING === $tok[0] || T_ENCAPSED_AND_WHITESPACE === $tok[0] ) ? "''" : $tok[1];
 					continue;
 				}
-				if ( $src[ $i ] === $c ) {
-					$i++;
-					break;
-				}
-				$out[ $i ] = ' ';
-				$i++;
-			}
-			continue;
+				$nc   .= (string) $tok;
+				$bare .= (string) $tok;
 		}
-		if ( '#' === $c || 0 === strpos( substr( $src, $i ), '//' ) ) {
-			$j = strpos( $src, "\n", $i );
-			$j = ( false === $j ) ? $n : $j;
-			for ( $k = $i; $k < $j; $k++ ) {
-				$out[ $k ] = ' ';
-			}
-			$i = $j;
-			continue;
+			return array( $nc, $bare );
 		}
-		if ( 0 === strpos( substr( $src, $i ), '/*' ) ) {
-			$j = strpos( $src, '*/', $i + 2 );
-			$j = ( false === $j ) ? $n : $j + 2;
-			for ( $k = $i; $k < $j; $k++ ) {
-				if ( "\n" !== $src[ $k ] ) {
-					$out[ $k ] = ' ';
-				}
-			}
-			$i = $j;
-			continue;
-		}
-		$i++;
+		$nc   = (string) preg_replace( '/\/\*.*?\*\//s', ' ', $src );
+		$nc   = (string) preg_replace( '/(^|\n)[ \t]*(\/\/|#)[^\n]*/', '$1', $nc );
+		$bare = (string) preg_replace( '/"(?:\\\\.|[^"\\\\])*"/', '""', $nc );
+		$bare = (string) preg_replace( "/'(?:\\\\.|[^'\\\\])*'/", "''", $bare );
+		return array( $nc, $bare );
 	}
-	return implode( '', $out );
 }
 
-echo "=== ab-rescue · گزارش نجات (v3.1.6) ===\n\n";
+if ( ! function_exists( 'abr_blind' ) ) {
+	function abr_blind( $src ) {
+		$pair = abr_split( $src );
+		return $pair[1];
+	}
+}
+
+if ( ! function_exists( 'abr_no_comments' ) ) {
+	function abr_no_comments( $src ) {
+		$pair = abr_split( $src );
+		return $pair[0];
+	}
+}
+
+
+/** فهرست ثبت‌های هوک در یک فایل + هر کدام که تابعش در همان فایل تعریف نشده باشد.
+    «dangling callback» = در PHP 8 خطای کشندهٔ call_user_func_array() ⇒ کل سایت پایین. */
+function abr_hooks( $src ) {
+	$nc = abr_no_comments( $src );
+	if ( ! preg_match_all( '/add_(?:action|filter|shortcode)\(\s*\'[^\']+\'\s*,\s*\'(javan_seda_[A-Za-z0-9_]+)\'/', $nc, $mm, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) ) {
+		return array();
+	}
+	$bare = preg_replace( '/"(?:\\\\.|[^"\\\\])*"/', '""', $nc );
+	$bare = preg_replace( "/'(?:\\\\.|[^'\\\\])*'/", "''", $bare );
+	$bad  = array();
+	foreach ( $mm as $one ) {
+		$cb  = isset( $one[1][0] ) ? (string) $one[1][0] : '';
+		$pos = isset( $one[1][1] ) ? (int) $one[1][1] : 0;
+		if ( '' === $cb ) {
+			continue;
+		}
+		if ( preg_match( '/function\s+' . preg_quote( $cb, '/' ) . '\s*\(/', $bare ) ) {
+			continue; /* تابع در همین فایل هست ⇒ امن */
+		}
+		if ( false !== strpos( $bare, "function_exists( '" . $cb . "' )" ) ) {
+			continue; /* ثبت با function_exists پیچیده شده ⇒ امن */
+		}
+		$bad[] = array( $cb, (int) substr_count( substr( $bare, 0, $pos ), "\n" ) + 1 );
+	}
+	return $bad;
+}
+
+echo "=== ab-rescue · گزارش نجات (v3.1.7) ===\n\n";
 
 echo "PHP            : " . PHP_VERSION . "   (ID " . ( defined( 'PHP_VERSION_ID' ) ? PHP_VERSION_ID : '?' ) . ")\n";
 echo "server software: " . ( isset( $_SERVER['SERVER_SOFTWARE'] ) ? $_SERVER['SERVER_SOFTWARE'] : '?' ) . "\n";
@@ -159,6 +185,12 @@ foreach ( $layers as $rel => $what ) {
 				}
 				$bad[ $label ] = array_slice( array_unique( $lines ), 0, 6 );
 			}
+		}
+	}
+	$hooks = abr_hooks( $src );
+	if ( $hooks ) {
+		foreach ( $hooks as $h ) {
+			$bad[ 'ارجاع به تابع تعریف‌نشده ⇒ در PHP 8 خطای کشنده (این دقیقاً علت خطای 3.1.5 بود): ' . $h[0] . ' در خط ' . $h[1] ] = array();
 		}
 	}
 	if ( $bad ) {

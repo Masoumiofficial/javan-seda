@@ -246,8 +246,8 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 	function javan_seda_expected_hashes() {
 	return array(
 		'header.php'                => '9807921341cccde44f702cedec6cdeecff490f86d51fd518d4bf80489da080c1',
-		'style.css'                 => 'b587e4626cf6b8d3595b7c80f5200c446c29f669d2ef8d2405c7c890743f4766',
-		'myfunctions.php'           => 'ccb4f388f948116be0a5997c3882c946da16ae35519b3116c713a869477ce8a5',
+		'style.css'                 => '3057dfeeb15a1217dccd97df3b8d2939eb4143df59bd12409743c5e752933321',
+		'myfunctions.php'           => '5a9deee1e76b006c09706c9d3f7125b4121535870db21847c175116c0c029fa4',
 		'home.php'                  => '6bf766679e28f87c5f9a6d64291c318257051ea8fbe45cf2a43b2214417a12c9',
 		'single.php'                => '03d49214211e9b138a709d178fafe920ac8e67b70a40efd34f2494143518b9d1',
 		'page.php'                  => 'b83d394588a1cbce37f075dcb7c679497ab19b20975488af07637419aa27da8a',
@@ -255,8 +255,8 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 		'404.php'                   => 'd1be37361a79299155cc397b70f8ad0c68bd70bc60328c1f874ed73658a604e3',
 		'search.php'                => 'd668da0b149b312c73f9a57dccf0f1c206eaebc8e8e87778a4d514a4a6a3e2b0',
 		'inc/ab-news-ticker.php'    => 'b9eebd2bc03497b9011a134e8cf7325a8952a2df18eea67ba9e010422b914d0e',
-		'inc/ab-perf.php'           => '1a923af24840955fd346422afd06a3118fda4d0a31623d8b8a92cc039b6a9766',
-		'inc/ab-seo.php'            => 'a1f55722e52835ad7827abd3c434798f14511904b25eab0af934cfb4a3634f66',
+		'inc/ab-perf.php'           => 'a04053e34aad2ba3a17aace914a438232a62c28c3084a7cba561a7c07a8695a6',
+		'inc/ab-seo.php'            => '6fead0b0d3bdcaaf9181ac363e971b822bd7f1e91d4d2e14901561e05d690403',
 		'inc/acf-compat.php'        => 'a80e945dcfc128fa39d400c6e950f04ca6a0c6e7665f9e11d5ad36c667e30068',
 		'inc/vip_slider.php'        => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
 		'inc/songs_post.php'        => '96e75daba47f8a1b740867306fafd382ce08904ab1406dc678d645c92ccd2107',

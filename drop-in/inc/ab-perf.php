@@ -195,7 +195,7 @@ if ( JAVANSEDA_PERF_LAZY_IMG && ! function_exists( 'javan_seda_perf_lazy_img' ) 
 		}
 		$html = preg_replace_callback(
 			'/<img\b[^>]*>/i',
-			static function ( $m ) {
+			function ( $m ) { /* v3.1.6: کلیدواژۀ static برای بستنِ بسته‌شده فقط PHP 7.4+ است ⇒ روی 7.0..7.3 syntax error و خوابیدن کل سایت */
 				$tag = $m[0];
 				if ( false !== stripos( $tag, 'loading=' ) ) {
 					return $tag; // از قبل تصمیم گرفته شده

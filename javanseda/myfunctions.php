@@ -1,50 +1,83 @@
 <?php
 /* ---------------------------------------------------------------------------
+   دروازۀ سازگاری (v3.1.6) — قبل از require هر لایه، فایل را سریع می‌خواند و اگر
+   ساختاری تازه‌تر از PHPِ جاری داشت (بستنۀ static ، fn() ، ??= ، ?-> ، ??) آن لایه را
+   بارگذاری نمی‌کند. چرا؟ چون یک syntax error در یک فایل لایه، کل سایت را با صفحهٔ
+   «یک خطای مهم در این وب سایت رخ داده است» می‌خواباند و هیچ flag/define‌ای هم نجاتش
+   نمی‌دهد (خطای زمان پارس را نمی‌شود خاموش کرد). با این دروازه، بدترین حالت فقط
+   غیرفعال‌شدن همان لایه است. روی PHP 7.4+ هیچ هزینه‌ای ندارد (اولین شرط کوتاه می‌شود).
+   ------------------------------------------------------------------------- */
+if ( ! function_exists( 'javan_seda_layer_loadable' ) ) {
+	function javan_seda_layer_loadable( $file ) {
+		if ( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID >= 70400 ) {
+			return true;
+		}
+		static $javan_seda_gate_cache = array();
+		if ( isset( $javan_seda_gate_cache[ $file ] ) ) {
+			return $javan_seda_gate_cache[ $file ];
+		}
+		$ok  = true;
+		$src = @file_get_contents( $file );
+		if ( is_string( $src ) && preg_match( '/\bstatic\s+function\s*\(|(?:^|[^$\w>])fn\s*\(|\?\?=|\?->/', $src ) ) {
+			$ok = false;
+		}
+		if ( $ok && is_string( $src ) && defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID < 70000 && false !== strpos( $src, '??' ) ) {
+			$ok = false;
+		}
+		if ( ! $ok && defined( 'WP_DEBUG' ) && WP_DEBUG && function_exists( 'error_log' ) ) {
+			error_log( '[javan-seda] لایه بارگذاری نشد (نیازمند PHP 7.4+): ' . $file );
+		}
+		$javan_seda_gate_cache[ $file ] = $ok;
+		return $ok;
+	}
+}
+
+/* ---------------------------------------------------------------------------
    لایهٔ ایمنی «سایدبار / ابزارک نوشته‌ها» (v3.0.2)
    اگر این include حذف شود، ناحیه‌های left_side / left_side2 / left_side1
    فقط به فایل رمزنگاری‌شدهٔ functions.php وابسته می‌مانند.
    ------------------------------------------------------------------------- */
 $_javan_seda_sidebars = trailingslashit( get_template_directory() ) . 'inc/ab-sidebars.php';
-if ( is_readable( $_javan_seda_sidebars ) ) {
+if ( is_readable( $_javan_seda_sidebars ) && javan_seda_layer_loadable( $_javan_seda_sidebars ) ) {
 	require_once $_javan_seda_sidebars;
 }
 unset( $_javan_seda_sidebars );
 /* v3.1.2 — لایهٔ «اخبار روز»: فقط تابع/شورت‌کد [ab_news] را تعریف می‌کند (بدون هوکِ رندر) */
 $_javan_seda_news = trailingslashit( get_template_directory() ) . 'inc/ab-news-ticker.php';
-if ( is_readable( $_javan_seda_news ) ) {
+if ( is_readable( $_javan_seda_news ) && javan_seda_layer_loadable( $_javan_seda_news ) ) {
 	require_once $_javan_seda_news;
 }
 unset( $_javan_seda_news );
 /* v3.1.5 — لایۀ «محبوبیت»: شمارش بازدید (با beacon، سازگار با کش) + چارت [ab_charts]
    خاموشی: define( 'JAVANSEDA_VIEWS', false );  |  خاموشی امتیاز: define( 'JAVANSEDA_RATINGS', false ); */
 $_javan_seda_views = trailingslashit( get_template_directory() ) . 'inc/ab-views.php';
-if ( is_readable( $_javan_seda_views ) ) {
+if ( is_readable( $_javan_seda_views ) && javan_seda_layer_loadable( $_javan_seda_views ) ) {
 	require_once $_javan_seda_views;
 }
 unset( $_javan_seda_views );
 $_javan_seda_rates = trailingslashit( get_template_directory() ) . 'inc/ab-ratings.php';
-if ( is_readable( $_javan_seda_rates ) ) {
+if ( is_readable( $_javan_seda_rates ) && javan_seda_layer_loadable( $_javan_seda_rates ) ) {
 	require_once $_javan_seda_rates;
 }
 unset( $_javan_seda_rates );
 /* v3.1.4 — لایۀ «دیده‌شدن» (meta description + og:/twitter: + BreadcrumbList + wp_robots)
    برای خاموش‌کردن همه:  define( 'JAVANSEDA_SEO', false );  در wp-config.php */
 $_javan_seda_seo = trailingslashit( get_template_directory() ) . 'inc/ab-seo.php';
-if ( is_readable( $_javan_seda_seo ) ) {
+if ( is_readable( $_javan_seda_seo ) && javan_seda_layer_loadable( $_javan_seda_seo ) ) {
 	require_once $_javan_seda_seo;
 }
 unset( $_javan_seda_seo );
 /* v3.1.3 — لایۀ «بایتِ سرعت»: defer / preload فونت / حذف بارِ <head> / lazy تصاویر + گزارش perf.
    برای خاموش‌کردن همه:  define( 'JAVANSEDA_PERF', false );  در wp-config.php */
 $_javan_seda_perf = trailingslashit( get_template_directory() ) . 'inc/ab-perf.php';
-if ( is_readable( $_javan_seda_perf ) ) {
+if ( is_readable( $_javan_seda_perf ) && javan_seda_layer_loadable( $_javan_seda_perf ) ) {
 	require_once $_javan_seda_perf;
 }
 unset( $_javan_seda_perf );
 /* v3.1.0 — لایهٔ سازگاری ACF: فقط وقتی ACF فعال نباشد توابع را تعریف می‌کند
    و از خطای کشندهٔ «Call to undefined function get_field()» در single.php جلوگیری می‌کند. */
 $_javan_seda_acf = trailingslashit( get_template_directory() ) . 'inc/acf-compat.php';
-if ( is_readable( $_javan_seda_acf ) ) {
+if ( is_readable( $_javan_seda_acf ) && javan_seda_layer_loadable( $_javan_seda_acf ) ) {
 	require_once $_javan_seda_acf;
 }
 unset( $_javan_seda_acf );
@@ -461,7 +494,7 @@ add_filter(
 				foreach ( array( 'post_tag', 'category' ) as $fallback_tax ) {
 					$alt = get_term_by( 'name', $needle, $fallback_tax );
 					if ( $alt && ! is_wp_error( $alt ) ) {
-						$lines[] = 'اما در «' . $fallback_tax . '» هست: ' . $alt->name . ' (' . $alt->count . ' نوشته) → ' . get_term_link( $alt );
+						$lines[] = 'اما در «' . $fallback_tax . '» هست: ' . $alt->name . ' (' . $alt->count . ' نوشته) → ' . ( is_wp_error( get_term_link( $alt ) ) ? 'لینک ساخته نشد' : get_term_link( $alt ) );
 					}
 				}
 				$cpt = get_page_by_path( sanitize_title( $needle ), OBJECT, 'singer' );

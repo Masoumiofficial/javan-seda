@@ -267,7 +267,7 @@ if ( ! function_exists( 'javan_seda_seo_canonical_backstop' ) ) {
 		} elseif ( is_category() || is_tag() || is_tax() ) {
 			$t = get_queried_object();
 			if ( $t ) {
-				$u = (string) get_term_link( $t );
+				$u = javan_seda_seo_link( $t );
 			}
 		}
 		if ( $u && ! is_wp_error( $u ) ) {
@@ -280,6 +280,21 @@ if ( ! function_exists( 'javan_seda_seo_canonical_backstop' ) ) {
 /* -------------------------------------------------------------------------
  * ۵) BreadcrumbList (JSON-LD)
  * ---------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------
+ * ۰) کمکی: نشانیِ ترم به‌صورت رشته، بدون ریسکِ «Object of class WP_Error could
+ *    not be converted to string» که در PHP 8 یک خطای کشنده است (get_category_link /
+ *    get_tag_link themselves may return WP_Error). v3.1.6
+ * ---------------------------------------------------------------------- */
+if ( ! function_exists( 'javan_seda_seo_link' ) ) {
+	function javan_seda_seo_link( $term, $taxonomy = '' ) {
+		$link = get_term_link( $term, $taxonomy );
+		if ( is_wp_error( $link ) || ! $link ) {
+			return '';
+		}
+		return (string) $link;
+	}
+}
+
 if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) ) {
 	function javan_seda_seo_breadcrumbs() {
 		if ( ! javan_seda_seo_active() || ! ( is_singular() || is_category() || is_tag() || is_tax() ) ) {
@@ -293,14 +308,14 @@ if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) )
 			if ( is_array( $cats ) && $cats ) {
 				$items[] = array(
 					'name' => wp_strip_all_tags( $cats[0]->name ),
-					'item' => (string) get_category_link( $cats[0]->term_id ),
+					'item' => javan_seda_seo_link( $cats[0]->term_id, 'category' ),
 				);
 			}
 			$singers = get_the_terms( get_the_ID(), 'singer' );
 			if ( is_array( $singers ) && $singers ) {
 				$items[] = array(
 					'name' => wp_strip_all_tags( $singers[0]->name ),
-					'item' => (string) get_term_link( $singers[0] ),
+					'item' => javan_seda_seo_link( $singers[0], 'singer' ),
 				);
 			}
 			$items[] = array( 'name' => wp_strip_all_tags( get_the_title() ), 'item' => '' );

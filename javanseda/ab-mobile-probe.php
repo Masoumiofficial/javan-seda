@@ -324,7 +324,7 @@ function abp_fetch( $url, $ua ) {
 
 /* =============================================================== سرِ گزارش ==== */
 abp_out( '===' );
-abp_out( '=== کاوشگرِ موبایل ↔ دسکتاپ — آهنگ‌بان (v3.1.5) ===' );
+abp_out( '=== کاوشگرِ موبایل ↔ دسکتاپ — آهنگ‌بان (v3.1.6) ===' );
 abp_out( '=== ' . date( 'Y-m-d H:i:s' ) . ' ===' );
 abp_out( '===' );
 abp_ln();
@@ -885,7 +885,7 @@ abp_out( '    <meta name="description" …>  ·  <meta property="og:image" …> 
 abp_out( '  اگر نبودند ⇒ یا فایل لایه (inc/ab-seo.php) روی هاست نیست یا بلوک require در myfunctions.php اعمال نشده/کش است.' );
 /* ------------------------------------ ۱۲) محبوبیت (بازدید · چارت · امتیاز) */
 abp_ln();
-abp_out( '۱۲) لایه‌های inc/ab-views.php و inc/ab-ratings.php (v3.1.5)' );
+abp_out( '۱۲) لایه‌های inc/ab-views.php و inc/ab-ratings.php (v3.1.5 · دروازۀ سازگاری v3.1.6)' );
 $abp_any = false;
 foreach ( array( 'javan_seda_views_report', 'javan_seda_rating_report' ) as $abp_fn ) {
 	if ( function_exists( $abp_fn ) ) {
@@ -899,6 +899,57 @@ foreach ( array( 'javan_seda_views_report', 'javan_seda_rating_report' ) as $abp
 if ( ! $abp_any ) {
 	abp_out( '  ✗ هیچ‌کدام از دو لایه بارگذاری نشده ⇒ inc/ab-views.php و inc/ab-ratings.php روی هاست نیست' );
 	abp_out( '    یا بلوک require در myfunctions.php اعمال نشده/کش است.' );
+}
+/* ------------------------- ۱۳) دروازۀ سازگاری PHP (v3.1.6) — «چرا سایت سفید شد؟» */
+abp_ln();
+abp_out( '۱۳) سازگاری فایل‌های لایه با PHP جاری — نسخهٔ PHP: ' . PHP_VERSION . ' (ID ' . PHP_VERSION_ID . ')' );
+$abp_layers = array(
+	'inc/ab-sidebars.php'    => 'javan_seda_expected_hashes',
+	'inc/ab-news-ticker.php' => 'javan_seda_news_category_slugs',
+	'inc/ab-views.php'       => 'javan_seda_views_ip',
+	'inc/ab-ratings.php'     => 'javan_seda_rate_ip_key',
+	'inc/ab-seo.php'         => 'javan_seda_seo_active',
+	'inc/ab-perf.php'        => 'javan_seda_perf_active',
+	'inc/acf-compat.php'     => 'get_field',
+);
+$abp_needles = array(
+	'7.4: بستۀ static' => '/\bstatic\s+function\s*\(/',
+	'7.4: fn() کوتاه'  => '/(?:^|[^\$\w>])fn\s*\(/',
+	'7.4: ??='         => '/\?\?=/',
+	'8.0: ?->'         => '/\?->/',
+	'8.0: match()'     => '/\bmatch\s*\(/',
+	'7.4: … در آرایه'  => '/=>\s*\.\.\.\$/',
+);
+foreach ( $abp_layers as $abp_lf => $abp_marker ) {
+	$abp_path = trailingslashit( get_template_directory() ) . $abp_lf;
+	if ( ! file_exists( $abp_path ) ) {
+		abp_out( '  – ' . $abp_lf . ' : روی هاست نیست (طبیعی اگر نinstallش کرده‌اید)' );
+		continue;
+	}
+	$abp_src = (string) @file_get_contents( $abp_path );
+	$abp_risky = array();
+	foreach ( $abp_needles as $abp_label => $abp_re ) {
+		if ( preg_match( $abp_re, $abp_src ) ) {
+			$abp_risky[] = $abp_label;
+		}
+	}
+	if ( PHP_VERSION_ID < 70000 && false !== strpos( $abp_src, '??' ) ) {
+		$abp_risky[] = '7.0: ?? (روی PHP 5.x خطای پارس است)';
+	}
+	$abp_state = function_exists( $abp_marker ) ? '✓ بارگذاری شده' : '✗ بارگذاری نشده';
+	if ( function_exists( 'javan_seda_layer_loadable' ) ) {
+		$abp_state .= ( javan_seda_layer_loadable( $abp_path ) ? ' · دروازه اجازه می‌دهد' : ' · دروازه رد می‌کند (لایه عمداً غیرفعال است)' );
+	} else {
+		$abp_state .= ' · دروازۀ v3.1.6 نصب نیست (myfunctions.php کهنه است)';
+	}
+	abp_out( '  ' . $abp_lf . ' (' . size_format( filesize( $abp_path ) ) . ') : ' . $abp_state . ( $abp_risky ? '  ⚠ ساختارِ تازه: ' . implode( ' · ', $abp_risky ) : '  ✓ فقط ساختار PHP 5.6+' ) );
+}
+abp_out( '  راهنما: اگر سایت «خطای کشنده» می‌دهد، همین‌جا باید یک خط ⚠ داشته باشیم یا یک لایه «بارگذاری نشده».' );
+abp_out( '  درمان فوری (بدون FTP اضافه): همان فایل لایه را موقتاً تغییر نام دهید (مثلاً inc/ab-perf.php.off)' );
+abp_out( '  — فایل‌های لایه با is_readable محافظت شده‌اند، پس نبودن‌شان سایت را بالا نگه می‌دارد.' );
+if ( function_exists( 'javan_seda_expected_hashes' ) ) {
+	$abp_man = (array) javan_seda_expected_hashes();
+	abp_out( '  مانیفست: ' . count( $abp_man ) . ' فایل' );
 }
 /* ------------------------------------------------- ذخیرهٔ اختیاری HTMLها */
 if ( ! empty( $_GET['save'] ) ) {

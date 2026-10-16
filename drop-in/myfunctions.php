@@ -15,6 +15,18 @@ if ( is_readable( $_javan_seda_news ) ) {
 	require_once $_javan_seda_news;
 }
 unset( $_javan_seda_news );
+/* v3.1.5 — لایۀ «محبوبیت»: شمارش بازدید (با beacon، سازگار با کش) + چارت [ab_charts]
+   خاموشی: define( 'JAVANSEDA_VIEWS', false );  |  خاموشی امتیاز: define( 'JAVANSEDA_RATINGS', false ); */
+$_javan_seda_views = trailingslashit( get_template_directory() ) . 'inc/ab-views.php';
+if ( is_readable( $_javan_seda_views ) ) {
+	require_once $_javan_seda_views;
+}
+unset( $_javan_seda_views );
+$_javan_seda_rates = trailingslashit( get_template_directory() ) . 'inc/ab-ratings.php';
+if ( is_readable( $_javan_seda_rates ) ) {
+	require_once $_javan_seda_rates;
+}
+unset( $_javan_seda_rates );
 /* v3.1.4 — لایۀ «دیده‌شدن» (meta description + og:/twitter: + BreadcrumbList + wp_robots)
    برای خاموش‌کردن همه:  define( 'JAVANSEDA_SEO', false );  در wp-config.php */
 $_javan_seda_seo = trailingslashit( get_template_directory() ) . 'inc/ab-seo.php';

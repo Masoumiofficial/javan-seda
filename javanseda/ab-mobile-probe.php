@@ -324,7 +324,7 @@ function abp_fetch( $url, $ua ) {
 
 /* =============================================================== سرِ گزارش ==== */
 abp_out( '===' );
-abp_out( '=== کاوشگرِ موبایل ↔ دسکتاپ — آهنگ‌بان (v3.1.4) ===' );
+abp_out( '=== کاوشگرِ موبایل ↔ دسکتاپ — آهنگ‌بان (v3.1.5) ===' );
 abp_out( '=== ' . date( 'Y-m-d H:i:s' ) . ' ===' );
 abp_out( '===' );
 abp_ln();
@@ -883,6 +883,23 @@ if ( function_exists( 'javan_seda_seo_report' ) ) {
 abp_out( '  چک دستیِ همین صفحه (در مرورگر، View Source): سه خط زیر باید باشند' );
 abp_out( '    <meta name="description" …>  ·  <meta property="og:image" …>  ·  <script type="application/ld+json">{…BreadcrumbList…}</script>' );
 abp_out( '  اگر نبودند ⇒ یا فایل لایه (inc/ab-seo.php) روی هاست نیست یا بلوک require در myfunctions.php اعمال نشده/کش است.' );
+/* ------------------------------------ ۱۲) محبوبیت (بازدید · چارت · امتیاز) */
+abp_ln();
+abp_out( '۱۲) لایه‌های inc/ab-views.php و inc/ab-ratings.php (v3.1.5)' );
+$abp_any = false;
+foreach ( array( 'javan_seda_views_report', 'javan_seda_rating_report' ) as $abp_fn ) {
+	if ( function_exists( $abp_fn ) ) {
+		$abp_any = true;
+		foreach ( (array) $abp_fn() as $abp_vl ) {
+			abp_out( '  ' . $abp_vl );
+		}
+		abp_ln();
+	}
+}
+if ( ! $abp_any ) {
+	abp_out( '  ✗ هیچ‌کدام از دو لایه بارگذاری نشده ⇒ inc/ab-views.php و inc/ab-ratings.php روی هاست نیست' );
+	abp_out( '    یا بلوک require در myfunctions.php اعمال نشده/کش است.' );
+}
 /* ------------------------------------------------- ذخیرهٔ اختیاری HTMLها */
 if ( ! empty( $_GET['save'] ) ) {
 	$dir = ( function_exists( 'get_temp_dir' ) ? rtrim( get_temp_dir(), '/\\' ) : sys_get_temp_dir() ) . '/ahangban_probe';

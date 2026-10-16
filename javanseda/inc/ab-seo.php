@@ -397,7 +397,7 @@ if ( JAVANSEDA_SEO_ROBOTS && ! function_exists( 'javan_seda_seo_robots' ) ) {
 if ( ! function_exists( 'javan_seda_seo_report' ) ) {
 	function javan_seda_seo_report() {
 		$L = array();
-		$line = static function ( $s = '' ) use ( &$L ) {
+		$line = function ( $s = '' ) use ( &$L ) {
 			$L[] = $s;
 		};
 		$line( '=== لایۀ «دیده‌شدن» v3.1.4 ===' );

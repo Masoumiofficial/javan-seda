@@ -228,7 +228,7 @@ if ( ! function_exists( 'javan_seda_perf_report' ) ) {
 		$L      = array();
 		$tdir   = get_template_directory();
 		$uri    = get_template_directory_uri();
-		$line   = static function ( $s = '' ) use ( &$L ) {
+		$line   = function ( $s = '' ) use ( &$L ) {
 			$L[] = $s;
 		};
 

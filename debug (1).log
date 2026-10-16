@@ -1,0 +1,23 @@
+[16-Oct-2026 18:38:13 UTC] PHP Notice:  Only variables should be passed by reference in /home/etehadya/domains/ahangban.ir/public_html/wp-content/themes/javanseda/inc/option-tree/ot-loader.php on line 329
+[16-Oct-2026 18:38:13 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, function "javan_seda_charts_add_shortcode" not found or invalid function name in /home/etehadya/domains/ahangban.ir/public_html/wp-includes/class-wp-hook.php:353
+Stack trace:
+#0 /home/etehadya/domains/ahangban.ir/public_html/wp-includes/class-wp-hook.php(377): WP_Hook->apply_filters(NULL, Array)
+#1 /home/etehadya/domains/ahangban.ir/public_html/wp-includes/plugin.php(523): WP_Hook->do_action(Array)
+#2 /home/etehadya/domains/ahangban.ir/public_html/wp-settings.php(779): do_action('init')
+#3 /home/etehadya/domains/ahangban.ir/public_html/wp-config.php(88): require_once('/home/etehadya/...')
+#4 /home/etehadya/domains/ahangban.ir/public_html/wp-load.php(50): require_once('/home/etehadya/...')
+#5 /home/etehadya/domains/ahangban.ir/public_html/wp-blog-header.php(13): require_once('/home/etehadya/...')
+#6 /home/etehadya/domains/ahangban.ir/public_html/index.php(17): require('/home/etehadya/...')
+#7 {main}
+  thrown in /home/etehadya/domains/ahangban.ir/public_html/wp-includes/class-wp-hook.php on line 353
+[16-Oct-2026 18:38:13 UTC] PHP Notice:  Only variables should be passed by reference in /home/etehadya/domains/ahangban.ir/public_html/wp-content/themes/javanseda/inc/option-tree/ot-loader.php on line 329
+[16-Oct-2026 18:38:14 UTC] PHP Fatal error:  Uncaught TypeError: call_user_func_array(): Argument #1 ($callback) must be a valid callback, function "javan_seda_charts_add_shortcode" not found or invalid function name in /home/etehadya/domains/ahangban.ir/public_html/wp-includes/class-wp-hook.php:353
+Stack trace:
+#0 /home/etehadya/domains/ahangban.ir/public_html/wp-includes/class-wp-hook.php(377): WP_Hook->apply_filters(NULL, Array)
+#1 /home/etehadya/domains/ahangban.ir/public_html/wp-includes/plugin.php(523): WP_Hook->do_action(Array)
+#2 /home/etehadya/domains/ahangban.ir/public_html/wp-settings.php(779): do_action('init')
+#3 /home/etehadya/domains/ahangban.ir/public_html/wp-config.php(88): require_once('/home/etehadya/...')
+#4 /home/etehadya/domains/ahangban.ir/public_html/wp-load.php(50): require_once('/home/etehadya/...')
+#5 /home/etehadya/domains/ahangban.ir/public_html/wp-cron.php(46): require_once('/home/etehadya/...')
+#6 {main}
+  thrown in /home/etehadya/domains/ahangban.ir/public_html/wp-includes/class-wp-hook.php on line 353

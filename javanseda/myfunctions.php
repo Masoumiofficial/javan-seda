@@ -15,6 +15,13 @@ if ( is_readable( $_javan_seda_news ) ) {
 	require_once $_javan_seda_news;
 }
 unset( $_javan_seda_news );
+/* v3.1.4 — لایۀ «دیده‌شدن» (meta description + og:/twitter: + BreadcrumbList + wp_robots)
+   برای خاموش‌کردن همه:  define( 'JAVANSEDA_SEO', false );  در wp-config.php */
+$_javan_seda_seo = trailingslashit( get_template_directory() ) . 'inc/ab-seo.php';
+if ( is_readable( $_javan_seda_seo ) ) {
+	require_once $_javan_seda_seo;
+}
+unset( $_javan_seda_seo );
 /* v3.1.3 — لایۀ «بایتِ سرعت»: defer / preload فونت / حذف بارِ <head> / lazy تصاویر + گزارش perf.
    برای خاموش‌کردن همه:  define( 'JAVANSEDA_PERF', false );  در wp-config.php */
 $_javan_seda_perf = trailingslashit( get_template_directory() ) . 'inc/ab-perf.php';

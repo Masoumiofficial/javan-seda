@@ -8,11 +8,11 @@ array('post_type'=>'post','post_status'=>'publish','posts_per_page'=>$vip_np,'or
 if($my_custom_query->have_posts()) : ?>
 <audio id="audio" preload="none" tabindex="0">
 <?php $rkian=1; while($my_custom_query->have_posts()) : $my_custom_query->the_post();?>
-<source src="<?php the_field('music128'); ?>" data-track-number="<?php echo $rkian; ?>" />
+<source src="<?php echo esc_url( get_field('music128') ); ?>" data-track-number="<?php echo (int) $rkian; ?>" />
 <?php $rkian++; endwhile; ?>  
 Your browser does not support HTML5 audio.
 </audio>
-<?php if($rkian = 1){ ?> 
+<?php if($rkian > 1){ ?> 
 <div class="player">
 <div class="player_controls">
 <i class="previous-track-btn disabled"><span class="screen-reader-text">Previous track button</span></i>
@@ -22,7 +22,7 @@ Your browser does not support HTML5 audio.
 </div>
     <div class="info-box">
       <div class="track-info-box">
-        <div class="track-title-text"> <?php the_field('artist') ?> - <?php the_field('song'); ?> </div>
+        <div class="track-title-text"> <?php echo esc_html( get_field('artist') ); ?> - <?php echo esc_html( get_field('song') ); ?> </div>
         <div class="audio-time">
         	<span class="duration">00:00</span> /
           <span class="current-time">00:00</span> 
@@ -62,7 +62,7 @@ if($my_custom_query->have_posts()) : ?>
         <?php echo $rkian; ?>. 
       </div>
       <div class="track-title">
-        <a class="playlist-track" href="#" data-play-track="<?php echo $rkian; ?>"><?php the_field('artist') ?> - <?php the_field('song'); ?></a>
+        <a class="playlist-track" href="#" data-play-track="<?php echo (int) $rkian; ?>"><?php echo esc_html( get_field('artist') ); ?> - <?php echo esc_html( get_field('song') ); ?></a>
       </div>
     </div>
 <?php $rkian++; endwhile; ?> 

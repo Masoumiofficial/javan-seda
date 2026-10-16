@@ -1,3 +1,12 @@
+<?php
+/* v3.1.4 — «/page/2/» و بقیۀ صفحه‌های شماره‌دار نباید کپیِ این صفحه باشند:
+   لوپِ استانداردِ قالب (index.php) اجرا می‌شود تا فهرستِ واقعیِ نوشته‌ها + صفحه‌بندی بیاید.
+   این بلوک باید اولین سطرِ فایل بماند (خروجیِ قبل از get_header() صفر است). */
+if ( get_query_var( 'paged' ) ) {
+	locate_template( array( 'index.php' ), true, true );
+	return;
+}
+?>
 <?php get_header(''); ?>
 <!-- centers_box -->
 <div class="tarlanweb_center">

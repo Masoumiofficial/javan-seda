@@ -245,16 +245,21 @@ if ( ! function_exists( 'javan_seda_sidebar' ) ) {
 if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 	function javan_seda_expected_hashes() {
 	return array(
-		'single.php'              => '11c677e1a7a61e52d58b70476a9d48b5865ad314913da4e6f9bd77925fe01b77',
-		'page.php'                => 'b83d394588a1cbce37f075dcb7c679497ab19b20975488af07637419aa27da8a',
-		'myfunctions.php'         => '11751e91d9752b7bcad6be22a8e858d7a0d7ebb19fcbb973c155d2f14c6ebd11',
-		'style.css'               => '8a42a305e10243c2a7a2395b046f9dce819ad755acb2c84bb617f1354c42c22e',
-		'footer.php'              => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
-		'header.php'              => '9807921341cccde44f702cedec6cdeecff490f86d51fd518d4bf80489da080c1',
-		'home.php'                => '1cf3bb8670f6683d6562eb60584c6a2e609e26d77a0ffd91201866394122f9b6',
-		'inc/vip_slider.php'      => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
-		'inc/ab-news-ticker.php'  => 'b9eebd2bc03497b9011a134e8cf7325a8952a2df18eea67ba9e010422b914d0e',
-		'inc/ab-perf.php'         => 'd79b274b181e2011c540bb7f40f46b01380dc5ff4b89d0f4afd13784ae209e60'
+		'single.php'                => '537d6c81f0266f7d410e53ea20566138d6cd9ce7e70b042f6db3b3a818cd7664',
+		'page.php'                  => 'b83d394588a1cbce37f075dcb7c679497ab19b20975488af07637419aa27da8a',
+		'myfunctions.php'           => 'ed86a1fd96ff943653d9e984e0ccced5b0dfd747ecf186197619cabd23e21bb2',
+		'style.css'                 => '683eda33f0b5b53247eacc1baafeffac68ff1ba361ef71de9199dd0ee4ee96c6',
+		'footer.php'                => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
+		'header.php'                => '9807921341cccde44f702cedec6cdeecff490f86d51fd518d4bf80489da080c1',
+		'home.php'                  => '6bf766679e28f87c5f9a6d64291c318257051ea8fbe45cf2a43b2214417a12c9',
+		'404.php'                   => 'd1be37361a79299155cc397b70f8ad0c68bd70bc60328c1f874ed73658a604e3',
+		'search.php'                => 'd668da0b149b312c73f9a57dccf0f1c206eaebc8e8e87778a4d514a4a6a3e2b0',
+		'inc/vip_slider.php'        => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
+		'inc/songs_post.php'        => '96e75daba47f8a1b740867306fafd382ce08904ab1406dc678d645c92ccd2107',
+		'inc/tarlanweb_player.php'  => '6764721f6a569baa1b6b1f6c05c4fe2956cbe195382a6351276397431fc8d57d',
+		'inc/ab-news-ticker.php'    => 'b9eebd2bc03497b9011a134e8cf7325a8952a2df18eea67ba9e010422b914d0e',
+		'inc/ab-perf.php'           => 'd79b274b181e2011c540bb7f40f46b01380dc5ff4b89d0f4afd13784ae209e60',
+		'inc/ab-seo.php'            => 'eee7aa3965f206bb4b8187e064795cae6404a577b181136211791623d1dc1359'
 	);
 }
 }
@@ -291,7 +296,7 @@ if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
 		$expected  = javan_seda_expected_hashes();
 		$mismatch  = 0;
 
-		$line( '=== گزارش تشخیص «ابزارک / سایدبار / هدر» — لایهٔ ایمنی v3.1.3 ===' );
+		$line( '=== گزارش تشخیص «ابزارک / سایدبار / هدر» — لایهٔ ایمنی v3.1.4 ===' );
 		$line( 'WordPress: ' . get_bloginfo( 'version' ) . ' | PHP: ' . PHP_VERSION . ' | نسخهٔ قالب: ' . ( $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '?' ) );
 		$line( 'stylesheet/template: ' . $theme->get_stylesheet() . ' / ' . $theme->get_template() . ( $theme->get_stylesheet() !== $theme->get_template() ? '   <<< چایلد‌تیم فعال است' : '' ) );
 		$line( 'قالبِ این درخواست: ' . ( $template ? $template : '(نامعلوم — از کاوشگر مستقل فراخوانی شد)' ) );

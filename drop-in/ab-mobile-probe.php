@@ -324,7 +324,7 @@ function abp_fetch( $url, $ua ) {
 
 /* =============================================================== سرِ گزارش ==== */
 abp_out( '===' );
-abp_out( '=== کاوشگرِ موبایل ↔ دسکتاپ — آهنگ‌بان (v3.1.3) ===' );
+abp_out( '=== کاوشگرِ موبایل ↔ دسکتاپ — آهنگ‌بان (v3.1.4) ===' );
 abp_out( '=== ' . date( 'Y-m-d H:i:s' ) . ' ===' );
 abp_out( '===' );
 abp_ln();
@@ -868,6 +868,21 @@ if ( function_exists( 'javan_seda_perf_report' ) ) {
 	abp_out( '  ✗ تابع javan_seda_perf_report موجود نیست ⇒ فایل inc/ab-perf.php روی هاست نیست' );
 	abp_out( '    یا require آن از myfunctions.php حذف شده. (افت سرعت را با PageSpeed بسنجید.)' );
 }
+/* ------------------------------------- ۱۱) لایۀ «دیده‌شدن» (SEO بدون افزونه) */
+abp_ln();
+abp_out( '۱۱) سئو/دیده‌شدن — لایۀ inc/ab-seo.php (v3.1.4)' );
+if ( function_exists( 'javan_seda_seo_report' ) ) {
+	$abp_seo = (array) javan_seda_seo_report();
+	foreach ( $abp_seo as $abp_sl ) {
+		abp_out( '  ' . $abp_sl );
+	}
+} else {
+	abp_out( '  ✗ javan_seda_seo_report موجود نیست ⇒ یا inc/ab-seo.php روی هاست نیست' );
+	abp_out( '    یا require آن از myfunctions.php حذف شده است.' );
+}
+abp_out( '  چک دستیِ همین صفحه (در مرورگر، View Source): سه خط زیر باید باشند' );
+abp_out( '    <meta name="description" …>  ·  <meta property="og:image" …>  ·  <script type="application/ld+json">{…BreadcrumbList…}</script>' );
+abp_out( '  اگر نبودند ⇒ یا فایل لایه (inc/ab-seo.php) روی هاست نیست یا بلوک require در myfunctions.php اعمال نشده/کش است.' );
 /* ------------------------------------------------- ذخیرهٔ اختیاری HTMLها */
 if ( ! empty( $_GET['save'] ) ) {
 	$dir = ( function_exists( 'get_temp_dir' ) ? rtrim( get_temp_dir(), '/\\' ) : sys_get_temp_dir() ) . '/ahangban_probe';

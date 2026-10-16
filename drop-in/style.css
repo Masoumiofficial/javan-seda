@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.1.3
+Version: 3.1.4
 */
 /*
 ==================================================================================
@@ -2657,3 +2657,56 @@ body.ab-has-mh{padding-top:90px;}
 	.ab-news .ab-news-thumb{display:none;}
 }
 /* --- انتهای بلوک ۲۲ (v3.1.3) --- */
+
+
+/* ============================================================================================
+   ۲۳) صفحۀ ۴۰۴ِ تازه + شمارش نتیجۀ جست‌وجو — نسخهٔ 3.1.4 (لایۀ «دیده‌شدن»)
+   فایل‌های مرتبط: 404.php · search.php · inc/ab-seo.php · myfunctions.php
+   پالت سازمانی: #FFFFFF / #185ADB / #111111 — بدون هیچ گرادینت
+   چرا؟ 404 قدیمی بعد از ۱۵ ثانیه کاربر را به خانه پرتاب می‌کرد (soft-404 برای گوگل،
+   و برای کاربرِ دنبال‌کنندۀ آهنگ = بدترین تجربه). حالا جست‌وجو + فهرستِ مقاصد + ۶ آهنگ تازه دارد.
+   ============================================================================================ */
+.ab-404-search{
+	display:flex;align-items:stretch;gap:8px;max-width:560px;margin:0 0 16px;
+}
+.ab-404-search input{
+	flex:1 1 auto;min-width:0;height:42px;margin:0;padding:0 14px;
+	background:#FFFFFF;color:#111111;font-size:14px;
+	border:1px solid var(--ab-line);border-radius:8px;
+}
+.ab-404-search input:focus{outline:2px solid #185ADB;outline-offset:1px;border-color:#185ADB;}
+.ab-404-search button{
+	flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;height:42px;
+	padding:0 18px;font:inherit;font-size:13.5px;font-weight:700;
+	background:#185ADB;color:#FFFFFF;border:1px solid #185ADB;border-radius:8px;cursor:pointer;
+}
+.ab-404-search button:hover{filter:brightness(.95);}
+.ab-404-links{
+	list-style:none;display:flex;flex-wrap:wrap;gap:9px;margin:0 0 18px;padding:0;
+}
+.ab-404-links li{margin:0;}
+.ab-404-links a{
+	display:inline-flex;align-items:center;gap:7px;padding:7px 15px;
+	font-size:13px;font-weight:700;color:#185ADB;text-decoration:none;
+	background:#FFFFFF;border:1px solid var(--ab-line);border-radius:999px;
+}
+.ab-404-links a:hover{background:#185ADB;color:#FFFFFF;border-color:#185ADB;}
+.ab-404-art{
+	display:block;max-width:100%;height:auto;margin:0 auto 22px;border-radius:10px;
+}
+/* شمارش نتیجۀ جست‌وجو (search.php) */
+.ab-search-count{margin:2px 0 0;font-size:13px;color:#111111;}
+.ab-search-count a{color:#185ADB;font-weight:700;text-decoration:none;}
+.ab-search-count a:hover{text-decoration:underline;}
+/* شب: سطحِ رنگ‌ها عوض می‌شود، حاشیه‌ها همان متغیر قالب می‌مانند */
+.night .ab-404-search input{background:#111111;color:#EEEEEE;}
+.night .ab-404-links a{background:#111111;color:#EEEEEE;}
+.night .ab-404-links a:hover{background:#185ADB;color:#FFFFFF;}
+.night .ab-search-count{color:#EEEEEE;}
+@media (max-width: 800px){
+	.ab-404-search{flex-direction:column;}
+	.ab-404-search button{justify-content:center;height:40px;}
+	.ab-404-links a{font-size:12.5px;padding:6px 12px;}
+	.ab-404-art{margin-bottom:16px;}
+}
+/* --- انتهای بلوک ۲۳ (v3.1.4) --- */

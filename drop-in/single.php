@@ -293,7 +293,7 @@ if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
 <!-- music player -->
 <div class="music_box_player taktarcks">
 <audio id="audio" preload="none" tabindex="0">
-<source src="<?php the_field('music128'); ?>" data-track-number="1" />    
+<source src="<?php echo esc_url( get_field('music128') ); ?>" data-track-number="1" />    
 پلیر شما قدیمی است و از پخش آنلاین پشتیبانی نمیکند.
 </audio>
 
@@ -425,19 +425,19 @@ if ( $taranehyar_download_title && (
 ?>
 <div class="dl_links_box">
 <?php if(get_field('music128')){ ?> 
-<a class="dl_link_128" href="<?php the_field('music128'); ?>"> <i class="icofont-download"></i>دانلود  آهنگ با کیفیت 128 </a><?php } if(get_field('music320')){ ?>
-<a class="dl_links_320" href="<?php the_field('music320'); ?>"> <i class="icofont-download"></i> دانلود آهنگ با کیفیت 320 </a><?php } if(get_field('album128')){ ?>	
-<a class="dl_link_128" href="<?php the_field('album128'); ?>"> <i class="icofont-download"></i>دانلود  آلبوم با کیفیت 128 </a><?php } if(get_field('album320')){ ?>
-<a class="dl_links_320" href="<?php the_field('album320'); ?>"> <i class="icofont-download"></i> دانلود  آلبوم با کیفیت 320 </a>	<?php } ?>
+<a class="dl_link_128" href="<?php echo esc_url( get_field('music128') ); ?>"> <i class="icofont-download"></i>دانلود  آهنگ با کیفیت 128 </a><?php } if(get_field('music320')){ ?>
+<a class="dl_links_320" href="<?php echo esc_url( get_field('music320') ); ?>"> <i class="icofont-download"></i> دانلود آهنگ با کیفیت 320 </a><?php } if(get_field('album128')){ ?>	
+<a class="dl_link_128" href="<?php echo esc_url( get_field('album128') ); ?>"> <i class="icofont-download"></i>دانلود  آلبوم با کیفیت 128 </a><?php } if(get_field('album320')){ ?>
+<a class="dl_links_320" href="<?php echo esc_url( get_field('album320') ); ?>"> <i class="icofont-download"></i> دانلود  آلبوم با کیفیت 320 </a>	<?php } ?>
 <div class="clear"></div>
 </div>
 <?php if((get_field('video1080')) || (get_field('video720')) || (get_field('video480'))){ ?>
 <div class="dl_linksv_box">
 <ul>
 <?php if(get_field('video1080')){ ?> 
-<li><a href="<?php the_field('video1080'); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  1080 </a></li><?php } if(get_field('video720')){ ?>
-<li><a href="<?php the_field('video720'); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  720 </a></li><?php } if(get_field('video480')){ ?>
-<li><a href="<?php the_field('video480'); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  480 </a></li><?php } ?>
+<li><a href="<?php echo esc_url( get_field('video1080') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  1080 </a></li><?php } if(get_field('video720')){ ?>
+<li><a href="<?php echo esc_url( get_field('video720') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  720 </a></li><?php } if(get_field('video480')){ ?>
+<li><a href="<?php echo esc_url( get_field('video480') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  480 </a></li><?php } ?>
 </ul>
 <div class="clear"></div>
 </div>

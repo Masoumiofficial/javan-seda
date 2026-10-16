@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.1.7
+Version: 3.1.4
 */
 /*
 ==================================================================================
@@ -2710,89 +2710,3 @@ body.ab-has-mh{padding-top:90px;}
 	.ab-404-art{margin-bottom:16px;}
 }
 /* --- انتهای بلوک ۲۳ (v3.1.4) --- */
-
-
-/* ============================================================================================
-   ۲۴) «محبوبیت» — نشان بازدید، چارت [ab_charts] و امتیازدهی ۱ تا ۵ — نسخهٔ 3.1.5
-   فایل‌های مرتبط: inc/ab-views.php · inc/ab-ratings.php · inc/mostviews_posts.php · single.php
-   پالت سازمانی: #FFFFFF / #185ADB / #111111 — بدون هیچ گرادینت (ستاره‌ها با عرضِ متحرک پر می‌شوند)
-   ============================================================================================ */
-
-/* نشان «چند بار دیده شده» زیر عنوانِ صفحۀ آهنگ */
-.ab-views-badge{list-style:none;display:flex;flex-wrap:wrap;gap:10px;margin:0 0 14px;padding:0;}
-.ab-views-badge li{margin:0;display:inline-flex;align-items:center;gap:7px;padding:5px 12px;
-	font-size:12.5px;font-weight:600;color:#111111;background:#FFFFFF;
-	border:1px solid var(--ab-line);border-radius:999px;}
-.ab-views-badge i{font-size:14px;color:#185ADB;}
-.ab-views-badge .ab-views-badge__m{opacity:.72;font-weight:600;}
-.night .ab-views-badge li{color:#EEEEEE;}
-
-/* چارت */
-.ab-chart .songs_title_box .ab-chart__hint{display:block;margin-top:5px;font-size:11.5px;font-weight:600;opacity:.68;}
-.ab-chart__list{list-style:none;margin:0;padding:0;}
-.ab-chart__row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--ab-line);}
-.ab-chart__row:last-child{border-bottom:0;}
-.ab-chart__rank{flex:0 0 auto;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;
-	font-size:12.5px;font-weight:700;color:#111111;background:#FFFFFF;border:1px solid var(--ab-line);border-radius:6px;}
-.ab-chart__row.is-top .ab-chart__rank{color:#FFFFFF;background:#185ADB;border-color:#185ADB;}
-.ab-chart__link{flex:1 1 auto;min-width:0;display:flex;align-items:center;gap:10px;color:#111111;text-decoration:none;}
-.ab-chart__img{flex:0 0 auto;display:block;}
-.ab-chart__img img{display:block;width:46px;height:46px;border-radius:6px;object-fit:cover;}
-.ab-chart__txt{min-width:0;display:flex;flex-direction:column;}
-.ab-chart__txt b{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ab-chart__txt i{font-style:normal;font-size:12px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.ab-chart__link:hover b{color:#185ADB;}
-.ab-chart__n{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#111111;opacity:.8;}
-.ab-chart__n i{color:#185ADB;}
-.ab-chart--2col .ab-chart__list{display:flex;flex-wrap:wrap;}
-.ab-chart--2col .ab-chart__row{flex:0 0 50%;max-width:50%;padding-left:14px;}
-.night .ab-chart__rank,.night .ab-chart__link{color:#EEEEEE;}
-.night .ab-chart__n{color:#EEEEEE;}
-
-/* امتیازدهی */
-.ab-rate{margin:0 0 18px;padding:14px;background:#FFFFFF;border:1px solid var(--ab-line);border-radius:10px;}
-.ab-rate__score{display:flex;align-items:center;gap:10px;margin:0 0 10px;}
-.ab-rate__num{font-size:20px;font-weight:700;line-height:1;color:#111111;}
-.ab-rate__stars{position:relative;display:inline-block;font-size:16px;line-height:1;letter-spacing:2px;color:var(--ab-line);}
-.ab-rate__stars-bg{display:block;}
-.ab-rate__stars-fg{position:absolute;top:0;right:0;height:100%;overflow:hidden;white-space:nowrap;color:#185ADB;}
-.ab-rate__n{font-size:12px;opacity:.72;}
-.ab-rate__opts{border:0;margin:0 0 10px;padding:0;display:flex;flex-direction:row-reverse;justify-content:flex-start;gap:4px;}
-.ab-rate__opts legend{margin-bottom:6px;font-size:13px;font-weight:700;color:#111111;}
-.ab-rate__opt{display:inline-flex;align-items:center;gap:3px;font-size:22px;line-height:1;color:var(--ab-line);cursor:pointer;}
-.ab-rate__opt input{position:absolute;width:1px;height:1px;opacity:0;}
-.ab-rate__opt input:focus + span{outline:2px solid #185ADB;outline-offset:2px;border-radius:4px;}
-.ab-rate__opt:hover span,.ab-rate__opt input:checked ~ span{color:#185ADB;}
-.ab-rate__opt em{font-style:normal;font-size:11px;font-weight:700;color:#111111;opacity:.6;}
-.ab-rate__btn{display:inline-flex;align-items:center;gap:7px;padding:7px 18px;font:inherit;font-size:13px;font-weight:700;
-	color:#FFFFFF;background:#185ADB;border:1px solid #185ADB;border-radius:999px;cursor:pointer;}
-.ab-rate__btn:hover{filter:brightness(.95);}
-.ab-rate__btn i{font-size:14px;}
-.ab-rate__msg,.ab-rate__done{margin:8px 0 0;font-size:12.5px;font-weight:700;color:#185ADB;}
-.night .ab-rate{background:#111111;}
-.night .ab-rate__num,.night .ab-rate__opts legend,.night .ab-rate__opt em{color:#EEEEEE;}
-@media (max-width: 800px){
-	.ab-rate{padding:12px;}
-	.ab-rate__opt{font-size:20px;}
-	.ab-chart--2col .ab-chart__row{flex:0 0 100%;max-width:100%;padding-left:0;}
-	.ab-chart__row{gap:8px;}
-}
-
-/* ۴ کلاسِ آیکن که در phpهای قالب صدا زده می‌شوند ولی در css/icofont.min.cssِ بریده‌شدۀ خودِ
-   قالب قاعده‌ای ندارند ⇒ جای آیکن خالی می‌ماند (در footer.php, home.php, 404.php,
-   inc/ab-news-ticker.php). با codepoint‌های موجودِ همان فونت اصلاح می‌شوند؛ هیچ فایل دیگری عوض نمی‌شود. */
-.icofont-microphone-alt:before{content:"\ea47";}
-.icofont-music-notes:before{content:"\eca1";}
-.icofont-arrow-left:before{content:"\ea93";}
-.icofont-fire-alt:before{content:"\ef21";}
-/* --- انتهای بلوک ۲۴ (v3.1.5) --- */
-
-/* v3.1.7 (دور ۱۲.۲ — hotfix دوم، علتِ قطعیِ debug.log):
-   علت خطا: در inc/ab-views.php شورت‌کد [ab_charts] با add_action('init', نامِ تابعی) ثبت می‌شد که
-   آن تابع هیچ‌جا تعریف نشده بود ⇒ در PHP 8 خطای کشندۀ call_user_func_array() روی هر درخواست و wp-cron.
-   اصلاح: ثبت مستقیم add_shortcode (بدون init، بدون نامِ معلق) + همهٔ ثبت‌های هوکِ لایه‌ها با
-   function_exists پیچیده شدند + دروازۀ myfunctions.php حالا «dangling callback» را هم می‌گیرد.
-
-   v3.1.6 (دور ۱۲.۱ — hotfix): دروازۀ سازگاری در myfunctions.php · حذف بستۀ static در inc/ab-perf.php
-   · محافظت WP_Error از نشانیِ ترم‌ها در inc/ab-seo.php. هیچ قانون ظاهری عوض نشد؛ فقط شمارۀ نسخه برای
-   cache-bust کردن استایل. انتهای فایل. */

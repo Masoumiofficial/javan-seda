@@ -557,11 +557,6 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 <?php } ?>
 <?php } } ?>
 
-<?php /* v3.1.5 — «چند بار دیده شده» + امتیازدهی ۱ تا ۵ (لایه‌های inc/ab-views.php و inc/ab-ratings.php).
-   هر دو تابع محافظت‌شده‌اند: اگر فایل لایه روی هاست نبود، این دو خط هیچ خروجی/خطایی ندارند. */
-if ( function_exists( 'javan_seda_views_badge' ) ) { javan_seda_views_badge( get_the_ID() ); }
-if ( function_exists( 'javan_seda_rating_block' ) ) { javan_seda_rating_block( get_the_ID() ); } ?>
-
 <?php $cm_off = ot_get_option('cm_off'); if('off' != $cm_off){ ?>
 <div class="single_posts rkianoosh_comment_box">
 <h3 class="comm_titrs">نظر خود را بنویسید</h3>

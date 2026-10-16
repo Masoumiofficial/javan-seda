@@ -245,7 +245,7 @@ if ( ! function_exists( 'javan_seda_seo_head' ) ) {
 			}
 		}
 	}
-	if ( function_exists( 'javan_seda_seo_head' ) ) { add_action( 'wp_head', 'javan_seda_seo_head', 4 ); }
+	add_action( 'wp_head', 'javan_seda_seo_head', 4 );
 }
 
 /* -------------------------------------------------------------------------
@@ -267,34 +267,19 @@ if ( ! function_exists( 'javan_seda_seo_canonical_backstop' ) ) {
 		} elseif ( is_category() || is_tag() || is_tax() ) {
 			$t = get_queried_object();
 			if ( $t ) {
-				$u = javan_seda_seo_link( $t );
+				$u = (string) get_term_link( $t );
 			}
 		}
 		if ( $u && ! is_wp_error( $u ) ) {
 			echo '<link rel="canonical" href="' . esc_url( $u ) . '">' . "\n";
 		}
 	}
-	if ( function_exists( 'javan_seda_seo_canonical_backstop' ) ) { add_action( 'wp_head', 'javan_seda_seo_canonical_backstop', 5 ); }
+	add_action( 'wp_head', 'javan_seda_seo_canonical_backstop', 5 );
 }
 
 /* -------------------------------------------------------------------------
  * ۵) BreadcrumbList (JSON-LD)
  * ---------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------
- * ۰) کمکی: نشانیِ ترم به‌صورت رشته، بدون ریسکِ «Object of class WP_Error could
- *    not be converted to string» که در PHP 8 یک خطای کشنده است (get_category_link /
- *    get_tag_link themselves may return WP_Error). v3.1.6
- * ---------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_seo_link' ) ) {
-	function javan_seda_seo_link( $term, $taxonomy = '' ) {
-		$link = get_term_link( $term, $taxonomy );
-		if ( is_wp_error( $link ) || ! $link ) {
-			return '';
-		}
-		return (string) $link;
-	}
-}
-
 if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) ) {
 	function javan_seda_seo_breadcrumbs() {
 		if ( ! javan_seda_seo_active() || ! ( is_singular() || is_category() || is_tag() || is_tax() ) ) {
@@ -308,14 +293,14 @@ if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) )
 			if ( is_array( $cats ) && $cats ) {
 				$items[] = array(
 					'name' => wp_strip_all_tags( $cats[0]->name ),
-					'item' => javan_seda_seo_link( $cats[0]->term_id, 'category' ),
+					'item' => (string) get_category_link( $cats[0]->term_id ),
 				);
 			}
 			$singers = get_the_terms( get_the_ID(), 'singer' );
 			if ( is_array( $singers ) && $singers ) {
 				$items[] = array(
 					'name' => wp_strip_all_tags( $singers[0]->name ),
-					'item' => javan_seda_seo_link( $singers[0], 'singer' ),
+					'item' => (string) get_term_link( $singers[0] ),
 				);
 			}
 			$items[] = array( 'name' => wp_strip_all_tags( get_the_title() ), 'item' => '' );
@@ -350,7 +335,7 @@ if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) )
 			)
 			. '</script>' . "\n";
 	}
-	if ( function_exists( 'javan_seda_seo_breadcrumbs' ) ) { add_action( 'wp_head', 'javan_seda_seo_breadcrumbs', 8 ); }
+	add_action( 'wp_head', 'javan_seda_seo_breadcrumbs', 8 );
 }
 
 /* -------------------------------------------------------------------------
@@ -367,7 +352,7 @@ if ( ! function_exists( 'javan_seda_seo_title_parts' ) ) {
 		}
 		return $parts;
 	}
-	if ( function_exists( 'javan_seda_seo_title_parts' ) ) { add_filter( 'document_title_parts', 'javan_seda_seo_title_parts', 20 ); }
+	add_filter( 'document_title_parts', 'javan_seda_seo_title_parts', 20 );
 }
 
 /* -------------------------------------------------------------------------
@@ -403,7 +388,7 @@ if ( JAVANSEDA_SEO_ROBOTS && ! function_exists( 'javan_seda_seo_robots' ) ) {
 		}
 		return $robots;
 	}
-	if ( function_exists( 'javan_seda_seo_robots' ) ) { add_filter( 'wp_robots', 'javan_seda_seo_robots', 20 ); }
+	add_filter( 'wp_robots', 'javan_seda_seo_robots', 20 );
 }
 
 /* -------------------------------------------------------------------------
@@ -412,7 +397,7 @@ if ( JAVANSEDA_SEO_ROBOTS && ! function_exists( 'javan_seda_seo_robots' ) ) {
 if ( ! function_exists( 'javan_seda_seo_report' ) ) {
 	function javan_seda_seo_report() {
 		$L = array();
-		$line = function ( $s = '' ) use ( &$L ) {
+		$line = static function ( $s = '' ) use ( &$L ) {
 			$L[] = $s;
 		};
 		$line( '=== لایۀ «دیده‌شدن» v3.1.4 ===' );

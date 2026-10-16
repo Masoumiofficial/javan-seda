@@ -104,7 +104,7 @@ if ( JAVANSEDA_PERF_DEFER && ! function_exists( 'javan_seda_perf_defer' ) ) {
 		}
 		return preg_replace( '/<script\s/', '<script defer ', $tag, 1 );
 	}
-	if ( function_exists( 'javan_seda_perf_defer' ) ) { add_filter( 'script_loader_tag', 'javan_seda_perf_defer', 20, 3 ); }
+	add_filter( 'script_loader_tag', 'javan_seda_perf_defer', 20, 3 );
 }
 
 /* -------------------------------------------------------------------------
@@ -134,9 +134,9 @@ if ( JAVANSEDA_PERF_STRIP_HEAD && ! function_exists( 'javan_seda_perf_strip_head
 	}
 	/* اسکریپت oEmbedِ وردپرس (wp-embed.js) برای این سایت بی‌مصرف است */
 	if ( ! defined( 'JAVANSEDA_PERF_KEEP_EMBED' ) ) {
-		if ( function_exists( 'javan_seda_perf_drop_embed' ) ) { add_action( 'wp_footer', 'javan_seda_perf_drop_embed', 1 ); }
+		add_action( 'wp_footer', 'javan_seda_perf_drop_embed', 1 );
 	}
-	if ( function_exists( 'javan_seda_perf_strip_head' ) ) { add_action( 'init', 'javan_seda_perf_strip_head', 99 ); }
+	add_action( 'init', 'javan_seda_perf_strip_head', 99 );
 }
 
 if ( ! function_exists( 'javan_seda_perf_drop_embed' ) ) {
@@ -182,7 +182,7 @@ if ( ! function_exists( 'javan_seda_perf_fonts' ) ) {
 </style>
 		<?php
 	}
-	if ( function_exists( 'javan_seda_perf_fonts' ) ) { add_action( 'wp_head', 'javan_seda_perf_fonts', 1 ); }
+	add_action( 'wp_head', 'javan_seda_perf_fonts', 1 );
 }
 
 /* -------------------------------------------------------------------------
@@ -195,7 +195,7 @@ if ( JAVANSEDA_PERF_LAZY_IMG && ! function_exists( 'javan_seda_perf_lazy_img' ) 
 		}
 		$html = preg_replace_callback(
 			'/<img\b[^>]*>/i',
-			function ( $m ) { /* v3.1.6: کلیدواژۀ static برای بستنِ بسته‌شده فقط PHP 7.4+ است ⇒ روی 7.0..7.3 syntax error و خوابیدن کل سایت */
+			static function ( $m ) {
 				$tag = $m[0];
 				if ( false !== stripos( $tag, 'loading=' ) ) {
 					return $tag; // از قبل تصمیم گرفته شده
@@ -214,8 +214,8 @@ if ( JAVANSEDA_PERF_LAZY_IMG && ! function_exists( 'javan_seda_perf_lazy_img' ) 
 		);
 		return $html;
 	}
-	if ( function_exists( 'javan_seda_perf_lazy_img' ) ) { add_filter( 'the_content', 'javan_seda_perf_lazy_img', 50 ); }
-	if ( function_exists( 'javan_seda_perf_lazy_img' ) ) { add_filter( 'the_excerpt', 'javan_seda_perf_lazy_img', 50 ); }
+	add_filter( 'the_content', 'javan_seda_perf_lazy_img', 50 );
+	add_filter( 'the_excerpt', 'javan_seda_perf_lazy_img', 50 );
 }
 
 /* -------------------------------------------------------------------------
@@ -228,7 +228,7 @@ if ( ! function_exists( 'javan_seda_perf_report' ) ) {
 		$L      = array();
 		$tdir   = get_template_directory();
 		$uri    = get_template_directory_uri();
-		$line   = function ( $s = '' ) use ( &$L ) {
+		$line   = static function ( $s = '' ) use ( &$L ) {
 			$L[] = $s;
 		};
 

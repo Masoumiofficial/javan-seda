@@ -1,154 +1,38 @@
 <?php
 /* ---------------------------------------------------------------------------
-   دروازۀ محافظتِ لایه‌ها (v3.1.7) — قبل از require هر لایه، همان فایل را (فقط وقتی عوض شده)
-   می‌خواند و دو چیز را می‌سنجد:
-     ۱) ساختاری تازه‌تر از PHPِ جاری: بستۀ static ، fn() ، ??= ، ?-> ، ??
-     ۲) «dangling callback»: add_action/add_filter روی نامِ تابعی که در همان فایل تعریف نشده.
-        همان بند ۲ علت خطای گزارش‌شدۀ 3.1.5 بود (debug.log):
-        call_user_func_array(): Argument #1 ($callback) must be a valid callback — function not found
-        که در PHP 8 یک TypeError کشنده است و کل سایت + wp-cron را می‌خواباند.
-   اگر لایه‌ای رد شود، فقط همان لایه خاموش می‌ماند و سایت کار می‌کند.
-   هزینه: یک get_option + چند filemtime در هر درخواست؛ متن فایل فقط هنگام عوض‌شدن mtime خوانده
-   و بررسی می‌شود (پس جابه‌جایی فایل روی هاست خودکار دوباره ارزیابی می‌شود).
-   خاموش‌کردنِ خودِ این محافظ:  define( 'JAVANSEDA_GATE_OFF', true );
-   ------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------
-   تفکیک‌کنندهٔ کد/کامنت/رشته (v3.1.7) — از token_get_all() استفاده می‌کند تا هیچ‌گاه
-   یک آپوستروف داخل کامنت (مثلاً «define( 'JAVANSEDA_SEO', false );» در خطوط توضیح)
-   باعث نشود تویعات واقعیِ فایل «تعریف‌نشده» به نظر برسند. اگر tokenizer نبود، به
-   preg برمی‌گردد. خروجی: array( کد+رشته‌ها , کد-بدون-رشته )
-   ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_layer_split' ) ) {
-	function javan_seda_layer_split( $src ) {
-		if ( function_exists( 'token_get_all' ) ) {
-			$nc = '';
-			$bare = '';
-			foreach ( (array) @token_get_all( $src ) as $tok ) {
-				if ( is_array( $tok ) ) {
-					if ( T_COMMENT === $tok[0] || T_DOC_COMMENT === $tok[0] ) {
-						$nc   .= "\n";
-						$bare .= "\n";
-						continue;
-					}
-					$nc   .= $tok[1];
-					$bare .= ( T_CONSTANT_ENCAPSED_STRING === $tok[0] || T_ENCAPSED_AND_WHITESPACE === $tok[0] ) ? "''" : $tok[1];
-					continue;
-				}
-				$nc   .= (string) $tok;
-				$bare .= (string) $tok;
-			}
-			return array( $nc, $bare );
-		}
-		$nc = (string) preg_replace( '/\/\*.*?\*\//s', ' ', $src );
-		$nc = (string) preg_replace( '/(^|\n)[ \t]*(\/\/|#)[^\n]*/', '$1', $nc );
-		$bare = (string) preg_replace( '/"(?:\\\\.|[^"\\\\])*"/', '""', $nc );
-		$bare = (string) preg_replace( "/'(?:\\\\.|[^'\\\\])*'/", "''", $bare );
-		return array( $nc, $bare );
-	}
-}
-
-if ( ! function_exists( 'javan_seda_layer_loadable' ) ) {
-	function javan_seda_layer_loadable( $file ) {
-		static $javan_seda_gate_seen = array();
-		if ( isset( $javan_seda_gate_seen[ $file ] ) ) {
-			return $javan_seda_gate_seen[ $file ];
-		}
-		if ( defined( 'JAVANSEDA_GATE_OFF' ) && JAVANSEDA_GATE_OFF ) {
-			return true;
-		}
-		if ( ! is_readable( $file ) ) {
-			return true; /* نبودن فایل را خودِ is_readable() در فراخوان مدیریت می‌کند */
-		}
-		$ok    = true;
-		$mtime = (int) @filemtime( $file );
-		$cache = function_exists( 'get_option' ) ? (array) get_option( 'javan_seda_gate_cache', array() ) : array();
-		$key   = basename( $file );
-		if ( isset( $cache[ $key ] ) && is_array( $cache[ $key ] ) && isset( $cache[ $key ]['m'] ) && (int) $cache[ $key ]['m'] === $mtime ) {
-			$javan_seda_gate_seen[ $file ] = ! empty( $cache[ $key ]['ok'] );
-			return $javan_seda_gate_seen[ $file ];
-		}
-		$src = @file_get_contents( $file );
-		if ( is_string( $src ) && '' !== $src ) {
-			/* $nc = کد + رشته‌ها (برای دیدنِ نامِ callbackهای ثبت‌شده) · $bare = کد خالص (برای ساختارِ نسخه‌ای) */
-			list( $nc, $bare ) = javan_seda_layer_split( $src );
-			if ( ! ( defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID >= 70400 ) ) {
-				if ( preg_match( '/\bstatic\s+function\s*\(|(?:^|[^$\w>])fn\s*\(|\?\?=|\?->/', $bare ) ) {
-					$ok = false;
-				}
-				if ( $ok && defined( 'PHP_VERSION_ID' ) && PHP_VERSION_ID < 70000 && false !== strpos( $bare, '??' ) ) {
-					$ok = false;
-				}
-			}
-			if ( $ok && preg_match_all( '/add_(?:action|filter|shortcode)\(\s*\'[^\']+\'\s*,\s*\'(javan_seda_[A-Za-z0-9_]+)\'/', $nc, $mm ) && ! empty( $mm[1] ) ) {
-				foreach ( array_unique( $mm[1] ) as $cb ) {
-					if ( false !== strpos( $nc, "function_exists( '" . $cb . "' )" ) ) {
-						continue; /* ثبت با function_exists پیچیده شده ⇒ نبودنِ تابع خطا نمی‌سازد */
-					}
-					if ( ! preg_match( '/function\s+' . preg_quote( $cb, '/' ) . '\s*\(/', $bare ) ) {
-						$ok = false;
-						break;
-					}
-				}
-			}
-		}
-		if ( ! $ok && function_exists( 'error_log' ) && defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			error_log( '[javan-seda] لایه خاموش شد (ناسازگار با PHP یا ارجاع به تابع تعریف‌نشده): ' . $file );
-		}
-		$javan_seda_gate_seen[ $file ] = $ok;
-		if ( function_exists( 'update_option' ) ) {
-			$cache[ $key ] = array( 'm' => $mtime, 'ok' => $ok );
-			update_option( 'javan_seda_gate_cache', $cache, false );
-		}
-		return $ok;
-	}
-}
-
-/* ---------------------------------------------------------------------------
    لایهٔ ایمنی «سایدبار / ابزارک نوشته‌ها» (v3.0.2)
    اگر این include حذف شود، ناحیه‌های left_side / left_side2 / left_side1
    فقط به فایل رمزنگاری‌شدهٔ functions.php وابسته می‌مانند.
    ------------------------------------------------------------------------- */
 $_javan_seda_sidebars = trailingslashit( get_template_directory() ) . 'inc/ab-sidebars.php';
-if ( is_readable( $_javan_seda_sidebars ) && javan_seda_layer_loadable( $_javan_seda_sidebars ) ) {
+if ( is_readable( $_javan_seda_sidebars ) ) {
 	require_once $_javan_seda_sidebars;
 }
 unset( $_javan_seda_sidebars );
 /* v3.1.2 — لایهٔ «اخبار روز»: فقط تابع/شورت‌کد [ab_news] را تعریف می‌کند (بدون هوکِ رندر) */
 $_javan_seda_news = trailingslashit( get_template_directory() ) . 'inc/ab-news-ticker.php';
-if ( is_readable( $_javan_seda_news ) && javan_seda_layer_loadable( $_javan_seda_news ) ) {
+if ( is_readable( $_javan_seda_news ) ) {
 	require_once $_javan_seda_news;
 }
 unset( $_javan_seda_news );
-/* v3.1.5 — لایۀ «محبوبیت»: شمارش بازدید (با beacon، سازگار با کش) + چارت [ab_charts]
-   خاموشی: define( 'JAVANSEDA_VIEWS', false );  |  خاموشی امتیاز: define( 'JAVANSEDA_RATINGS', false ); */
-$_javan_seda_views = trailingslashit( get_template_directory() ) . 'inc/ab-views.php';
-if ( is_readable( $_javan_seda_views ) && javan_seda_layer_loadable( $_javan_seda_views ) ) {
-	require_once $_javan_seda_views;
-}
-unset( $_javan_seda_views );
-$_javan_seda_rates = trailingslashit( get_template_directory() ) . 'inc/ab-ratings.php';
-if ( is_readable( $_javan_seda_rates ) && javan_seda_layer_loadable( $_javan_seda_rates ) ) {
-	require_once $_javan_seda_rates;
-}
-unset( $_javan_seda_rates );
 /* v3.1.4 — لایۀ «دیده‌شدن» (meta description + og:/twitter: + BreadcrumbList + wp_robots)
    برای خاموش‌کردن همه:  define( 'JAVANSEDA_SEO', false );  در wp-config.php */
 $_javan_seda_seo = trailingslashit( get_template_directory() ) . 'inc/ab-seo.php';
-if ( is_readable( $_javan_seda_seo ) && javan_seda_layer_loadable( $_javan_seda_seo ) ) {
+if ( is_readable( $_javan_seda_seo ) ) {
 	require_once $_javan_seda_seo;
 }
 unset( $_javan_seda_seo );
 /* v3.1.3 — لایۀ «بایتِ سرعت»: defer / preload فونت / حذف بارِ <head> / lazy تصاویر + گزارش perf.
    برای خاموش‌کردن همه:  define( 'JAVANSEDA_PERF', false );  در wp-config.php */
 $_javan_seda_perf = trailingslashit( get_template_directory() ) . 'inc/ab-perf.php';
-if ( is_readable( $_javan_seda_perf ) && javan_seda_layer_loadable( $_javan_seda_perf ) ) {
+if ( is_readable( $_javan_seda_perf ) ) {
 	require_once $_javan_seda_perf;
 }
 unset( $_javan_seda_perf );
 /* v3.1.0 — لایهٔ سازگاری ACF: فقط وقتی ACF فعال نباشد توابع را تعریف می‌کند
    و از خطای کشندهٔ «Call to undefined function get_field()» در single.php جلوگیری می‌کند. */
 $_javan_seda_acf = trailingslashit( get_template_directory() ) . 'inc/acf-compat.php';
-if ( is_readable( $_javan_seda_acf ) && javan_seda_layer_loadable( $_javan_seda_acf ) ) {
+if ( is_readable( $_javan_seda_acf ) ) {
 	require_once $_javan_seda_acf;
 }
 unset( $_javan_seda_acf );
@@ -565,7 +449,7 @@ add_filter(
 				foreach ( array( 'post_tag', 'category' ) as $fallback_tax ) {
 					$alt = get_term_by( 'name', $needle, $fallback_tax );
 					if ( $alt && ! is_wp_error( $alt ) ) {
-						$lines[] = 'اما در «' . $fallback_tax . '» هست: ' . $alt->name . ' (' . $alt->count . ' نوشته) → ' . ( is_wp_error( get_term_link( $alt ) ) ? 'لینک ساخته نشد' : get_term_link( $alt ) );
+						$lines[] = 'اما در «' . $fallback_tax . '» هست: ' . $alt->name . ' (' . $alt->count . ' نوشته) → ' . get_term_link( $alt );
 					}
 				}
 				$cpt = get_page_by_path( sanitize_title( $needle ), OBJECT, 'singer' );

@@ -324,7 +324,7 @@ function abp_fetch( $url, $ua ) {
 
 /* =============================================================== سرِ گزارش ==== */
 abp_out( '===' );
-abp_out( '=== کاوشگرِ موبایل ↔ دسکتاپ — آهنگ‌بان (v3.0.6) ===' );
+abp_out( '=== کاوشگرِ موبایل ↔ دسکتاپ — آهنگ‌بان (v3.1.3) ===' );
 abp_out( '=== ' . date( 'Y-m-d H:i:s' ) . ' ===' );
 abp_out( '===' );
 abp_ln();
@@ -458,7 +458,7 @@ foreach ( $abp_hooks as $hook ) {
 		}
 		foreach ( (array) $callbacks as $prio => $set ) {
 			foreach ( (array) $set as $fn ) {
-				$name = '(闭)';
+				$name = '(بدون‌نام)';
 				if ( isset( $fn['function'] ) ) {
 					if ( is_string( $fn['function'] ) ) {
 						$name = $fn['function'];
@@ -521,24 +521,66 @@ if ( $pid ) {
 abp_ln();
 
 /* ---------------------------------------------------- بخش ۵: رندر با سه UA */
-/* --- ۴.۱) منبع «اخبار روز» --- */
+/* --- ۴.۱) منبع «اخبار روز» (v3.1.3: فقط دستهٔ news، در حالت سخت‌گیر «هیچ») --- */
 abp_ln();
-abp_out( '۴.۱) نوار «اخبار روز» (home.php زیر هدر)' );
-$ncat = 0;
+abp_out( '۴.۱) نوار «اخبار روز» — منبعِ داده (home.php زیر هدر / شورت‌کد [ab_news])' );
+$ncat  = 0;
+$slugs = array( 'news' );
+if ( function_exists( 'javan_seda_news_category_slugs' ) ) {
+	$slugs = (array) javan_seda_news_category_slugs();
+}
 if ( function_exists( 'javan_seda_news_category_id' ) ) {
 	$ncat = (int) javan_seda_news_category_id();
 } else {
-	$t = get_term_by( 'slug', 'news', 'category' );
-	$ncat = ( $t && ! is_wp_error( $t ) ) ? (int) $t->term_id : 0;
+	foreach ( $slugs as $sl ) {
+		$t = get_term_by( 'slug', $sl, 'category' );
+		if ( $t && ! is_wp_error( $t ) ) {
+			$ncat = (int) $t->term_id;
+			break;
+		}
+	}
 }
-abp_out( '  تابع جاوا_سِدا موجود است؟ : ' . ( function_exists( 'javan_seda_news_ticker' ) ? '✓ بله (inc/ab-news-ticker.php بارگذاری شده)' : '✗ نه ⇒ home.php نوار قدیمی را چاپ می‌کند (fallback)' ) );
-abp_out( '  دستهٔ اخبار (slug=news)   : ' . ( $ncat ? 'id=' . $ncat . ' → ' . ( ( $ti = get_term( $ncat, 'category' ) ) && ! is_wp_error( $ti ) ? $ti->name . ' (' . $ti->count . ' نوشته)' : '?' ) : '✗ دسته‌ای با slug=news پیدا نشد ⇒ آخرین نوشته‌ها نمایش داده می‌شود' ) );
+$strict = ! ( defined( 'JAVANSEDA_NEWS_STRICT' ) && false === JAVANSEDA_NEWS_STRICT );
+abp_out( '  فایل لایه موجود است؟     : ' . ( function_exists( 'javan_seda_news_ticker' ) ? '✓ بله (inc/ab-news-ticker.php بارگذاری شده)' : '✗ نه ⇒ home.php نوار قدیمی (دسترسی سریع) را چاپ می‌کند — drop-in اعمال نشده' ) );
+abp_out( '  slugهای مجاز            : ' . implode( ', ', $slugs ) . ( defined( 'JAVANSEDA_NEWS_CATEGORY' ) ? '   (JAVANSEDA_NEWS_CATEGORY=' . JAVANSEDA_NEWS_CATEGORY . ')' : '' ) );
+$cat_name = '?';
+$cat_link = '';
+if ( $ncat ) {
+	$ti = get_term( $ncat, 'category' );
+	if ( $ti && ! is_wp_error( $ti ) ) {
+		$cat_name = $ti->name . ' (' . (int) $ti->count . ' نوشته)';
+		$tl       = get_term_link( $ti, 'category' );
+		$cat_link = ( ! is_wp_error( $tl ) ) ? (string) $tl : '';
+	}
+	abp_out( '  دستهٔ یافت‌شده            : id=' . $ncat . ' → ' . $cat_name );
+	abp_out( '  لینک آرشیو دسته         : ' . ( $cat_link ? $cat_link : '✗ ساخته نشد' ) );
+	if ( $cat_link ) {
+		$hc = array( 'timeout' => 4, 'sslverify' => false, 'user-agent' => 'ahangban-probe' );
+		$rp = function_exists( 'wp_remote_get' ) ? wp_remote_get( $cat_link, $hc ) : null;
+		if ( is_array( $rp ) && ! is_wp_error( $rp ) ) {
+			$code = (int) wp_remote_retrieve_response_code( $rp );
+			abp_out( '    وضعیت HTTP آرشیو      : ' . $code . ( 200 === $code ? ' ✓' : ' ✗ اگر 404 است، یعنی لینک دستهٔ news روی این سایت کار نمی‌کند — یا slug را بسازید یا JAVANSEDA_NEWS_CATEGORY را روی id/slug درست تنظیم کنید' ) );
+		} else {
+			abp_out( '    وضعیت HTTP آرشیو      : (.req ناموفق — روی بعضی هاست‌ها درخواست بیرونی بسته است؛ دستی در مرورگر باز کنید)' );
+		}
+	}
+} else {
+	abp_out( '  دستهٔ یافت‌شده            : ✗ هیچ‌کدام از slugهای بالا در «نوشته‌ها › دسته‌ها» وجود ندارد' );
+}
 if ( function_exists( 'javan_seda_news_posts' ) ) {
 	$nn = javan_seda_news_posts( 3 );
-	abp_out( '  سه خبرِ اول            : ' . ( ! empty( $nn['items'] ) ? implode( ' | ', array_map( function ( $x ) { return $x['date'] . ' ' . $x['title']; }, $nn['items'] ) ) : '(خالی)' ) );
-	abp_out( '  حالت داده             : ' . ( empty( $nn['fallback'] ) ? 'عادی' : ( 1 == $nn['fallback'] ? 'دسته پیدا نشد → آخرین نوشته‌ها' : 'دسته خالی بود → آخرین نوشته‌ها' ) ) );
+	abp_out( '  سه خبرِ اول              : ' . ( ! empty( $nn['items'] ) ? implode( ' | ', array_map( function ( $x ) { return $x['date'] . ' ' . $x['title']; }, $nn['items'] ) ) : '(خالی)' ) );
+	$how = 'دستهٔ انتخابی';
+	if ( ! empty( $nn['fallback'] ) ) {
+		$how = ( 1 == $nn['fallback'] ) ? '⚠ fallback: دسته نبود → آخرین نوشته‌ها' : '⚠ fallback: دسته خالی بود → آخرین نوشته‌ها';
+	}
+	abp_out( '  منبعِ چاپ‌شده             : ' . $how );
 }
-abp_out( '  تنظیم‌ها                : JAVANSEDA_NEWS_CATEGORY=' . ( defined( 'JAVANSEDA_NEWS_CATEGORY' ) ? JAVANSEDA_NEWS_CATEGORY : "'news' (پیش‌فرض)" ) . ' | JAVANSEDA_NEWS_COUNT=' . ( defined( 'JAVANSEDA_NEWS_COUNT' ) ? JAVANSEDA_NEWS_COUNT : '8' ) );
+abp_out( '  حالت                     : ' . ( $strict ? 'سخت‌گیر (اگر دستهٔ اخبار نباشد → نوار خالی/بدون چاپ) ✓ پیش‌فرض v3.1.3' : 'مجاز ⇒ در نبودِ دسته، «آخرین نوشته‌ها» می‌آید (JAVANSEDA_NEWS_STRICT=false)' ) );
+abp_out( '  تنظیم‌ها                   : JAVANSEDA_NEWS_COUNT=' . ( defined( 'JAVANSEDA_NEWS_COUNT' ) ? (int) JAVANSEDA_NEWS_COUNT : '8' ) . ' | JAVANSEDA_NEWS_CACHE=' . ( defined( 'JAVANSEDA_NEWS_CACHE' ) ? (int) JAVANSEDA_NEWS_CACHE : '60' ) . ' ثانیه' );
+abp_out( '  نکته                     : تیکر هیچ خبری «تولید» نمی‌کند؛ فقط نوشته‌های همان دسته را می‌خواند.' );
+abp_out( '     در View Sourceِ همان صفحه، کامنت <!-- javan_seda: news ticker | cat=… | N خبر | strict=on/off --> را ببینید:' );
+abp_out( '     اگر cat=NONE بود ⇒ دسته‌ای با آن slugها وجود ندارد (در حالت سخت‌گیر نوار چاپ نمی‌شود).' );
 
 abp_ln();
 abp_out( '۴.۵) سلامتِ فایل‌ها از نظر «خطرِ خطای کشنده» (علتِ احتمالیِ باکسِ خالی)' );
@@ -814,6 +856,18 @@ abp_out( '       #centers_box,.single_content_box{ min-height:1px !important; ov
 abp_out( '     اگر محتوا ظاهر شد ⇒ علت، عرضِ ثابت ۲۵۰ تا ۳۵۰ پیکسلی قالب در موبایل است' );
 abp_out( '     (قاعده‌های @media در style.css که فقط ۹۰٪ عرض را می‌دهد و body با overflow-x:hidden)' );
 abp_out( '     و باید style.css نسخهٔ جدید روی هاست اعمال شود؛ همین قاعده‌ها داخلش هست.' );
+/* ------------------------------------------------ ۱۰) بایتِ سرعت (لایۀ perf) */
+abp_ln();
+abp_out( '۱۰) بایتِ سرعت — لایۀ inc/ab-perf.php (v3.1.3)' );
+if ( function_exists( 'javan_seda_perf_report' ) ) {
+	$abp_perf = (array) javan_seda_perf_report();
+	foreach ( $abp_perf as $abp_pl ) {
+		abp_out( '  ' . $abp_pl );
+	}
+} else {
+	abp_out( '  ✗ تابع javan_seda_perf_report موجود نیست ⇒ فایل inc/ab-perf.php روی هاست نیست' );
+	abp_out( '    یا require آن از myfunctions.php حذف شده. (افت سرعت را با PageSpeed بسنجید.)' );
+}
 /* ------------------------------------------------- ذخیرهٔ اختیاری HTMLها */
 if ( ! empty( $_GET['save'] ) ) {
 	$dir = ( function_exists( 'get_temp_dir' ) ? rtrim( get_temp_dir(), '/\\' ) : sys_get_temp_dir() ) . '/ahangban_probe';

@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.1.2
+Version: 3.1.3
 */
 /*
 ==================================================================================
@@ -2521,28 +2521,30 @@ body{padding-top:0;}
 }
 
 /* ============================================================================================
-   ۲۱) هدر موبایل — بازگردانی و قاعدهٔ «هیچ‌وقت بدون هدر نمان» (نسخهٔ 3.0.3)
-   مربوط به فایل: header.php  (کلاس بدنه: .ab-has-mh یعنی هدر موبایل رندر شده است)
+   ۲۱) هدر موبایل — نسخهٔ «وابسته به عرضِ صفحه» (v3.1.3)
+   فایل مرتبط: header.php  (بلوک inline: ab-header-critical — مقادیر یکسان‌اند)
+   چرا دیگر ab-has-mh نیست؟  چون تصمیم‌گیری با wp_is_mobile() باعث شد با کشِ
+   «نسخهٔ موبایل/دسکتاپ» یا فیلترِ wp_is_mobile، هدرِ دسکتاپ هم از کار بیفتد.
+   حالا مارک‌آپ در همهٔ دستگاه‌ها یکی است و CSSِ viewport تصمیم می‌گیرد (cache-safe).
    پالت: #FFFFFF / #185ADB / #111111 — بدون گرادینت
    ============================================================================================ */
 
-/* هدر موبایل هر جا رندر شد، دیده می‌شود (نه فقط زیر ۸۰۰px) */
-body.ab-has-mh #mobiles_header{display:block !important;visibility:visible !important;height:70px !important;overflow:visible !important;}
+/* پیش‌فرض (دسکتاپ): هدر موبایل پنهان — فقط «پنهان»، چیزی حذف نمی‌شود */
+#mobiles_header{display:none;}
 
-/* اگر هدر موبایل رندر نشده باشد، هیچ ردپایی از آن در صفحه نمی‌ماند */
-body:not(.ab-has-mh) #mobiles_header{display:none !important;visibility:hidden !important;height:0 !important;overflow:hidden !important;}
+/* موبایل و تبلت (≤800px): نوار ۷۰ پیکسلی + ۲۰ پیکسل فاصله = ۹۰px فضای بالای صفحه */
+@media (max-width: 800px){
+	#mobiles_header{display:block !important;visibility:visible !important;height:70px !important;overflow:visible !important;}
+	body{padding-top:90px !important;}
+	#header{display:none !important;}
+	#header .menu_right{max-width:100% !important;}
+}
 
-/* فاصلهٔ بالای صفحه فقط وقتی لازم است که هدرِ fixed (موبایل) وجود دارد — ۶۵px = ارتفاع نوار */
+/* سازگاری با فایل‌های قدیمی‌تر که کلاس ab-has-mh را روی body می‌گذاشتند */
 body.ab-has-mh{padding-top:90px;}
-/* هدر قدیمیِ قالب (padding inline 60pxِ اصلی) ⇒ جبرانِ هم‌پوشانی در موبایل (v3.1.2) */
-@media (max-width: 800px){ body:not(.ab-has-mh){padding-top:90px !important;} #mobiles_header{height:70px !important;} }
+@media (min-width: 801px){ body.ab-has-mh #mobiles_header{display:none !important;} }
 
-/* همان قاعده‌ها به‌صورت inline در header.php هم آمده‌اند (نسخهٔ ضدّ‌کش) — مقدارها یکسان است */
-
-/* ایمنی موبایل: ظرف ثابت‌عرض نباید محتوا را در عرض باریک ببُرد + جلوگیری از برش عمودی
-   (قالب در @mediaهای ۲۵۰ تا ۴۵۰ پیکسل، عرضِ ثابتِ ۲۵۰/۳۵۰/۴۵۰ می‌دهد؛ روی گوشی‌های
-    ۳۲۰ و ۳۶۰ پیکسلی + body{overflow-x:hidden} بخشی از محتوا بیرونِ برش می‌افتاد) */
-.tarlanweb_center{max-width:100% !important;}
+/* ایمنی موبایل: ظرف ثابت‌عرض نباید محتوا را در عرض باریک ببُرد + جلوگیری از برش عمودی */
 #centers_box,.single_content_box{overflow:visible;}
 @media (max-width: 800px){
 	.tarlanweb_center{width:auto !important;max-width:100% !important;margin-right:12px;margin-left:12px;}
@@ -2553,18 +2555,11 @@ body.ab-has-mh{padding-top:90px;}
 	.single_content_box iframe{max-width:100% !important;}
 }
 
-/* حالت ریسک: کاربر دسکتاپ با پنجرهٔ باریک (یا موبایل با «نسخهٔ دسکتاپ») — هدر اصلی نباید غیب شود */
-@media (max-width: 800px){
-	body:not(.ab-has-mh) #header{display:block !important;padding:14px 0 !important;}
-	body:not(.ab-has-mh) #header .menu_right{max-width:60% !important;}
-}
-
-/* هدر دسکتاپ: همان حالت فلت تمیز با فاصلهٔ >= 28px از بخش زیرین */
+/* هدر دسکتاپ: حالت فلتِ تمیز با فاصلهٔ >= 28px از بخش زیرین */
 #header{margin-bottom:28px !important;}
-body.ab-has-mh #header{display:none !important;}
 
 /* ============================================================================================
-   ۲۲) «اخبار روز» (جایگزین نوار دسترسی سریع زیر هدر) + فضای بیشترِ هدر در موبایل — نسخهٔ 3.1.2
+   ۲۲) «اخبار روز» (فقط دستهٔ news) + فضای بیشترِ هدر در موبایل + فاصلۀ صفحۀ هنرمند — نسخهٔ 3.1.3
    فایل‌های مرتبط: home.php · inc/ab-news-ticker.php · myfunctions.php · header.php
    پالت سازمانی: #FFFFFF / #185ADB / #111111 — بدون هیچ گرادینت
    ============================================================================================ */
@@ -2640,3 +2635,25 @@ body.ab-has-mh #header{display:none !important;}
 @media (prefers-reduced-motion: reduce){
 	.ab-news .ab-news-track{animation:none !important;}
 }
+
+/* صفحهٔ اختصاصی هنرمند (taxonomy-singer.php) — رفع «چسبیدن» دو بخش در دسکتاپ:
+   ۱) بلوک پروفایل (تصویر + «صفحات مجازی هنرمند») به اولین سرتیترِ بخش‌ها می‌چسبید
+   ۲) سطرِ «… اثر در این صفحه • آخرین به‌روزرسانی: …» به تیتر «موزیک ویدیو» می‌چسبید */
+.artist_box_tarlanweb{margin-bottom:34px !important;padding-bottom:26px !important;}
+.artists_imsf .socials_box{margin-top:14px !important;padding-top:12px !important;border-top:1px solid var(--ab-line);}
+.ab-artist-page__meta{margin:16px 0 0 !important;padding-top:12px !important;border-top:1px solid var(--ab-line);}
+.artist_box_detss .clear2{padding:14px 0 !important;}
+#artist_box > .song_boxs:first-of-type,.ab-artist-page__sortbox + .song_boxs,#centers_box > .song_boxs:first-of-type{margin-top:26px !important;}
+.song_boxs .songs_title_box{margin-bottom:12px !important;}
+@media (max-width: 800px){
+	.artist_box_tarlanweb{margin-bottom:22px !important;padding-bottom:16px !important;}
+	.ab-artist-page__meta{margin-top:12px !important;}
+}
+
+/* بایتِ سرعت v3.1.3: بندانگشتی ۲۴پیکسلیِ خبر (فقط دسکتاپ) + ابعادِ صریح تا CLS صفر بماند */
+.ab-news .ab-news-thumb{flex:0 0 auto;width:24px;height:24px;border-radius:4px;object-fit:cover;}
+.night .ab-news .ab-news-thumb{opacity:.9;}
+@media (max-width: 800px){
+	.ab-news .ab-news-thumb{display:none;}
+}
+/* --- انتهای بلوک ۲۲ (v3.1.3) --- */

@@ -15,6 +15,13 @@ if ( is_readable( $_javan_seda_news ) ) {
 	require_once $_javan_seda_news;
 }
 unset( $_javan_seda_news );
+/* v3.1.3 — لایۀ «بایتِ سرعت»: defer / preload فونت / حذف بارِ <head> / lazy تصاویر + گزارش perf.
+   برای خاموش‌کردن همه:  define( 'JAVANSEDA_PERF', false );  در wp-config.php */
+$_javan_seda_perf = trailingslashit( get_template_directory() ) . 'inc/ab-perf.php';
+if ( is_readable( $_javan_seda_perf ) ) {
+	require_once $_javan_seda_perf;
+}
+unset( $_javan_seda_perf );
 /* v3.1.0 — لایهٔ سازگاری ACF: فقط وقتی ACF فعال نباشد توابع را تعریف می‌کند
    و از خطای کشندهٔ «Call to undefined function get_field()» در single.php جلوگیری می‌کند. */
 $_javan_seda_acf = trailingslashit( get_template_directory() ) . 'inc/acf-compat.php';

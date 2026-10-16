@@ -245,14 +245,16 @@ if ( ! function_exists( 'javan_seda_sidebar' ) ) {
 if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 	function javan_seda_expected_hashes() {
 	return array(
-		'single.php'          => '40748d997791260756cb4bf72aab584553eaa903050bd891fb05ee67a0ba3a17',
-		'page.php'            => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
-		'myfunctions.php'     => 'a1e1dd1b38613a373759c5e663530b873a30d61fe465c4efd135939df2fc2dc9',
-		'style.css'           => 'c942486fc567642eff34c544b1eb931cb744276b3cc86bf52938601398806083',
-		'footer.php'          => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
-		'header.php'          => 'c5231ff7bba20b93887f809ef1716e0f336234f4357e69287ebc0842b3cc0fd5',
-		'home.php'            => 'e1237170bba2752362befac9d05d6c74a4a303a52af5b5a9114b62ea1d721b9e',
-		'inc/vip_slider.php'  => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
+		'single.php'              => '11c677e1a7a61e52d58b70476a9d48b5865ad314913da4e6f9bd77925fe01b77',
+		'page.php'                => 'b83d394588a1cbce37f075dcb7c679497ab19b20975488af07637419aa27da8a',
+		'myfunctions.php'         => '11751e91d9752b7bcad6be22a8e858d7a0d7ebb19fcbb973c155d2f14c6ebd11',
+		'style.css'               => '8a42a305e10243c2a7a2395b046f9dce819ad755acb2c84bb617f1354c42c22e',
+		'footer.php'              => '0e8e4b8d56a75ecf142caa5082d65070649cf8ba6c64048ac4c26979e41c40fe',
+		'header.php'              => '9807921341cccde44f702cedec6cdeecff490f86d51fd518d4bf80489da080c1',
+		'home.php'                => '1cf3bb8670f6683d6562eb60584c6a2e609e26d77a0ffd91201866394122f9b6',
+		'inc/vip_slider.php'      => '03b6e6cbf63ee7e4194bf55dda81d1312a6802d31287e1aaea61fe0ee1ad0410',
+		'inc/ab-news-ticker.php'  => 'b9eebd2bc03497b9011a134e8cf7325a8952a2df18eea67ba9e010422b914d0e',
+		'inc/ab-perf.php'         => 'd79b274b181e2011c540bb7f40f46b01380dc5ff4b89d0f4afd13784ae209e60'
 	);
 }
 }
@@ -289,7 +291,7 @@ if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
 		$expected  = javan_seda_expected_hashes();
 		$mismatch  = 0;
 
-		$line( '=== گزارش تشخیص «ابزارک / سایدبار / هدر» — لایهٔ ایمنی v3.1.0 ===' );
+		$line( '=== گزارش تشخیص «ابزارک / سایدبار / هدر» — لایهٔ ایمنی v3.1.3 ===' );
 		$line( 'WordPress: ' . get_bloginfo( 'version' ) . ' | PHP: ' . PHP_VERSION . ' | نسخهٔ قالب: ' . ( $theme->get( 'Version' ) ? $theme->get( 'Version' ) : '?' ) );
 		$line( 'stylesheet/template: ' . $theme->get_stylesheet() . ' / ' . $theme->get_template() . ( $theme->get_stylesheet() !== $theme->get_template() ? '   <<< چایلد‌تیم فعال است' : '' ) );
 		$line( 'قالبِ این درخواست: ' . ( $template ? $template : '(نامعلوم — از کاوشگر مستقل فراخوانی شد)' ) );

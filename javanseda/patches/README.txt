@@ -1,30 +1,52 @@
-پچ‌های اضطراری — نسخهٔ 3.1.2 (برای هاستی که فایل‌هایش هنوز «اصلی/۳.۰.۲» است)
+پچ‌های اضطراری — نسخهٔ 3.1.3 (برای هاستی که فایل‌هایش هنوز «اصلی/۳.۰.۲» است)
 ================================================================================
-چرا این پوشه؟  نشانه‌ها (مانیفستِ فایل ab-sidebars.php شما) نشان داد هاست هنوز
-header.php / style.css / single.php «اصلی» را اجرا می‌کند و فقط یک فایل جایگزین شده.
-در header.php اصلیِ قالب:
-  • خط ۱۶ : `if(wp_is_mobile()){ ?><style>body{padding-top: 60px;}`  (کم به‌ازای هدر ۶۵px)
-  • خط ۲۳ : `if(wp_is_mobile()){}else{ ?> <header id="header">`  ⇒ در موبایل هیچ هدری نیست
-  • خط ۵۰ : `get_template_part('inc/mobiles_header');` بدون شرط ⇒ رندرِ دوبل در دسکتاپ
 
-فایل‌ها:
-  header.original-patched.php  = همان header.php اصلیِ شما + ۱۹ سطرِ افزوده (بدون هیچ حذف/ویرایش؛
-      با diff تأیید شده). بلوک <style id="ab-mobile-patch"> داخل همان شرطِ wp_is_mobile()
-      می‌نشیند، پس دسکتاپ دقیقاً مثل الان می‌ماند. چه می‌کند:
-        body{padding-top:90px !important}            ← ۷۰px نوار + ۲۰px فاصله (درخواست v3.1.2)
-        #mobiles_header{height:70px !important}     ← کمی بلندتر، همان‌طور که خواستید
-        #header/.menu_right/#searches{display:none} ← رفع رندرِ دوبل در موبایل
-        .tarlanweb_center{width:auto;max-width:100%} ← رفع بریده‌شدن محتوا در عرض باریکِ RTL
-        .ab-news,.ab-quickbar{margin-top:20px}       ← فاصلهٔ نوار «اخبار روز» از هدر
+چرا این پوشه؟
+  در نسخهٔ 3.1.2 «header.php کامل» را به‌عنوان drop-in دادیم و سایت شما کلاً به‌هم ریخت
+  (هدر در دسکتاپ و موبایل ناپدید شد). علت دو تا بود:
+    ۱) قوانین `#header{display:none}` و `.menu_right/#searches{display:none}` داخل شرطِ
+       `wp_is_mobile()` نوشته شده بود ⇒ روی هاستِ شما (کشِ UA / proxy) آن شرط برای
+       دسکتاپ هم true شد و هدر حذف شد؛
+    ۲) یک خط کامنتِ فارسی بیرون از بلوک `/* … */` افتاده بود ⇒ متن داخل <head> چاپ شد
+       و چیدمان کل صفحه خراب شد.
+  در 3.1.3 هر دو رفع شد: مخفی‌سازی هدر فقط با `@media (max-width:800px)` است (هیچ وابستگی
+  به wp_is_mobile / User-Agent ندارد) و هیچ متنی بیرون از کامنت چاپ نمی‌شود.
 
-نصب:  کپی روی wp-content/themes/javanseda/header.php (اول از فایل فعلی بکاپ بگیرید)
-      و بعد Purge All در افزونهٔ کش + CDN.
+فایل‌ها
+  header.original-patched.php  =  همان header.php «اصلیِ» شما + ۱۸ سطرِ افزوده، ۰ خط حذف/ویرایش
+      (با diff تأیید شده ⇒ اگر خواستید برگردید، فقط همین ۱۸ خط را پاک کنید).
+      چه می‌کند؟ کل محتوایش داخل یک بلوک است:  <style id="ab-mobile-patch">  و داخل آن
+      فقط  @media (max-width: 800px){ … }  ⇒ دسکتاپ «صفر تغییر».
+        body{padding-top:90px !important}                 ← ۷۰px نوار + ۲۰px فاصله (درخواست شما)
+        #mobiles_header{height:70px !important}           ← هدر موبایل کمی بلندتر
+        #centers_box,.single_content_box{overflow:visible}← رفع بریده‌شدن محتوا
+        .tarlanweb_center{width:auto;max-width:100%}      ← رفع سرریز در عرض باریکِ RTL
+        .single_posts_right,#left_side{width:100%;float:none} ← ستون‌ها در موبایل کامل بیایند
+        .ab-news,.ab-quickbar{margin-top:20px;margin-bottom:18px} ← فاصلۀ «اخبار روز» با هدر
+        #breadcrumbs_container{margin-top:14px}
+      ✱ توجه: در این نسخه هیچ `display:none` روی #header / منو / جست‌وجو نیست. اگر هدر
+        اصلیِ قالب شما در موبایل دوبار رندر می‌شود (خط ۲۳ و ۵۰ header.php اصلی)، آن را
+        دستی با همان @media مخفی کنید یا بستهٔ drop-in را کامل اعمال کنید.
 
-قاعدهٔ انتخاب (مهم):
-  • اگر در header.php هاستتان عبارت «ab-has-mh» هست ⇒ نسخهٔ ۳.۰.۴+ نصب است؛ این پچ را
-    نصب نکنید (فقط style.css / home.php / myfunctions.php / inc/ab-news-ticker.php را بگذارید).
-  • اگر «ab-has-mh» نیست و خط ۱۶ همان `padding-top: 60px` است ⇒ همین پچ را نصب کنید.
-  • هر دو را با هم نصب نکنید.
+نصب (کمینه‌ترین حالت)
+  ۱) از header.php فعلی هاست بکاپ بگیرید (cp header.php header.php.bak-312).
+  ۲) محتوای همین فایل را روی  wp-content/themes/javanseda/header.php  کپی کنید.
+  ۳) style.css نسخهٔ 3.1.3 را هم بگذارید (بلوک ۲۱ و ۲۲ داخلش است).
+  ۴) Purge All در افزونۀ کش + Purge در CDN؛ بعد سایت را هم با موبایل و هم با دسکتاپ باز کنید.
 
-توصیهٔ اصلی: به‌جای پچ، بستهٔ drop-in-v3.1.2.zip را کامل اعمال کنید — چون single.php روی
+قاعدهٔ انتخاب (مهم — هر دو را با هم نصب نکنید)
+  • اگر داخل header.php هاستتان عبارت «ab-header-critical» یا «ab-has-mh» هست ⇒
+    نسخهٔ 3.1.x نصب است؛ این پچ را نصب نکنید (فقط style.css / home.php / myfunctions.php /
+    inc/ab-news-ticker.php / inc/ab-perf.php را به‌روز کنید).
+  • اگر «ab-has-mh» نیست و خط ۱۶ همان  `if(wp_is_mobile()){ ?><style>body{padding-top: 60px;}`
+    است ⇒ همین پچ را نصب کنید.
+
+تستِ سریع بعد از نصب
+  • دسکتاپ: هدر، منو، جست‌وجو و دکمهٔ شب/روز باید دقیقاً مثل قبل باشند.
+  • موبایل (یا DevTools با عرض ۴۰۰px): نوار موبایل دیده شود، ۲۰px فضای بالای محتوا،
+    و متنِ اضافی (فارسی/انگلیسی) بین <head> و </head> چاپ نشده باشد.
+  • کاوشگر:  https://example.com/ab-mobile-probe.php?html=1  → بخش ۱ (هشِ فایل‌ها)،
+    بخش ۴.۱ (اخبار) و بخش ۱۰ (بایتِ سرعت). بعد از استفاده فایل کاوشگر را پاک کنید.
+
+توصیهٔ اصلی: به‌جای پچ، بستهٔ drop-in-v3.1.3.zip را کامل اعمال کنید — چون single.php روی
 هاست شما هنوز نسخهٔ اصلی است و هیچ‌کدام از محافظ‌های ACF/plugin.php را ندارد.

@@ -14,48 +14,41 @@
 <?php wp_enqueue_script("jquery"); wp_head('');
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
 <?php
-/* v3.1.2 — CSS حیاتیِ هدر + محتوا + فاصلهٔ اخبار روز */، به‌صورت inline در <head>:
-   اگر style.css روی هاست قدیمی بماند یا CDN/کش نسخهٔ کهنهٔ آن را سرو کند،
-   نمایش هدر موبایل باز هم درست کار می‌کند. کلاس ab-has-mh یعنی «هدر موبایل رندر شد».
-   ارتفاع هدر موبایل ۶۵px است؛ پس padding هم ۶۵px (رفع ۵ پیکسل پوشاندن محتوا). */
+/* v3.1.3 — CSS حیاتیِ هدر، inline و «وابسته به عرضِ صفحه» (نه کاربرگزار).
+   دو درسِ این نسخه:
+   ۱) در v3.1.2 یک جملهٔ فارسی بیرون از بلوک کامنت افتاده بود و داخل <head> چاپ می‌شد
+      (علتِ «سایت کلاً خراب شد»). این‌جا همه‌چیز داخل کامنت است و هیچ متنی print نمی‌شود.
+   ۲) نمایش/عدم‌نمایش هدر موبایل دیگر به wp_is_mobile() وابسته نیست؛ فقط با media query
+      انجام می‌شود، پس کشِ «نسخهٔ موبایل/دسکتاپ» و فیلترهای wp_is_mobile دیگر نمی‌توانند
+      هدر را در یک دستگاه خراب کنند. مارک‌آپ در همهٔ دستگاه‌ها یکسان است (cache-friendly).
+   ارتفاع هدر موبایل: ۷۰px | فاصلهٔ بالای صفحه در موبایل: ۹۰px (۷۰ + ۲۰). */
 ?>
 <style id="ab-header-critical">
 body{padding-top:0;}
-body.ab-has-mh{padding-top:90px;} /* v3.1.2: ۷۰پیکسل نوار + ۲۰پیکسل فاصله */
-/* هدر قدیمی (padding 60pxِ اصلی) + style.css کهنه ⇒ همان فاصله در موبایل (v3.1.2) */
-@media (max-width: 800px){body:not(.ab-has-mh){padding-top:90px;} #mobiles_header{height:70px !important;}}
-@media (min-width: 801px){body:not(.ab-has-mh){padding-top:0;}}
-body.ab-has-mh #mobiles_header{display:block !important;visibility:visible !important;height:70px !important;overflow:visible !important;}
-body:not(.ab-has-mh) #mobiles_header{display:none !important;}
-body.ab-has-mh #header{display:none !important;}
+/* هدر موبایل به‌صورت پیش‌فرض پنهان است و فقط در عرضِ موبایل/تبلت ظاهر می‌شود */
+#mobiles_header{display:none;}
 #header{margin-bottom:28px !important;}
-@media (min-width: 801px){
-body.ab-has-mh #mobiles_header{display:block !important;}
-}
 @media (max-width: 800px){
-body:not(.ab-has-mh) #header{display:block !important;padding:12px 0 !important;}
-body:not(.ab-has-mh) #header .menu_right{max-width:60% !important;}
-}
-/* ایمنی موبایل: ظرف ثابت‌عرضِ قالب نباید محتوا را در عرض‌های باریک (RTL) ببُرد */
-.tarlanweb_center{max-width:100% !important;}
-#centers_box,.single_content_box{overflow:visible;}
-@media (max-width: 800px){
+body{padding-top:90px !important;}
+#mobiles_header{display:block !important;visibility:visible !important;height:70px !important;overflow:visible !important;}
+#header{display:none !important;}
+#header .menu_right{max-width:100% !important;}
 .tarlanweb_center{width:auto !important;max-width:100% !important;margin-right:12px;margin-left:12px;}
 .single_posts_right,.single_posts_left{width:100% !important;float:none !important;}
 .single_featured_image,.single_content_box img,.single_content_box iframe{max-width:100% !important;height:auto;}
+#centers_box,.single_content_box{overflow:visible;}
+.tarlanweb_center{max-width:100% !important;}
 }
+/* سازگاری با نسخه‌های قبلی که کلاس ab-has-mh را روی <body> می‌گذاشتند (بی‌اثر اگر نبود) */
+body.ab-has-mh{padding-top:90px;}
+@media (min-width: 801px){body.ab-has-mh #mobiles_header{display:none !important;}}
 </style>
 </head>
-<?php
-/* v3.0.3 — تک‌منبع تشخیص موبایل: همین متغیر هم رندر را کنترل می‌کند و هم کلاس بدنه را */
-$ab_mobile_ua = wp_is_mobile();
-$darks = ot_get_option('dark_modes');
-if ( 'off' != $darks ) { ?>
-<body <?php body_class( $ab_mobile_ua ? 'night ab-has-mh' : 'night' ); ?>>
+<?php $darks = ot_get_option('dark_modes'); if ( 'off' != $darks ) { ?>
+<body <?php body_class('night'); ?>>
 <?php } else { ?>
-<body <?php body_class( $ab_mobile_ua ? 'ab-has-mh' : '' ); ?>>
+<body <?php body_class(''); ?>>
 <?php } ?>
-<?php if ( ! $ab_mobile_ua ) { ?> 
 <header id="header">
 <div class="tarlanweb_center">
 <?php if(is_home()){ ?> <h1 class="h1_hidden_home"><?php echo ot_get_option('head_h1'); ?></h1> <?php } ?>
@@ -81,12 +74,9 @@ if ( 'off' != $darks ) { ?>
 <div class="clear"></div>
 </div>
 </header>
-<?php } ?>
 <?php
-/* هدر موبایل: فقط روی موبایل رندر می‌شود (قانون ۵) ولی اگر این خط حذف شود،
-   سایت روی موبایل «هیچ» هدری نخواهد داشت — رندرِ مشروط، نه حذف. */
-if ( $ab_mobile_ua ) {
-	get_template_part( 'inc/mobiles_header' );
-}
+/* هدر موبایل همیشه رندر می‌شود؛ CSSِ بالا تصمیم می‌گیرد کِی دیده شود.
+   این خط هرگز نباید حذف شود — نبودش = نداشتن هدر در گوشی. */
+get_template_part('inc/mobiles_header');
 ?>
 <main>

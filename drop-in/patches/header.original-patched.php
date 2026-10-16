@@ -14,23 +14,22 @@
 <?php wp_enqueue_script("jquery"); wp_head('');
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
 <?php if(wp_is_mobile('')){ ?><style>body{padding-top: 60px;}</style><?php } ?>
-<?php /* PATCH-MOBILE-2 (نسخهٔ 3.1.2) — فقط برای فایلِ «اصلیِ» قالب که بلوک ۲۱ در style.css ندارد:
-   ۱) ۷۰px برای نوارِ ثابت موبایل و ۹۰px فضای بالای صفحه (v3.1.2: «کمی فاصله با هدر بیشتر بشود»)
-      — قبلاً ۶۰px بود که ۵ پیکسل از ابتدای بلوک محتوا را زیر هدرِ fixed قایم می‌کرد
-   ۲) به‌صورت inline در <head> می‌آید تا کشِ style.css/CDN بی‌اثرش نکند
-   ۳) عرض ثابتِ قالب در موبایل خنثی می‌شود تا بلوک محتوا بریده/بیرونِ صفحه نیفتد */ ?>
+<?php /* PATCH-MOBILE-3 (v3.1.3) — افزوده‌شده روی header.php «اصلیِ» قالب.
+   نسخهٔ ۱ و ۲ این پچ سه خط داشت که هدر دسکتاپ را می‌کشت (#header{display:none} بدون media query)؛
+   در این نسخه هیچ قاعده‌ای بیرون از media query نیست و چیزی «حذف» نمی‌شود.
+   درخواست مالک: ۱) هدر در دسکتاپ و موبایل سالم باشد ۲) در موبایل فاصله با هدر بیشتر شود. */ ?>
 <style id="ab-mobile-patch">
-body{padding-top:90px !important;}
-#header{display:none !important;}
-.menu_right,#searches,.dark_light_mode{display:none !important;}
-#mobiles_header{height:70px !important;box-sizing:border-box;padding-top:3px;}
-#centers_box,.single_content_box{overflow:visible;}
+/* دسکتاپ: دست‌نخورده (همان که الان کار می‌کند) */
+/* موبایل/تبلت: جبران ۶۰→۷۰px + فاصلهٔ بیشتر (۲۰px) + ضدّ بریده‌شدن محتوا در RTL */
 @media (max-width: 800px){
+body{padding-top:90px !important;}
+#mobiles_header{height:70px !important;box-sizing:border-box;}
+#centers_box,.single_content_box{overflow:visible;}
 .tarlanweb_center{width:auto !important;max-width:100% !important;margin-right:12px;margin-left:12px;}
 .single_posts_right,#left_side{width:100% !important;float:none !important;}
+.single_featured_image,.single_content_box img,.single_content_box iframe{max-width:100% !important;height:auto;}
 .ab-news,.ab-quickbar{margin-top:20px !important;margin-bottom:18px !important;}
 #breadcrumbs_container{margin-top:14px;}
-.single_featured_image,.single_content_box img,.single_content_box iframe{max-width:100% !important;height:auto;}
 }
 </style>
 </head>

@@ -22,23 +22,46 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( ! function_exists( 'javan_seda_news_category_slugs' ) ) {
+	/** نامک‌هایی که به‌ترتیب برای «دستهٔ اخبار» جست‌وجو می‌شوند. */
+	function javan_seda_news_category_slugs() {
+		$slugs = array();
+		if ( defined( 'JAVANSEDA_NEWS_CATEGORY' ) ) {
+			$slugs[] = trim( (string) JAVANSEDA_NEWS_CATEGORY );
+		}
+		$slugs = array_merge( $slugs, array( 'news', 'akhbar', 'akhbar-musiqi', 'music-news', 'اخبار' ) );
+		$slugs = array_values( array_unique( array_filter( $slugs, 'strlen' ) ) );
+		return apply_filters( 'javanseda_news_category_slugs', $slugs );
+	}
+}
+
 if ( ! function_exists( 'javan_seda_news_category_id' ) ) {
-	/** شناسهٔ گویای دستهٔ اخبار (slug یا id). @return int|0 */
+	/** شناسهٔ دستهٔ اخبار: slug/نام در فهرست بالا (یا id عددی). ۰ = پیدا نشد. */
 	function javan_seda_news_category_id() {
-		$raw = defined( 'JAVANSEDA_NEWS_CATEGORY' ) ? JAVANSEDA_NEWS_CATEGORY : 'news';
-		$raw = trim( (string) $raw );
-		if ( '' === $raw ) {
-			return 0;
+		static $cached = null;
+		if ( null !== $cached ) {
+			return $cached;
 		}
-		if ( ctype_digit( $raw ) ) {
-			$term = get_term( (int) $raw, 'category' );
-			return ( $term && ! is_wp_error( $term ) ) ? (int) $term->term_id : 0;
+		foreach ( javan_seda_news_category_slugs() as $slug ) {
+			if ( ctype_digit( $slug ) ) {
+				$term = get_term( (int) $slug, 'category' );
+				if ( $term && ! is_wp_error( $term ) ) {
+					$cached = (int) $term->term_id;
+					return $cached;
+				}
+				continue;
+			}
+			$term = get_term_by( 'slug', $slug, 'category' );
+			if ( ! $term ) {
+				$term = get_term_by( 'name', $slug, 'category' );
+			}
+			if ( $term && ! is_wp_error( $term ) ) {
+				$cached = (int) $term->term_id;
+				return $cached;
+			}
 		}
-		$term = get_term_by( 'slug', $raw, 'category' );
-		if ( ! $term ) {
-			$term = get_term_by( 'name', $raw, 'category' );
-		}
-		return ( $term && ! is_wp_error( $term ) ) ? (int) $term->term_id : 0;
+		$cached = 0;
+		return 0;
 	}
 }
 
@@ -84,26 +107,31 @@ if ( ! function_exists( 'javan_seda_news_posts' ) ) {
 			while ( $q->have_posts() ) {
 				$q->the_post();
 				$items['items'][] = array(
-					'id'    => get_the_ID(),
-					'title' => get_the_title(),
-					'url'   => get_permalink(),
-					'date'  => get_the_date( 'j F' ),
+					'id'       => get_the_ID(),
+					'title'    => get_the_title(),
+					'url'      => get_permalink(),
+					'date'     => get_the_date( 'j F' ),
+					'cover'    => get_the_post_thumbnail_url( get_the_ID(), 'thumb2' ),
 				);
 			}
 		}
 		wp_reset_postdata();
 
-		// اگر دستهٔ اخبار مطلبی نداشت، آخرین نوشته‌ها نمایش داده می‌شود
-		if ( $cat && ! $items['items'] ) {
-			unset( $args['cat'] );
-			$q2 = new WP_Query( $args );
+		/* اگر دستهٔ اخبار پیدا نشد: در حالت سخت‌گیر (پیش‌فرض v3.1.3) نوار «چیزی» نمایش
+		   نمی‌دهد، چون مالک خواست فقط نوشته‌های دستهٔ news بیاید. برای بازگشت به
+		   «آخرین نوشته‌ها» :  define( 'JAVANSEDA_NEWS_STRICT', false );  */
+		if ( ! $cat && defined( 'JAVANSEDA_NEWS_STRICT' ) && false === JAVANSEDA_NEWS_STRICT ) {
+			$fallback = $args;
+			unset( $fallback['cat'] );
+			$q2 = new WP_Query( $fallback );
 			while ( $q2->have_posts() ) {
 				$q2->the_post();
 				$items['items'][] = array(
-					'id'    => get_the_ID(),
-					'title' => get_the_title(),
-					'url'   => get_permalink(),
-					'date'  => get_the_date( 'j F' ),
+					'id'       => get_the_ID(),
+					'title'    => get_the_title(),
+					'url'      => get_permalink(),
+					'date'     => get_the_date( 'j F' ),
+					'cover'    => get_the_post_thumbnail_url( get_the_ID(), 'thumb2' ),
 				);
 			}
 			wp_reset_postdata();
@@ -147,8 +175,13 @@ if ( ! function_exists( 'javan_seda_news_ticker' ) ) {
 		}
 
 		$one = function ( $it ) {
+			$thumb = '';
+			if ( ! empty( $it['cover'] ) ) {
+				$thumb = '<img class="ab-news-thumb" src="' . esc_url( $it['cover'] ) . '" width="24" height="24" alt="" loading="lazy" decoding="async">';
+			}
 			return '<li class="ab-quickbar__item ab-news-item">'
 				. '<a class="ab-quickbar__link ab-news-link" href="' . esc_url( $it['url'] ) . '" title="' . esc_attr( $it['title'] ) . '">'
+				. $thumb
 				. '<span class="ab-news-date">' . esc_html( $it['date'] ) . '</span>'
 				. '<span class="ab-news-title">' . esc_html( $it['title'] ) . '</span>'
 				. '</a></li>';
@@ -171,7 +204,7 @@ if ( ! function_exists( 'javan_seda_news_ticker' ) ) {
 			. '</div>'
 			. ( $more ? '<a class="ab-news-more" href="' . esc_url( $more ) . '">همهٔ اخبار <i class="icofont-arrow-left" aria-hidden="true"></i></a>' : '' )
 			. '</div>'
-			. '<!-- javan_seda: news ticker | cat=' . ( $cat_id ? $cat_id : '(هیچ→آخرین نوشته‌ها)' ) . ' | ' . count( $items ) . ' خبر -->'
+			. '<!-- javan_seda: news ticker | cat=' . ( $cat_id ? $cat_id : 'NONE' ) . ' | ' . count( $items ) . ' خبر | strict=' . ( defined( 'JAVANSEDA_NEWS_STRICT' ) && false === JAVANSEDA_NEWS_STRICT ? 'off' : 'on' ) . ' -->'
 			. '</nav>';
 
 		if ( $echo ) {

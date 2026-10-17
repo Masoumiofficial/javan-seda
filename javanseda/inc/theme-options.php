@@ -435,6 +435,30 @@ array(
 'type'=>'on-off',
 'section'=>'dl_pages',
 ),
+array(
+'id'=>'credits_box',
+'label'=>'شناسنامۀ آهنگ (تهیه‌کنندگان)',
+'desc'=>'ردیف‌های خواننده · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید در صفحۀ پست نمایش داده شود؟ (داده از فیلدهای artist/composer/lyricist/arranger/mixer/producer)',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'dl_pages'
+),
+array(
+'id'=>'credits_title',
+'label'=>'تیتر باکس شناسنامۀ آهنگ',
+'desc'=>'اگر خالی بماند، «شناسنامۀ آهنگ» چاپ می‌شود',
+'type'=>'text',
+'std'=>'',
+'section'=>'dl_pages'
+),
+array(
+'id'=>'credits_before_player',
+'label'=>'شناسنامه بالای پلیر',
+'desc'=>'روشن = بالای باکس پلیر؛ خاموش = بعد از لینک‌های دانلود (حالت پیش‌فرض)',
+'std'=>'off',
+'type'=>'on-off',
+'section'=>'dl_pages'
+),
 
 ));
   /* allow settings to be filtered before saving */

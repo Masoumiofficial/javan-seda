@@ -36,6 +36,14 @@ if ( is_readable( $_javan_seda_extras ) ) {
 	require_once $_javan_seda_extras;
 }
 unset( $_javan_seda_extras );
+/* v3.2.1 — لایۀ «شناسنامۀ آهنگ» (inc/ab-credits.php) — ردیف‌های آهنگساز/ترانه‌سرا/تنظیم/میکس/تولید.
+   خاموشی:  define( 'JAVANSEDA_CREDITS', false );  ·  فقط کادر ویرایش:  define( 'JAVANSEDA_CREDITS_METABOX', false ); */
+$_javan_seda_credits = trailingslashit( get_template_directory() ) . 'inc/ab-credits.php';
+if ( is_readable( $_javan_seda_credits ) ) {
+	require_once $_javan_seda_credits;
+}
+unset( $_javan_seda_credits );
+
 
 /* v3.1.0 — لایهٔ سازگاری ACF: فقط وقتی ACF فعال نباشد توابع را تعریف می‌کند
    و از خطای کشندهٔ «Call to undefined function get_field()» در single.php جلوگیری می‌کند. */

@@ -280,6 +280,7 @@ if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
    شده؛ نبودن فایل ⇒ صفر خروجی و صفر خطا. لینک‌ها و متن دکمه‌ها از تنظیمات قالب → «شبکه‌های اجتماعی»
    می‌آیند و با همان گزینهٔ fixbtn روشن/خاموش می‌شوند. */
 if ( function_exists( 'javan_seda_social_box' ) ) { javan_seda_social_box( get_the_ID() ); }
+if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get_the_ID(), 'before_player' ); }
 ?>
 
 <?php if(get_field('video720') || get_field('video1080') || get_field('video480')){ ?> 
@@ -450,6 +451,10 @@ if ( $taranehyar_download_title && (
 </div>
 <?php } ?>
 <?php if ( '' !== $taranehyar_lyrics_box && 'end' === $taranehyar_lyrics_position ) { echo $taranehyar_lyrics_box; } ?>
+<?php /* v3.2.1 — «شناسنامۀ آهنگ» (خواننده · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید).
+   جایگاه از تنظیمات قالب → «صفحه دانلود آهنگ» → «شناسنامه بالای پلیر» عوض می‌شود؛ اگر فایل
+   inc/ab-credits.php نصب نباشد، این دو خط هیچ خروجی و هیچ خطایی ندارند. */
+if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get_the_ID(), 'after_download' ); } ?>
 <div class="clear"></div>
 </div>
 

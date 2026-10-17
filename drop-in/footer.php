@@ -3,13 +3,11 @@
 <?php $upbs = ot_get_option('upb'); if('off' != $upbs){ ?>
 <div class="top_page boxes_shadows"><i class="icofont-thin-up"></i></div>
 <?php } ?>
-<?php if(!wp_is_mobile()){ $fixbtns = ot_get_option('fixbtn'); if('off' != $fixbtns){ ?>
-<div class="fix_bottom_right_box">
-<?php if(ot_get_option('telegram') !=""){ ?>
-<a class="telegrams_ch" target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('telegram')); ?>"><?php echo esc_html(ot_get_option('teltxt')); ?></a><?php } if(ot_get_option('instagram') !=""){ ?>
-<a class="instagrms_ch" target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('instagram')); ?>"><?php echo esc_html(ot_get_option('instxt')); ?></a><?php } ?>
-</div>
-<?php } } ?>
+<?php /* v3.2.0 — «باکس شناور پایین-راست» (تلگرام/اینستاگرام) از پایین صفحه حذف شد.
+   لینک‌های اجتماعی حالا در باکس «ما را دنبال کنید» بالای لینک‌های دانلودِ همان صفحهٔ پست
+   نمایش داده می‌شوند (inc/ab-post-extras.php). گزینهٔ fixbtn در تنظیمات قالب هم به همان باکس
+   وصل شده است؛ برای همین این بلوک دیگر لازم نیست. اگر خواستید برگردد، همین ۷ خط را
+   از نسخهٔ 3.1.4 جای‌گذاری کنید. */ ?>
 
 <footer id="footer" class="ab-footer" role="contentinfo">
 <div class="tarlanweb_center">
@@ -92,6 +90,9 @@
 				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('twitter')); ?>" aria-label="twitter" class="icofont-twitter"></a><?php } if(ot_get_option('youtube') !=""){ ?>
 				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('youtube')); ?>" aria-label="youtube" class="icofont-youtube-play"></a><?php } if(ot_get_option('aparat') !=""){ ?>
 				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('aparat')); ?>" aria-label="aparat" class="icofont-movie"></a><?php } ?>
+				<?php /* v3.2.0 — دو پیام‌رسان تازه (کلیدهایشان در تنظیمات قالب → «شبکه‌های اجتماعی» اضافه شده) */ if(ot_get_option('bale') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('bale')); ?>" aria-label="bale" class="icofont-chat"></a><?php } if(ot_get_option('rubika') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('rubika')); ?>" aria-label="rubika" class="icofont-comment"></a><?php } ?>
 				<div class="clear"></div>
 			</div>
 

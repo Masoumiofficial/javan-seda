@@ -27,7 +27,15 @@
 </div>
 <!-- single_posts_right -->
 <div id="left_side">
-<?php if (!function_exists('dynamic_sidebar') || !dynamic_sidebar('left_side1')) : endif; ?>
+<?php
+/* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
+if ( function_exists( 'javan_seda_sidebar' ) ) {
+	javan_seda_sidebar( 'left_side1' );
+} else {
+	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side1' ) ) :
+	endif;
+}
+?>
 <div class="clear"></div>
 </div>
 <div class="clear"></div>

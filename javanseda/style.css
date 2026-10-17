@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.0.1
+Version: 3.2.3
 */
 /*
 ==================================================================================
@@ -2470,3 +2470,341 @@ body{padding-top:0;}
 	margin:8px 0 0 0 !important;
 }
 
+
+/* ============================================================================================
+   ۲۰) سایدبارِ نوشته‌ها/برگه‌ها — پایداری نمایش ابزارک‌ها (نسخهٔ 3.0.2)
+   مربوط به: single.php، page.php، myfunctions.php، inc/ab-sidebars.php
+   پالت سازمانی: #FFFFFF / #185ADB / #111111 — بدون هیچ گرادینت
+   ============================================================================================ */
+
+/* اطمینان از اینکه ستون چپ همیشه بلوک‌مانند و در جریان صفحه است */
+#left_side{display:block;float:left;width:23.5%;}
+
+/* اگر ناحیهٔ ابزارک کاملاً خالی باشد، ستون فضای خالیِ زشت نمی‌سازد */
+#left_side:empty{display:none;}
+#left_side .related_posts:empty{display:none;}
+@media (max-width: 1100px){
+	.single #left_side:empty ~ *,.single #centers_box:has(#left_side:empty) .single_posts_right{width:100%;}
+}
+
+/* فاصلهٔ استاندارد میان ابزارک‌ها */
+#left_side > .related_posts{margin-bottom:20px;}
+#left_side > *:last-child{margin-bottom:0;}
+
+/* استایل پایه برای ابزارک‌های هستهٔ وردپرس (تاریخ‌واره، دسته‌ها، جستجو و…) */
+#left_side .tarlanweb_side_titles{color:#111111;margin:0 0 10px 0;line-height:24px;}
+#left_side .related_posts ul,#left_side .related_posts ol{list-style:none;margin:0;padding:0;}
+#left_side .related_posts li{line-height:22px;}
+#left_side .related_posts a{color:#222222;}
+#left_side .related_posts a:hover{color:#185ADB;}
+#left_side .related_posts select,
+#left_side .related_posts input[type="text"],
+#left_side .related_posts input[type="search"]{
+	width:100%;max-width:100%;box-sizing:border-box;
+	border:1px solid var(--ab-line);border-radius:6px;padding:7px 10px;
+	background:#FFFFFF;color:#111111;}
+#left_side .related_posts .screen-reader-text{
+	position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+
+/* حالت شب — تنها تغییر سطح رنگ؛ بدون گرادینت */
+.night #left_side .tarlanweb_side_titles{color:#EEEEEE;}
+.night #left_side .related_posts a{color:#DDDDDD;}
+.night #left_side .related_posts a:hover{color:#FFFFFF;}
+.night #left_side .related_posts select,
+.night #left_side .related_posts input[type="text"],
+.night #left_side .related_posts input[type="search"]{
+	background:#222222;color:#EEEEEE;border-color:rgba(255,255,255,0.10);}
+
+/* موبایل/تبلت: ستون ابزارک زیر محتوا و بدون چپ‌اندازی */
+@media (max-width: 900px){
+	#left_side{width:100%;float:none;margin-top:20px;}
+}
+
+/* ============================================================================================
+   ۲۱) هدر موبایل — نسخهٔ «وابسته به عرضِ صفحه» (v3.1.3)
+   فایل مرتبط: header.php  (بلوک inline: ab-header-critical — مقادیر یکسان‌اند)
+   چرا دیگر ab-has-mh نیست؟  چون تصمیم‌گیری با wp_is_mobile() باعث شد با کشِ
+   «نسخهٔ موبایل/دسکتاپ» یا فیلترِ wp_is_mobile، هدرِ دسکتاپ هم از کار بیفتد.
+   حالا مارک‌آپ در همهٔ دستگاه‌ها یکی است و CSSِ viewport تصمیم می‌گیرد (cache-safe).
+   پالت: #FFFFFF / #185ADB / #111111 — بدون گرادینت
+   ============================================================================================ */
+
+/* پیش‌فرض (دسکتاپ): هدر موبایل پنهان — فقط «پنهان»، چیزی حذف نمی‌شود */
+#mobiles_header{display:none;}
+
+/* موبایل و تبلت (≤800px): نوار ۷۰ پیکسلی + ۲۰ پیکسل فاصله = ۹۰px فضای بالای صفحه */
+@media (max-width: 800px){
+	#mobiles_header{display:block !important;visibility:visible !important;height:70px !important;overflow:visible !important;}
+	body{padding-top:90px !important;}
+	#header{display:none !important;}
+	#header .menu_right{max-width:100% !important;}
+}
+
+/* سازگاری با فایل‌های قدیمی‌تر که کلاس ab-has-mh را روی body می‌گذاشتند */
+body.ab-has-mh{padding-top:90px;}
+@media (min-width: 801px){ body.ab-has-mh #mobiles_header{display:none !important;} }
+
+/* ایمنی موبایل: ظرف ثابت‌عرض نباید محتوا را در عرض باریک ببُرد + جلوگیری از برش عمودی */
+#centers_box,.single_content_box{overflow:visible;}
+@media (max-width: 800px){
+	.tarlanweb_center{width:auto !important;max-width:100% !important;margin-right:12px;margin-left:12px;}
+	.single_posts_right,.single_posts_left{width:100% !important;float:none !important;}
+	#centers_box{width:100% !important;}
+	.single_featured_image{max-width:100% !important;height:auto !important;}
+	.single_content_box img{max-width:100% !important;height:auto;}
+	.single_content_box iframe{max-width:100% !important;}
+}
+
+/* هدر دسکتاپ: حالت فلتِ تمیز با فاصلهٔ >= 28px از بخش زیرین */
+#header{margin-bottom:28px !important;}
+
+/* ============================================================================================
+   ۲۲) «اخبار روز» (فقط دستهٔ news) + فضای بیشترِ هدر در موبایل + فاصلۀ صفحۀ هنرمند — نسخهٔ 3.1.3
+   فایل‌های مرتبط: home.php · inc/ab-news-ticker.php · myfunctions.php · header.php
+   پالت سازمانی: #FFFFFF / #185ADB / #111111 — بدون هیچ گرادینت
+   ============================================================================================ */
+
+/* برچسب «اخبار روز» در ابتدای نوار */
+.ab-news .ab-news-title-label{
+	display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;
+	font-weight:700;font-size:13px;color:#FFFFFF;background:#185ADB;
+	padding:5px 12px;border-radius:999px;line-height:1.6;white-space:nowrap;
+}
+.night .ab-news .ab-news-title-label{background:#185ADB;color:#FFFFFF;}
+
+/* ردیف‌ها: برچسب | مسیرِ متحرک | دکمهٔ «همهٔ اخبار» */
+.ab-news .ab-news-bar{
+	display:flex !important;align-items:center;gap:14px;
+	justify-content:flex-start !important;flex-wrap:nowrap !important;
+}
+.ab-news .ab-news-viewport{
+	flex:1 1 auto;min-width:0;overflow:hidden;position:relative;padding:0 2px;
+}
+.ab-news .ab-news-track{
+	display:flex;align-items:center;gap:0;list-style:none;margin:0;padding:0;
+	width:max-content;will-change:transform;
+}
+.ab-news .ab-news-set{
+	display:flex;align-items:center;gap:0;list-style:none;margin:0;padding:0;
+}
+.ab-news ul.ab-news-set li{margin:0 !important;}
+.ab-news ul.ab-news-set{background:transparent;border:0;}
+.ab-news .ab-news-item{
+	margin:0 !important;flex:0 0 auto;max-width:360px;
+}
+.ab-news .ab-news-item + .ab-news-item{border-right:1px solid var(--ab-line);padding-right:22px;}
+.ab-news .ab-news-link{
+	display:inline-flex;align-items:baseline;gap:8px;max-width:100%;
+	font-size:13.5px;font-weight:600;color:#111111;text-decoration:none;
+}
+.ab-news .ab-news-link:hover{color:#185ADB;text-decoration:underline;}
+.night .ab-news .ab-news-link{color:#EEEEEE;}
+.night .ab-news .ab-news-link:hover{color:#FFFFFF;}
+.ab-news .ab-news-date{
+	font-size:11.5px;font-weight:700;color:#185ADB;flex:0 0 auto;white-space:nowrap;
+}
+.ab-news .ab-news-title{
+	white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ab-news .ab-news-more{
+	flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;
+	font-size:12.5px;font-weight:700;color:#185ADB;text-decoration:none;
+	border:1px solid #185ADB;border-radius:999px;padding:4px 12px;
+}
+.ab-news .ab-news-more:hover{background:#185ADB;color:#FFFFFF;}
+.night .ab-news .ab-news-more{color:#FFFFFF;border-color:#185ADB;}
+.night .ab-news .ab-news-more:hover{background:#185ADB;}
+
+/* حرکت بی‌درز فقط در دسکتاپ (پهنای ≥801px) — با توقف روی هاور */
+@media (min-width: 801px){
+	.ab-news .ab-news-track{animation:ab-news-marquee 30s linear infinite;}
+	.ab-news:hover .ab-news-track{animation-play-state:paused;}
+	@keyframes ab-news-marquee{from{transform:translateX(0);}to{transform:translateX(50%);}}
+}
+
+/* موبایل: اسکرول لمسیِ افقی (بدون انیمیشن) + کمی فضای بیشتر زیر هدرِ ۷۰ پیکسلی */
+@media (max-width: 800px){
+	.ab-news{padding:8px 10px !important;margin-bottom:18px !important;}
+	.ab-news .ab-news-bar{gap:10px;}
+	.ab-news .ab-news-viewport{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;}
+	.ab-news .ab-news-track{gap:0;}
+	.ab-news .ab-news-item{max-width:74vw;}
+	.ab-news .ab-news-link{font-size:12.5px;}
+	.ab-news .ab-news-more{display:none;}
+}
+@media (prefers-reduced-motion: reduce){
+	.ab-news .ab-news-track{animation:none !important;}
+}
+
+/* صفحهٔ اختصاصی هنرمند (taxonomy-singer.php) — رفع «چسبیدن» دو بخش در دسکتاپ:
+   ۱) بلوک پروفایل (تصویر + «صفحات مجازی هنرمند») به اولین سرتیترِ بخش‌ها می‌چسبید
+   ۲) سطرِ «… اثر در این صفحه • آخرین به‌روزرسانی: …» به تیتر «موزیک ویدیو» می‌چسبید */
+.artist_box_tarlanweb{margin-bottom:34px !important;padding-bottom:26px !important;}
+.artists_imsf .socials_box{margin-top:14px !important;padding-top:12px !important;border-top:1px solid var(--ab-line);}
+.ab-artist-page__meta{margin:16px 0 0 !important;padding-top:12px !important;border-top:1px solid var(--ab-line);}
+.artist_box_detss .clear2{padding:14px 0 !important;}
+#artist_box > .song_boxs:first-of-type,.ab-artist-page__sortbox + .song_boxs,#centers_box > .song_boxs:first-of-type{margin-top:26px !important;}
+.song_boxs .songs_title_box{margin-bottom:12px !important;}
+@media (max-width: 800px){
+	.artist_box_tarlanweb{margin-bottom:22px !important;padding-bottom:16px !important;}
+	.ab-artist-page__meta{margin-top:12px !important;}
+}
+
+/* بایتِ سرعت v3.1.3: بندانگشتی ۲۴پیکسلیِ خبر (فقط دسکتاپ) + ابعادِ صریح تا CLS صفر بماند */
+.ab-news .ab-news-thumb{flex:0 0 auto;width:24px;height:24px;border-radius:4px;object-fit:cover;}
+.night .ab-news .ab-news-thumb{opacity:.9;}
+@media (max-width: 800px){
+	.ab-news .ab-news-thumb{display:none;}
+}
+/* --- انتهای بلوک ۲۲ (v3.1.3) --- */
+
+
+/* ============================================================================================
+   ۲۳) صفحۀ ۴۰۴ِ تازه + شمارش نتیجۀ جست‌وجو — نسخهٔ 3.1.4 (لایۀ «دیده‌شدن»)
+   فایل‌های مرتبط: 404.php · search.php · inc/ab-seo.php · myfunctions.php
+   پالت سازمانی: #FFFFFF / #185ADB / #111111 — بدون هیچ گرادینت
+   چرا؟ 404 قدیمی بعد از ۱۵ ثانیه کاربر را به خانه پرتاب می‌کرد (soft-404 برای گوگل،
+   و برای کاربرِ دنبال‌کنندۀ آهنگ = بدترین تجربه). حالا جست‌وجو + فهرستِ مقاصد + ۶ آهنگ تازه دارد.
+   ============================================================================================ */
+.ab-404-search{
+	display:flex;align-items:stretch;gap:8px;max-width:560px;margin:0 0 16px;
+}
+.ab-404-search input{
+	flex:1 1 auto;min-width:0;height:42px;margin:0;padding:0 14px;
+	background:#FFFFFF;color:#111111;font-size:14px;
+	border:1px solid var(--ab-line);border-radius:8px;
+}
+.ab-404-search input:focus{outline:2px solid #185ADB;outline-offset:1px;border-color:#185ADB;}
+.ab-404-search button{
+	flex:0 0 auto;display:inline-flex;align-items:center;gap:7px;height:42px;
+	padding:0 18px;font:inherit;font-size:13.5px;font-weight:700;
+	background:#185ADB;color:#FFFFFF;border:1px solid #185ADB;border-radius:8px;cursor:pointer;
+}
+.ab-404-search button:hover{filter:brightness(.95);}
+.ab-404-links{
+	list-style:none;display:flex;flex-wrap:wrap;gap:9px;margin:0 0 18px;padding:0;
+}
+.ab-404-links li{margin:0;}
+.ab-404-links a{
+	display:inline-flex;align-items:center;gap:7px;padding:7px 15px;
+	font-size:13px;font-weight:700;color:#185ADB;text-decoration:none;
+	background:#FFFFFF;border:1px solid var(--ab-line);border-radius:999px;
+}
+.ab-404-links a:hover{background:#185ADB;color:#FFFFFF;border-color:#185ADB;}
+.ab-404-art{
+	display:block;max-width:100%;height:auto;margin:0 auto 22px;border-radius:10px;
+}
+/* شمارش نتیجۀ جست‌وجو (search.php) */
+.ab-search-count{margin:2px 0 0;font-size:13px;color:#111111;}
+.ab-search-count a{color:#185ADB;font-weight:700;text-decoration:none;}
+.ab-search-count a:hover{text-decoration:underline;}
+/* شب: سطحِ رنگ‌ها عوض می‌شود، حاشیه‌ها همان متغیر قالب می‌مانند */
+.night .ab-404-search input{background:#111111;color:#EEEEEE;}
+.night .ab-404-links a{background:#111111;color:#EEEEEE;}
+.night .ab-404-links a:hover{background:#185ADB;color:#FFFFFF;}
+.night .ab-search-count{color:#EEEEEE;}
+@media (max-width: 800px){
+	.ab-404-search{flex-direction:column;}
+	.ab-404-search button{justify-content:center;height:40px;}
+	.ab-404-links a{font-size:12.5px;padding:6px 12px;}
+	.ab-404-art{margin-bottom:16px;}
+}
+/* --- انتهای بلوک ۲۳ (v3.1.4) --- */
+
+/* ==========================================================================
+   بلوک ۲۴ (نسخۀ 3.2.0) — باکس «ما را دنبال کنید» + نوارِ چسبانِ پخش
+   فایل: inc/ab-post-extras.php  ·  فراخوانی: single.php (بالای باکس پلیر)
+   پالت سازمانی: #FFFFFF · #185ADB · #111111 — بدون گرادینت، بدون رنگ جدید
+   خاموشی: JAVANSEDA_POST_EXTRAS / JAVANSEDA_STICKY_PLAYER یا گزینهٔ fixbtn
+   اگر فایل لایه حذف شود، این قواعد بی‌مصرف می‌مانند ولی چیزی را نمی‌شکنند.
+   ========================================================================== */
+.ab-social-box{display:block;margin:14px 0 8px;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:12px;box-shadow:0 1px 2px rgba(17,17,17,.04);overflow:hidden}
+.ab-social-box__head{display:flex;align-items:center;flex-wrap:wrap;padding:11px 14px;border-bottom:1px solid #eef1f6}
+.ab-social-box__head>i{font-size:16px;color:#185ADB;margin-left:8px}
+.ab-social-box__title{font-size:14px;font-weight:700;color:#111111}
+.ab-social-box__hint{margin-right:auto;font-size:11.5px;color:#8a92a6}
+.ab-social-box__row{display:block;padding:11px 11px 13px}
+.ab-social{display:inline-flex;align-items:center;margin:0 8px 8px 0;padding:7px 11px 7px 9px;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:10px;color:#111111;text-decoration:none;transition:border-color .16s ease,background-color .16s ease}
+.ab-social__icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:30px;height:30px;margin-left:9px;border-radius:8px;background:#f2f5fb;color:#185ADB;font-size:16px;transition:background-color .16s ease,color .16s ease}
+.ab-social__txt{display:block;min-width:0;line-height:1.35}
+.ab-social__txt b{display:block;font-size:12.5px;font-weight:700;color:#111111;white-space:nowrap}
+.ab-social__txt em{display:block;max-width:150px;overflow:hidden;font-size:10.5px;font-style:normal;font-weight:400;color:#8a92a6;white-space:nowrap;text-overflow:ellipsis;direction:ltr;unicode-bidi:embed}
+.ab-social__arrow{font-size:13px;color:#c3cbd9;transition:color .16s ease}
+.ab-social:hover,.ab-social:focus{border-color:#185ADB;background:#f7f9fd;color:#185ADB;text-decoration:none}
+.ab-social:hover .ab-social__icon,.ab-social:focus .ab-social__icon{background:#185ADB;color:#FFFFFF}
+.ab-social:hover .ab-social__arrow,.ab-social:focus .ab-social__arrow{color:#185ADB}
+/* --- نوار چسبانِ پخش (کنترل همان <audio id="audio"> قالب) --- */
+.ab-sticky{position:fixed;right:0;left:0;bottom:0;z-index:9999;background:#FFFFFF;border-top:1px solid #e6e9ef;box-shadow:0 -2px 10px rgba(17,17,17,.07);padding-bottom:env(safe-area-inset-bottom)}
+#ab-sticky-player[hidden]{display:none}
+.ab-sticky[hidden]{display:none}
+body.ab-sticky-on{padding-bottom:84px}
+.ab-sp__in{display:flex;align-items:center;max-width:1080px;margin:0 auto;padding:8px 12px}
+.ab-sp-thumb{display:block;flex:0 0 auto;width:46px;height:46px;border-radius:8px;overflow:hidden;background:#f2f5fb}
+.ab-sp-thumb img{display:block;width:46px;height:46px;object-fit:cover}
+.ab-sp-thumb--none{display:flex;align-items:center;justify-content:center;color:#185ADB;font-size:19px}
+.ab-sp-play{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;margin:0 10px;padding:0;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:50%;color:#185ADB;font-size:16px;line-height:1;cursor:pointer}
+.ab-sp-play:hover,.ab-sp-play:focus{background:#185ADB;border-color:#185ADB;color:#FFFFFF}
+.ab-sp__meta{flex:1 1 auto;min-width:0}
+.ab-sp__title{display:block;font-size:13px;font-weight:700;color:#111111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab-sp__artist{display:block;font-size:11px;color:#8a92a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab-sp__bar{display:flex;align-items:center;margin-top:5px}
+.ab-sp-range{flex:1 1 auto;width:100%;height:4px;margin:0 8px;-webkit-appearance:none;appearance:none;background:#e9edf4;border:0;border-radius:2px;outline:none;cursor:pointer;direction:ltr}
+.ab-sp-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border:2px solid #FFFFFF;border-radius:50%;background:#185ADB;box-shadow:0 0 0 1px #dfe4ee}
+.ab-sp-range::-moz-range-thumb{width:12px;height:12px;border:2px solid #FFFFFF;border-radius:50%;background:#185ADB}
+.ab-sp-range:disabled{opacity:.55;cursor:default}
+.ab-sp-time{flex:0 0 auto;font-size:10.5px;color:#8a92a6;white-space:nowrap;direction:ltr;unicode-bidi:embed}
+.ab-sp__dl{display:inline-flex;align-items:center;flex:0 0 auto;margin:0 8px;padding:7px 10px;border:1px solid #e6ebf3;border-radius:8px;background:#FFFFFF;color:#111111;font-size:12px}
+.ab-sp__dl i{margin-left:5px;color:#185ADB;font-size:15px}
+.ab-sp__dl:hover,.ab-sp__dl:focus{border-color:#185ADB;color:#185ADB;text-decoration:none}
+.ab-sp-close{flex:0 0 auto;width:30px;height:30px;padding:0;border:0;background:none;color:#8a92a6;font-size:15px;line-height:1;cursor:pointer}
+.ab-sp-close:hover,.ab-sp-close:focus{color:#111111}
+@media (max-width:767px){
+	.ab-social-box__row{padding:9px 9px 10px}
+	.ab-social{display:flex;width:100%;margin:0 0 7px}
+	.ab-social:last-child{margin-bottom:0}
+	.ab-social__txt em{max-width:none}
+	.ab-social__arrow{margin-right:auto}
+	.ab-sp__in{padding:6px 8px}
+	.ab-sp-thumb,.ab-sp-thumb img{width:38px;height:38px}
+	.ab-sp__artist{display:none}
+	.ab-sp__dl span{display:none}
+	.ab-sp__dl{padding:7px 8px;margin:0 6px}
+	body.ab-sticky-on{padding-bottom:72px}
+}
+@media print{.ab-sticky,.ab-social-box{display:none}}
+/* --- انتهای بلوک ۲۴ (v3.2.0) --- */
+
+/* ==========================================================================
+   بلوک ۲۵ (3.2.1 / بازطراحی در 3.2.3) — «شناسنامۀ آهنگ» (خواننده · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید)
+   فایل: inc/ab-credits.php  ·  جایگاه: single.php (بعد از لینک‌های دانلود یا بالای پلیر)
+   پالت سازمانی: #FFFFFF · #185ADB · #111111 — بدون گرادینت
+   حذف فایل لایه ⇒ این قواعد بی‌مصرف می‌مانند و چیزی را نمی‌شکنند.
+   ========================================================================== */
+/* چیدمان افقی: خودِ باکس یک ردیفِ flex است؛ تیتر جلوی چیپ‌ها می‌نشیند و
+   هر آیکن/برچسب/مقدار یک «کادر کوچک» جداست. ارتفاع کل ≈ یک خط متن (۳۴px) و
+   در موبایل چیپ‌ها بدون اسکرول‌بار در خود خط می‌شکنند. */
+.ab-credits{display:flex;align-items:center;flex-wrap:wrap;margin:12px 0;padding:8px 11px;background:#f7f9fd;border:1px solid #eef1f6;border-radius:14px}
+.ab-credits__title{display:inline-flex;align-items:center;margin:0 2px 0 4px;padding:0;font-size:12.5px;font-weight:700;color:#8a92a6;line-height:1.5}
+.ab-credits__title i{font-size:14px;color:#185ADB;margin-left:5px}
+.ab-credits__row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;flex:1 1 300px;min-width:0}
+.ab-credit{display:inline-flex;align-items:center;max-width:100%;margin:0;padding:4px 10px;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:999px;box-shadow:0 1px 1px rgba(17,17,17,.03);font-size:12.5px;line-height:1.5;transition:border-color .16s ease,box-shadow .16s ease}
+.ab-credit:hover{border-color:#185ADB;box-shadow:0 1px 3px rgba(24,90,219,.15)}
+.ab-credit>i{flex:0 0 auto;font-size:13px;color:#185ADB;margin-left:6px}
+.ab-credit__k{flex:0 0 auto;margin-left:6px;font-size:11px;font-weight:500;color:#8a92a6;white-space:nowrap}
+.ab-credit__v{min-width:0;font-size:12.5px;font-weight:700;color:#111111}
+.ab-credit__v a{color:#111111;text-decoration:none;border-bottom:1px solid transparent;transition:color .16s ease,border-color .16s ease}
+.ab-credit__v a:hover,.ab-credit__v a:focus{color:#185ADB;border-bottom-color:#185ADB;text-decoration:none}
+.ab-credit__sep{margin:0 4px;color:#c3cbd9;font-weight:400}
+@media (max-width:767px){
+	.ab-credits{padding:7px 9px;border-radius:12px}
+	.ab-credits__title{width:100%;margin:0 0 2px}
+	.ab-credits__row{gap:5px;flex:1 1 100%}
+	.ab-credit{padding:3px 9px}
+	.ab-credit__v{font-size:12px}
+}
+@media print{.ab-credits{display:none}}
+/* آیکنِ جاافتادۀ قالب: در home.php و 404.php از icofont-microphone-alt استفاده شده، ولی این گلیف
+   در css/icofont.min.css این نسخۀ قالب وجود ندارد (بخشی از آیکن دیده نمی‌شد). با همان گلیف
+   میکروفنِ موجود (icofont-radio-mic) جایگزین شد؛ اگر آیکون‌فونت را کامل عوض کردید، خط بعد را بردارید. */
+.icofont-microphone-alt:before{content:"\ea4e"}
+/* --- انتهای بلوک ۲۵ (v3.2.3 — چیپی/افقی) --- */

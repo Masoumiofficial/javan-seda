@@ -1,0 +1,682 @@
+<?php get_header(''); ?>
+<?php get_template_part('inc/breadcrumbs'); ?>
+<?php if((ot_get_option('ads_bt') !="") || (ot_get_option('adsjs_bt') !="")){ ?>
+<div id="ads_top">
+<?php echo ot_get_option('ads_bt'); ?><?php echo ot_get_option('adsjs_bt'); ?>
+<div class="clear"></div>
+</div>
+<?php } ?>
+<!-- centers_box -->
+<div class="tarlanweb_center">
+<div id="centers_box">
+
+<!-- single_posts_right -->
+<div class="single_posts_right">
+<?php if(have_posts()) : while(have_posts()) : the_post(); ?>
+<article class="single_posts tarlanweb_post_box">
+<header>
+<h1><?php the_title(); ?></h1> 
+<div class="stars_ratings_box">
+<?php /* v3.1.0 — محافظ خطای کشنده: include و توابع اداری فقط در صورت وجود؛ ستاره‌دهی هم فقط اگر تابعش موجود باشد (قبلاً همین خط می‌توانست کل بلوک محتوا را نصفه‌کاره بکشد) */
+if ( ! function_exists( 'is_plugin_active' ) ) {
+	$ab_plug_api = ABSPATH . 'wp-admin/includes/plugin.php';
+	if ( is_readable( $ab_plug_api ) ) {
+		include_once $ab_plug_api;
+	}
+	unset( $ab_plug_api );
+}
+if ( function_exists( 'is_plugin_active' ) && is_plugin_active( 'kk-star-ratings/index.php' ) && function_exists( 'kk_star_ratings' ) ) { echo kk_star_ratings(); } ?>
+</div>
+<div class="liner clear"></div>
+<div class="tarlanweb_post_ft"><i class="icofont-folder-open"></i> <?php the_category(' , '); ?></div>
+<?php if(function_exists('the_views')){ ?>
+<div class="tarlanweb_post_ft"><i class="icofont-eye-alt"></i> <?php the_views(); ?></div><?php } ?>
+<div class="tarlanweb_post_ft"><i class="icofont-comment"></i> <?php comments_number('0','1','%'); ?></div><?php edit_post_link('ویرایش مطلب'); ?>
+<div class="clear"></div>
+</header>
+
+<div class="single_content_box">
+
+<?php
+/* تصویر شاخص نوشته (کاور پست) به‌صورت خودکار در ابتدای بخش توضیحات درج می‌شود
+   تا نیازی به گذاشتن دستی همان تصویر داخل متن توضیحات نباشد.
+   اندازهٔ نمایش را در متغیر زیر می‌توانید تغییر دهید:
+   'large' یا 'full' = اندازهٔ بزرگ/اصلی تصویر | 'thumb1' = ۶۴۰×۳۶۰ | 'thumb2' = ۱۹۰×۱۹۰ */
+$taranehyar_featured_size = 'large';
+if ( has_post_thumbnail() ) {
+	?>
+	<div class="single_featured_cover">
+		<figure class="single_featured_image">
+			<?php the_post_thumbnail( $taranehyar_featured_size, array( 'alt' => get_the_title(), 'title' => get_the_title() ) ); ?>
+		</figure>
+	</div>
+	<?php
+} ?>
+
+<?php
+/* ---------- نام آهنگ / خواننده / لینک صفحهٔ خواننده (مشترک بین باکس متن ترانه و تیتر دانلود) ----------
+   لینک خواننده روی تاکسونومی singer ساخته می‌شود؛ مثال: «محسن یگانه» → https://site/singer/mohsen-yaganeh
+   ترتیب جست‌وجو: فیلد اختیاری artist_link روی خود نوشته ← ترم singer با همان نام ← ترم singer با اسلاگ ←
+   جست‌وجوی تقریبی با نرمال‌سازی ي/ك/ة و نیم‌فاصله ← برچسب هم‌نام.
+   در پایان، فیلتر taranehyar_artist_url می‌تواند نتیجه را بازنویسی کند.
+------------------------------------------------------------------------------------------------- */
+$taranehyar_song   = function_exists( 'get_field' ) ? trim( (string) get_field( 'song' ) ) : '';
+$taranehyar_artist = function_exists( 'get_field' ) ? trim( (string) get_field( 'artist' ) ) : '';
+if ( '' === $taranehyar_song ) {
+	$taranehyar_song = get_the_title();
+}
+
+/* برچسب نوع (آهنگ/آلبوم/موزیک ویدیو) از فیلد musics_type؛ پیش‌فرض «آهنگ» */
+$taranehyar_type_raw = function_exists( 'get_field' ) ? get_field( 'musics_type' ) : '';
+$taranehyar_type     = is_scalar( $taranehyar_type_raw ) ? trim( (string) $taranehyar_type_raw ) : '';
+if ( '' === $taranehyar_type ) {
+	$taranehyar_type = 'آهنگ';
+}
+
+$taranehyar_artist_url = '';
+if ( '' !== $taranehyar_artist ) {
+	$taranehyar_custom_link = function_exists( 'get_field' ) ? get_field( 'artist_link' ) : '';
+	if ( is_string( $taranehyar_custom_link ) && '' !== trim( $taranehyar_custom_link ) ) {
+		$taranehyar_artist_url = trim( $taranehyar_custom_link );
+	} else {
+		$taranehyar_lookups = array(
+			array( 'name', $taranehyar_artist, 'singer' ),
+			array( 'slug', sanitize_title( $taranehyar_artist ), 'singer' ),
+		);
+		foreach ( $taranehyar_lookups as $taranehyar_lookup ) {
+			if ( '' === $taranehyar_lookup[1] ) {
+				continue;
+			}
+			$taranehyar_term = get_term_by( $taranehyar_lookup[0], $taranehyar_lookup[1], $taranehyar_lookup[2] );
+			if ( $taranehyar_term && ! is_wp_error( $taranehyar_term ) ) {
+				$taranehyar_term_link = get_term_link( $taranehyar_term );
+				if ( ! is_wp_error( $taranehyar_term_link ) ) {
+					$taranehyar_artist_url = $taranehyar_term_link;
+					break;
+				}
+			}
+		}
+		if ( '' === $taranehyar_artist_url ) {
+			/* جست‌وجوی تقریبی: ی/ي، ک/ك، ه/ة و نیم‌فاصله یکسان‌سازی می‌شوند */
+			$taranehyar_normalize = function ( $value ) {
+				$value = str_replace( array( 'ي', 'ك', 'ة', "\xE2\x80\x8C" ), array( 'ی', 'ک', 'ه', ' ' ), (string) $value ); /* آخری = فاصلهٔ مجازی (ZWNJ) */
+				return trim( preg_replace( '/\s+/u', ' ', $value ) );
+			};
+			$taranehyar_needle = $taranehyar_normalize( $taranehyar_artist );
+			foreach ( array( 'singer', 'post_tag' ) as $taranehyar_tax ) {
+				$taranehyar_matches = get_terms(
+					array(
+						'taxonomy'   => $taranehyar_tax,
+						'hide_empty' => false,
+						'number'     => 20,
+						'name__like' => $taranehyar_needle,
+					)
+				);
+				if ( is_array( $taranehyar_matches ) ) {
+					foreach ( $taranehyar_matches as $taranehyar_match ) {
+						if ( $taranehyar_normalize( $taranehyar_match->name ) === $taranehyar_needle ) {
+							$taranehyar_term_link = get_term_link( $taranehyar_match );
+							if ( ! is_wp_error( $taranehyar_term_link ) ) {
+								$taranehyar_artist_url = $taranehyar_term_link;
+								break 2;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	$taranehyar_artist_url = apply_filters( 'taranehyar_artist_url', $taranehyar_artist_url, $taranehyar_artist );
+}
+?>
+
+<?php the_content(''); ?>
+
+<?php
+/* ============================ باکس «متن ترانه» (متن آهنگ) ============================
+   منبع متن: فیلد music_text  (ویرایشگر/WYSIWYG یا متن ساده — هر دو پشتیبانی می‌شود)
+   تنظیم‌ها (فقط همین سه خط را در صورت نیاز عوض کنید):
+     $taranehyar_lyrics_position : 'here' = همین‌جا بعد از توضیحات | 'end' = بعد از لینک‌های دانلود
+     $taranehyar_lyrics_schema   : true = چاپ داده ساختاریافته (MusicRecording + MusicComposition)
+     $taranehyar_artist_type     : 'Person' خوانندهٔ تک‌خوان | 'MusicGroup' گروه
+   ==================================================================================== */
+$taranehyar_lyrics_position = 'here';
+$taranehyar_lyrics_schema   = true;
+$taranehyar_artist_type     = 'Person';
+
+$taranehyar_lyrics_box = '';
+$taranehyar_lyrics_raw = function_exists( 'get_field' ) ? get_field( 'music_text' ) : '';
+if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw ) ) {
+
+	/* خروجی ایمن: اگر مقدار HTML باشد با wp_kses_post، وگرنه با nl2br + esc_html */
+	if ( false !== strpos( $taranehyar_lyrics_raw, '<' ) ) {
+		$taranehyar_lyrics_html = wp_kses_post( $taranehyar_lyrics_raw );
+	} else {
+		$taranehyar_lyrics_html = nl2br( esc_html( $taranehyar_lyrics_raw ) );
+	}
+
+	/* نسخهٔ متن ساده برای داده ساختاریافته (خط‌ها و بندها حفظ می‌شوند) */
+	$taranehyar_lyrics_plain = wp_strip_all_tags( str_replace( array( '</p>', '<br />', '<br>', '<br/>' ), "\n", $taranehyar_lyrics_html ) );
+	$taranehyar_lyrics_plain = trim( preg_replace( '/[ \t]+/u', ' ', $taranehyar_lyrics_plain ) );
+	$taranehyar_lyrics_plain = preg_replace( "/\n{3,}/u", "\n\n", $taranehyar_lyrics_plain );
+
+	ob_start();
+	?>
+	<section class="music_lyrics_box" aria-labelledby="taranehyar_lyrics_title" lang="fa" dir="rtl">
+		<div class="music_lyrics_head">
+			<h2 class="music_lyrics_title" id="taranehyar_lyrics_title">
+				<i class="icofont-quote-right" aria-hidden="true"></i>
+				متن آهنگ <span class="music_lyrics_song"><?php echo esc_html( $taranehyar_song ); ?></span><?php if ( '' !== $taranehyar_artist ) { ?> از <span class="music_lyrics_artist"><?php echo esc_html( $taranehyar_artist ); ?></span><?php } ?>
+			</h2>
+			<div class="music_lyrics_actions">
+				<?php if ( '' !== $taranehyar_artist_url ) { ?>
+				<a class="music_lyrics_artist_link" href="<?php echo esc_url( $taranehyar_artist_url ); ?>"><i class="icofont-radio-mic" aria-hidden="true"></i>سایر آهنگ‌های <?php echo esc_html( $taranehyar_artist ); ?></a>
+				<?php } ?>
+				<button type="button" class="music_lyrics_copy" id="taranehyar_lyrics_copy" aria-label="کپی متن ترانه"><i class="icofont-quote-left" aria-hidden="true"></i><span class="lbl">کپی متن ترانه</span></button>
+			</div>
+		</div>
+		<div class="music_lyrics_text" id="taranehyar_lyrics_text"><?php echo $taranehyar_lyrics_html; // خروجی با wp_kses_post یا esc_html پاک‌سازی شده است. ?></div>
+		<?php
+		if ( $taranehyar_lyrics_schema && ! function_exists( 'javan_seda_music_schema' ) ) {
+		/* v3.2.2 — اگر inc/ab-credits.php نصب باشد، schema از همان فایل و در wp_head چاپ می‌شود
+		   (برای همهٔ نوشته‌ها، حتی وقتی متن ترانه خالی است) و این بلوکِ قدیمی اجرا نمی‌شود تا دو بار چاپ نشود. */
+			$taranehyar_permalink = get_permalink();
+			$taranehyar_audio     = '';
+			foreach ( array( 'music320', 'music128' ) as $taranehyar_audio_key ) {
+				$taranehyar_audio_val = get_field( $taranehyar_audio_key );
+				if ( is_string( $taranehyar_audio_val ) && '' !== trim( $taranehyar_audio_val ) ) {
+					$taranehyar_audio = $taranehyar_audio_val;
+					break;
+				}
+			}
+			$taranehyar_graph = array(
+				'@context' => 'https://schema.org',
+				'@graph'   => array(
+					array(
+						'@type'            => 'MusicRecording',
+						'@id'              => $taranehyar_permalink . '#recording',
+						'name'             => $taranehyar_song,
+						'url'              => $taranehyar_permalink,
+						'inLanguage'       => 'fa-IR',
+						'byArtist'         => array(
+							'@type' => $taranehyar_artist_type,
+							'name'  => $taranehyar_artist,
+							'url'   => '' !== $taranehyar_artist_url ? $taranehyar_artist_url : $taranehyar_permalink,
+						),
+						'datePublished'    => get_the_date( 'c' ),
+						'dateModified'     => get_the_modified_date( 'c' ),
+						'recordingOf'      => array( '@id' => $taranehyar_permalink . '#composition' ),
+						'mainEntityOfPage' => array( '@id' => $taranehyar_permalink . '#webpage' ),
+					),
+					array(
+						'@type'      => 'MusicComposition',
+						'@id'        => $taranehyar_permalink . '#composition',
+						'name'       => $taranehyar_song,
+						'inLanguage' => 'fa-IR',
+						'lyricist'   => array(
+							'@type' => 'Person',
+							'name'  => $taranehyar_artist,
+						),
+						'lyrics'     => array(
+							'@type'      => 'CreativeWork',
+							'text'       => $taranehyar_lyrics_plain,
+							'inLanguage' => 'fa-IR',
+						),
+						'recordedAs' => array( '@id' => $taranehyar_permalink . '#recording' ),
+					),
+					array(
+						'@type'      => 'WebPage',
+						'@id'        => $taranehyar_permalink . '#webpage',
+						'url'        => $taranehyar_permalink,
+						'name'       => get_the_title(),
+						'inLanguage' => 'fa-IR',
+						'mainEntity' => array( '@id' => $taranehyar_permalink . '#recording' ),
+					),
+				),
+			);
+			if ( '' !== $taranehyar_audio ) {
+				$taranehyar_graph['@graph'][0]['audio'] = array(
+					'@type'          => 'AudioObject',
+					'contentUrl'     => $taranehyar_audio,
+					'encodingFormat' => 'audio/mpeg',
+				);
+			}
+			/* wp_json_encode پیش‌فرض «/» را \/ می‌کند تا محتوای متن نتواند از تگ script خارج شود. */
+			?>
+			<script type="application/ld+json"><?php echo wp_json_encode( $taranehyar_graph, JSON_UNESCAPED_UNICODE ); ?></script>
+			<?php
+		}
+		?>
+	</section>
+	<script>
+	(function () {
+		var btn = document.getElementById('taranehyar_lyrics_copy');
+		var box = document.getElementById('taranehyar_lyrics_text');
+		if (!btn || !box) { return; }
+		if (!navigator.clipboard) { btn.style.display = 'none'; return; }
+		btn.addEventListener('click', function () {
+			navigator.clipboard.writeText(box.innerText).then(function () {
+				var lbl = btn.querySelector('.lbl');
+				btn.classList.add('is-done');
+				if (lbl) { lbl.textContent = 'کپی شد'; }
+				window.setTimeout(function () {
+					btn.classList.remove('is-done');
+					if (lbl) { lbl.textContent = 'کپی متن ترانه'; }
+				}, 2200);
+			});
+		});
+	})();
+	</script>
+	<?php
+	$taranehyar_lyrics_box = ob_get_clean();
+}
+
+if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
+	echo $taranehyar_lyrics_box; // خروجی همین بالا ساخته و escape شده است.
+}
+?>
+<div class="clear"></div>
+
+<?php /* v3.2.0 — باکس «ما را دنبال کنید» (تلگرام · اینستاگرام · بله · روبیکا): بالای باکس پلیر،
+   زیر متن/ترانه و پیش از ویدیو و پلیر. تابع در inc/ab-post-extras.php است و با function_exists محافظت
+   شده؛ نبودن فایل ⇒ صفر خروجی و صفر خطا. لینک‌ها و متن دکمه‌ها از تنظیمات قالب → «شبکه‌های اجتماعی»
+   می‌آیند و با همان گزینهٔ fixbtn روشن/خاموش می‌شوند. */
+if ( function_exists( 'javan_seda_social_box' ) ) { javan_seda_social_box( get_the_ID() ); }
+if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get_the_ID(), 'before_player' ); }
+?>
+
+<?php if(get_field('video720') || get_field('video1080') || get_field('video480')){ ?> 
+<div class="video_player">
+<video width="640" height="360" controls>
+<source src="<?php if(get_field('video480')){the_field('video480');} elseif(get_field('video720')){the_field('video720');} else{the_field('video1080');} ?>" type="video/mp4">
+مرورگر شما قدیمی است و از پخش آنلاین پشتیبانی نمیکند. بروز باش عزیز من
+</video> 
+</div>
+<?php } ?>
+
+<?php if((ot_get_option('ads_sg') !="") || (ot_get_option('adsjs_sg') !="")){ ?>
+<div id="ads_top_dl"><?php echo ot_get_option('ads_sg'); ?><?php echo ot_get_option('adsjs_sg'); ?><div class="clear"></div></div>
+<?php } ?>
+
+
+<?php if(get_field('music128')){ ?> 
+<!-- music player -->
+<div class="music_box_player taktarcks">
+<audio id="audio" preload="none" tabindex="0">
+<source src="<?php echo esc_url( get_field('music128') ); ?>" data-track-number="1" />    
+پلیر شما قدیمی است و از پخش آنلاین پشتیبانی نمیکند.
+</audio>
+
+ <div class="player">
+
+<div class="player_controls">
+<i class="previous-track-btn disabled"><span class="screen-reader-text">Previous track button</span></i>
+<div class="large-toggle-btn"><i class="icofont-play-alt-1"><span class="screen-reader-text">Large toggle button</span></i></div>
+<i class="next-track-btn"><span class="screen-reader-text">Next track button</span></i>
+
+</div>
+    <div class="info-box">
+      <div class="track-info-box">
+        <div class="track-title-text"> <?php the_field('artist');?> - <?php the_field('song') ?> </div>
+        <div class="audio-time">
+        	<span class="duration">00:00</span> /
+          <span class="current-time">00:00</span> 
+        </div>
+      </div>
+      <!-- /.info-box -->
+      <div class="progress-box">
+        <div class="progress-cell">
+          <div class="progress">
+            <div class="progress-buffer"></div>
+            <div class="progress-indicator"></div>
+          </div>
+        </div>
+<div class="volume_box">
+<i class="icofont-volume-bar"></i>
+<input type="range" id="volume-bar" min="0" max="100" step="5" value="100">
+</div>
+      </div>
+    </div>
+    <!-- /.progress-box -->
+  </div>
+  <!-- /.player -->
+<div class="play-list">
+<div class="play-list-row" data-track-row="1">
+<div class="small-toggle-btn">
+<i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i>
+</div>
+<div class="track-number">1.</div>
+<div class="track-title"><?php if(get_field('song')){ ?><a class="playlist-track" href="#" data-play-track="<?php echo $rkianoosh; ?>"><?php the_field('artist');?> - <?php the_field('song') ?></a><?php } ?></div>
+</div>
+</div>
+</div>
+<!-- music player -->
+<?php } ?>
+
+
+
+<?php if( have_rows('album') ): ?>
+<!-- album player -->
+<div class="music_box_player">
+
+<audio id="audio" preload="none" tabindex="0">
+<?php $rkianoosh=1; while( have_rows('album') ): the_row(); ?>
+<source src="<?php if(get_sub_field('albumlink128')){the_sub_field('albumlink128');}else{the_sub_field('albumlink320');} ?>" data-track-number="<?php echo $rkianoosh; ?>" />
+<?php $rkianoosh++; endwhile; ?>    
+Your browser does not support HTML5 audio.
+</audio>
+<div class="player">
+<div class="player_controls">
+<i class="previous-track-btn disabled"><span class="screen-reader-text">Previous track button</span></i>
+<div class="large-toggle-btn"><i class="icofont-play-alt-1"><span class="screen-reader-text">Large toggle button</span></i></div>
+<i class="next-track-btn"><span class="screen-reader-text">Next track button</span></i>
+</div>
+<div class="info-box">
+      <div class="track-info-box">
+        <div class="track-title-text"> انتخاب قطعه </div>
+        <div class="audio-time">
+        	<span class="duration">00:00</span> /
+          <span class="current-time">00:00</span> 
+        </div>
+      </div>
+      <!-- /.info-box -->
+      <div class="progress-box">
+        <div class="progress-cell">
+          <div class="progress">
+            <div class="progress-buffer"></div>
+            <div class="progress-indicator"></div>
+          </div>
+        </div>
+<div class="volume_box">
+<i class="icofont-volume-bar"></i>
+<input type="range" id="volume-bar" min="0" max="100" step="5" value="100">
+</div>
+</div>
+</div>
+<!-- /.progress-box -->
+</div>
+<!-- /.player -->
+<div class="play-list">
+<?php $rkianoosh=1; while( have_rows('album') ): the_row(); ?>
+<div class="play-list-row <?php if($rkianoosh % 2 == 0){echo 'plylodd';}?>" data-track-row="<?php echo $rkianoosh; ?>">
+<div class="small-toggle-btn">
+<i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i>
+</div>
+<div class="track-number"><?php echo $rkianoosh; ?>.</div>
+<div class="track-title"><?php if(get_sub_field('song_names')){ ?><a class="playlist-track" href="#" data-play-track="<?php echo $rkianoosh; ?>"><?php the_sub_field('song_names'); ?></a><?php } ?></div>
+<div class="download_box">
+<?php if(get_sub_field('albumlink128')){ ?>
+<a target="_blank" href="<?php the_sub_field('albumlink128'); ?>">دانلود  128</a>
+<?php } if(get_sub_field('albumlink320')){ ?>
+<a target="_blank" href="<?php the_sub_field('albumlink320'); ?>">دانلود  320</a><?php } ?>
+</div>
+</div>
+<?php $rkianoosh++; endwhile; ?> 
+</div>
+</div>
+<!-- album player -->
+<?php endif; ?>
+
+
+<?php
+/* ---------- تیتر بخش دانلود (هدف جست‌وجوی «دانلود آهنگ X از Y») ----------
+   برای خاموش کردن این تیتر، خط زیر را false کنید. */
+$taranehyar_download_title = true;
+if ( $taranehyar_download_title && (
+	get_field( 'music128' ) || get_field( 'music320' ) || get_field( 'album128' ) || get_field( 'album320' ) ||
+	get_field( 'video480' ) || get_field( 'video720' ) || get_field( 'video1080' )
+) ) {
+	?>
+	<h2 class="dl_title">
+		<i class="icofont-download" aria-hidden="true"></i>دانلود <span class="dl_title_type"><?php echo esc_html( $taranehyar_type ); ?></span> <span class="dl_title_song"><?php echo esc_html( $taranehyar_song ); ?></span><?php if ( '' !== $taranehyar_artist ) { ?> از <span class="dl_title_artist"><?php echo esc_html( $taranehyar_artist ); ?></span><?php } ?>
+	</h2>
+	<?php
+}
+?>
+<div class="dl_links_box">
+<?php if(get_field('music128')){ ?> 
+<a class="dl_link_128" href="<?php echo esc_url( get_field('music128') ); ?>"> <i class="icofont-download"></i>دانلود  آهنگ با کیفیت 128 </a><?php } if(get_field('music320')){ ?>
+<a class="dl_links_320" href="<?php echo esc_url( get_field('music320') ); ?>"> <i class="icofont-download"></i> دانلود آهنگ با کیفیت 320 </a><?php } if(get_field('album128')){ ?>	
+<a class="dl_link_128" href="<?php echo esc_url( get_field('album128') ); ?>"> <i class="icofont-download"></i>دانلود  آلبوم با کیفیت 128 </a><?php } if(get_field('album320')){ ?>
+<a class="dl_links_320" href="<?php echo esc_url( get_field('album320') ); ?>"> <i class="icofont-download"></i> دانلود  آلبوم با کیفیت 320 </a>	<?php } ?>
+<div class="clear"></div>
+</div>
+<?php if((get_field('video1080')) || (get_field('video720')) || (get_field('video480'))){ ?>
+<div class="dl_linksv_box">
+<ul>
+<?php if(get_field('video1080')){ ?> 
+<li><a href="<?php echo esc_url( get_field('video1080') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  1080 </a></li><?php } if(get_field('video720')){ ?>
+<li><a href="<?php echo esc_url( get_field('video720') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  720 </a></li><?php } if(get_field('video480')){ ?>
+<li><a href="<?php echo esc_url( get_field('video480') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  480 </a></li><?php } ?>
+</ul>
+<div class="clear"></div>
+</div>
+<?php } ?>
+<?php if ( '' !== $taranehyar_lyrics_box && 'end' === $taranehyar_lyrics_position ) { echo $taranehyar_lyrics_box; } ?>
+<?php /* v3.2.1 — «شناسنامۀ آهنگ» (خواننده · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید).
+   جایگاه از تنظیمات قالب → «صفحه دانلود آهنگ» → «شناسنامه بالای پلیر» عوض می‌شود؛ اگر فایل
+   inc/ab-credits.php نصب نباشد، این دو خط هیچ خروجی و هیچ خطایی ندارند. */
+if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get_the_ID(), 'after_download' ); } ?>
+<div class="clear"></div>
+</div>
+
+<footer>
+<div class="tarlanweb_post_ft"><i class="icofont-clock-time"></i> <?php the_time('j F Y'); ?></div>
+<div class="post-actions-input">
+<div class="post-actions-right"><i class="icofont-link"></i>لینک کوتاه</div>
+<input type="url" value="<?php bloginfo('url'); ?>/?p=<?php the_id(''); ?>" readonly="" onclick="this.setSelectionRange(0, this.value.length)">
+<div class="clear"></div>
+</div>
+</footer>
+<div class="clear"></div>
+</article>
+<?php endwhile; endif; ?>
+
+<?php $share_off = ot_get_option('share_off'); if('off' != $share_off){ ?>
+<div class="single_posts socials_shares_box">
+<p>اشتراک گذاری مطلب</p>
+<div class="socials_shares">
+<a target="_blank" href="http://www.facebook.com/share.php?v=4&src=bm&u=<?php the_permalink(); ?>"><i aria-label="facebook" class="icofont-facebook"></i></a>
+<a target="_blank" href="https://twitter.com/intent/tweet?text=<?php the_permalink(); ?>"><i aria-label="twitter" class="icofont-twitter"></i></a>
+<a target="_blank" href="https://api.whatsapp.com/send?text=<?php the_title(); bloginfo('url'); ?>/?p=<?php the_id(''); ?>"><i aria-label="whatsapp" class="icofont-whatsapp"></i></a>
+<a target="_blank" href="https://telegram.me/share/url?url=<?php the_permalink(); ?>"><i aria-label="telegram" class="icofont-paper-plane"></i></a>
+</div>
+<div class="clear"></div>
+</div>
+<?php } ?>
+
+<?php $tag_off = ot_get_option('tag_off'); if('off' != $tag_off){ if(has_tag()){ ?>
+<div class="single_posts rkianoosh_tags_box">
+<span> برچسب ها :</span> <?php the_tags('','',''); ?>
+<div class="clear"></div>
+</div>
+<?php } } ?>
+	
+	
+
+	
+<?php $reltag1 = ot_get_option('reltag1'); if('off' != $reltag1){
+$reltag = ot_get_option('reltag'); if('off' != $reltag){ ?>	
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist=get_field('artist');
+$my_custom_query= new WP_Query(
+array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,
+'meta_query'=>array(array('key'=>'artist','value'=>$artist,'compare'=>'LIKE')), ));
+if($my_custom_query->have_posts()) : ?>
+<div class="related_posts rel_sing_bbt">
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php echo $artist; ?></h3>
+<?php if(has_tag()){ if(isset($artist) && !empty($artist)){ $post_tags = get_the_tags(); foreach( $post_tags as $tag) :
+if ( $tag->name === $artist ){ ?>
+<div class="left_artists_pp"><a class="artist_songs_page" href="<?php bloginfo('url');?>/tag/<?php print_r($tag->slug);?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی  <?php print_r($tag->name); ?> </a></div>
+<?php } endforeach; } } ?>
+<div class="liner clear"></div>
+<div class="tarlanweb_side_box">
+<ul>
+<?php while($my_custom_query->have_posts()) : $my_custom_query->the_post(); ?>
+<li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
+<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<?php if(has_post_thumbnail()){
+the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
+<img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
+<?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
+<?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
+if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
+</a></li>
+<?php endwhile; ?>
+<?php if(has_tag()){ if(isset($artist) && !empty($artist)){ $post_tags = get_the_tags(); foreach( $post_tags as $tag) :
+if ( $tag->name === $artist ){ ?>
+<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php bloginfo('url');?>/tag/<?php print_r($tag->slug);?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی  <?php print_r($tag->name); ?> </a></li>
+<?php } endforeach; } } ?>
+</ul>
+<div class="clear"></div>
+</div>
+<div class="clear"></div>
+</div>
+<?php endif; wp_reset_query(); ?>
+<?php } else{ ?>
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,'singer','string'); $term_ids=wp_list_pluck($terms,'term_id');
+$second_query = new WP_Query( array('post_type'=>'post',
+'tax_query' => array( array('taxonomy'=>'singer','field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
+'posts_per_page'=>$pppr,'ignore_sticky_posts'=>1,'orderby'=>'id'));
+if($second_query->have_posts()) { ?>	
+<div class="related_posts rel_sing_bbt">
+<div class="title_tarlanweb_box">
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,'singer');
+$terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_string; ?></h3>
+<?php $terms = get_the_terms($post->ID,'singer'); foreach ($terms as $term){ ?>
+<div class="left_artists_pp"><a class="artist_songs_page" href="<?php bloginfo('url'); ?>/singer/<?php echo $term->slug; ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></div>
+<?php } ?>
+<div class="liner clear"></div>
+</div>
+<div class="tarlanweb_side_box">
+<ul>
+<?php while($second_query->have_posts()) : $second_query->the_post(); ?>
+<li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
+<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<?php if(has_post_thumbnail()){
+the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
+<img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
+<?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
+<?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
+if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
+</a></li>
+<?php endwhile; ?> 
+<?php $terms = get_the_terms($post->ID,'singer'); foreach ($terms as $term){ ?>
+<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php bloginfo('url'); ?>/singer/<?php echo $term->slug; ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
+<?php } ?>
+</ul>
+<div class="clear"></div>
+</div>
+<div class="clear"></div>
+</div>	
+<?php } ?>
+<?php } } ?>
+
+<?php $cm_off = ot_get_option('cm_off'); if('off' != $cm_off){ ?>
+<div class="single_posts rkianoosh_comment_box">
+<h3 class="comm_titrs">نظر خود را بنویسید</h3>
+<?php comments_template(); ?>
+<div class="clear"></div>
+</div>
+<?php } ?>
+
+<div class="clear"></div>
+</div>
+<!-- single_posts_right -->
+	
+<div id="left_side">
+<?php
+/* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
+if ( function_exists( 'javan_seda_sidebar' ) ) {
+	javan_seda_sidebar( 'left_side' );
+} else {
+	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side' ) ) :
+	endif;
+}
+?>
+<?php $reltag1 = ot_get_option('reltag1'); if('off' == $reltag1){
+$reltag = ot_get_option('reltag'); if('off' != $reltag){ ?>	
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist=get_field('artist');
+$my_custom_query= new WP_Query(
+array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,
+'meta_query'=>array(array('key'=>'artist','value'=>$artist,'compare'=>'LIKE')), ));
+if($my_custom_query->have_posts()) : ?>
+<aside class="related_posts">
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php echo $artist; ?></h3>
+<div class="liner clear"></div>
+<div class="tarlanweb_side_box">
+<ul>
+<?php while($my_custom_query->have_posts()) : $my_custom_query->the_post(); ?>
+<li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
+<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<?php if(has_post_thumbnail()){
+the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
+<img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
+<?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
+<?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
+if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
+</a></li>
+<?php endwhile; ?>
+<?php if(has_tag()){ if(isset($artist) && !empty($artist)){ $post_tags = get_the_tags(); foreach( $post_tags as $tag) :
+if ( $tag->name === $artist ){ ?>
+<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php bloginfo('url');?>/tag/<?php print_r($tag->slug);?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی  <?php print_r($tag->name); ?> </a></li>
+<?php } endforeach; } } ?>
+</ul>
+<div class="clear"></div>
+</div>
+<div class="clear"></div>
+</aside>
+<?php endif; wp_reset_query(); ?>
+<?php } else{ ?>
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,'singer','string'); $term_ids=wp_list_pluck($terms,'term_id');
+$second_query = new WP_Query( array('post_type'=>'post',
+'tax_query' => array( array('taxonomy'=>'singer','field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
+'posts_per_page'=>$pppr,'ignore_sticky_posts'=>1,'orderby'=>'id'));
+if($second_query->have_posts()) { ?>	
+<aside class="related_posts">
+<div class="title_tarlanweb_box">
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,'singer');
+$terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_string; ?></h3>
+<div class="liner clear"></div>
+</div>
+<div class="tarlanweb_side_box">
+<ul>
+<?php while($second_query->have_posts()) : $second_query->the_post(); ?>
+<li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
+<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<?php if(has_post_thumbnail()){
+the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
+<img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
+<?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
+<?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
+if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
+</a></li>
+<?php endwhile; ?>
+<?php $terms = get_the_terms($post->ID,'singer'); foreach ($terms as $term){ ?>
+<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php bloginfo('url'); ?>/singer/<?php echo $term->slug; ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
+<?php } ?>
+</ul>
+<div class="clear"></div>
+</div>
+<div class="clear"></div>
+</aside>	
+<?php } ?>
+<?php }
+	} ?>
+<?php
+/* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
+if ( function_exists( 'javan_seda_sidebar' ) ) {
+	javan_seda_sidebar( 'left_side2' );
+} else {
+	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side2' ) ) :
+	endif;
+}
+?>
+<div class="clear"></div>
+</div>	
+
+<div class="clear"></div>
+</div>
+</div>
+<!-- centers_box -->
+
+<?php get_footer(''); ?>

@@ -17,8 +17,15 @@
 <header>
 <h1><?php the_title(); ?></h1> 
 <div class="stars_ratings_box">
-<?php include_once(ABSPATH .'wp-admin/includes/plugin.php');
-if(is_plugin_active('kk-star-ratings/index.php')){ echo kk_star_ratings(); } ?>
+<?php /* v3.1.0 — محافظ خطای کشنده: include و توابع اداری فقط در صورت وجود؛ ستاره‌دهی هم فقط اگر تابعش موجود باشد (قبلاً همین خط می‌توانست کل بلوک محتوا را نصفه‌کاره بکشد) */
+if ( ! function_exists( 'is_plugin_active' ) ) {
+	$ab_plug_api = ABSPATH . 'wp-admin/includes/plugin.php';
+	if ( is_readable( $ab_plug_api ) ) {
+		include_once $ab_plug_api;
+	}
+	unset( $ab_plug_api );
+}
+if ( function_exists( 'is_plugin_active' ) && is_plugin_active( 'kk-star-ratings/index.php' ) && function_exists( 'kk_star_ratings' ) ) { echo kk_star_ratings(); } ?>
 </div>
 <div class="liner clear"></div>
 <div class="tarlanweb_post_ft"><i class="icofont-folder-open"></i> <?php the_category(' , '); ?></div>
@@ -170,7 +177,9 @@ if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw 
 		</div>
 		<div class="music_lyrics_text" id="taranehyar_lyrics_text"><?php echo $taranehyar_lyrics_html; // خروجی با wp_kses_post یا esc_html پاک‌سازی شده است. ?></div>
 		<?php
-		if ( $taranehyar_lyrics_schema ) {
+		if ( $taranehyar_lyrics_schema && ! function_exists( 'javan_seda_music_schema' ) ) {
+		/* v3.2.2 — اگر inc/ab-credits.php نصب باشد، schema از همان فایل و در wp_head چاپ می‌شود
+		   (برای همهٔ نوشته‌ها، حتی وقتی متن ترانه خالی است) و این بلوکِ قدیمی اجرا نمی‌شود تا دو بار چاپ نشود. */
 			$taranehyar_permalink = get_permalink();
 			$taranehyar_audio     = '';
 			foreach ( array( 'music320', 'music128' ) as $taranehyar_audio_key ) {
@@ -268,6 +277,14 @@ if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
 ?>
 <div class="clear"></div>
 
+<?php /* v3.2.0 — باکس «ما را دنبال کنید» (تلگرام · اینستاگرام · بله · روبیکا): بالای باکس پلیر،
+   زیر متن/ترانه و پیش از ویدیو و پلیر. تابع در inc/ab-post-extras.php است و با function_exists محافظت
+   شده؛ نبودن فایل ⇒ صفر خروجی و صفر خطا. لینک‌ها و متن دکمه‌ها از تنظیمات قالب → «شبکه‌های اجتماعی»
+   می‌آیند و با همان گزینهٔ fixbtn روشن/خاموش می‌شوند. */
+if ( function_exists( 'javan_seda_social_box' ) ) { javan_seda_social_box( get_the_ID() ); }
+if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get_the_ID(), 'before_player' ); }
+?>
+
 <?php if(get_field('video720') || get_field('video1080') || get_field('video480')){ ?> 
 <div class="video_player">
 <video width="640" height="360" controls>
@@ -286,7 +303,7 @@ if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
 <!-- music player -->
 <div class="music_box_player taktarcks">
 <audio id="audio" preload="none" tabindex="0">
-<source src="<?php the_field('music128'); ?>" data-track-number="1" />    
+<source src="<?php echo esc_url( get_field('music128') ); ?>" data-track-number="1" />    
 پلیر شما قدیمی است و از پخش آنلاین پشتیبانی نمیکند.
 </audio>
 
@@ -418,24 +435,28 @@ if ( $taranehyar_download_title && (
 ?>
 <div class="dl_links_box">
 <?php if(get_field('music128')){ ?> 
-<a class="dl_link_128" href="<?php the_field('music128'); ?>"> <i class="icofont-download"></i>دانلود  آهنگ با کیفیت 128 </a><?php } if(get_field('music320')){ ?>
-<a class="dl_links_320" href="<?php the_field('music320'); ?>"> <i class="icofont-download"></i> دانلود آهنگ با کیفیت 320 </a><?php } if(get_field('album128')){ ?>	
-<a class="dl_link_128" href="<?php the_field('album128'); ?>"> <i class="icofont-download"></i>دانلود  آلبوم با کیفیت 128 </a><?php } if(get_field('album320')){ ?>
-<a class="dl_links_320" href="<?php the_field('album320'); ?>"> <i class="icofont-download"></i> دانلود  آلبوم با کیفیت 320 </a>	<?php } ?>
+<a class="dl_link_128" href="<?php echo esc_url( get_field('music128') ); ?>"> <i class="icofont-download"></i>دانلود  آهنگ با کیفیت 128 </a><?php } if(get_field('music320')){ ?>
+<a class="dl_links_320" href="<?php echo esc_url( get_field('music320') ); ?>"> <i class="icofont-download"></i> دانلود آهنگ با کیفیت 320 </a><?php } if(get_field('album128')){ ?>	
+<a class="dl_link_128" href="<?php echo esc_url( get_field('album128') ); ?>"> <i class="icofont-download"></i>دانلود  آلبوم با کیفیت 128 </a><?php } if(get_field('album320')){ ?>
+<a class="dl_links_320" href="<?php echo esc_url( get_field('album320') ); ?>"> <i class="icofont-download"></i> دانلود  آلبوم با کیفیت 320 </a>	<?php } ?>
 <div class="clear"></div>
 </div>
 <?php if((get_field('video1080')) || (get_field('video720')) || (get_field('video480'))){ ?>
 <div class="dl_linksv_box">
 <ul>
 <?php if(get_field('video1080')){ ?> 
-<li><a href="<?php the_field('video1080'); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  1080 </a></li><?php } if(get_field('video720')){ ?>
-<li><a href="<?php the_field('video720'); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  720 </a></li><?php } if(get_field('video480')){ ?>
-<li><a href="<?php the_field('video480'); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  480 </a></li><?php } ?>
+<li><a href="<?php echo esc_url( get_field('video1080') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  1080 </a></li><?php } if(get_field('video720')){ ?>
+<li><a href="<?php echo esc_url( get_field('video720') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  720 </a></li><?php } if(get_field('video480')){ ?>
+<li><a href="<?php echo esc_url( get_field('video480') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  480 </a></li><?php } ?>
 </ul>
 <div class="clear"></div>
 </div>
 <?php } ?>
 <?php if ( '' !== $taranehyar_lyrics_box && 'end' === $taranehyar_lyrics_position ) { echo $taranehyar_lyrics_box; } ?>
+<?php /* v3.2.1 — «شناسنامۀ آهنگ» (خواننده · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید).
+   جایگاه از تنظیمات قالب → «صفحه دانلود آهنگ» → «شناسنامه بالای پلیر» عوض می‌شود؛ اگر فایل
+   inc/ab-credits.php نصب نباشد، این دو خط هیچ خروجی و هیچ خطایی ندارند. */
+if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get_the_ID(), 'after_download' ); } ?>
 <div class="clear"></div>
 </div>
 
@@ -563,7 +584,15 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 <!-- single_posts_right -->
 	
 <div id="left_side">
-<?php if (!function_exists('dynamic_sidebar') || !dynamic_sidebar('left_side')) : endif; ?>
+<?php
+/* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
+if ( function_exists( 'javan_seda_sidebar' ) ) {
+	javan_seda_sidebar( 'left_side' );
+} else {
+	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side' ) ) :
+	endif;
+}
+?>
 <?php $reltag1 = ot_get_option('reltag1'); if('off' == $reltag1){
 $reltag = ot_get_option('reltag'); if('off' != $reltag){ ?>	
 <?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist=get_field('artist');
@@ -633,7 +662,15 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 <?php } ?>
 <?php }
 	} ?>
-<?php if (!function_exists('dynamic_sidebar') || !dynamic_sidebar('left_side2')) : endif; ?>
+<?php
+/* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
+if ( function_exists( 'javan_seda_sidebar' ) ) {
+	javan_seda_sidebar( 'left_side2' );
+} else {
+	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side2' ) ) :
+	endif;
+}
+?>
 <div class="clear"></div>
 </div>	
 

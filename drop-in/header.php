@@ -13,14 +13,42 @@
 <link rel="apple-touch-icon" href="<?php echo ot_get_option('logo'); ?>">
 <?php wp_enqueue_script("jquery"); wp_head('');
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
-<?php if(wp_is_mobile('')){ ?><style>body{padding-top: 60px;}</style><?php } ?>
+<?php
+/* v3.1.3 — CSS حیاتیِ هدر، inline و «وابسته به عرضِ صفحه» (نه کاربرگزار).
+   دو درسِ این نسخه:
+   ۱) در v3.1.2 یک جملهٔ فارسی بیرون از بلوک کامنت افتاده بود و داخل <head> چاپ می‌شد
+      (علتِ «سایت کلاً خراب شد»). این‌جا همه‌چیز داخل کامنت است و هیچ متنی print نمی‌شود.
+   ۲) نمایش/عدم‌نمایش هدر موبایل دیگر به wp_is_mobile() وابسته نیست؛ فقط با media query
+      انجام می‌شود، پس کشِ «نسخهٔ موبایل/دسکتاپ» و فیلترهای wp_is_mobile دیگر نمی‌توانند
+      هدر را در یک دستگاه خراب کنند. مارک‌آپ در همهٔ دستگاه‌ها یکسان است (cache-friendly).
+   ارتفاع هدر موبایل: ۷۰px | فاصلهٔ بالای صفحه در موبایل: ۹۰px (۷۰ + ۲۰). */
+?>
+<style id="ab-header-critical">
+body{padding-top:0;}
+/* هدر موبایل به‌صورت پیش‌فرض پنهان است و فقط در عرضِ موبایل/تبلت ظاهر می‌شود */
+#mobiles_header{display:none;}
+#header{margin-bottom:28px !important;}
+@media (max-width: 800px){
+body{padding-top:90px !important;}
+#mobiles_header{display:block !important;visibility:visible !important;height:70px !important;overflow:visible !important;}
+#header{display:none !important;}
+#header .menu_right{max-width:100% !important;}
+.tarlanweb_center{width:auto !important;max-width:100% !important;margin-right:12px;margin-left:12px;}
+.single_posts_right,.single_posts_left{width:100% !important;float:none !important;}
+.single_featured_image,.single_content_box img,.single_content_box iframe{max-width:100% !important;height:auto;}
+#centers_box,.single_content_box{overflow:visible;}
+.tarlanweb_center{max-width:100% !important;}
+}
+/* سازگاری با نسخه‌های قبلی که کلاس ab-has-mh را روی <body> می‌گذاشتند (بی‌اثر اگر نبود) */
+body.ab-has-mh{padding-top:90px;}
+@media (min-width: 801px){body.ab-has-mh #mobiles_header{display:none !important;}}
+</style>
 </head>
-<?php $darks = ot_get_option('dark_modes'); if('off' != $darks){ ?>
+<?php $darks = ot_get_option('dark_modes'); if ( 'off' != $darks ) { ?>
 <body <?php body_class('night'); ?>>
-<?php } else{ ?> 
+<?php } else { ?>
 <body <?php body_class(''); ?>>
 <?php } ?>
-<?php if(wp_is_mobile()){} else{ ?> 
 <header id="header">
 <div class="tarlanweb_center">
 <?php if(is_home()){ ?> <h1 class="h1_hidden_home"><?php echo ot_get_option('head_h1'); ?></h1> <?php } ?>
@@ -46,6 +74,9 @@ if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-r
 <div class="clear"></div>
 </div>
 </header>
-<?php } ?>
-<?php get_template_part('inc/mobiles_header'); ?>
+<?php
+/* هدر موبایل همیشه رندر می‌شود؛ CSSِ بالا تصمیم می‌گیرد کِی دیده شود.
+   این خط هرگز نباید حذف شود — نبودش = نداشتن هدر در گوشی. */
+get_template_part('inc/mobiles_header');
+?>
 <main>

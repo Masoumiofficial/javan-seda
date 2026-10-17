@@ -249,8 +249,9 @@ array(
 //socials
 array(
 'id'=>'fixbtn',
-'label'=>'لینکهای ثابت',
-'desc'=>'لینکهای تلگرام  و اینستاگرام  به شکل ثابت نمایش داده شوند ؟',
+'label'=>'باکس شبکه‌های اجتماعی در صفحهٔ پست',
+'desc'=>'بالای لینک‌های دانلود هر آهنگ، دکمه‌های تلگرام/اینستاگرام/بله/روبیکا نمایش داده شود ؟ (در نسخهٔ 3.2.0 این گزینه جای «لینک‌های ثابتِ پایین صفحه» را گرفته)',
+'old_label'=>'لینکهای ثابت',
 'std'=>'on',
 'type'=>'on-off',
 'section'=>'socials',
@@ -285,6 +286,38 @@ array(
 'desc'=>'متن لینک ثابت  اینستاگرام را وارد کنید',
 'type'=>'text',
 'std'=>'صفحه اینستاگرام ',
+'section'=>'socials'
+),
+array(
+'id'=>'bale',
+'label'=>'بله',
+'desc'=>'لینک کانال/صفحهٔ بله را وارد کنید (https://bale.ai/...)',
+'type'=>'text',
+'std'=>'',
+'section'=>'socials'
+),
+array(
+'id'=>'baletxt',
+'label'=>'متن بله',
+'desc'=>'متن دکمهٔ بله در باکس صفحهٔ پست',
+'type'=>'text',
+'std'=>'کانال بله ',
+'section'=>'socials'
+),
+array(
+'id'=>'rubika',
+'label'=>'روبیکا',
+'desc'=>'لینک کانال/صفحهٔ روبیکا را وارد کنید',
+'type'=>'text',
+'std'=>'',
+'section'=>'socials'
+),
+array(
+'id'=>'rubikatxt',
+'label'=>'متن روبیکا',
+'desc'=>'متن دکمهٔ روبیکا در باکس صفحهٔ پست',
+'type'=>'text',
+'std'=>'کانال روبیکا ',
 'section'=>'socials'
 ),
 array(
@@ -401,6 +434,30 @@ array(
 'std'=>'on',
 'type'=>'on-off',
 'section'=>'dl_pages',
+),
+array(
+'id'=>'credits_box',
+'label'=>'شناسنامۀ آهنگ (تهیه‌کنندگان)',
+'desc'=>'ردیف‌های خواننده · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید در صفحۀ پست نمایش داده شود؟ (داده از فیلدهای artist/composer/lyricist/arranger/mixer/producer)',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'dl_pages'
+),
+array(
+'id'=>'credits_title',
+'label'=>'تیتر باکس شناسنامۀ آهنگ',
+'desc'=>'اگر خالی بماند، «شناسنامۀ آهنگ» چاپ می‌شود',
+'type'=>'text',
+'std'=>'',
+'section'=>'dl_pages'
+),
+array(
+'id'=>'credits_before_player',
+'label'=>'شناسنامه بالای پلیر',
+'desc'=>'روشن = بالای باکس پلیر؛ خاموش = بعد از لینک‌های دانلود (حالت پیش‌فرض)',
+'std'=>'off',
+'type'=>'on-off',
+'section'=>'dl_pages'
 ),
 
 ));

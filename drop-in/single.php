@@ -177,7 +177,9 @@ if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw 
 		</div>
 		<div class="music_lyrics_text" id="taranehyar_lyrics_text"><?php echo $taranehyar_lyrics_html; // خروجی با wp_kses_post یا esc_html پاک‌سازی شده است. ?></div>
 		<?php
-		if ( $taranehyar_lyrics_schema ) {
+		if ( $taranehyar_lyrics_schema && ! function_exists( 'javan_seda_music_schema' ) ) {
+		/* v3.2.2 — اگر inc/ab-credits.php نصب باشد، schema از همان فایل و در wp_head چاپ می‌شود
+		   (برای همهٔ نوشته‌ها، حتی وقتی متن ترانه خالی است) و این بلوکِ قدیمی اجرا نمی‌شود تا دو بار چاپ نشود. */
 			$taranehyar_permalink = get_permalink();
 			$taranehyar_audio     = '';
 			foreach ( array( 'music320', 'music128' ) as $taranehyar_audio_key ) {

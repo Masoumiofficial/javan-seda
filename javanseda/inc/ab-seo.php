@@ -55,6 +55,58 @@ if ( ! defined( 'JAVANSEDA_SEO_IMAGE' ) ) {
 	define( 'JAVANSEDA_SEO_IMAGE', 'thumb1' );
 }
 
+/* -------------------------------------------------------------------------
+ * ۲-الف) آیا افزونۀ سئو فعال است؟ (AIO / Yoast / Rank Math / SEOPress)
+ *      اگر بله، لایه از چاپ meta/OG/canonical/BreadcrumbList دست می‌کشد تا
+ *      تکراری نشود؛ فقط داده ساختاریافتهٔ موسیقی (که افزونه‌ها نمی‌سازند) می‌ماند.
+ * ---------------------------------------------------------------------- */
+if ( ! function_exists( 'javan_seda_seo_has_plugin' ) ) {
+	function javan_seda_seo_has_plugin() {
+		$const = array( 'WPSEO_VERSION', 'RANK_MATH_VERSION', 'AIOSEO_VERSION', 'SEOPRESS_VERSION', 'SEOPRO_VERSION' );
+		foreach ( $const as $name ) {
+			if ( defined( $name ) ) {
+				return (string) constant( $name );
+			}
+		}
+		$classes = array(
+			'AIOSEO\\Plugin\\AIOSEO',
+			'Yoast\\WPSEO\\Main',
+			'RankMath\\Main',
+			'Seopress',
+		);
+		foreach ( $classes as $cls ) {
+			if ( class_exists( $cls ) ) {
+				return $cls;
+			}
+		}
+		return '';
+	}
+}
+
+/** آدرسِ امنِ یک ترم/دسته — هیچ‌وقت (string) روی WP_Error نمی‌شود (PHP 8: کشنده) */
+if ( ! function_exists( 'javan_seda_seo_term_url' ) ) {
+	function javan_seda_seo_term_url( $term ) {
+		if ( ! $term ) {
+			return '';
+		}
+		$link = get_term_link( $term );
+		if ( is_wp_error( $link ) ) {
+			return '';
+		}
+		return (string) $link;
+	}
+}
+
+/** آدرسِ امنِ دسته */
+if ( ! function_exists( 'javan_seda_seo_cat_url' ) ) {
+	function javan_seda_seo_cat_url( $cat_id ) {
+		$link = get_category_link( (int) $cat_id );
+		if ( is_wp_error( $link ) ) {
+			return '';
+		}
+		return (string) $link;
+	}
+}
 /** آیا در این درخواست خروجی SEO لازم است؟ */
 if ( ! function_exists( 'javan_seda_seo_active' ) ) {
 	function javan_seda_seo_active() {
@@ -163,6 +215,10 @@ if ( ! function_exists( 'javan_seda_seo_head' ) ) {
 		if ( ! javan_seda_seo_active() ) {
 			return;
 		}
+		/* اگر افزونۀ سئو فعال است، توضیح/OG را او می‌سازد؛ دو بار چاپ نکنیم */
+		if ( '' !== javan_seda_seo_has_plugin() && ! ( defined( 'JAVANSEDA_SEO_OVERRIDE_PLUGIN' ) && JAVANSEDA_SEO_OVERRIDE_PLUGIN ) ) {
+			return;
+		}
 		$desc = javan_seda_seo_description();
 		if ( '' !== $desc ) {
 			echo '<meta name="description" content="' . esc_attr( $desc ) . '">' . "\n";
@@ -267,7 +323,7 @@ if ( ! function_exists( 'javan_seda_seo_canonical_backstop' ) ) {
 		} elseif ( is_category() || is_tag() || is_tax() ) {
 			$t = get_queried_object();
 			if ( $t ) {
-				$u = (string) get_term_link( $t );
+				$u = javan_seda_seo_term_url( $t );
 			}
 		}
 		if ( $u && ! is_wp_error( $u ) ) {
@@ -285,6 +341,10 @@ if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) )
 		if ( ! javan_seda_seo_active() || ! ( is_singular() || is_category() || is_tag() || is_tax() ) ) {
 			return;
 		}
+		/* افزونۀ سئو خودش BreadcrumbList می‌سازد ⇒ تکراری نشود */
+		if ( '' !== javan_seda_seo_has_plugin() && ! ( defined( 'JAVANSEDA_SEO_OVERRIDE_PLUGIN' ) && JAVANSEDA_SEO_OVERRIDE_PLUGIN ) ) {
+			return;
+		}
 		$items = array(
 			array( 'name' => get_bloginfo( 'name' ), 'item' => home_url( '/' ) ),
 		);
@@ -293,14 +353,14 @@ if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) )
 			if ( is_array( $cats ) && $cats ) {
 				$items[] = array(
 					'name' => wp_strip_all_tags( $cats[0]->name ),
-					'item' => (string) get_category_link( $cats[0]->term_id ),
+					'item' => javan_seda_seo_cat_url( $cats[0]->term_id ),
 				);
 			}
 			$singers = get_the_terms( get_the_ID(), 'singer' );
 			if ( is_array( $singers ) && $singers ) {
 				$items[] = array(
 					'name' => wp_strip_all_tags( $singers[0]->name ),
-					'item' => (string) get_term_link( $singers[0] ),
+					'item' => javan_seda_seo_term_url( $singers[0] ),
 				);
 			}
 			$items[] = array( 'name' => wp_strip_all_tags( get_the_title() ), 'item' => '' );
@@ -397,13 +457,13 @@ if ( JAVANSEDA_SEO_ROBOTS && ! function_exists( 'javan_seda_seo_robots' ) ) {
 if ( ! function_exists( 'javan_seda_seo_report' ) ) {
 	function javan_seda_seo_report() {
 		$L = array();
-		$line = static function ( $s = '' ) use ( &$L ) {
+		$line = function ( $s = '' ) use ( &$L ) {
 			$L[] = $s;
 		};
 		$line( '=== لایۀ «دیده‌شدن» v3.1.4 ===' );
 		$line( 'لایه                    : ' . ( ( defined( 'JAVANSEDA_SEO' ) && false === JAVANSEDA_SEO ) ? '✗ خاموش' : '✓ روشن' ) . ' | og=' . ( JAVANSEDA_SEO_OG ? 'on' : 'off' ) . ' robots=' . ( JAVANSEDA_SEO_ROBOTS ? 'on' : 'off' ) . ' crumbs=' . ( JAVANSEDA_SEO_CRUMBS ? 'on' : 'off' ) );
 		$line( 'توضیحِ ساختنیِ این صفحه  : «' . mb_substr( javan_seda_seo_description(), 0, 90, 'UTF-8' ) . '»' );
-		$line( 'افزونۀ سئو شناسایی‌شده   : ' . ( ( defined( 'WPSEO_VERSION' ) ) ? 'Yoast (' . WPSEO_VERSION . ')' : ( ( defined( 'RANK_MATH_VERSION' ) ) ? 'Rank Math (' . RANK_MATH_VERSION . ')' : ( ( class_exists( 'AIOSEO\\Plugin\\Loader' ) ) ? 'All in One SEO' : 'هیچ  <<< اگر هیچ‌کدام نیست، sitemap را وردپرس (wp-sitemap.xml) یا خودتان بسازید' ) ) ) );
+		$line( 'افزونۀ سئو شناسایی‌شده   : ' . ( ( '' !== javan_seda_seo_has_plugin() ) ? javan_seda_seo_has_plugin() . '  ← لایه از چاپ meta/OG/BreadcrumbList عقب کشید' : 'هیچ  ← لایه خودش meta/OG را می‌سازد' ) );
 		$line( 'core sitemap             : ' );
 		foreach ( array( '/wp-sitemap.xml', '/sitemap_index.xml', '/sitemap.xml' ) as $sm ) {
 			$code = '—';

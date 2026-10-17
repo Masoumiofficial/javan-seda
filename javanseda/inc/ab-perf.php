@@ -195,7 +195,7 @@ if ( JAVANSEDA_PERF_LAZY_IMG && ! function_exists( 'javan_seda_perf_lazy_img' ) 
 		}
 		$html = preg_replace_callback(
 			'/<img\b[^>]*>/i',
-			static function ( $m ) {
+			function ( $m ) {
 				$tag = $m[0];
 				if ( false !== stripos( $tag, 'loading=' ) ) {
 					return $tag; // از قبل تصمیم گرفته شده
@@ -228,7 +228,7 @@ if ( ! function_exists( 'javan_seda_perf_report' ) ) {
 		$L      = array();
 		$tdir   = get_template_directory();
 		$uri    = get_template_directory_uri();
-		$line   = static function ( $s = '' ) use ( &$L ) {
+		$line   = function ( $s = '' ) use ( &$L ) {
 			$L[] = $s;
 		};
 

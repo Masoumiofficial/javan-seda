@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.2.2
+Version: 3.2.3
 */
 /*
 ==================================================================================
@@ -2775,33 +2775,36 @@ body.ab-sticky-on{padding-bottom:84px}
 /* --- انتهای بلوک ۲۴ (v3.2.0) --- */
 
 /* ==========================================================================
-   بلوک ۲۵ (نسخۀ 3.2.1) — «شناسنامۀ آهنگ» (آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید)
+   بلوک ۲۵ (3.2.1 / بازطراحی در 3.2.3) — «شناسنامۀ آهنگ» (خواننده · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید)
    فایل: inc/ab-credits.php  ·  جایگاه: single.php (بعد از لینک‌های دانلود یا بالای پلیر)
    پالت سازمانی: #FFFFFF · #185ADB · #111111 — بدون گرادینت
    حذف فایل لایه ⇒ این قواعد بی‌مصرف می‌مانند و چیزی را نمی‌شکنند.
    ========================================================================== */
-.ab-credits{display:block;margin:14px 0;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:12px;overflow:hidden}
-.ab-credits__head{display:flex;align-items:center;padding:10px 14px;background:#f7f9fd;border-bottom:1px solid #eef1f6}
-.ab-credits__head i{font-size:16px;color:#185ADB;margin-left:7px}
-.ab-credits__head h2{display:inline;margin:0;font-size:14px;font-weight:700;color:#111111;line-height:1.4}
-.ab-credits__rows{display:block;margin:0;padding:2px 14px}
-.ab-credit{display:flex;align-items:flex-start;padding:7px 0;border-bottom:1px dashed #eef1f6;margin:0}
-.ab-credit:last-child{border-bottom:0}
-.ab-credit dt{flex:0 0 138px;margin:0;font-size:12.5px;font-weight:400;color:#8a92a6}
-.ab-credit dt i{font-size:14px;color:#185ADB;margin-left:6px}
-.ab-credit dd{flex:1 1 auto;min-width:0;margin:0;font-size:13.5px;font-weight:600;color:#111111;line-height:1.6}
-.ab-credit dd a{color:#111111;text-decoration:none;border-bottom:1px solid #dfe4ee}
-.ab-credit dd a:hover,.ab-credit dd a:focus{color:#185ADB;border-bottom-color:#185ADB;text-decoration:none}
-.ab-credit__sep{margin:0 5px;color:#c3cbd9;font-weight:400}
+/* چیدمان افقی: خودِ باکس یک ردیفِ flex است؛ تیتر جلوی چیپ‌ها می‌نشیند و
+   هر آیکن/برچسب/مقدار یک «کادر کوچک» جداست. ارتفاع کل ≈ یک خط متن (۳۴px) و
+   در موبایل چیپ‌ها بدون اسکرول‌بار در خود خط می‌شکنند. */
+.ab-credits{display:flex;align-items:center;flex-wrap:wrap;margin:12px 0;padding:8px 11px;background:#f7f9fd;border:1px solid #eef1f6;border-radius:14px}
+.ab-credits__title{display:inline-flex;align-items:center;margin:0 2px 0 4px;padding:0;font-size:12.5px;font-weight:700;color:#8a92a6;line-height:1.5}
+.ab-credits__title i{font-size:14px;color:#185ADB;margin-left:5px}
+.ab-credits__row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;flex:1 1 300px;min-width:0}
+.ab-credit{display:inline-flex;align-items:center;max-width:100%;margin:0;padding:4px 10px;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:999px;box-shadow:0 1px 1px rgba(17,17,17,.03);font-size:12.5px;line-height:1.5;transition:border-color .16s ease,box-shadow .16s ease}
+.ab-credit:hover{border-color:#185ADB;box-shadow:0 1px 3px rgba(24,90,219,.15)}
+.ab-credit>i{flex:0 0 auto;font-size:13px;color:#185ADB;margin-left:6px}
+.ab-credit__k{flex:0 0 auto;margin-left:6px;font-size:11px;font-weight:500;color:#8a92a6;white-space:nowrap}
+.ab-credit__v{min-width:0;font-size:12.5px;font-weight:700;color:#111111}
+.ab-credit__v a{color:#111111;text-decoration:none;border-bottom:1px solid transparent;transition:color .16s ease,border-color .16s ease}
+.ab-credit__v a:hover,.ab-credit__v a:focus{color:#185ADB;border-bottom-color:#185ADB;text-decoration:none}
+.ab-credit__sep{margin:0 4px;color:#c3cbd9;font-weight:400}
 @media (max-width:767px){
-	.ab-credit{display:block;padding:8px 0}
-	.ab-credit dt{flex:none;margin-bottom:1px}
-	.ab-credit dd{flex:none;font-size:13px}
-	.ab-credits__rows{padding:2px 11px}
+	.ab-credits{padding:7px 9px;border-radius:12px}
+	.ab-credits__title{width:100%;margin:0 0 2px}
+	.ab-credits__row{gap:5px;flex:1 1 100%}
+	.ab-credit{padding:3px 9px}
+	.ab-credit__v{font-size:12px}
 }
 @media print{.ab-credits{display:none}}
 /* آیکنِ جاافتادۀ قالب: در home.php و 404.php از icofont-microphone-alt استفاده شده، ولی این گلیف
    در css/icofont.min.css این نسخۀ قالب وجود ندارد (بخشی از آیکن دیده نمی‌شد). با همان گلیف
    میکروفنِ موجود (icofont-radio-mic) جایگزین شد؛ اگر آیکون‌فونت را کامل عوض کردید، خط بعد را بردارید. */
 .icofont-microphone-alt:before{content:"\ea4e"}
-/* --- انتهای بلوک ۲۵ (v3.2.1) --- */
+/* --- انتهای بلوک ۲۵ (v3.2.3 — چیپی/افقی) --- */

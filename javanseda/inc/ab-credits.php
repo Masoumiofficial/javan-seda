@@ -319,18 +319,20 @@ if ( ! function_exists( 'javan_seda_credits_box' ) ) {
 			if ( ! $cells ) {
 				continue;
 			}
-			$html .= '<div class="ab-credit">'
-				. '<dt><i class="' . esc_attr( $row['icon'] ) . '" aria-hidden="true"></i>' . esc_html( $row['label'] ) . '</dt>'
-				. '<dd>' . implode( '<span class="ab-credit__sep">،</span>', $cells ) . '</dd>'
-				. '</div>';
+			/* یک «چیپ»: آیکن + برچسب + مقدار — همه در یک خط (نسخۀ 3.2.3: چیدمان افقی) */
+			$html .= '<span class="ab-credit">'
+				. '<i class="' . esc_attr( $row['icon'] ) . '" aria-hidden="true"></i>'
+				. '<b class="ab-credit__k">' . esc_html( $row['label'] ) . '</b>'
+				. '<span class="ab-credit__v">' . implode( '<span class="ab-credit__sep">،</span>', $cells ) . '</span>'
+				. '</span>';
 		}
 		if ( '' === $html ) {
 			return '';
 		}
 
 		$html = '<section class="ab-credits" aria-label="' . esc_attr( javan_seda_credits_title() ) . '">'
-			. '<header class="ab-credits__head"><i class="icofont-info-circle" aria-hidden="true"></i><h2>' . esc_html( javan_seda_credits_title() ) . '</h2></header>'
-			. '<dl class="ab-credits__rows">' . $html . '</dl>'
+			. '<h2 class="ab-credits__title"><i class="icofont-info-circle" aria-hidden="true"></i>' . esc_html( javan_seda_credits_title() ) . '</h2>'
+			. '<div class="ab-credits__row">' . $html . '</div>'
 			. '<div class="clear"></div>'
 			. '</section>';
 

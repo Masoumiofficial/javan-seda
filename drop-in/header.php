@@ -51,7 +51,10 @@ body.ab-has-mh{padding-top:90px;}
 <?php } ?>
 <?php /* v3.3.8 — هوک استاندارد بدنه (پلاگین‌ها/اسکیپ‌لینک از همین‌جا درج می‌شوند) */ ?>
 <?php if ( function_exists( 'wp_body_open' ) ) { wp_body_open(); } ?>
-<?php if ( ( ! defined( 'JAVANSEDA_SKIP_LINK' ) || JAVANSEDA_SKIP_LINK ) && ( ! function_exists( 'javan_seda_ui_on' ) || javan_seda_ui_on( 'ab_skip_link', true, 'JAVANSEDA_SKIP_LINK' ) ) ) { ?> /* v3.4.1 — تنظیمات قالب: لینک «پرش» «پرش به محتوا» */
+<?php /* v3.4.2 — متنِ راهنما عمداً داخل بلوک PHP است (در 3.4.1 بعد از ?> رفته و چاپ می‌شد).
+   خاموشیِ این لینک: «تنظیمات قالب ← کنترل رابط ← لینک پرش به محتوا»
+   یا define( 'JAVANSEDA_SKIP_LINK', false ); */ ?>
+<?php if ( ( ! defined( 'JAVANSEDA_SKIP_LINK' ) || JAVANSEDA_SKIP_LINK ) && ( ! function_exists( 'javan_seda_ui_on' ) || javan_seda_ui_on( 'ab_skip_link', true, 'JAVANSEDA_SKIP_LINK' ) ) ) { ?>
 <a class="ab-skip-link" href="#centers_box">پرش به محتوای اصلی</a>
 <?php } /* JAVANSEDA_SKIP_LINK */ ?>
 <header id="header">

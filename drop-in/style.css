@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.4.1
+Version: 3.4.2
 */
 /*
 ==================================================================================
@@ -3505,3 +3505,55 @@ body.ab-player-novol .music_box_player .volume_box{display: none}
    دستیِ دقیق‌تر هم می‌شود توکن‌ها را در «ظاهره ← سفارشی‌سازی ← CSS اضافی» بازنویسی کرد:
      :root{--ab-player-gap:36px;--ab-player-radius:14px}                          */
 /* انتهای بلوک ۳۴ (v3.4.1) */
+/* ============================================================================================
+   بلوک ۳۵ (نسخۀ 3.4.2) — «پلیر داخل کادر بماند»
+   ------------------------------------------------------------------------------------------
+   گزارش: «پلیر ریخته به هم و از کادر زده بیرون». در 3.4.1 برای رفع بریدگیِ ردیف آخر،
+   overflow:hiddenِ کارت برداشته شد؛ آن کار لازم بود ولی کارت را بی‌حصار گذاشت:
+   قالب مادر روی فرزندهای پلیر float و position:absolute می‌گذارد
+     · خط 953/977 : .info-box{float:right;width:83%} و .progress-box{float:left;min-width:75%}
+     · خط 1040    : .play-list{position:absolute;top:75px;width:300px;z-index:888}
+     · خط 1642    : در موبایل .track-info-box{position:absolute;top:-40px}
+   بلوک‌های ۳۰ و ۳۳ بیشترشان را خنثی می‌کردند، ولی با حذف overflow:hidden هر قاعدۀ
+   جا‌افتاده (یا قواعد !important‌دارِ لایه‌های دیگر) دیگر بریده نمی‌شد ⇒ بیرون‌زدگی.
+   راه‌حل این بلوک: هم «حصار» برگردد، هم چیدمان ردیف‌ها اینجا *مجددا و کامل* نوشته شود
+   تا اگر هر یک از بلوک‌های ۳۰/۳۳ جابه‌جا یا حذف شدند، پلیر باز هم داخل کادر بماند:
+     · display:flow-root  ⇒ جریان مستقل: ارتفاع کارت همیشه جمعِ فرزندهاست و هیچ float بیرون نمی‌زند
+     · overflow:hidden    ⇒ گوشۀ گرد، فرزندِ گرد را می‌بُرد؛ چون لیست *داخل* padding است، چیزی بریده نمی‌شود
+     · min-width:0 روی همه‌چیز ⇒ تیترِ بلند نوار پیشرفت را به بیرون هل نمی‌دهد
+     · سقف ارتفاع لیست در همه‌جا ⇒ کارتِ صفحۀ نوشته هم با آلبوم ۴۰‌ترکی کشیده نمی‌شود
+   هیچ DOM‌ی تغییر نمی‌کند (js/scripts.js سالم)، هیچ !important تازه‌ای نیست، پالت
+   #FFFFFF · #185ADB · #111111 و بدون گرادیند. بازگشت: همین بلوک را از انتها حذف کنید.
+   ========================================================================================== */
+.music_box_player{
+	display: flow-root;
+	overflow: hidden;
+	min-height: 0;
+}
+/* ردیف کنترل‌ها — سه بخشِ مستقل، هر سه با min-width:0 */
+.music_box_player .player{display: flex;flex-wrap: nowrap;align-items: center;gap: var(--ab-player-row-gap, 16px);height: auto;min-width: 0}
+.music_box_player .player > *{min-width: 0}
+.music_box_player .player_controls{display: flex;align-items: center;gap: 8px;flex: 0 0 auto;float: none;width: auto;height: auto}
+.music_box_player .info-box{display: flex;align-items: center;gap: 14px;flex: 1 1 auto;float: none;width: auto;height: auto;min-width: 0}
+.music_box_player .info-box .track-info-box{
+	display: flex;align-items: baseline;gap: 10px;min-width: 0;
+	position: static;top: auto;left: auto;right: auto;margin-top: 0;float: none;width: auto;height: auto;
+}
+.music_box_player .progress-box{display: flex;flex-wrap: wrap;align-items: center;gap: 12px;flex: 1 1 auto;float: none;width: auto;min-width: 0;margin-top: 0}
+.music_box_player .progress-box .progress-cell{display: flex;align-items: center;flex: 1 1 auto;width: auto;min-width: 0;height: 18px;float: none}
+.music_box_player .progress-box .progress-cell .progress{width: auto;min-width: 0}
+/* لیست آلبوم: همیشه داخل کارت، با سقف ارتفاع (صفحۀ نوشته هم) */
+.music_box_player .play-list{
+	position: static;top: auto;left: auto;right: auto;width: auto;max-width: none;z-index: auto;
+	max-height: min(296px, 45vh);overflow: auto;overscroll-behavior: contain;
+}
+/* دکمه‌ها: float موروثی حذف (در flex بی‌معنی است و در حالت fallback علتِ بیرون‌زدگی بود) */
+.music_box_player .previous-track-btn,.music_box_player .next-track-btn,
+.music_box_player .album_show_hide,.music_box_player .large-toggle-btn{float: none}
+@media (max-width: 600px){
+	.music_box_player .player{flex-wrap: wrap-reverse;gap: 10px}
+	.music_box_player .player_controls{flex: 1 1 auto;justify-content: center}
+	.music_box_player .info-box{flex: 1 1 100%}
+}
+/* انتهای بلوک ۳۵ (v3.4.2) */
+

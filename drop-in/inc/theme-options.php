@@ -459,6 +459,14 @@ array(
 'type'=>'on-off',
 'section'=>'dl_pages'
 ),
+array(
+'id'=>'lyrics_after_download',
+'label'=>'متن ترانه زیر لینک دانلود',
+'desc'=>'روشن = متن آهنگ بعد از لینک‌های دانلود چاپ شود (حالت پیش‌فرض 3.3.2)؛ خاموش = بالای پلیر و زیر توضیحات',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'dl_pages'
+),
 
 ));
   /* allow settings to be filtered before saving */

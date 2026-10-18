@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.3.1
+Version: 3.3.2
 */
 /*
 ==================================================================================
@@ -1279,7 +1279,7 @@ background: rgba(255,255,255,0.24);filter: blur(10px);}
    منبع متن: فیلد music_text — وسط‌چین، با هدر، لینک خواننده و دکمهٔ کپی
    قابل تنظیم: border-radius، font-size، line-height، text-align
 ---------------------------------------------------------------------- */
-.music_lyrics_box{position: relative;margin: 26px 0 10px 0;background: var(--ab-surface);
+.music_lyrics_box{position: relative;margin: var(--ab-space-5) 0 var(--ab-space-4);background: var(--ab-surface);
 border: 1px solid var(--ab-line);border-radius: 12px;overflow: hidden;
 box-shadow: var(--ab-shadow);}
 .music_lyrics_head{display: flex;flex-direction: column;align-items: center;gap: 9px;padding: 15px 16px 13px 16px;

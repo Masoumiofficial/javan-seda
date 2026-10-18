@@ -135,12 +135,24 @@ if ( '' !== $taranehyar_artist ) {
 <?php
 /* ============================ باکس «متن ترانه» (متن آهنگ) ============================
    منبع متن: فیلد music_text  (ویرایشگر/WYSIWYG یا متن ساده — هر دو پشتیبانی می‌شود)
-   تنظیم‌ها (فقط همین سه خط را در صورت نیاز عوض کنید):
+   تنظیم‌ها (سه خط زیر؛ جایگاه همچنین از تنظیمات قالب قابل تغییر است):
      $taranehyar_lyrics_position : 'here' = همین‌جا بعد از توضیحات | 'end' = بعد از لینک‌های دانلود
+     از نسخۀ 3.3.2 پیش‌فرض 'end' است و از تنظیمات قالب → «صفحة دانلود آهنگ» →
+     «متن ترانه زیر لینک دانلود» قابل برگرداندن است (بدون ویرایش فایل).
      $taranehyar_lyrics_schema   : true = چاپ داده ساختاریافته (MusicRecording + MusicComposition)
      $taranehyar_artist_type     : 'Person' خوانندهٔ تک‌خوان | 'MusicGroup' گروه
    ==================================================================================== */
-$taranehyar_lyrics_position = 'here';
+/* v3.3.2 — ترتیب جدید: پلیر و لینک‌های دانلود اول، متن ترانه بعد.
+   دلیل: «شنیدن/دانلود» قصد اصلی بازدیدکننده است و روی موبایل متن بلند،
+   دکمۀ پخش را از دید پنهان می‌کرد. متن از DOM حذف نشده (فقط جابه‌جا) و
+   schema هم مثل قبل روی wp_head چاپ می‌شود، پس سئو نمی‌شکند.
+   خاموشی: تنظیمات قالب → «متن ترانه زیر لینک دانلود» = خاموش
+   هوک: add_filter( 'taranehyar_lyrics_position', function( $p ) { return 'here'; } ); */
+$taranehyar_lyrics_position = 'end';
+if ( function_exists( 'ot_get_option' ) && 'off' === ot_get_option( 'lyrics_after_download' ) ) {
+	$taranehyar_lyrics_position = 'here';
+}
+$taranehyar_lyrics_position = apply_filters( 'taranehyar_lyrics_position', $taranehyar_lyrics_position );
 $taranehyar_lyrics_schema   = true;
 $taranehyar_artist_type     = 'Person';
 

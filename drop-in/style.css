@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.4.3
+Version: 3.4.4
 */
 /*
 ==================================================================================
@@ -3556,4 +3556,62 @@ body.ab-player-novol .music_box_player .volume_box{display: none}
 	.music_box_player .info-box{flex: 1 1 100%}
 }
 /* انتهای بلوک ۳۵ (v3.4.2) */
-
+/* ============================================================================================
+   بلوک ۳۶ (نسخۀ 3.4.4) — اسلایدر صدا: از حالت «پاپ‌آپ عمودی» بیرون بیاید و گوشه بنشیند
+   ------------------------------------------------------------------------------------------
+   گزارش: «کم‌وزیاد کردن صدا آمده رو خط پخش موزیک، همان اول؛ باید گوشۀ چپ یا راست، با
+   فاصله از المان‌های دیگر». علت ریشۀ کار در خودِ قالب مادر است، نه در 3.4.2:
+     · خط 1117 : .volume_box{width:30px;float:right;margin:-7px -40px 0 0;position:relative}
+     · خط 1119 تا 1127 : اسلایدر صدا position:absolute;top:-50px;left:-30px است، همراه با
+       transform:rotate(-90deg) و visibility:hidden;opacity:0 و فقط با :hover نمایان می‌شود
+       ⇒ یک نوارِ عمودیِ مخفی که با ۵۰px منفیِ بالا و ۴۰px منفیِ راست، روی خطِ دکمۀ پخش
+       می‌نشیند و با بقیهٔ المان‌ها قاطی می‌شود. بلوک ۳۴ عرض/ارتفاع را درست کرد ولی همین
+       پنج اعلامیه دست‌نخورده ماند.
+   راه‌حل — CSS فقط، DOM و js/scripts.js دست‌نخورده:
+     · موقعیت مطلق + چرخش + مخفی‌شدن لغو می‌شود ⇒ اسلایدر افقی و همیشه دیدنی
+     · .volume_box از float، عرض 30px و مارجین منفی آزاد می‌شود
+     · margin-inline-start:auto ⇒ چسبیده به گوشۀ انتهایی ردیف (در RTL: چپ) و
+       padding-inline-start:16px ⇒ فاصله از نوار پیشرفت (در ≤760px هر دو صفر می‌شوند)
+     · appearance:auto + accent-color ⇒ کنترل بومیِ مرورگر، با پرشدۀ آبی در
+       Chrome/Safari/Firefox (به‌جای بازسازی pseudo-element که در هر مرورگر فرق می‌کند)
+   بازگشت: «تنظیمات قالب ← کنترل رابط ← دکمۀ صدا در پلیر» = خاموش (کل اسلایدر حذف
+   می‌شود) یا حذف همین بلوک از انتهای فایل. در ≤450px قالب مادر خودش
+   .volume_box{display:none !important} را دارد (خط 1649) — عمداً دست نمی‌زنیم.
+   هیچ !important تازه‌ای نیست، پالت #FFFFFF · #185ADB · #111111، بدون گرادینت.
+   ========================================================================================== */
+.music_box_player .volume_box{
+	display: flex;align-items: center;gap: 10px;
+	flex: 0 0 auto;min-width: 0;
+	float: none;width: auto;
+	margin: 0;margin-inline-start: auto;
+	padding-inline-start: 16px;
+	position: relative;top: auto;left: auto;right: auto;bottom: auto;
+}
+.music_box_player .volume_box > i{
+	float: none;margin: 0;font-size: 17px;line-height: 1;color: var(--ab-muted);
+}
+.music_box_player .volume_box input[type=range]{
+	position: static;top: auto;bottom: auto;left: auto;right: auto;
+	visibility: visible;opacity: 1;
+	-webkit-transform: none;-moz-transform: none;transform: none;
+	-webkit-appearance: auto;-moz-appearance: auto;appearance: auto;
+	direction: ltr;
+	width: 108px;max-width: 26vw;height: 20px;
+	margin: 0;padding: 0;border: 0;background: transparent;
+	accent-color: var(--ab-blue);cursor: pointer;
+}
+.music_box_player .volume_box:hover input[type=range]{visibility: visible;opacity: 1}
+.music_box_player .volume_box input[type=range]:focus{outline: none}
+.music_box_player .volume_box input[type=range]:focus-visible{
+	outline: 2px solid var(--ab-blue);outline-offset: 3px;border-radius: 6px;
+}
+/* فاصلهٔ مطمئن میان دو آیتمِ ردیف، حتی اگر flex جایگزینش نشود */
+.music_box_player .progress-box{column-gap: 14px}
+@media (max-width: 760px){
+	.music_box_player .volume_box{
+		flex: 1 1 100%;order: 5;justify-content: flex-start;
+		margin-inline-start: 0;padding-inline-start: 0;
+	}
+	.music_box_player .volume_box input[type=range]{width: 100%;max-width: 220px;flex: 1 1 auto}
+}
+/* انتهای بلوک ۳۶ (v3.4.4) */

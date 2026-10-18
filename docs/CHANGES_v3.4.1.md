@@ -90,7 +90,7 @@
 
 | کلید | نوع | پیش‌فرض | چه کاری می‌کند |
 |------|------|------|----------------|
-| `ab_footer_cols` | checkbox | هر چهار ستون | ستون‌های نمایش‌داده‌شده: درباره ما / لینک‌های مفید / دسته‌های پرطرفدار / شبکهٔ اجتماعی. ستونِ نخورده **اصلاً چاپ نمی‌شود** (نه `display:none`)؛ چون `.ab-footer__col--*` با `col-sm-3` عرض را پر می‌کند، جای خالی نمی‌ماند |
+| `ab_footer_cols` | checkbox | هر چهار ستون | ستون‌های نمایش‌داده‌شده: درباره ما / لینک‌های مفید / دسته‌های پرطرفدار / شبکهٔ اجتماعی. ستونِ نخورده **اصلاً چاپ نمی‌شود** (نه `display:none`)؛ `footer.php` شمارۀ ستون‌های روشن را در `data-ab-cols` می‌نویسد و بلوک ۳۴ همان را به `grid-template-columns` تبدیل می‌کند ⇒ شبکه‌ی چهارستونه جای خالی نمی‌اندازد (در موبایل مثل قبل ۲/۱ ستون) |
 | `ab_footer_pinned` | on-off | on | «همهٔ خواننده‌ها» و «تازه‌ترین آهنگ‌ها» در ستون لینک‌های مفید (همان دو لینکی که در 3.4.0 منتقل شدند) |
 | `ab_footer_links` | textarea | خالی | لینک‌های دستیِ شما در همان ستون؛ هر خط: `عنوان|آدرس`. خطِ شروع‌شده با `#` نادیده گرفته می‌شود؛ اگر `https://` نداشته باشد افزوده می‌شود؛ خروجی با `esc_url`/`esc_html` چاپ می‌شود |
 | `ab_footer_search` | on-off | on | فرم جست‌وجوی فوتر |
@@ -153,7 +153,7 @@
 
 | فایل | وضعیت | دریافت |
 |------|---------|--------|
-| `javanseda/inc/ab-controls.php` | **تازه** — درِ ورودی گزینه‌ها | [raw](https://github.com/Masoumiofficial/javan-seda/raw/refs/tags/v3.4.1/javanseda/inc/ab-controls.php) |
+| `javanseda/inc/ab-controls.php` | **تازه** — درِ ورودی گزینه‌ها (+ شمارش ستون فوتر) | [raw](https://github.com/Masoumiofficial/javan-seda/raw/refs/tags/v3.4.1/javanseda/inc/ab-controls.php) |
 | `javanseda/style.css` | بلوک ۳۳ توکنی + رفع فاصله/بریدگی + بلوک ۳۴ تازه · `Version: 3.4.1` | [raw](https://github.com/Masoumiofficial/javan-seda/raw/refs/tags/v3.4.1/javanseda/style.css) |
 | `javanseda/css/ab-ui.css` | بازتولید از style.css (گارد) | [raw](https://github.com/Masoumiofficial/javan-seda/raw/refs/tags/v3.4.1/javanseda/css/ab-ui.css) |
 | `javanseda/inc/theme-options.php` | بخش «کنترل رابط» + ۱۹ فیلد | [raw](https://github.com/Masoumiofficial/javan-seda/raw/refs/tags/v3.4.1/javanseda/inc/theme-options.php) |

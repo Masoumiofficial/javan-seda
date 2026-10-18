@@ -840,6 +840,15 @@ body.ab-player-list-hide .music_box_player .album_show_hide{display: none}
 /* «دکمۀ صدا: خاموش» — flex gap فقط بین آیتم‌های موجود حساب می‌شود، پس ردیف نمی‌شکند */
 body.ab-player-novol .music_box_player .volume_box{display: none}
 
+/* فوتر: اگر ستونی در «تنظیمات قالب ← پانوشت ← ستون‌های فوتر» خاموش شود، footer.php
+   شمارۀ ستون‌های روشن را در data-ab-cols می‌نویسد ⇒ شبکه به‌جای جای خالی، عرض را بین
+   ستون‌های باقی‌مانده تقسیم می‌کند. (قواعد زیر عمداً !important ندارند: قاعدۀ خط 1854
+   هم دیگر !important ندارد؛ قاعدۀ media در 991px/767px مثل قبل برنده است ⇒ در موبایل
+   همان دو/یک ستون همیشگی.) */
+.ab-footer__grid[data-ab-cols="3"]{grid-template-columns:repeat(3, minmax(0, 1fr))}
+.ab-footer__grid[data-ab-cols="2"]{grid-template-columns:repeat(2, minmax(0, 1fr))}
+.ab-footer__grid[data-ab-cols="1"]{grid-template-columns:minmax(0, 1fr)}
+
 /* بازگشت: گزینه‌ها را در «تنظیمات قالب ← کنترل رابط» روی حالت پیش‌فرض بگذارید
    (کارت / دکمه / روشن) یا همین بلوک ۳۴ را از انتهای style.css حذف کنید. برای تنظیم
    دستیِ دقیق‌تر هم می‌شود توکن‌ها را در «ظاهره ← سفارشی‌سازی ← CSS اضافی» بازنویسی کرد:

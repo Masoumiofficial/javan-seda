@@ -190,6 +190,20 @@ if ( ! function_exists( 'javan_seda_ui_footer_col' ) ) {
 	}
 }
 
+if ( ! function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
+	/** چند ستون فوتر روشن است؟ footer.php آن را در data-ab-cols می‌نویسد تا شبکه
+	   به‌جای یک‌چهارم خالی، عرض را بین ستون‌های باقی‌مانده تقسیم کند (بلوک ۳۴). */
+	function javan_seda_ui_footer_cols_count() {
+		$n = 0;
+		foreach ( array( 'about', 'links', 'cats', 'social' ) as $col ) {
+			if ( javan_seda_ui_footer_col( $col ) ) {
+				$n++;
+			}
+		}
+		return $n ? $n : 4;
+	}
+}
+
 if ( ! function_exists( 'javan_seda_ui_footer_links' ) ) {
 	/**
 	 * لینک‌های ستون «لینک‌های مفید»: دو لینک پیش‌فرض (اگر روشن باشد) + لینک‌های

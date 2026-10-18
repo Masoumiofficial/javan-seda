@@ -23,10 +23,14 @@ $ab_footer_links = array(
 if ( function_exists( 'javan_seda_ui_footer_links' ) ) {
 	$ab_footer_links = javan_seda_ui_footer_links();
 }
+$ab_footer_cols_on = 4;
+if ( function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
+	$ab_footer_cols_on = javan_seda_ui_footer_cols_count();
+}
 ?>
 <footer id="footer" class="ab-footer" role="contentinfo">
 <div class="tarlanweb_center">
-	<div class="ab-footer__grid">
+	<div class="ab-footer__grid" data-ab-cols="<?php echo esc_attr( $ab_footer_cols_on ); ?>">
 		<!-- ستون ۱: درباره ما -->
 		<?php if ( ! function_exists( 'javan_seda_ui_footer_col' ) || javan_seda_ui_footer_col( 'about' ) ) { ?>
 		<div class="ab-footer__col ab-footer__col--about">

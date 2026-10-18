@@ -61,7 +61,7 @@ if ( function_exists( 'javan_seda_news_ticker' ) ) {
 <!-- song_boxs -->
 <div class="song_boxs">
 <div class="songs_title_box">
-<h3><?php echo $artise['title']; ?></h3>
+<h3><?php echo esc_html( $artise['title'] ); ?></h3>
 <?php $category_id = $artise['hty-cat']; $category_link = get_category_link($category_id); ?>
 <a href="<?php echo esc_url($category_link); ?>">مشاهده بیشتر</a>
 <div class="clear"></div>
@@ -75,11 +75,12 @@ $my_custom_query= new WP_Query(array(
 'post_status' => 'publish',
 'cat'   =>  $cat_ft1,
 'orderby' => 'date',
-'posts_per_page' =>$num_ft1
+'posts_per_page' =>$num_ft1,
+'no_found_rows'=>true,'ignore_sticky_posts'=>true,'update_post_term_cache'=>false
 )); if($my_custom_query->have_posts()) : ?>
 <?php while($my_custom_query->have_posts()) : $my_custom_query->the_post(); $post_id=get_the_ID(); ?>
 <li><?php get_template_part('inc/songs_post'); ?></li>
-<?php endwhile; endif; wp_reset_query(); ?>
+<?php endwhile; endif; wp_reset_postdata(); ?>
 </ul>
 <div class="clear"></div>
 </div>

@@ -540,6 +540,42 @@ if ( ! function_exists( 'javan_seda_music_schema' ) ) {
 			$rec['producer'] = javan_seda_credit_one_or_many( $prod );
 		}
 
+		/* v3.3.8 — دو عددی که روی کارت آهنگ هم نمایش داده می‌شود: بازدید (متای views) و رأی
+		   (kksr_avg یا kksr_ratings ÷ kksr_casts). فقط وقتی می‌آیند که عدد واقعی وجود داشته باشد؛
+		   اگر هیچ‌کدام نبود، این بلوک کلاً چاپ نمی‌شود (اسکیما دروغ نمی‌سازیم). */
+		$counters = array();
+		$ab_views = (int) get_post_meta( $post_id, 'views', true );
+		if ( $ab_views > 0 ) {
+			$counters[] = array(
+				'@type'                => 'InteractionCounter',
+				'interactionType'      => 'https://schema.org/ViewAction',
+				'userInteractionCount' => $ab_views,
+			);
+		}
+		$ab_casts = (int) get_post_meta( $post_id, 'kksr_casts', true );
+		$ab_avg   = (float) get_post_meta( $post_id, 'kksr_avg', true );
+		if ( $ab_avg <= 0 ) {
+			$ab_sum = (float) get_post_meta( $post_id, 'kksr_ratings', true );
+			$ab_avg = ( $ab_casts > 0 && $ab_sum > 0 ) ? round( $ab_sum / $ab_casts, 2 ) : 0.0;
+		}
+		$ab_rating = array();
+		if ( $ab_avg > 0 && $ab_casts > 0 ) {
+			$ab_rating = array(
+				'@type'       => 'AggregateRating',
+				'ratingValue' => (float) round( $ab_avg, 1 ),
+				'ratingCount' => $ab_casts,
+				'bestRating'  => 5,
+				'worstRating' => 1,
+			);
+		}
+		if ( $counters ) {
+			$rec['interactionStatistic'] = ( 1 === count( $counters ) ) ? $counters[0] : $counters;
+		}
+		if ( $ab_rating ) {
+			$rec['aggregateRating'] = $ab_rating;
+		}
+
+
 		$comp = array(
 			'@type'      => 'MusicComposition',
 			'@id'        => $permalink . '#composition',

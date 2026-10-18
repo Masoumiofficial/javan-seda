@@ -58,11 +58,21 @@ if ( is_readable( $_javan_seda_acf ) ) {
 	require_once $_javan_seda_acf;
 }
 unset( $_javan_seda_acf );
+/* v3.3.8 — گاردِ لایۀ UI (css/ab-ui.css را فقط اگر مارکر از style.css رفت enqueue می‌کند) */
+$_javan_seda_uiguard = function_exists( 'locate_template' ) ? locate_template( 'inc/ab-ui-guard.php' ) : trailingslashit( get_template_directory() ) . 'inc/ab-ui-guard.php';
+if ( $_javan_seda_uiguard && is_readable( $_javan_seda_uiguard ) ) {
+	require_once $_javan_seda_uiguard;
+}
+unset( $_javan_seda_uiguard );
 add_theme_support( 'post-thumbnails' );
+if ( function_exists( 'add_theme_support' ) ) { /* v3.3.8 — مارکاپ مدرن برای فرم/گالر‌ی/کپشن و حذف type از enqueueها؛ title-tag عمداً افزوده نشد چون لایۀ ab-seo.php عنوان را خودش می‌سازد */
+	add_theme_support( 'html5', array( 'search-form', 'gallery', 'caption', 'style', 'script' ) );
+}
 if (function_exists('add_image_size')){
 add_image_size( 'thumb4', 150, 150, true);
 add_image_size( 'thumb3', 60, 60, true);
 add_image_size( 'thumb2', 190, 190, true);
+add_image_size( 'thumb2x', 380, 380, true); /* v3.3.8 — برای srcset/دستگاه‌های DPR2 (کارت‌ها روی موبایل شارپ می‌شوند) */
 add_image_size( 'thumb1', 640, 360, true);
 } ?>
 <?php
@@ -520,3 +530,15 @@ add_filter(
 	},
 	PHP_INT_MAX
 );
+/* ------------------------------------------------------------------------- v3.3.8 */
+/* شمارندۀ پلیرها. JS قالب (js/scripts.js:88,135) با getElementById('audio') فقط اولین پلیر را
+   bind می‌کند؛ اگر در یک نوشته هم «تک‌آهنگ» و هم «آلبوم» باشد، id تکراری و کنترل بی‌حرکت
+   می‌ساخت. اولی همان `audio` می‌ماند (پس JS دست‌نخورده کار می‌کند) و بعدی‌ها `audio-2`،
+   `audio-3` … می‌شوند + خصیصۀ data-ab-player که در CSS کنترل‌های مردهٔ پلیر دوم را پنهان می‌کند. */
+if ( ! function_exists( 'javan_seda_player_uid' ) ) {
+	function javan_seda_player_uid() {
+		static $n = 0;
+		$n++;
+		return $n;
+	}
+}

@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.3.7
+Version: 3.3.8
 */
 /*
 ==================================================================================
@@ -77,19 +77,19 @@ strong{font-weight: bold;}
 
 @font-face {
 font-family: vazir;
-src: url('fonts/vazir-fd.woff') format('woff');
+src: url('fonts/vazir-fd.woff2') format('woff2'), url('fonts/vazir-fd.woff') format('woff');
 font-weight: normal;
 font-display: swap;
 }
 @font-face {
 font-family: vazir;
-src: url('fonts/vazir-bold-fd.woff') format('woff');
+src: url('fonts/vazir-bold-fd.woff2') format('woff2'), url('fonts/vazir-bold-fd.woff') format('woff');
 font-weight: bold;
 font-display: swap;
 }
 @font-face {
 font-family: vazir;
-src: url('fonts/vazir-light-fd.woff') format('woff');
+src: url('fonts/vazir-light-fd.woff2') format('woff2'), url('fonts/vazir-light-fd.woff') format('woff');
 font-weight: 300;
 font-display: swap;
 }
@@ -2655,6 +2655,11 @@ body.ab-has-mh{padding-top:90px;}
 }
 /* --- انتهای بلوک ۲۳ (v3.1.4) --- */
 
+/* ── ab-ui-layer ──────────────────────────────────────────────────────────────────
+   از این خط تا انتهای فایل، لایۀ اختصاصی آهنگ‌بان است (v3.2.0 → v3.3.8).
+   css/ab-ui.css کپیِ همین ناحیه است و inc/ab-ui-guard.php آن را فقط وقتی enqueue
+   می‌کند که این مارکر از style.css رفته باشد (مثلاً بعد از آپدیت قالب مادر).
+   ─────────────────────────────────────────────────────────────────────────────── */
 /* ==========================================================================
    بلوک ۲۴ (3.2.0 · نوار پخش در 3.2.4: تیره‌پسند، کوتاه‌تر، قبلی/بعدی) — باکس «ما را دنبال کنید» + نوارِ چسبانِ پخش
    فایل: inc/ab-post-extras.php  ·  فراخوانی: single.php (بالای باکس پلیر)
@@ -3202,3 +3207,31 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
    (متن‌های «بازدید این اثر» / «از ۵» فقط برای صفحه‌خوان است، نه چشم) */
 .screen-reader-text{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);border:0;white-space:nowrap}
 /* انتهای بلوک ۳۱ (v3.3.7) */
+
+/* ==========================================================================
+   بلوک ۳۲ (نسخۀ 3.3.8) — دسترس‌پذیریِ هدر، پلیرِ دومِ آلبوم، پرده‌بندیِ UI
+   فایل‌ها: header.php (wp_body_open + .ab-skip-link) · single.php و
+            inc/tarlanweb_player.php (data-ab-player + id یکتا)
+   پالت سازمانی بدون گرادینت · خاموشی: JAVANSEDA_SKIP_LINK / JAVANSEDA_UI_GUARD
+   ========================================================================== */
+
+/* ۱) لینک «پرش به محتوا»: پیش از اولین Tab دیده نمی‌شود، با فوکوس ظاهر می‌شود
+      (mkp در style.css برای آیتم‌های منو z-index:99999 دارد؛ ما زیر آن می‌مانیم). */
+.ab-skip-link{position:absolute;top:8px;right:8px;left:auto;z-index:99998;display:inline-block;padding:9px 15px;background:var(--ab-blue);color:var(--ab-white);font-size:13px;font-weight:700;line-height:1.4;border-radius:10px;text-decoration:none;box-shadow:0 6px 18px rgba(17,17,17,.18);transform:translateY(-220%);transition:transform .16s ease}
+.ab-skip-link:focus,.ab-skip-link:focus-visible{transform:none;outline:2px solid var(--ab-blue-accent);outline-offset:2px;color:var(--ab-white)}
+.night .ab-skip-link{background:var(--ab-blue-accent);color:#0b0f16;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+
+/* ۲) پلیر دوم: js/scripts.js فقط یک پلیر را bind می‌کند (getElementById + querySelector
+      سراسری) ⇒ در صفحۀ آهنگِ آلبوم‌دار، ردیف کنترلِ پلیر دوم «مرده» چاپ می‌شد و
+      اسکرول/کلیک روی دکمه‌هایش هیچ اتفاقی نمی‌افتاد. با idهای یکتا (audio-2 …) حالا
+      DOM معتبر است و این سه قاعده همان ردیف کنترلِ مرده را پنهان می‌کند، در حالی که
+      فهرست دانلودِ ردیف‌ها (.play-list) سرِ جایش می‌ماند. قاعده عمداً فقط
+      [data-ab-player="2"] است تا نوار پخش هوم/فوتر (=۱) هرگز بی‌دلیل بی‌کار نشود؛
+      اگر روزی JS چندنمونگی شد، همین سه خط را حذف کنید. */
+.music_box_player[data-ab-player="2"]{min-height:0;padding:10px 14px}
+.music_box_player[data-ab-player="2"] .player{display:none}
+.music_box_player[data-ab-player="2"] .play-list{margin:0 -14px;border-top:0}
+
+/* ۳) حالت خاموشی JAVANSEDA_SKIP_LINK: لینک پرش چاپ نمی‌شود، پس قاعده هم لازم نیست */
+
+/* انتهای بلوک ۳۲ (v3.3.8) */

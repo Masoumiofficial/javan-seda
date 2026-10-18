@@ -23,9 +23,18 @@ body{padding:0 0 90px;background:var(--ab-page)}
 .pv-note{margin:36px 0 0;padding:14px 16px;border:1px dashed var(--ab-line);border-radius:14px;font-size:12px;line-height:2;color:var(--ab-muted)}
 .pv-note b{color:var(--ab-text)}
 .pv-note code{direction:ltr;display:inline-block;font-size:11px}
+
+/* v3.3.8 — دو قاعدۀ تازهٔ style.css (بلوک ۳۲) در همین‌جا هم شبیه‌سازی می‌شود تا
+   رفتار لینک پرش و پنهان‌شدن کنترلِ پلیر دوم قابل دیدن باشد. */
+.ab-skip-link{position:absolute;top:8px;right:8px;left:auto;z-index:99998;display:inline-block;padding:9px 15px;background:var(--ab-blue);color:#fff;font-size:13px;font-weight:700;line-height:1.4;border-radius:10px;text-decoration:none;box-shadow:0 6px 18px rgba(17,17,17,.18);transform:translateY(-220%);transition:transform .16s ease}
+.ab-skip-link:focus,.ab-skip-link:focus-visible{transform:none;outline:2px solid var(--ab-blue-accent);outline-offset:2px;color:#fff}
+.night .ab-skip-link{background:var(--ab-blue-accent);color:#0b0f16}
+.music_box_player[data-ab-player="2"] .player{display:none}
 </style>
 </head>
 <body>
+<!-- پرش به محتوا: با اولین Tab ظاهر می‌شود -->
+<a class="ab-skip-link" href="#centers_box">پرش به محتوای اصلی</a>
 
 <!-- هدر موبایل + کشو: همان نشانه‌گذاری inc/mobiles_header.php -->
 <header id="mobiles_header">
@@ -252,7 +261,9 @@ body{padding:0 0 90px;background:var(--ab-page)}
 </div>
 
 <div class="pv-note">
-<b>چیزی که اینجا می‌بینید</b> = نشانه‌گذاری واقعیِ <code>header.php</code> / <code>inc/songs_post.php</code> / <code>single.php</code> / <code>404.php</code> + CSS واقعیِ همین نسخه (<code>style.css</code> بلوک ۲۶ و <code>css/ab-glass.css</code>).<br>
+<b>v3.3.8</b> = لینک «پرش به محتوای اصلی» (با Tab دیده می‌شود)، فونت woff2، srcset روی کاور،
+ id یکتا برای پلیر دومِ آلبوم (ردیف کنترل مرده‌اش پنهان: <code>[data-ab-player="2"] .player</code>)،
+ و <code>wp_body_open()</code> در <code>header.php</code>.<b>چیزی که اینجا می‌بینید</b> = نشانه‌گذاری واقعیِ <code>header.php</code> / <code>inc/songs_post.php</code> / <code>single.php</code> / <code>404.php</code> + CSS واقعیِ همین نسخه (<code>style.css</code> بلوک ۲۶ و <code>css/ab-glass.css</code>).<br>
 <b>دکمۀ «لایۀ شیشه‌ای»</b> دقیقاً همان کاری را می‌کند که <code>define('JAVANSEDA_GLASS_UI', false)</code> روی هاست می‌کند: فایل خاموش می‌شود و ساختار/تراز دست‌نخورده می‌ماند.<br>
 <b>فلاش رفرش</b> با دکمۀ «فلاشِ پیش از init» قابل دیدن است: تا لحظۀ اضافه‌شدن کلاس <code>owl-loaded</code> فقط آیند اول چیده می‌شود (بلوک ۲۸) — همان چیزی که بعد از init هم دیده می‌شود، پس پرش ارتفاع نداریم و JS تازه‌ای لازم نیست.<br>
         <b>بخش هنرمندان</b> به حالت قبل برگشت: هر قاعدۀ من روی owl-item و سایز آیتم‌ها حذف شد و owl خودش تعداد/ظاهر را تعیین می‌کند.

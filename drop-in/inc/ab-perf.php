@@ -159,26 +159,33 @@ if ( ! function_exists( 'javan_seda_perf_fonts' ) ) {
 		$dir = get_stylesheet_directory_uri();
 
 		if ( JAVANSEDA_PERF_PRELOAD_FONTS ) {
+			/* v3.3.8 — اگر نسخهٔ woff2ِ همان فونت روی هاست باشد، همان preload می‌شود (≈۲۰٪ کوچک‌تر
+			   در این قالب؛ فایل‌های woff هم دست‌نخورده می‌مانند تا fallback امن باشد). */
 			$candidates = apply_filters(
 				'javanseda_perf_preload_fonts',
-				array( $dir . '/fonts/vazir-fd.woff', $dir . '/fonts/icofont.woff' )
+				array( $dir . '/fonts/vazir-fd.woff2', $dir . '/fonts/icofont.woff2', $dir . '/fonts/vazir-fd.woff', $dir . '/fonts/icofont.woff' )
 			);
 			$real = get_stylesheet_directory() . '/fonts/';
+			$got  = array();
 			foreach ( $candidates as $u ) {
 				$name = basename( (string) $u );
-				if ( is_readable( $real . $name ) ) {
-					echo '<link rel="preload" as="font" type="font/woff" href="' . esc_url( $u ) . '" crossorigin="anonymous">' . "\n";
+				$ext  = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
+				$stem = preg_replace( '/\.woff2?$/', '', $name );
+				if ( isset( $got[ $stem ] ) || ! is_readable( $real . $name ) ) { /* یک نسخه به‌ازای هر فونت */
+					continue;
 				}
+				$got[ $stem ] = 1;
+				echo '<link rel="preload" as="font" type="font/' . esc_attr( $ext ) . '" href="' . esc_url( $u ) . '" crossorigin="anonymous">' . "\n";
 			}
 		}
 		?>
 <style id="ab-perf-fonts">
 /* font-display: swap — جلوگیری از پنهان‌ماندنِ متن تا دانلود فونت (v3.1.3) */
-@font-face{font-family:vazir;src:url(<?php echo esc_url( $dir ); ?>/fonts/vazir-fd.woff) format("woff");font-display:swap;font-weight:400;}
-@font-face{font-family:vazir;src:url(<?php echo esc_url( $dir ); ?>/fonts/vazir-bold-fd.woff) format("woff");font-display:swap;font-weight:700;}
-@font-face{font-family:vazir;src:url(<?php echo esc_url( $dir ); ?>/fonts/vazir-medium-fd.woff) format("woff");font-display:swap;font-weight:500;}
-@font-face{font-family:vazir;src:url(<?php echo esc_url( $dir ); ?>/fonts/vazir-light-fd.woff) format("woff");font-display:swap;font-weight:300;}
-@font-face{font-family:IcoFont;src:url(<?php echo esc_url( $dir ); ?>/fonts/icofont.woff) format("woff");font-display:swap;font-weight:400;}
+@font-face{font-family:vazir;src:url(<?php echo esc_url( $dir ); ?>/fonts/vazir-fd.woff2) format("woff2"),url(<?php echo esc_url( $dir ); ?>/fonts/vazir-fd.woff) format("woff");font-display:swap;font-weight:400;}
+@font-face{font-family:vazir;src:url(<?php echo esc_url( $dir ); ?>/fonts/vazir-bold-fd.woff2) format("woff2"),url(<?php echo esc_url( $dir ); ?>/fonts/vazir-bold-fd.woff) format("woff");font-display:swap;font-weight:700;}
+@font-face{font-family:vazir;src:url(<?php echo esc_url( $dir ); ?>/fonts/vazir-medium-fd.woff2) format("woff2"),url(<?php echo esc_url( $dir ); ?>/fonts/vazir-medium-fd.woff) format("woff");font-display:swap;font-weight:500;}
+@font-face{font-family:vazir;src:url(<?php echo esc_url( $dir ); ?>/fonts/vazir-light-fd.woff2) format("woff2"),url(<?php echo esc_url( $dir ); ?>/fonts/vazir-light-fd.woff) format("woff");font-display:swap;font-weight:300;}
+@font-face{font-family:IcoFont;src:url(<?php echo esc_url( $dir ); ?>/fonts/icofont.woff2) format("woff2"),url(<?php echo esc_url( $dir ); ?>/fonts/icofont.woff) format("woff");font-display:swap;font-weight:400;}
 </style>
 		<?php
 	}

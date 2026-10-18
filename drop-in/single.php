@@ -313,8 +313,8 @@ if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get
 
 <?php if(get_field('music128')){ ?> 
 <!-- music player -->
-<div class="music_box_player taktarcks">
-<audio id="audio" preload="none" tabindex="0">
+<div class="music_box_player taktarcks" data-ab-player="<?php $ab_pu = javan_seda_player_uid(); echo (int) $ab_pu; ?>">
+<audio id="audio<?php echo ( ! empty( $ab_pu ) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" preload="none" tabindex="0">
 <source src="<?php echo esc_url( get_field('music128') ); ?>" data-track-number="1" />    
 پلیر شما قدیمی است و از پخش آنلاین پشتیبانی نمیکند.
 </audio>
@@ -345,7 +345,7 @@ if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get
         </div>
 <div class="volume_box">
 <i class="icofont-volume-bar"></i>
-<input type="range" id="volume-bar" min="0" max="100" step="5" value="100">
+<input type="range" id="volume-bar<?php echo ( isset($ab_pu) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" min="0" max="100" step="5" value="100">
 </div>
       </div>
     </div>
@@ -369,9 +369,9 @@ if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get
 
 <?php if( have_rows('album') ): ?>
 <!-- album player -->
-<div class="music_box_player">
+<div class="music_box_player" data-ab-player="<?php $ab_pu = javan_seda_player_uid(); echo (int) $ab_pu; ?>">
 
-<audio id="audio" preload="none" tabindex="0">
+<audio id="audio<?php echo ( ! empty( $ab_pu ) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" preload="none" tabindex="0">
 <?php $rkianoosh=1; while( have_rows('album') ): the_row(); ?>
 <source src="<?php if(get_sub_field('albumlink128')){the_sub_field('albumlink128');}else{the_sub_field('albumlink320');} ?>" data-track-number="<?php echo $rkianoosh; ?>" />
 <?php $rkianoosh++; endwhile; ?>    
@@ -401,7 +401,7 @@ Your browser does not support HTML5 audio.
         </div>
 <div class="volume_box">
 <i class="icofont-volume-bar"></i>
-<input type="range" id="volume-bar" min="0" max="100" step="5" value="100">
+<input type="range" id="volume-bar<?php echo ( isset($ab_pu) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" min="0" max="100" step="5" value="100">
 </div>
 </div>
 </div>
@@ -543,7 +543,7 @@ if ( $tag->name === $artist ){ ?>
 </div>
 <div class="clear"></div>
 </div>
-<?php endif; wp_reset_query(); ?>
+<?php endif; wp_reset_postdata(); ?>
 <?php } else{ ?>
 <?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,'singer','string'); $term_ids=wp_list_pluck($terms,'term_id');
 $second_query = new WP_Query( array('post_type'=>'post',
@@ -637,7 +637,7 @@ if ( $tag->name === $artist ){ ?>
 </div>
 <div class="clear"></div>
 </aside>
-<?php endif; wp_reset_query(); ?>
+<?php endif; wp_reset_postdata(); ?>
 <?php } else{ ?>
 <?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,'singer','string'); $term_ids=wp_list_pluck($terms,'term_id');
 $second_query = new WP_Query( array('post_type'=>'post',

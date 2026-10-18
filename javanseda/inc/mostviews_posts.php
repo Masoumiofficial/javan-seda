@@ -5,11 +5,12 @@
 $arms = array(
 'post_type'=>'post','posts_per_page'=>ot_get_option('index_nm'),'offset'=>0,
 'meta_key'=>'views','orderby'=>'meta_value_num','post_status'=>'publish',
+'no_found_rows'=>true,'ignore_sticky_posts'=>true,
 'date_query'=> array(array('column' =>'post_date_gmt','after' =>'1 month ago')));
 $the_query = new WP_Query( $arms ); ?>
 <?php if ($the_query->have_posts()) : ?>
 <div class="songs_title_box">
-<h3><?php echo ot_get_option('index_pt'); ?></h3> 
+<h3><?php echo esc_html( ot_get_option('index_pt') ); ?></h3> 
 <div class="clear"></div>
 <div class="liner"></div>
 </div>

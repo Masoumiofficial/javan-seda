@@ -44,10 +44,24 @@ $abp_u   = is_string( $abp_get ) ? trim( $abp_get ) : '';
 $abp_self_get = function_exists( 'filter_input' ) ? filter_input( INPUT_GET, 'k' ) : ( isset( $_GET['k'] ) ? $_GET['k'] : null );
 $abp_k        = is_string( $abp_self_get ) ? trim( $abp_self_get ) : '';
 
+/* v3.3.8 - سه اکشن ?dl / ?rm / ?save پشت کلیدِ خودِ فایل رفتند (در نسخۀ قبلی این‌ها پیش از
+   گیت مدیرِ پایین همین فایل اجرا می‌شدند ⇒ هر کسی که آدرس فایل را می‌دانست می‌توانست
+   سورس کاوشگر را بگیرد یا فایل‌های موقتش را پاک کند). این سه اکشن (و ?self) کلید می‌خواهند:
+   نمونه  /ab-mobile-probe.php?save=1&k=AHANGBAN-PROBE-306  ·  گزارش معمولی بدون کلید کار می‌کند. */
+if ( isset( $_GET['dl'] ) || isset( $_GET['rm'] ) || isset( $_GET['save'] ) ) {
+	if ( $ABP_TOKEN !== $abp_k ) {
+		header( 'Content-Type: text/plain; charset=utf-8' );
+		if ( function_exists( 'http_response_code' ) ) { http_response_code( 403 ); }
+		exit( 'براي ?dl / ?rm / ?save كليد هم لازم است  ?k=' . $ABP_TOKEN );
+	}
+}
+
 /* --------------------------------------------------- حالت ۱: دادن سورس فایل */
 if ( isset( $_GET['self'] ) ) {
-	if ( 'x' === $abp_k ) {
-		exit( 'کلید نامعتبر است. کلید را در فایل ببینید.' );
+	/* v3.3.8 — در نسخۀ قبل فقط k=x رد می‌شد ⇒ سورس کاوشگر با یک درخواست ساده به
+	   هر بازدیدکننده داده می‌شد. حالا کلیدِ خودِ فایل لازم است. */
+	if ( $ABP_TOKEN !== $abp_k ) {
+		exit( 'کلید نامعتبر است؛ کلید در خط $ABP_TOKEN همین فایل هست.' );
 	}
 	header( 'Content-Type: application/octet-stream' );
 	header( 'Content-Disposition: attachment; filename="ab-mobile-probe.php"' );

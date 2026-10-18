@@ -8,9 +8,9 @@
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-status-bar-style" content="#000000">
 <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
-<link rel="alternate" href="<?php bloginfo('url'); ?>/feed" type="application/rss+xml" title="RSS 2.0">
-<link rel="shortcut icon" type="image/x-icon" href="<?php echo ot_get_option('favicon'); ?>">
-<link rel="apple-touch-icon" href="<?php echo ot_get_option('logo'); ?>">
+<link rel="alternate" href="<?php echo esc_url( home_url() ); ?>/feed" type="application/rss+xml" title="RSS 2.0">
+<link rel="shortcut icon" type="image/x-icon" href=\"<?php echo esc_url( ot_get_option('favicon') ); ?>\">
+<link rel="apple-touch-icon" href=\"<?php echo esc_url( ot_get_option('logo') ); ?>\">
 <?php wp_enqueue_script("jquery"); wp_head('');
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
 <?php
@@ -49,15 +49,20 @@ body.ab-has-mh{padding-top:90px;}
 <?php } else { ?>
 <body <?php body_class(''); ?>>
 <?php } ?>
+<?php /* v3.3.8 — هوک استاندارد بدنه (پلاگین‌ها/اسکیپ‌لینک از همین‌جا درج می‌شوند) */ ?>
+<?php if ( function_exists( 'wp_body_open' ) ) { wp_body_open(); } ?>
+<?php if ( ! defined( 'JAVANSEDA_SKIP_LINK' ) || JAVANSEDA_SKIP_LINK ) { ?>
+<a class="ab-skip-link" href="#centers_box">پرش به محتوای اصلی</a>
+<?php } /* JAVANSEDA_SKIP_LINK */ ?>
 <header id="header">
 <div class="tarlanweb_center">
-<?php if(is_home()){ ?> <h1 class="h1_hidden_home"><?php echo ot_get_option('head_h1'); ?></h1> <?php } ?>
-<div class="logo_top"><figure><a href="<?php bloginfo('url'); ?>"><img src="<?php echo ot_get_option('logo'); ?>" width="150" height="40" alt="<?php echo ot_get_option('head_h1'); ?>" title="<?php echo ot_get_option('head_h1'); ?>"></a></figure></div>
+<?php if(is_home()){ ?> <h1 class=\"h1_hidden_home\"><?php echo esc_html( ot_get_option('head_h1') ); ?></h1> <?php } ?>
+<div class="logo_top"><figure><a href="<?php echo esc_url( home_url() ); ?>"><img src=\"<?php echo esc_url( ot_get_option('logo') ); ?>\" width="150" height="40" alt=\"<?php echo esc_attr( ot_get_option('head_h1') ); ?>\" title="<?php echo ot_get_option('head_h1'); ?>"></a></figure></div>
 <nav class="menu_right">
 <?php wp_nav_menu(array('theme_location'=>'top_menu','menu_id'=>'rkianoosh_ir','container'=>'')); ?>
 <div class="clear"></div>
 </nav>
-<form id="searches" method="get" action="<?php bloginfo('url'); ?>">
+<form id="searches" method="get" action="<?php echo esc_url( home_url() ); ?>">
 <input id="lsds" class="meta searchfield" name="s" placeholder="جستجو  ..." type="text" data-swplive="true">
 <button><i class="icofont-search"></i></button>
 </form>

@@ -10,6 +10,55 @@ if ( is_readable( $_javan_seda_controls ) ) {
 }
 unset( $_javan_seda_controls );
 /* ---------------------------------------------------------------------------
+   v3.4.7 — «نامک یکتای هنرمند» (inc/ab-tax-artist.php)
+   تاکسونومی خواننده‌ها در مادر singer است ولی بقیۀ پروژه artist را به کار می‌برد
+   (فیلد ACFِ artist، کلاس‌های ab-artist__*، فایل artist-template.php). این لایه
+   همان داده را زیر نامک artist می‌برد و نامک قدیمی را پنهان نگه می‌دارد.
+   باید پیش از لایه‌های دیگر بیاید چون آن‌ها توابعش را صدا می‌زنند.
+   خاموشی کامل:  define( 'JAVANSEDA_ARTIST_TAX', false );  در wp-config.php
+   ------------------------------------------------------------------------- */
+$_javan_seda_artist_tax = trailingslashit( get_template_directory() ) . 'inc/ab-tax-artist.php';
+if ( is_readable( $_javan_seda_artist_tax ) ) {
+	require_once $_javan_seda_artist_tax;
+}
+unset( $_javan_seda_artist_tax );
+
+/* اگر لایۀ بالا روی سرور نبود، همه‌چیز دقیقاً مثل قبل کار می‌کند: نامک singer
+   و آدرسِ همان صفحۀ «همهٔ خواننده‌ها». (هیچ فایلی به تنهایی نمی‌تواند بشکند.) */
+if ( ! function_exists( 'javan_seda_artist_tax' ) ) {
+	function javan_seda_artist_tax() {
+		return 'singer';
+	}
+}
+if ( ! function_exists( 'javan_seda_artist_slug' ) ) {
+	function javan_seda_artist_slug() {
+		return 'singer';
+	}
+}
+if ( ! function_exists( 'javan_seda_artist_term_link' ) ) {
+	function javan_seda_artist_term_link( $term ) {
+		if ( ! $term ) {
+			return '';
+		}
+		if ( ! is_object( $term ) ) {
+			$term = get_term_by( 'slug', (string) $term, 'singer' );
+		}
+		if ( ! $term || is_wp_error( $term ) ) {
+			return '';
+		}
+		$link = get_term_link( $term );
+		if ( ! is_wp_error( $link ) && ! empty( $link ) ) {
+			return $link;
+		}
+		return empty( $term->slug ) ? '' : home_url( '/singer/' . $term->slug . '/' );
+	}
+}
+if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
+	function javan_seda_artists_index_url() {
+		return home_url( '/singers/' );
+	}
+}
+/* ---------------------------------------------------------------------------
    v3.4.3 — پوستۀ صفحۀ «تنظیمات قالب» (فقط پیشخوان؛ inc/ab-admin-ui.php)
    این فایل روی صفحۀ سایت هیچ چیزی چاپ نمی‌کند؛ اگر نبود، همه‌چیز مثل قبل.
    ------------------------------------------------------------------------- */
@@ -352,14 +401,15 @@ if ( JAVANSEDA_SINGER_FIX ) {
 	add_action(
 		'init',
 		function () {
-			if ( taxonomy_exists( 'singer' ) ) {
+			$jv_tax = function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer';
+			if ( taxonomy_exists( $jv_tax ) ) {
 				return; // قبلاً ثبت شده است؛ دست نزن
 			}
-			if ( post_type_exists( 'singer' ) ) {
+			if ( post_type_exists( $jv_tax ) ) {
 				return; // پست‌تایپ هم‌نام وجود دارد؛ ثبت تاکسونومی هم‌نام باعث تداخل rewrite و ۴۰۴ می‌شود
 			}
 			register_taxonomy(
-				'singer',
+				$jv_tax,
 				array( 'post' ),
 				array(
 					'labels'             => array(
@@ -373,7 +423,7 @@ if ( JAVANSEDA_SINGER_FIX ) {
 					'show_admin_column'  => true,
 					'show_in_rest'       => true,
 					'rewrite'            => array(
-						'slug'       => 'singer',
+						'slug'       => ( function_exists( 'javan_seda_artist_slug' ) ? javan_seda_artist_slug() : 'singer' ),
 						'with_front' => false,
 					),
 				)
@@ -386,10 +436,10 @@ if ( JAVANSEDA_SINGER_FIX ) {
 	add_action(
 		'admin_init',
 		function () {
-			if ( ! taxonomy_exists( 'singer' ) ) {
+			if ( ! taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ) {
 				return;
 			}
-			$version = '2.0.0';
+			$version = '2.1.0';
 			if ( get_option( 'javanseda_singer_rewrite_version' ) === $version ) {
 				return;
 			}
@@ -422,11 +472,11 @@ add_filter(
 
 		$lines[] = '';
 		$lines[] = '--- نوع ثبت «singer» ---';
-		$lines[] = 'taxonomy_exists(singer): ' . ( taxonomy_exists( 'singer' ) ? 'YES' : 'NO' );
-		$lines[] = 'post_type_exists(singer): ' . ( post_type_exists( 'singer' ) ? 'YES  <-- صفحهٔ خواننده در این سایت «پست‌تایپ» است، نه آرشیو تاکسونومی' : 'NO' );
+		$lines[] = 'taxonomy_exists(singer): ' . ( taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES' : 'NO' );
+		$lines[] = 'post_type_exists(singer): ' . ( post_type_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES  <-- صفحهٔ خواننده در این سایت «پست‌تایپ» است، نه آرشیو تاکسونومی' : 'NO' );
 		$lines[] = 'taxonomy_exists(post_tag): ' . ( taxonomy_exists( 'post_tag' ) ? 'YES' : 'NO' );
-		if ( taxonomy_exists( 'singer' ) ) {
-			$object  = get_taxonomy( 'singer' );
+		if ( taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ) {
+			$object  = get_taxonomy( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
 			$lines[] = 'public: ' . ( $object->public ? 'yes' : 'NO' ) . ' | publicly_queryable: ' . ( $object->publicly_queryable ? 'yes' : 'NO' );
 			$lines[] = 'hierarchical: ' . ( $object->hierarchical ? 'yes' : 'no' ) . ' | show_in_rest: ' . ( $object->show_in_rest ? 'yes' : 'no' );
 			$lines[] = 'object_type: ' . wp_json_encode( $object->object_type );
@@ -439,9 +489,9 @@ add_filter(
 		$lines[] = 'matched_rule: ' . ( isset( $wp->matched_rule ) && '' !== $wp->matched_rule ? $wp->matched_rule : '(هیچ قانونی مطابقت نکرد)' );
 		$lines[] = 'matched_query: ' . ( isset( $wp->matched_query ) && '' !== $wp->matched_query ? $wp->matched_query : '(خالی)' );
 		$lines[] = 'is_404: ' . ( is_404() ? 'YES  <-- همین باعث «بالا نیامدن» صفحه است' : 'no' );
-		$lines[] = 'is_tax(singer): ' . ( is_tax( 'singer' ) ? 'YES (آرشیو تاکسونومی — حالت درست)' : 'no' );
+		$lines[] = 'is_tax(singer): ' . ( is_tax( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES (آرشیو تاکسونومی — حالت درست)' : 'no' );
 		$lines[] = 'is_singular: ' . ( is_singular() ? 'YES (' . get_post_type() . ')' : 'no' );
-		$lines[] = 'is_post_type_archive(singer): ' . ( is_post_type_archive( 'singer' ) ? 'YES' : 'no' );
+		$lines[] = 'is_post_type_archive(singer): ' . ( is_post_type_archive( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES' : 'no' );
 		$lines[] = 'is_archive: ' . ( is_archive() ? 'yes' : 'no' ) . ' | is_home: ' . ( is_home() ? 'yes' : 'no' );
 
 		$queried = get_queried_object();
@@ -467,19 +517,20 @@ add_filter(
 		} else {
 			$found = array();
 			foreach ( array_keys( $rules ) as $pattern ) {
-				if ( false !== strpos( $pattern, 'singer' ) ) {
+				$jv_base = function_exists( 'javan_seda_artist_slug' ) ? javan_seda_artist_slug() : 'singer';
+				if ( false !== strpos( $pattern, 'singer' ) || false !== strpos( $pattern, $jv_base ) ) {
 					$found[] = $pattern . '  →  ' . $rules[ $pattern ];
 				}
 			}
 			$lines[] = $found ? implode( "\n", array_slice( $found, 0, 8 ) ) : '(هیچ قانونی برای singer ثبت نشده است)';
 		}
 
-		$total  = wp_count_terms( array( 'taxonomy' => 'singer', 'hide_empty' => false ) );
+		$total  = wp_count_terms( array( 'taxonomy' => function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer', 'hide_empty' => false ) );
 		$lines[] = '';
 		$lines[] = '--- ترم‌های singer ---';
 		$lines[] = 'تعداد کل: ' . ( is_wp_error( $total ) ? 'WP_Error: ' . $total->get_error_message() : $total );
 
-		$sample = get_terms( array( 'taxonomy' => 'singer', 'hide_empty' => false, 'number' => 5 ) );
+		$sample = get_terms( array( 'taxonomy' => function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer', 'hide_empty' => false, 'number' => 5 ) );
 		if ( is_wp_error( $sample ) ) {
 			$lines[] = 'get_terms خطا: ' . $sample->get_error_message();
 		} elseif ( is_array( $sample ) ) {
@@ -493,9 +544,9 @@ add_filter(
 		if ( '' !== $needle ) {
 			$lines[] = '';
 			$lines[] = '--- بررسی ترم: ' . $needle . ' ---';
-			$term    = get_term_by( 'slug', sanitize_title( $needle ), 'singer' );
+			$term    = get_term_by( 'slug', sanitize_title( $needle ), function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
 			if ( ! $term ) {
-				$term = get_term_by( 'name', $needle, 'singer' );
+				$term = get_term_by( 'name', $needle, function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
 			}
 			if ( ! $term || is_wp_error( $term ) ) {
 				$lines[] = 'در تاکسونومی singer ترمی با این نام/اسلاگ پیدا نشد.';
@@ -505,7 +556,7 @@ add_filter(
 						$lines[] = 'اما در «' . $fallback_tax . '» هست: ' . $alt->name . ' (' . $alt->count . ' نوشته) → ' . get_term_link( $alt );
 					}
 				}
-				$cpt = get_page_by_path( sanitize_title( $needle ), OBJECT, 'singer' );
+				$cpt = get_page_by_path( sanitize_title( $needle ), OBJECT, function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
 				if ( $cpt ) {
 					$lines[] = 'و یک نوشته از پست‌تایپ singer با همین اسلاگ وجود دارد: ' . get_permalink( $cpt );
 				}
@@ -524,7 +575,7 @@ add_filter(
 						'no_found_rows'  => true,
 						'tax_query'      => array(
 							array(
-								'taxonomy' => 'singer',
+								'taxonomy' => function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer',
 								'field'    => 'term_id',
 								'terms'    => $term->term_id,
 							),

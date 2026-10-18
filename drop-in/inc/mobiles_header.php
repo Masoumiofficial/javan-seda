@@ -44,7 +44,7 @@ foreach ( array( 'mobiles_menu', 'top_menu' ) as $ab_mm_loc ) {
 if ( ! $ab_mm_done ) {
 	echo '<div id="cssmenu"><ul class="ab-mobile-menu-fallback">';
 	echo '<li><a href="' . esc_url( home_url( '/' ) ) . '"><i class="icofont-home" aria-hidden="true"></i> صفحۀ اصلی</a></li>';
-	echo '<li><a href="' . esc_url( home_url( '/singers/' ) ) . '"><i class="icofont-microphone-alt" aria-hidden="true"></i> همهٔ خواننده‌ها</a></li>';
+	echo '<li><a href="' . esc_url( javan_seda_artists_index_url() ) . '"><i class="icofont-microphone-alt" aria-hidden="true"></i> همهٔ خواننده‌ها</a></li>';
 	if ( function_exists( 'wp_list_pages' ) ) { wp_list_pages( array( 'title_li' => '', 'depth' => 1, 'number' => 6 ) ); }
 	echo '</ul></div>';
 }

@@ -17,7 +17,7 @@ if ( function_exists( 'javan_seda_ui_footer_cats' ) ) {
 	$ab_footer_cats_num = javan_seda_ui_footer_cats();
 }
 $ab_footer_links = array(
-	array( 'label' => 'همهٔ خواننده‌ها', 'url' => home_url('/singers/'), 'icon' => 'icofont-microphone-alt' ),
+	array( 'label' => 'همهٔ خواننده‌ها', 'url' => javan_seda_artists_index_url(), 'icon' => 'icofont-microphone-alt' ),
 	array( 'label' => 'تازه‌ترین آهنگ‌ها', 'url' => home_url('/#new-songs'), 'icon' => 'icofont-music-notes' ),
 );
 if ( function_exists( 'javan_seda_ui_footer_links' ) ) {

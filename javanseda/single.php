@@ -60,8 +60,9 @@ if ( has_post_thumbnail() ) {
 
 <?php
 /* ---------- نام آهنگ / خواننده / لینک صفحهٔ خواننده (مشترک بین باکس متن ترانه و تیتر دانلود) ----------
-   لینک خواننده روی تاکسونومی singer ساخته می‌شود؛ مثال: «محسن یگانه» → https://site/singer/mohsen-yaganeh
-   ترتیب جست‌وجو: فیلد اختیاری artist_link روی خود نوشته ← ترم singer با همان نام ← ترم singer با اسلاگ ←
+   لینک خواننده روی تاکسونومی هنرمند ساخته می‌شود؛ نامک فعال را javan_seda_artist_tax() می‌دهد
+   مثال: «محسن یگانه» → https://site/artist/mohsen-yeganeh
+   ترتیب جست‌وجو: فیلد اختیاری artist_link روی خود نوشته ← ترم هنرمند با همان نام ← با اسلاگ ←
    جست‌وجوی تقریبی با نرمال‌سازی ي/ك/ة و نیم‌فاصله ← برچسب هم‌نام.
    در پایان، فیلتر taranehyar_artist_url می‌تواند نتیجه را بازنویسی کند.
 ------------------------------------------------------------------------------------------------- */
@@ -85,8 +86,8 @@ if ( '' !== $taranehyar_artist ) {
 		$taranehyar_artist_url = trim( $taranehyar_custom_link );
 	} else {
 		$taranehyar_lookups = array(
-			array( 'name', $taranehyar_artist, 'singer' ),
-			array( 'slug', sanitize_title( $taranehyar_artist ), 'singer' ),
+			array( 'name', $taranehyar_artist, javan_seda_artist_tax() ),
+			array( 'slug', sanitize_title( $taranehyar_artist ), javan_seda_artist_tax() ),
 		);
 		foreach ( $taranehyar_lookups as $taranehyar_lookup ) {
 			if ( '' === $taranehyar_lookup[1] ) {
@@ -108,7 +109,7 @@ if ( '' !== $taranehyar_artist ) {
 				return trim( preg_replace( '/\s+/u', ' ', $value ) );
 			};
 			$taranehyar_needle = $taranehyar_normalize( $taranehyar_artist );
-			foreach ( array( 'singer', 'post_tag' ) as $taranehyar_tax ) {
+			foreach ( array( javan_seda_artist_tax(), 'post_tag' ) as $taranehyar_tax ) {
 				$taranehyar_matches = get_terms(
 					array(
 						'taxonomy'   => $taranehyar_tax,
@@ -550,17 +551,17 @@ if ( $tag->name === $artist ){ ?>
 </div>
 <?php endif; wp_reset_postdata(); ?>
 <?php } else{ ?>
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,'singer','string'); $term_ids=wp_list_pluck($terms,'term_id');
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,javan_seda_artist_tax(),'string'); $term_ids=wp_list_pluck($terms,'term_id');
 $second_query = new WP_Query( array('post_type'=>'post',
-'tax_query' => array( array('taxonomy'=>'singer','field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
+'tax_query' => array( array('taxonomy'=>javan_seda_artist_tax(),'field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
 'posts_per_page'=>$pppr,'ignore_sticky_posts'=>1,'orderby'=>'id'));
 if($second_query->have_posts()) { ?>	
 <div class="related_posts rel_sing_bbt">
 <div class="title_tarlanweb_box">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,'singer');
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,javan_seda_artist_tax());
 $terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_string; ?></h3>
-<?php $terms = get_the_terms($post->ID,'singer'); foreach ($terms as $term){ ?>
-<div class="left_artists_pp"><a class="artist_songs_page" href="<?php bloginfo('url'); ?>/singer/<?php echo $term->slug; ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></div>
+<?php $terms = get_the_terms($post->ID,javan_seda_artist_tax()); foreach ($terms as $term){ ?>
+<div class="left_artists_pp"><a class="artist_songs_page" href="<?php echo esc_url( javan_seda_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></div>
 <?php } ?>
 <div class="liner clear"></div>
 </div>
@@ -577,8 +578,8 @@ the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_
 if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
 </a></li>
 <?php endwhile; ?> 
-<?php $terms = get_the_terms($post->ID,'singer'); foreach ($terms as $term){ ?>
-<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php bloginfo('url'); ?>/singer/<?php echo $term->slug; ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
+<?php $terms = get_the_terms($post->ID,javan_seda_artist_tax()); foreach ($terms as $term){ ?>
+<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php echo esc_url( javan_seda_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
 <?php } ?>
 </ul>
 <div class="clear"></div>
@@ -659,14 +660,14 @@ if ( $tag->name === $artist ){ ?>
 </aside>
 <?php endif; wp_reset_postdata(); ?>
 <?php } else{ ?>
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,'singer','string'); $term_ids=wp_list_pluck($terms,'term_id');
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,javan_seda_artist_tax(),'string'); $term_ids=wp_list_pluck($terms,'term_id');
 $second_query = new WP_Query( array('post_type'=>'post',
-'tax_query' => array( array('taxonomy'=>'singer','field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
+'tax_query' => array( array('taxonomy'=>javan_seda_artist_tax(),'field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
 'posts_per_page'=>$pppr,'ignore_sticky_posts'=>1,'orderby'=>'id'));
 if($second_query->have_posts()) { ?>	
 <aside class="related_posts">
 <div class="title_tarlanweb_box">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,'singer');
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,javan_seda_artist_tax());
 $terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_string; ?></h3>
 <div class="liner clear"></div>
 </div>
@@ -683,8 +684,8 @@ the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_
 if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
 </a></li>
 <?php endwhile; ?>
-<?php $terms = get_the_terms($post->ID,'singer'); foreach ($terms as $term){ ?>
-<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php bloginfo('url'); ?>/singer/<?php echo $term->slug; ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
+<?php $terms = get_the_terms($post->ID,javan_seda_artist_tax()); foreach ($terms as $term){ ?>
+<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php echo esc_url( javan_seda_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
 <?php } ?>
 </ul>
 <div class="clear"></div>

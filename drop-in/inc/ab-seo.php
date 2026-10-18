@@ -138,7 +138,7 @@ if ( ! function_exists( 'javan_seda_seo_song_labels' ) ) {
 			$song = $title;
 		}
 		if ( '' === $artist ) {
-			$terms = get_the_terms( $post_id, 'singer' );
+			$terms = get_the_terms( $post_id, javan_seda_artist_tax() );
 			if ( is_array( $terms ) && ! is_wp_error( $terms ) ) {
 				$artist = (string) $terms[0]->name;
 			}
@@ -182,7 +182,7 @@ if ( ! function_exists( 'javan_seda_seo_description' ) ) {
 				$d = 'آرشیو ' . ( $term ? $term->name : '' ) . ' — ' . $n . ' اثر برای دانلود با کیفیت ۱۲۸ و ۳۲۰';
 			}
 			$txt = $d;
-		} elseif ( is_tax( 'singer' ) ) {
+		} elseif ( is_tax( javan_seda_artist_tax() ) ) {
 			$term = get_queried_object();
 			$n    = ( isset( $GLOBALS['wp_query']->found_posts ) ) ? (int) $GLOBALS['wp_query']->found_posts : 0;
 			$txt  = 'صفحهٔ اختصاصی ' . ( $term ? $term->name : 'هنرمند' ) . ' — دانلود ' . $n . ' آهنگ و موزیک‌ویدیو، متن ترانه و شبکه‌های اجتماعی';
@@ -356,7 +356,7 @@ if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) )
 					'item' => javan_seda_seo_cat_url( $cats[0]->term_id ),
 				);
 			}
-			$singers = get_the_terms( get_the_ID(), 'singer' );
+			$singers = get_the_terms( get_the_ID(), javan_seda_artist_tax() );
 			if ( is_array( $singers ) && $singers ) {
 				$items[] = array(
 					'name' => wp_strip_all_tags( $singers[0]->name ),

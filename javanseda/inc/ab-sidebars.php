@@ -245,23 +245,27 @@ if ( ! function_exists( 'javan_seda_sidebar' ) ) {
 if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 	function javan_seda_expected_hashes() {
 	return array(
-		'single.php'                => 'da3603eeeab3b2778c134e5ababdc2ac4cd36d28ec5c850c74c369bb6391373b',
+		'single.php'                => '74b189baef721c98b11e34365d2a37d4143ba53ee422a2682c08ddab6adfbcf2',
 		'page.php'                  => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
-		'myfunctions.php'           => '163df7704bea0ac6b786916dc387aaaed6f9d8b93b7c4a69da24a903ac1ef48e',
-		'style.css'                 => 'd6d49db7488b26b5dd662f8d4e30787812fd89bfc8c09110624af2d72f06c3cf',
-		'footer.php'                => '66d3257b118a2d0d9f095fa5bd471f467f94ca55f572c904a7809bb914c70b58',
+		'myfunctions.php'           => 'bd185630a0c26e72a5a3f5e61cd63f89ab32b0b7407e2b92c9da897f5d1355e7',
+		'style.css'                 => '9add17bac71e7a413acfc6da894fe843db9a34ff35e9ba571177da7b3eef23a0',
+		'footer.php'                => '6475b69e2a86aee289102daa78806b4b0b0d9331349ed6fe69ebef5148a1479f',
 		'header.php'                => 'f5174209fae4506f9952e5ae838716df21bd3f1cbea413675a42863d585306dc',
-		'home.php'                  => 'e79d00aa628334dddf6f158efa1e00960423e04b71cab1d9bc27429f2de2b6ca',
-		'404.php'                   => 'c3d88ec0f32f51fd1b94fb55bcbc277408eae7f76d6ec2143ec01a532a611c35',
+		'home.php'                  => 'a0103a063b47dd0df06b85049572bd7ed31d851c3a6239047dfa3ce8c91032f0',
+		'404.php'                   => 'e8379a33fe6b36bd42b45d9672b929e65ee5e20329a1887e203e7c8b7627813e',
 		'search.php'                => '4ba4d8ad7f2bb134a4b7cefd116d5e27f3a5e4a787e65cc8fbae2b96c599a288',
 		'inc/vip_slider.php'        => '988b7cba33eeaab8fefae98a010e5e57ec3d94f627acc3f13601be9115379c2d',
 		'inc/songs_post.php'        => '82348ad0c372f90cedc1aad7042f075a2a669119682d643c44870b7c944259e0',
 		'inc/tarlanweb_player.php'  => '20a59a9df1cba22f6495a034a04be4dfcf5187168ade479fa80d692d907ac063',
 		'inc/ab-news-ticker.php'    => 'b9eebd2bc03497b9011a134e8cf7325a8952a2df18eea67ba9e010422b914d0e',
 		'inc/ab-perf.php'           => '03fbcbc96260de30f5919384c46a8dc4829b1429cf5f44b2f5d1efa10c786d1e',
-		'inc/ab-seo.php'            => 'd87768789152356cd9c03deb196a62581695208f8450c28d574b05f4e57bb984',
-		'inc/ab-controls.php'       => 'b2092291affbf7277efa9cdf4daee70ed36038c3c8ae09cdd93eb6d7945f74e2',
-		'inc/theme-options.php'     => '9079a062e7c395ebd374b35f3cfbc16f1aa34f7b3dbda842dd6da619bac7b3ff',
+		'inc/ab-seo.php'            => '8102491752bfd28176e6132f14a0a2637626529863b81a11e8b0a08680b8843e',
+		'inc/ab-controls.php'       => '7ad040dd3691c154ea1702a4ed72be05377dbc6b7a1f14d2c53b3076519f3bd5',
+		'inc/theme-options.php'     => 'c620bba375eae074b4814da2926340020d8e19d2f34a347b9935f86a8dec471a',
+		'taxonomy-artist.php'       => 'a61a0cf175c3f9ee64395a3e2fec15097c1172e00941e17e009799d4b8325d99',
+		'taxonomy-singer.php'       => '314121b1277eaf1afff36382ad87691fae56f1e743395cf0078240a8fcfc6807',
+		'inc/ab-tax-artist.php'     => '24122ee7f0bbc964109b0187d55866c43eac50b84057e9ebbb68f86c6b033ea9',
+		'inc/ab-credits.php'        => 'e86a933e1e9a4591be9cfa10de568e00730f8fa92fbb6978a13a4bb52f6fe1f8',
 	);
 }
 }

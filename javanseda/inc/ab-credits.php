@@ -6,7 +6,7 @@
  *
  * • مقدارها از فیلدهای ACF خوانده می‌شوند؛ اگر افزونۀ ACF نباشد، فایل
  *   inc/acf-compat.php همان کلیدها را از post_meta می‌خواند، پس هر دو حالت کار می‌کند.
- * • برای هر ردیف یک «مربوط‌شدنِ نام» به تاکسونومی singer انجام می‌شود: اگر نام با
+ * • برای هر ردیف یک «مربوط‌شدنِ نام» به تاکسونومی هنرمند (javan_seda_artist_tax(): artist یا singer) انجام می‌شود: اگر نام با
  *   یک ترمِ خواننده یکی باشد، لینک آرشیو همان خواننده ساخته می‌شود؛ اگر نباشد
  *   فقط متن چاپ می‌شود (هیچ لینک ۴۰۴‌ساز، هیچ تاکسونومی تازه، هیچ هوک سراسری).
  * • ورودی دادن: یک metabox ساده در ویرایش نوشته. اگر ACF را دوست دارید، کافی است
@@ -35,7 +35,8 @@ if ( ! defined( 'JAVANSEDA_CREDITS_METABOX' ) ) {
 	define( 'JAVANSEDA_CREDITS_METABOX', true );
 }
 if ( ! defined( 'JAVANSEDA_CREDITS_TAX' ) ) {
-	define( 'JAVANSEDA_CREDITS_TAX', 'singer' ); /* تاکسونومی خواننده‌ها — فقط خوانده می‌شود، ثبت/تغییر نمی‌کند */
+	/* v3.4.7 — نامکِ فعال از لایۀ «هنرمند» خوانده می‌شود (artist یا singer)؛ اگر لایه نبود مثل قبل. */
+	define( 'JAVANSEDA_CREDITS_TAX', function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ); /* فقط خوانده می‌شود؛ ثبت/تغییر نمی‌کند */
 }
 
 /* ==========================================================================
@@ -240,7 +241,7 @@ if ( ! function_exists( 'javan_seda_credit_names' ) ) {
 }
 
 /* ==========================================================================
-   ۴) ردیف خواننده (از فیلد artist یا ترم‌های singerِ خودِ نوشته)
+   ۴) ردیف خواننده (از فیلد artist یا ترم‌های هنرمندِ خودِ نوشته)
    ========================================================================== */
 if ( ! function_exists( 'javan_seda_credit_singer' ) ) {
 	function javan_seda_credit_singer( $post_id = 0 ) {
@@ -494,7 +495,7 @@ if ( ! function_exists( 'javan_seda_music_schema' ) ) {
 			'mainEntityOfPage' => array( '@id' => $permalink . '#webpage' ),
 		);
 
-		/* خواننده: از فیلد artist یا ترم‌های singer — اگر نبود، دروغ نمی‌سازیم */
+		/* خواننده: از فیلد artist یا ترم‌های هنرمند — اگر نبود، دروغ نمی‌سازیم */
 		$by = javan_seda_credit_person_list( javan_seda_credit_singer( $post_id ) );
 		if ( $by ) {
 			$rec['byArtist'] = javan_seda_credit_one_or_many( $by );

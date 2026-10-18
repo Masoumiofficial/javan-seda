@@ -2,7 +2,7 @@
 /**
  * Template Name: خواننده ها
  *
- * صفحهٔ «همهٔ هنرمندان» (مثلاً https://ahangban.ir/singers/).
+ * صفحهٔ «همهٔ هنرمندان» — آدرسِ خودِ این برگه از javan_seda_artists_index_url() هم خوانده می‌شود.
  *
  * این فایل فقط «نمایش» است: نه تاکسونومی ثبت می‌کند، نه rewrite را تغییر می‌دهد،
  * نه در جایی از سایت دخالت می‌کند. اگر این فایل را بردارید، قالب قبلی دقیقاً مثل
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
    ۰) تنظیم‌ها — اگر خواستید چیزی را عوض کنید، فقط همین جدول
    ================================================================================== */
 $ab_cfg = array(
-	'taxonomy'    => 'singer', // نام تاکسونومی خواننده‌ها
+	'taxonomy'    => javan_seda_artist_tax(), // نامک فعالِ تاکسونومی هنرمند (artist یا singer)
 	'hide_empty'  => true,     // خواننده‌های بدون آهنگ پنهان بمانند
 	'max_terms'   => 1200,     // بیشتر از این تعداد → حالت صفحه‌بندی (برای امنیت سرعت)
 	'per_page'    => 60,       // فقط در حالت صفحه‌بندی
@@ -45,7 +45,7 @@ $ab_cfg = array(
 );
 $ab_cfg = apply_filters( 'javanseda_artists_config', $ab_cfg );
 
-$ab_taxonomy = isset( $ab_cfg['taxonomy'] ) ? (string) $ab_cfg['taxonomy'] : 'singer';
+$ab_taxonomy = isset( $ab_cfg['taxonomy'] ) ? (string) $ab_cfg['taxonomy'] : javan_seda_artist_tax();
 $ab_total    = 0;
 
 /* ==================================================================================

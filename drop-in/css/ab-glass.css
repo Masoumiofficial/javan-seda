@@ -145,10 +145,12 @@
 .ab-sticky .ab-sp-play,.ab-sticky .ab-sp__dl,.ab-sticky .ab-sp__no{background: var(--ab-glass-bg-strong)}
 .ab-sticky .ab-sp-thumb{border: 1px solid var(--ab-glass-border)}
 
-/* ------------------------------------------------- کارت‌های آهنگ و آلبوم --- */
+/* ------------------------------------------------- کارت‌های آهنگ و آلبوم ---
+   .artist_boxs a عمداً از این فهرست بیرون است (v3.3.7): دایرۀ هنرمند داخل یک
+   کارتِ گوشه‌گردِ مربعی/مستطیلی می‌نشست و همان «مربع دور دایره» را می‌ساخت؛
+   آیتم هنرمند باید فقط همان دایره باشد و فاصله‌اش را از padding آیتم می‌گیرد. */
 .songs_post,
-.vip_post.ab-vip-post,
-.artist_boxs a{
+.vip_post.ab-vip-post{
 	border-radius: var(--ab-radius-m, 14px);
 	border: 1px solid var(--ab-glass-border);
 	box-shadow: var(--ab-depth-1);
@@ -166,7 +168,6 @@
 	line-height: 1.7;
 }
 .songs_post:hover,
-.artist_boxs a:hover,
 .vip_post.ab-vip-post:hover{
 	border-color: var(--ab-blue);
 	box-shadow: var(--ab-glass-hl), var(--ab-depth-2);

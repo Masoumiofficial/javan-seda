@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.3.6
+Version: 3.3.7
 */
 /*
 ==================================================================================
@@ -3153,3 +3153,52 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 	.ab-news .ab-news-track{animation: none}
 }
 /* انتهای بلوک ۳۰ (v3.3.6) */
+
+/* ============================================================================================
+   بلوک ۳۱ (نسخۀ 3.3.7) — آمارِ اثر روی کاور + بیرون‌آمدن دایرۀ هنرمند از کادر مربع
+   ------------------------------------------------------------------------------------------
+   ۱) `.ab-card-stats` را `inc/songs_post.php` چاپ می‌کند (بازدید از متای `views`، میانگین
+      رأی از `kksr_avg` یا `kksr_ratings ÷ kksr_casts`). لایه روی خودِ figure نشسته،
+      `pointer-events:none` دارد ⇒ لینک کارت دست‌نخورده می‌ماند و چون absolute است، هیچ
+      تغییر چیدمان/CLS ندارد.
+   ۲) مات‌وشیشه‌ای شدن کاور *فقط در حالت hover/focus* اعمال می‌شود، نه همیشه: blur روی
+      دوازده کارتِ هم‌زمان گران است، ولی روی یک کارتِ در حال اشاره تقریباً رایگان.
+   ۳) روی دستگاه لمسی (hover:none) هیچ فیلتری نیست و آمار به‌صورت دو چیپِ تیره روی
+      پایینِ کاور همیشه دیده می‌شود ⇒ هم خوانا، هم بی‌هزینه.
+   ۴) ستاره‌ها بدون گرادینت: یک ردیف ☆ و یک ردیف ★ که با `width` درصدی بریده می‌شود.
+   ۵) دایرۀ هنرمند: کادر گوشه‌گردِ شیشه‌ای از `css/ab-glass.css` برداشته شد (همان
+      «مربع/مستطیل دور دایره»)؛ حالا فقط حلقۀ باریک خودش می‌ماند و در hover آبی می‌شود.
+   ========================================================================================== */
+.songs_post header figure{position: relative}
+.ab-card-stats{position: absolute;inset: 0;display: flex;align-items: flex-end;padding: 7px;opacity: 0;pointer-events: none;background: rgba(255,255,255,.26);transition: opacity .16s ease}
+.night .ab-card-stats{background: rgba(17,17,17,.30)}
+.songs_post:hover .ab-card-stats,
+.songs_post:focus-within .ab-card-stats{opacity: 1}
+@supports (backdrop-filter: blur(2px)){
+	.songs_post:hover .ab-card-stats,
+	.songs_post:focus-within .ab-card-stats{-webkit-backdrop-filter: blur(6px) saturate(1.12);backdrop-filter: blur(6px) saturate(1.12)}
+}
+.ab-card-stats__in{display: flex;align-items: center;flex-wrap: wrap;gap: 5px;width: 100%}
+.ab-cs-num{display: inline-flex;align-items: center;gap: 4px;max-width: 100%;padding: 3px 8px;border-radius: var(--ab-radius-pill, 999px);background: var(--ab-glass-bg-strong, rgba(255,255,255,.88));border: 1px solid var(--ab-glass-border, rgba(17,17,17,.08));color: var(--ab-text, #222);font-size: 11px;font-weight: 700;line-height: 1.7;letter-spacing: .1px;white-space: nowrap}
+.ab-cs-num i{font-style: normal;font-size: 12.5px}
+.ab-cs-num>i:first-child{font-size: 12px;color: var(--ab-blue-accent, #185ADB)}
+.ab-cs-num em{font-style: normal;font-weight: 500;color: var(--ab-muted, #555);font-size: 10px}
+.ab-cs-stars{position: relative;display: inline-block;direction: ltr;font-size: 11px;line-height: 1.4;letter-spacing: 1px;color: var(--ab-muted, #555)}
+.ab-cs-stars>b{position: absolute;top: 0;left: 0;display: block;overflow: hidden;white-space: nowrap;color: var(--ab-cs-star, var(--ab-blue, #185ADB));font-weight: 400}
+.artist_boxs a:hover img,
+.artist_boxs a:focus img{box-shadow: 0 0 0 2px var(--ab-blue-accent, #185ADB), 0 8px 20px rgba(24,90,219,.20)}
+.night .ab-cs-num{border-color: rgba(255,255,255,.10)}
+@media (hover: none){
+	.ab-card-stats{background: transparent;padding: 6px}
+	.ab-cs-num{background: rgba(17,17,17,.56);border-color: transparent;color: #FFFFFF;text-shadow: 0 1px 2px rgba(0,0,0,.35)}
+	.ab-cs-num>i:first-child,.ab-cs-num em{color: rgba(255,255,255,.82)}
+	.ab-cs-stars{color: rgba(255,255,255,.5)}
+	.ab-cs-stars>b{color: var(--ab-cs-star, #FFFFFF)}
+}
+@media (prefers-reduced-motion: reduce){
+	.ab-card-stats{transition: none}
+}
+/* ابزارک خوانا: اگر قالب .screen-reader-text را ندارد، خودمان تعریفش می‌کنیم
+   (متن‌های «بازدید این اثر» / «از ۵» فقط برای صفحه‌خوان است، نه چشم) */
+.screen-reader-text{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);border:0;white-space:nowrap}
+/* انتهای بلوک ۳۱ (v3.3.7) */

@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.3.2
+Version: 3.3.3
 */
 /*
 ==================================================================================
@@ -2882,8 +2882,6 @@ html{-webkit-text-size-adjust: 100%;text-size-adjust: 100%}
 .single_content_box td,.single_content_box th{padding: 8px 10px;border: 1px solid var(--ab-line)}
 
 /* ۶) دیدگاه‌ها و فرم‌ها */
-.commentlist > li{border: 1px solid var(--ab-line);border-radius: var(--ab-radius-m);padding: var(--ab-space-4);line-height: 1.9}
-.commentlist > li ul.children{margin: var(--ab-space-4) 0 0;padding-inline-start: var(--ab-space-5);list-style: none}
 #commentform p{margin: 0 0 var(--ab-space-3)}
 #commentform input[type="text"],#commentform input[type="email"],#commentform input[type="url"],#commentform textarea{width: 100%;max-width: 520px;padding: 9px 12px;border: 1px solid var(--ab-line);border-radius: var(--ab-radius-s);font-size: 13.5px;line-height: 1.8}
 #commentform textarea{min-height: 120px}
@@ -2938,3 +2936,137 @@ html{-webkit-text-size-adjust: 100%;text-size-adjust: 100%}
 }
 
 /* --- انتهای بلوک ۲۶ (v3.3.0 — تراز سراسری + کارت‌ها + خوانایی) --- */
+
+/* ============================================================================================
+   بلوک ۲۷ (نسخۀ 3.3.3) — چهار ایراد گزارش‌شده توسط مالک، همه با CSS و بدون جااسکریپت تازه
+   ------------------------------------------------------------------------------------------
+   ۱) ریل‌ها در موبایل (خواننده‌ها / آهنگ‌ها / مرتبط‌ها): «هر ردیف یک دونه و کلی فضا»
+      علت: در ۴۵۰pxِ قالب `.artist_boxs a{width:100%}` نوشته شده وowl carousel
+      هیچ‌گاه استایلش لود نمی‌شود (فقط js/owl.carousel.js هست، owl.carousel.css در قالب نیست)
+      ⇒ هیچ اسلایدری واقعاً اسلایدر نمی‌شود و آیتم‌ها بلوکی روی هم می‌چینند.
+      راه‌حل: ریل واقعی با scroll-snap بومی (لمسی، بدون کتابخانه) + گرید فشرح دو ستونه برای
+      فهرست‌های بلند (نتیجۀ جست‌وجو، بایگانی‌ها، صفحۀ خواننده). همه با :not(.owl-loaded) تا اگر
+      روزی owl کار کرد، owl کنترل را پس بگیرد.
+   ۲) کشی منوی موبایل: `.mobiles_menu` و `.bodydeactive` با position:fixed داخل
+      `#mobiles_header` هستند؛ لایۀ شیشۀ 3.3.0 روی همان المنت backdrop-filter گذاشت و
+      backdrop-filter (مثل filter/transform) «جرم مرجع» فرزندانه fixed را عوض می‌کند
+      ⇒ کشی به ارتفاع هدر (۶۵px) گیر می‌کرد و عملاً دیده نمی‌شد. در ab-glass.css اصلاح شد
+      (شیشه به ::before منتقل شد)؛ اینجا فقط ابعاد/کنتراست خود کشی درست می‌شود.
+   ۳) دیدگاه‌ها: قاعدۀ قالب `.commentlist li{background:rgba(255,255,255,.2);border:1px solid
+      rgba(0,0,0,.4)}` روی صفحۀ سفید یعنی «بی‌رنگ با حاشیۀ خاکستریِ خشن» و `.fn a` سبز است.
+   ۴) ۴۰۴ در حالت روشن: در ab-glass.css یک قاعدۀ گروهی، background سفیدِ شیشه را روی
+      input/button/لینک‌ها نشاند و رنگ متنِ سفیدِ قبلی باقی ماند ⇒ سفید روی سفید.
+   ========================================================================================== */
+
+/* ---- ۱) ریل‌ها ---- */
+.artists_slider:not(.owl-loaded){display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:var(--ab-gap-sm);align-items:start;padding:2px 0}
+.artists_slider:not(.owl-loaded)>*{min-width:0}
+.artists_slider:not(.owl-loaded) a{width:auto;height:auto;margin:0;display:block;text-align:center;padding:6px 4px;border-radius:var(--ab-radius-m)}
+.artists_slider:not(.owl-loaded) a img{width:clamp(74px,62%,106px);height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:50%}
+.artists_slider:not(.owl-loaded) a span{display:block;margin-top:6px;font-size:12px;line-height:1.7}
+.artists_slider:not(.owl-loaded) a:hover{background:var(--ab-blue-soft)}
+.song_boxs .songs_title_box{margin-bottom:var(--ab-space-4)}
+@media (max-width: 767px){
+	.artist_boxs a,.artist_boxs a img{width:auto;height:auto;max-width:100%}
+	.artist_boxs a img{display:block;margin:0 auto}
+	.artists_slider:not(.owl-loaded){
+		display:flex;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+		scroll-snap-type:x mandatory;scrollbar-width:none;gap:10px;padding:2px 1px 12px;margin:0
+	}
+	.artists_slider:not(.owl-loaded)>*{flex:0 0 auto;width:88px;scroll-snap-align:start}
+	.artists_slider:not(.owl-loaded) a img{width:66px}
+	.artists_slider.owl-carousel .owl-item{width:88px !important}
+	.artists_slider.owl-carousel .artist_boxs a,.artists_slider.owl-carousel .artist_boxs a img{width:auto;height:auto}
+	/* ریل‌های صفحۀ اصلی: اسلایدر لمسی */
+	body.home .song_boxs .song_boxs_posts ul,
+	.song_boxs.ab-related .song_boxs_posts ul{
+		display:flex;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+		scroll-snap-type:x mandatory;scrollbar-width:none;gap:var(--ab-gap-sm);
+		padding:2px 1px 12px;margin:0;list-style:none
+	}
+	body.home .song_boxs .song_boxs_posts ul::-webkit-scrollbar,
+	.song_boxs.ab-related .song_boxs_posts ul::-webkit-scrollbar{display:none;width:0;height:0}
+	body.home .song_boxs .song_boxs_posts ul>li,
+	.song_boxs.ab-related .song_boxs_posts ul>li{flex:0 0 clamp(140px,43vw,172px);width:auto;margin:0;scroll-snap-align:start}
+	/* فهرست‌های بلند: دو ستون فشرده (نه یک ستونِ کشیده) */
+	.song_boxs_posts ul{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ab-gap-sm)}
+	.songs_post .ft_box_head{padding:8px 10px}
+	.songs_post h2{font-size:12.5px}
+	.songs_post h2 span{font-size:11.5px}
+	.song_boxs+.song_boxs{margin-top:var(--ab-space-6)}
+}
+@media (max-width: 400px){
+	.artists_slider:not(.owl-loaded)>*{width:80px}
+	.artists_slider.owl-carousel .owl-item{width:80px !important}
+	body.home .song_boxs .song_boxs_posts ul>li,
+	.song_boxs.ab-related .song_boxs_posts ul>li{flex-basis:clamp(132px,46vw,158px)}
+}
+
+/* ---- ۲) کشی منوی موبایل ---- */
+.mobiles_menu{width:min(82vw,256px);background:var(--ab-charcoal);padding-bottom:16px;-webkit-overflow-scrolling:touch}
+.mobiles_menu .top_logo_title{background:transparent;padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.10)}
+.mobiles_menu .top_logo_title img{padding:0;max-width:140px;height:auto}
+#cssmenu > ul > li > a{padding:11px 16px;font-size:13.5px;line-height:1.8}
+#cssmenu > ul > li > a:hover,#cssmenu > ul > li.active > a,#cssmenu > ul > li.open > a{background:rgba(255,255,255,.07)}
+#cssmenu ul ul{background:rgba(0,0,0,.20)}
+#cssmenu ul ul li a{padding:9px 30px 9px 22px;font-size:12.5px;line-height:1.8}
+#cssmenu ul ul li a:hover{background:rgba(255,255,255,.06)}
+.mobiles_menu .socials_box{background:transparent;padding:10px 0 0;margin:0;border-top:1px solid rgba(255,255,255,.10)}
+.mobiles_menu .socials_box a{margin:4px 5px;background:rgba(255,255,255,.08)}
+.ab-mobile-menu-fallback{list-style:none;margin:0;padding:0}
+.ab-mobile-menu-fallback li a{display:block;padding:11px 16px;font-size:13.5px;line-height:1.8;color:#fff}
+.ab-mobile-menu-fallback li+li{border-top:1px solid rgba(255,255,255,.07)}
+
+/* ---- ۳) دیدگاه‌ها ---- */
+#comments{margin-top:var(--ab-space-7)}
+.comments-title,.comment-title{font-size:16px;font-weight:700;line-height:1.7;margin:0 0 var(--ab-space-4)}
+ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);padding:0}
+.commentlist li{width:auto;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:var(--ab-radius-m);padding:14px 16px;margin:0 0 12px;line-height:1.95}
+.commentlist .children{list-style:none;margin:12px 0 0;padding-inline-start:clamp(10px,3.2vw,22px)}
+.commentlist li .children li{background:var(--ab-blue-soft)}
+.commentlist li footer{border-bottom:1px solid var(--ab-line);padding-bottom:8px;margin-bottom:9px}
+#comments .commentlist li .avatar{width:42px !important;height:42px !important;border-radius:50% !important;object-fit:cover;box-shadow:0 0 0 2px var(--ab-line)}
+.commentlist .fn{float:none;display:inline-block;line-height:1.5;font-size:14px;font-weight:700;margin:0 10px 0 0}
+.commentlist .fn a{color:var(--ab-blue-accent) !important;text-decoration:none}
+.commentlist .fn a:hover{text-decoration:underline}
+.commentlist .says{display:none}
+.commentlist .comment-date,.commentlist .commentmeta,.commentlist .comment-awaiting-moderation{float:none;display:block;font-size:11.5px;line-height:1.8;color:var(--ab-muted)}
+.commentlist .comment-content{float:none;width:100%;text-align:inherit;font-size:13.5px;line-height:2.05;overflow-wrap:anywhere}
+.commentlist .comment-content p{margin:0 0 8px}
+.commentlist .reply,.commentlist .comment-replay{float:none;display:block;margin-top:8px}
+.commentlist .reply a,.commentlist .comment-replay a{display:inline-flex;align-items:center;float:none;padding:5px 13px;border:1px solid var(--ab-line);border-radius:var(--ab-radius-pill);background:var(--ab-surface);color:var(--ab-text);font-size:12px;line-height:1.6}
+.commentlist .reply a:hover,.commentlist .comment-replay a:hover{border-color:var(--ab-blue);color:var(--ab-blue-accent);background:var(--ab-blue-soft)}
+#respond{width:100%;margin:var(--ab-space-6) 0 0;padding:var(--ab-space-5) var(--ab-space-4);border:1px solid var(--ab-line);border-radius:var(--ab-radius-l);background:var(--ab-surface)}
+#reply-title{margin:0 0 var(--ab-space-4);font-size:15px;font-weight:700;padding:0}
+#respond .comment-form{display:grid;gap:var(--ab-space-3);grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+#respond .comment-form-comment,#respond .form-submit,#respond .comment-notes,#respond .logged-in-as,#respond p{grid-column:1/-1;margin:0}
+#respond label{display:block;font-size:12px;font-weight:600;margin-bottom:4px}
+#respond .comment-form-author,#respond .comment-form-email,#respond .comment-form-url{display:block}
+#respond input[type="text"],#respond input[type="email"],#respond input[type="url"],#respond textarea{width:100%;max-width:none;padding:10px 12px;font-size:13.5px;line-height:1.8;color:var(--ab-text);background:var(--ab-page);border:1px solid var(--ab-line);border-radius:var(--ab-radius-s)}
+#respond textarea{min-height:126px;resize:vertical}
+#respond input:focus,#respond textarea:focus{outline:none;border-color:var(--ab-blue);box-shadow:0 0 0 3px rgba(24,90,219,.16)}
+#respond .form-submit input[type="submit"],.form-submit #submit{padding:10px 22px;border:0;border-radius:var(--ab-radius-pill);background:var(--ab-blue);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+#respond .cancel-comment-reply-link{display:inline-block;margin-inline-start:10px;font-size:12px;color:var(--ab-muted)}
+#respond .required{color:var(--ab-blue-accent)}
+.comment-navigation,.navigation.comment-navigation{display:flex;justify-content:space-between;gap:10px;margin:var(--ab-space-4) 0 0;font-size:12.5px}
+.nocomments{font-size:13px;color:var(--ab-muted);margin:var(--ab-space-4) 0 0}
+.night .commentlist li,.night #respond{background:var(--ab-charcoal)}
+.night .commentlist li .children li{background:rgba(255,255,255,.04)}
+
+/* ---- ۴) ۴۰۴ در حالت روشن (و شب) ---- */
+.ab-404-search{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.ab-404-search input[type="search"],.ab-404-search input[type="text"]{
+	flex:1 1 220px;min-width:0;min-height:44px;padding:10px 14px;font-size:13.5px;line-height:1.6;
+	color:var(--ab-text);background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:var(--ab-radius-pill);
+	box-shadow:none;-webkit-appearance:none;appearance:none
+}
+.ab-404-search input::placeholder{color:var(--ab-muted);opacity:1}
+.ab-404-search input:focus{outline:none;border-color:var(--ab-blue);box-shadow:0 0 0 3px rgba(24,90,219,.16)}
+.ab-404-search button{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:10px 20px;font-size:13px;font-weight:600;color:#fff;background:var(--ab-blue);border:1px solid transparent;border-radius:var(--ab-radius-pill);cursor:pointer;box-shadow:none}
+.ab-404-search button:hover{filter:brightness(1.06)}
+.ab-404-links a,.ab-404-back{color:var(--ab-text);background:var(--ab-surface);border:1px solid var(--ab-line)}
+.ab-404-links a:hover,.ab-404-back:hover{color:var(--ab-blue-accent);background:var(--ab-blue-soft);border-color:var(--ab-blue)}
+.ab-404-home{color:#fff;background:var(--ab-blue);border:1px solid transparent}
+.ab-404-home:hover{color:#fff;background:var(--ab-blue-accent)}
+.night .ab-404-search input[type="search"],.night .ab-404-search input[type="text"],.night .ab-404-links a,.night .ab-404-back{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);color:#ededed}
+/* انتهای بلوک ۲۷ (v3.3.3) */

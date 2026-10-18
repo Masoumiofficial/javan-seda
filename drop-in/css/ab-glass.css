@@ -98,13 +98,27 @@
 	border-bottom: 1px solid var(--ab-glass-border);
 	box-shadow: var(--ab-glass-hl);
 }
-#mobiles_header{
+/* هدر موبایل: شیشه روی ::before، نه خودِ المنت.
+   چرا؟ `backdrop-filter` (مثل filter/transform) «جرم مرجع» فرزندانه با
+   position:fixed را عوض می‌کند؛ کشی منو (.mobiles_menu) و پرده (.bodydeactive)
+   داخل همین هدر fixed هستند و با فیلتر روی والد، ارتفاعشان به ۶۵px هدر گیر می‌کرد
+   ⇒ در 3.3.0 تا 3.3.2 کشی منو عملاً ناپدید می‌شد. با ::before هیچ فرزندی درگیر نمی‌شود. */
+#mobiles_header{background: transparent;border-bottom: 0;box-shadow: none}
+.night #mobiles_header{background: transparent}
+#mobiles_header::before{
+	content: "";
+	position: absolute;
+	top: 0; right: 0; left: 0; bottom: 0;
+	z-index: -1;
 	background: var(--ab-glass-bg);
 	-webkit-backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
 	backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
 	border-bottom: 1px solid var(--ab-glass-border);
 	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
 }
+#mobiles_header .navicon,
+#mobiles_header .circle_hlink,
+#mobiles_header .logo_mobiles{position: relative;z-index: 1}
 /* زیرمنوها شناورند ⇒ شیشه + سایه */
 .menu_right li ul.sub-menu{
 	background: var(--ab-glass-bg-strong);
@@ -221,7 +235,7 @@
 	border-radius: var(--ab-radius-m, 14px);
 	box-shadow: var(--ab-depth-1);
 }
-.commentlist > li{padding: 14px 16px;box-shadow: none}
+/* .commentlist > li → به بلوک ۲۷ در style.css سپرده شد (سطح محتوا، نه شیشه) */
 
 /* -------------------------------------------------------------------- صفحۀ ۴۰۴ --- */
 .ab-404-panel{
@@ -232,16 +246,9 @@
 	border-radius: var(--ab-radius-xl, 26px);
 	box-shadow: var(--ab-glass-hl), var(--ab-depth-2);
 }
-.ab-404-search input,
-.ab-404-search button,
-.ab-404-links a,
-.ab-404-home,
-.ab-404-back{
-	background: var(--ab-glass-bg-strong);
-	border: 1px solid var(--ab-glass-border);
-	border-radius: var(--ab-radius-pill, 999px);
-	box-shadow: var(--ab-glass-hl);
-}
+/* فرم و دکمه‌های ۴۰۴ عمداً اینجا رنگ نمی‌گیرند: بلوک ۲۷ (style.css) مالک آن‌هاست،
+   چون رنگ متنِ آن‌ها (#fff روی دکمۀ آبی) با پس‌زمینۀ شیشه‌ایِ روشن تداخل می‌کرد و
+   در حالت روشن «سفید روی سفید» می‌شد. شعاع/حلقۀ فوکوس هم همان‌جا تعریف شده. */
 
 /* ------------------------------------------------- نتیجهٔ جست‌وجو و برگه‌ها --- */
 .search .song_boxs,

@@ -16,7 +16,39 @@
 <a href="<?php bloginfo('url'); ?>"><img src="<?php echo ot_get_option('logo'); ?>" alt="<?php echo ot_get_option('head_h1'); ?>" title="get" width="150" height="40"></a>
 <div class="clear"></div>
 </div>
-<?php wp_nav_menu(array('theme_location'=>'mobiles_menu','container_id'=>'cssmenu','walker'=>new CSS_Menu_Maker_Walker())); ?>
+<?php
+/* v3.3.3 — کشوی منوی موبایل هیچ‌وقت خالی نمی‌ماند.
+   قبل از این فقط یک wp_nav_menu با theme_location='mobiles_menu' بود؛ اگر آن مکان در
+   پیشخوان به منویی وصل نباشد، وردپرس به fallback «فهرست برگه‌ها» می‌رود و در سایتی که
+   فقط «آهنگ» دارد یعنی کشوی خالی (آنچه مالک دید: فقط شبکه‌های اجتماعی).
+   ترتیب: منوی موبایل ← منوی اصلی (همان که در دسکتاپ است) ← برگه‌ها ← دو پیوند همیشگی.
+   کلاسِ walker هم محافظت‌شده است؛ اگر تعریف نشده بود new CSS_Menu_Maker_Walker خطای
+   کشنده می‌داد و کل صفحه سفید می‌شد. */
+$ab_mm_args = array( 'container' => 'div', 'container_id' => 'cssmenu', 'depth' => 3, 'fallback_cb' => false );
+if ( class_exists( 'CSS_Menu_Maker_Walker' ) ) {
+	$ab_mm_args['walker'] = new CSS_Menu_Maker_Walker();
+}
+$ab_mm_done = false;
+if ( ! function_exists( 'wp_nav_menu' ) ) {
+	$ab_mm_done = true; // بدون هستۀ منو، فهرست پیش‌فرض پایین ساخته می‌شود
+}
+foreach ( array( 'mobiles_menu', 'top_menu' ) as $ab_mm_loc ) {
+	if ( $ab_mm_done ) { continue; }
+	if ( function_exists( 'has_nav_menu' ) && has_nav_menu( $ab_mm_loc ) ) {
+		$ab_mm_args['theme_location'] = $ab_mm_loc;
+		wp_nav_menu( $ab_mm_args );
+		$ab_mm_done = true;
+		break;
+	}
+}
+if ( ! $ab_mm_done ) {
+	echo '<div id="cssmenu"><ul class="ab-mobile-menu-fallback">';
+	echo '<li><a href="' . esc_url( home_url( '/' ) ) . '"><i class="icofont-home" aria-hidden="true"></i> صفحۀ اصلی</a></li>';
+	echo '<li><a href="' . esc_url( home_url( '/singers/' ) ) . '"><i class="icofont-microphone-alt" aria-hidden="true"></i> همهٔ خواننده‌ها</a></li>';
+	if ( function_exists( 'wp_list_pages' ) ) { wp_list_pages( array( 'title_li' => '', 'depth' => 1, 'number' => 6 ) ); }
+	echo '</ul></div>';
+}
+?>
 <div class="clear"></div>
 <div class="socials_box">
 <?php if(ot_get_option('facebook') !=""){ ?>

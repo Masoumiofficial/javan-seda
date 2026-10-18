@@ -10,6 +10,9 @@
 <style>
 /* ---- فقط ابزارهای همین صفحۀ پیش‌نمایش (در قالب چیزی اضافه نشده) ---- */
 body{padding:0 0 90px;background:var(--ab-page)}
+/* همان دو خطِ header.php قالب، تا هدر موبایل اینجا هم مثل سایت واقعی رفتار کند */
+#mobiles_header{display:none}
+@media (max-width:800px){#mobiles_header{display:block}body{padding-top:90px}.pv-bar{top:70px}}
 .pv-bar{position:sticky;top:0;z-index:99;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:9px 14px;background:var(--ab-surface);border-bottom:1px solid var(--ab-line);font-size:12px}
 .pv-bar b{font-size:12.5px;color:var(--ab-text)}
 .pv-bar button{margin:0;padding:6px 12px;border:1px solid var(--ab-line);border-radius:999px;background:var(--ab-blue-soft);color:var(--ab-text);font:inherit;cursor:pointer}
@@ -23,6 +26,22 @@ body{padding:0 0 90px;background:var(--ab-page)}
 </style>
 </head>
 <body>
+
+<!-- هدر موبایل + کشو: همان نشانه‌گذاری inc/mobiles_header.php -->
+<header id="mobiles_header">
+<div class="logo_mobiles"><figure><a href="#n"><img src="../javanseda/images/nomusics.jpg" width="150" height="40" alt="لوگو"></a></figure></div>
+<div class="navicon" id="pv-navicon" role="button" tabindex="0" aria-label="باز کردن منو" aria-expanded="false"><i class="responsive-menu-button-inner"></i></div>
+<div class="circle_hlink search_mobile_box"><i class="icofont-search"></i></div>
+<div class="mobile_box">
+<div class="bodydeactive" id="pv-deactive"></div>
+<div class="mobiles_menu" id="pv-drawer">
+<div class="top_logo_title"><a href="#n"><img src="../javanseda/images/nomusics.jpg" width="150" height="40" alt="لوگو"></a><div class="clear"></div></div>
+<div id="cssmenu"><ul class="menu"><li class="current-menu-item"><a href="#n">صفحه اصلی</a></li><li><a href="#n">آهنگ‌ها</a><ul class="children"><li><a href="#n">تازه‌ترین‌ها</a></li><li><a href="#n">پربازدیدترین‌ها</a></li></ul></li><li><a href="#n">خواننده‌ها</a></li><li><a href="#n">آلبوم‌ها</a></li><li><a href="#n">موزیک ویدیو</a></li></ul><div class="clear"></div></div>
+<div class="socials_box"><a href="#n" class="icofont-facebook"></a><a href="#n" class="icofont-instagram"></a><a href="#n" class="icofont-paper-plane"></a><a href="#n" class="icofont-youtube-play"></a><div class="clear"></div></div>
+<div class="clear"></div>
+</div>
+</div>
+</header>
 
 <div class="pv-bar">
   <b>پیش‌نمایش 3.3.0</b>
@@ -72,6 +91,15 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <div class="song_boxs" id="new-songs">
 <div class="songs_title_box"><h3>تازه‌ترین آهنگ‌ها</h3><a href="#n">مشاهده بیشتر</a><div class="clear"></div><div class="liner"></div></div>
 <div class="song_boxs_posts"><ul id="pv-cards"></ul><div class="clear"></div></div>
+<div class="clear"></div>
+</div>
+
+<div class="song_boxs">
+<div class="songs_title_box"><h3>خواننده‌ها</h3><a href="#n">همهٔ خواننده‌ها</a><div class="clear"></div><div class="liner"></div></div>
+<div class="artist_boxs">
+<div class="artists_slider owl-carousel owl-theme" id="pv-artists"></div>
+<div class="clear"></div>
+</div>
 <div class="clear"></div>
 </div>
 
@@ -126,6 +154,37 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <div class="clear"></div>
 </div>
 
+<h2 class="pv-h">دیدگاه‌ها — همان نشانه‌گذاری comments.php</h2>
+<p>قاعدۀ قدیمی قالب برای هر دیدگاه «پس‌زمینۀ ۲۰٪ سفید روی صفحۀ سفید + حاشیۀ خاکستریِ خشن + نامِ سبزِ کاربر» بود؛ حالا کارتِ روشن با مرز نازک، آواتار دایره‌ای، تورفتگیِ راست‌به‌چپ برای پاسخ‌ها و فرم در یک ظرف.</p>
+<div id="comments">
+<h3 class="comments-title">۲ دیدگاه</h3>
+<ol class="commentlist">
+<li class="comment depth-1" id="li-comment-1">
+<footer><div class="comment-author vcard"><img class="avatar" src="../javanseda/images/no-artist.jpg" width="45" height="45" alt=""><span class="fn">مهمان</span></div><div class="comment-date">۱۴ آبان ۱۴۰۴ · ۱۸:۲۰</div><div class="clear"></div></footer>
+<div class="comment-content"><p>ترانۀ خیلی خوبی بود، کیفیت ۳۲۰ هم تمیز در اومد. ممنون از سایتتون 🙏</p></div>
+<div class="reply"><a class="comment-reply-link" href="#n">پاسخ</a></div>
+<ul class="children">
+<li class="comment depth-2" id="li-comment-2">
+<footer><div class="comment-author vcard"><img class="avatar" src="../javanseda/images/no-artist.jpg" width="45" height="45" alt=""><span class="fn"><a href="#n">پشتیبانی جوان‌صدا</a></span></div><div class="comment-date">۱۴ آبان ۱۴۰۴ · ۱۹:۰۲</div><div class="clear"></div></footer>
+<div class="comment-content"><p>ممنون از لطفتون. اگر لینکی خراب بود همین‌جا گزارش بدید تا سریع درست می‌کنیم.</p></div>
+<div class="reply"><a class="comment-reply-link" href="#n">پاسخ</a></div>
+</li>
+</ul>
+</li>
+</ol>
+<div id="respond">
+<h3 id="reply-title">دیدگاه خود را بنویسید <a class="cancel-comment-reply-link" href="#n">لغو پاسخ</a></h3>
+<form class="comment-form" id="commentform">
+<p class="comment-notes"><span id="email-notes">نشانی ایمیل شما منتشر نخواهد شد.</span></p>
+<p class="comment-form-comment"><label for="comment">دیدگاه</label><textarea id="comment" name="comment"></textarea></p>
+<p class="comment-form-author"><label for="author">نام <span class="required">*</span></label><input id="author" name="author" type="text"></p>
+<p class="comment-form-email"><label for="email">ایمیل <span class="required">*</span></label><input id="email" name="email" type="text"></p>
+<p class="comment-form-url"><label for="url">وب‌سایت</label><input id="url" name="url" type="text"></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" value="ارسال دیدگاه"></p>
+</form>
+</div>
+</div>
+
 <!-- ================= نوار چسبان پخش ================= -->
 <div id="ab-sticky-player" class="ab-sticky" role="region" aria-label="پخش آهنگ" data-ab-sp-mode="links" data-ab-sp-index="1">
 <div class="ab-sp__in">
@@ -175,6 +234,9 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <div class="pv-note">
 <b>چیزی که اینجا می‌بینید</b> = نشانه‌گذاری واقعیِ <code>header.php</code> / <code>inc/songs_post.php</code> / <code>single.php</code> / <code>404.php</code> + CSS واقعیِ همین نسخه (<code>style.css</code> بلوک ۲۶ و <code>css/ab-glass.css</code>).<br>
 <b>دکمۀ «لایۀ شیشه‌ای»</b> دقیقاً همان کاری را می‌کند که <code>define('JAVANSEDA_GLASS_UI', false)</code> روی هاست می‌کند: فایل خاموش می‌شود و ساختار/تراز دست‌نخورده می‌ماند.<br>
+<b>برای ریل‌های موبایل</b> پنجره را زیر ۷۶۸px بیاورید: خواننده‌ها و آهنگ‌های صفحۀ اصلی اسلایدرِ لمسی (scroll-snap) می‌شوند و فهرست‌های بلند (صفحۀ خواننده، جست‌وجو) دو ستون فشرده.<br>
+<b>کشوی منو</b> بالا-راست همین صفحه با همان CSS واقعی باز می‌شود؛ در 3.3.2 backdrop-filterِ هدر، فرزندِ <code>position:fixed</code> را داخل جعبۀ ۶۵px هدر گیر می‌انداخت (علت «منو کلا رفته»).
+
 <b>پنجره را بکشید</b> (یا دکمۀ «عرض باریک») تا ببینید ظرف از ۱۳۰۰pxِ پله‌ای به <code>max-width + gutter</code> پیوسته رسیده: ستون‌ها با <code>auto-fill</code> کم/زیاد می‌شوند و هیچ برشِ یک‌طرفه‌ای نیست.
 </div>
 </div>
@@ -192,6 +254,16 @@ body{padding:0 0 90px;background:var(--ab-page)}
 		        '<footer><span class="ft_box_format">128 / 320</span></footer></article></li>';
 	}
 	ul.innerHTML = html;
+	var names=['روزبه بمانی','حامد حسینی','ناصر زینعلی','معین حبیبی','آصف آریا','شهرام صولتی','مهدی رجبیان','نیما مسیحا','علیرضا طلیسچی','رضا صادقی'];
+	var sl=document.getElementById('pv-artists'), ah='';
+	for (var k=0;k<names.length;k++){ ah += '<a href="#n"><img src="../javanseda/images/no-artist.jpg" width="150" height="150" alt="'+names[k]+'"><span>'+names[k]+'</span></a>'; }
+	if (sl) sl.innerHTML = ah;
+	var ico=document.getElementById('pv-navicon'), dr=document.getElementById('pv-drawer'), de=document.getElementById('pv-deactive');
+	function op(open){ if(!dr) return; dr.style.marginRight = open ? '0px' : '-262px'; if(de) de.style.display = open ? 'block' : 'none'; if(ico) ico.setAttribute('aria-expanded', open ? 'true':'false'); }
+	if (ico) ico.addEventListener('click', function(){ op(dr.style.marginRight !== '0px'); });
+	if (ico) ico.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ico.click(); } });
+	if (de) de.addEventListener('click', function(){ op(false); });
+	op(false);
 	var night=document.getElementById('pv-night'), glass=document.getElementById('ab-glass'), gbtn=document.getElementById('pv-glass'), wbtn=document.getElementById('pv-w'), wrap=document.querySelector('.tarlanweb_center'), meter=document.getElementById('pv-width');
 	night.addEventListener('click',function(){ document.body.className = document.body.className.indexOf('night')>-1 ? document.body.className.replace(/ ?night/,'') : (document.body.className+' night').replace(/\s+/g,' '); });
 	gbtn.addEventListener('click',function(){

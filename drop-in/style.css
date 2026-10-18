@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.3.3
+Version: 3.3.4
 */
 /*
 ==================================================================================
@@ -2959,35 +2959,16 @@ html{-webkit-text-size-adjust: 100%;text-size-adjust: 100%}
    ========================================================================================== */
 
 /* ---- ۱) ریل‌ها ---- */
-.artists_slider:not(.owl-loaded){display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:var(--ab-gap-sm);align-items:start;padding:2px 0}
-.artists_slider:not(.owl-loaded)>*{min-width:0}
-.artists_slider:not(.owl-loaded) a{width:auto;height:auto;margin:0;display:block;text-align:center;padding:6px 4px;border-radius:var(--ab-radius-m)}
-.artists_slider:not(.owl-loaded) a img{width:clamp(74px,62%,106px);height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:50%}
-.artists_slider:not(.owl-loaded) a span{display:block;margin-top:6px;font-size:12px;line-height:1.7}
-.artists_slider:not(.owl-loaded) a:hover{background:var(--ab-blue-soft)}
 .song_boxs .songs_title_box{margin-bottom:var(--ab-space-4)}
 @media (max-width: 767px){
-	.artist_boxs a,.artist_boxs a img{width:auto;height:auto;max-width:100%}
-	.artist_boxs a img{display:block;margin:0 auto}
-	.artists_slider:not(.owl-loaded){
-		display:flex;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
-		scroll-snap-type:x mandatory;scrollbar-width:none;gap:10px;padding:2px 1px 12px;margin:0
-	}
-	.artists_slider:not(.owl-loaded)>*{flex:0 0 auto;width:88px;scroll-snap-align:start}
-	.artists_slider:not(.owl-loaded) a img{width:66px}
-	.artists_slider.owl-carousel .owl-item{width:88px !important}
-	.artists_slider.owl-carousel .artist_boxs a,.artists_slider.owl-carousel .artist_boxs a img{width:auto;height:auto}
 	/* ریل‌های صفحۀ اصلی: اسلایدر لمسی */
-	body.home .song_boxs .song_boxs_posts ul,
-	.song_boxs.ab-related .song_boxs_posts ul{
+	body.home .song_boxs .song_boxs_posts ul{
 		display:flex;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
 		scroll-snap-type:x mandatory;scrollbar-width:none;gap:var(--ab-gap-sm);
 		padding:2px 1px 12px;margin:0;list-style:none
 	}
-	body.home .song_boxs .song_boxs_posts ul::-webkit-scrollbar,
-	.song_boxs.ab-related .song_boxs_posts ul::-webkit-scrollbar{display:none;width:0;height:0}
-	body.home .song_boxs .song_boxs_posts ul>li,
-	.song_boxs.ab-related .song_boxs_posts ul>li{flex:0 0 clamp(140px,43vw,172px);width:auto;margin:0;scroll-snap-align:start}
+	body.home .song_boxs .song_boxs_posts ul::-webkit-scrollbar{display:none;width:0;height:0}
+	body.home .song_boxs .song_boxs_posts ul>li{flex:0 0 clamp(140px,43vw,172px);width:auto;margin:0;scroll-snap-align:start}
 	/* فهرست‌های بلند: دو ستون فشرده (نه یک ستونِ کشیده) */
 	.song_boxs_posts ul{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ab-gap-sm)}
 	.songs_post .ft_box_head{padding:8px 10px}
@@ -2996,10 +2977,7 @@ html{-webkit-text-size-adjust: 100%;text-size-adjust: 100%}
 	.song_boxs+.song_boxs{margin-top:var(--ab-space-6)}
 }
 @media (max-width: 400px){
-	.artists_slider:not(.owl-loaded)>*{width:80px}
-	.artists_slider.owl-carousel .owl-item{width:80px !important}
-	body.home .song_boxs .song_boxs_posts ul>li,
-	.song_boxs.ab-related .song_boxs_posts ul>li{flex-basis:clamp(132px,46vw,158px)}
+	body.home .song_boxs .song_boxs_posts ul>li{flex-basis:clamp(132px,46vw,158px)}
 }
 
 /* ---- ۲) کشی منوی موبایل ---- */
@@ -3070,3 +3048,22 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 .ab-404-home:hover{color:#fff;background:var(--ab-blue-accent)}
 .night .ab-404-search input[type="search"],.night .ab-404-search input[type="text"],.night .ab-404-links a,.night .ab-404-back{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);color:#ededed}
 /* انتهای بلوک ۲۷ (v3.3.3) */
+
+/* ============================================================================================
+   بلوک ۲۸ (نسخۀ 3.3.4) — فلاشِ «کل صفحه را گرفتنِ اسلایدر» هنگام رفرش
+   ------------------------------------------------------------------------------------------
+   علت: `inc/ab-perf.php` اسکریپت‌ها را defer می‌کند (JAVANSEDA_PERF_DEFER=true — کار درست برای
+   سرعت) و owl هنگام init کلاس `.owl-loaded` را اضافه می‌کند. تুকۀ owl که در style.css قالب
+   هست، قاعدۀ `.owl-carousel{display:none}` را ندارد؛ پس تا لحظۀ init، هر ۵ آیندِ
+   `.vip_top_slider` (و همهِ خواننده‌ها) پشت‌سرهم و تمام‌عرض چیده می‌شوند ⇒ «یک‌دفعه کل صفحه».
+   راه‌حل CSS-خالص: تا قبل از `.owl-loaded` فقط آیند اول چیده شود. همان چیزی که بعد از init
+   هم دیده می‌شود ⇒ بدون پرشِ ارتفاع (CLS)، بدون JS تازه، بدون درخواست تازه.
+   نکته: تصاویر ۲ تا ۵ از قبل loading="lazy" هستند، پس پنهان‌کردنشان بار شبکه را هم کم می‌کند.
+   اگر جااسکریپت کلاً خاموش باشد، کاربر همین آیند اول را می‌بیند (و لینک «مشاهده بیشتر» پایین
+   همان بخش، بقیه را دارد) — یعنی هیچ محتوایی از دسترس/Crawl خارج نمی‌شود.
+   ========================================================================================== */
+.vip_top_slider:not(.owl-loaded),
+.artists_slider:not(.owl-loaded){display:block;overflow:hidden}
+.vip_top_slider:not(.owl-loaded)>:nth-child(n+2),
+.artists_slider:not(.owl-loaded)>:nth-child(n+2){display:none}
+/* انتهای بلوک ۲۸ (v3.3.4) */

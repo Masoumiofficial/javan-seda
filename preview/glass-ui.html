@@ -48,6 +48,7 @@ body{padding:0 0 90px;background:var(--ab-page)}
   <button type="button" id="pv-night">حالت شب</button>
   <button type="button" id="pv-glass">لایۀ شیشه‌ای: روشن</button>
   <button type="button" id="pv-w">عرض باریک</button>
+  <button type="button" id="pv-flash">فلاشِ پیش از init</button>
   <span class="pv-w" id="pv-width">viewport: —</span>
 </div>
 
@@ -81,10 +82,11 @@ body{padding:0 0 90px;background:var(--ab-page)}
 </nav>
 
 <div class="vip_img_box ab-vip-slider-box">
-<ul>
-<li><article class="vip_post ab-vip-post"><figure><a href="#n"><img class="ab-vip-img" src="../javanseda/images/nomusics.jpg" width="640" height="360" alt="اسلاید"></a></figure><header><h2><a href="#n">روزبه بمانی — بوسه آخر<span>تک‌آهنگ · ۱۴۰۴</span></a></h2></header></article></li>
-<li><article class="vip_post ab-vip-post"><figure><a href="#n"><img class="ab-vip-img" src="../javanseda/images/nomusics.jpg" width="640" height="360" alt="اسلاید"></a></figure><header><h2><a href="#n">حامد حسینی — شب بی‌ستاره<span>آلبوم · ۹ قطعه</span></a></h2></header></article></li>
-</ul>
+<div class="vip_top_slider owl-carousel owl-theme owl-loaded" id="pv-vip">
+<article class="vip_post ab-vip-post"><figure><a href="#n"><img class="ab-vip-img" src="../javanseda/images/nomusics.jpg" width="640" height="360" alt="اسلاید" loading="eager" fetchpriority="high"></a></figure><header><h2><a href="#n">روزبه بمانی — بوسه آخر<span>تک‌آهنگ · ۱۴۰۴</span></a></h2></header></article>
+<article class="vip_post ab-vip-post"><figure><a href="#n"><img class="ab-vip-img" src="../javanseda/images/nomusics.jpg" width="640" height="360" alt="اسلاید" loading="lazy"></a></figure><header><h2><a href="#n">حامد حسینی — شب بی‌ستاره<span>آلبوم · ۹ قطعه</span></a></h2></header></article>
+<article class="vip_post ab-vip-post"><figure><a href="#n"><img class="ab-vip-img" src="../javanseda/images/nomusics.jpg" width="640" height="360" alt="اسلاید" loading="lazy"></a></figure><header><h2><a href="#n">معین حبیبی — تا صبح<span>تک‌آهنگ · ۱۴۰۳</span></a></h2></header></article>
+</div>
 </div>
 
 <!-- ================= ریل کارت‌ها (netz: grid با gap، بدون margin منفی) ================= -->
@@ -97,7 +99,7 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <div class="song_boxs">
 <div class="songs_title_box"><h3>خواننده‌ها</h3><a href="#n">همهٔ خواننده‌ها</a><div class="clear"></div><div class="liner"></div></div>
 <div class="artist_boxs">
-<div class="artists_slider owl-carousel owl-theme" id="pv-artists"></div>
+<div class="artists_slider owl-carousel owl-theme owl-loaded" id="pv-artists"></div>
 <div class="clear"></div>
 </div>
 <div class="clear"></div>
@@ -234,7 +236,10 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <div class="pv-note">
 <b>چیزی که اینجا می‌بینید</b> = نشانه‌گذاری واقعیِ <code>header.php</code> / <code>inc/songs_post.php</code> / <code>single.php</code> / <code>404.php</code> + CSS واقعیِ همین نسخه (<code>style.css</code> بلوک ۲۶ و <code>css/ab-glass.css</code>).<br>
 <b>دکمۀ «لایۀ شیشه‌ای»</b> دقیقاً همان کاری را می‌کند که <code>define('JAVANSEDA_GLASS_UI', false)</code> روی هاست می‌کند: فایل خاموش می‌شود و ساختار/تراز دست‌نخورده می‌ماند.<br>
-<b>برای ریل‌های موبایل</b> پنجره را زیر ۷۶۸px بیاورید: خواننده‌ها و آهنگ‌های صفحۀ اصلی اسلایدرِ لمسی (scroll-snap) می‌شوند و فهرست‌های بلند (صفحۀ خواننده، جست‌وجو) دو ستون فشرده.<br>
+<b>فلاش رفرش</b> با دکمۀ «فلاشِ پیش از init» قابل دیدن است: تا لحظۀ اضافه‌شدن کلاس <code>owl-loaded</code> فقط آیند اول چیده می‌شود (بلوک ۲۸) — همان چیزی که بعد از init هم دیده می‌شود، پس پرش ارتفاع نداریم و JS تازه‌ای لازم نیست.<br>
+        <b>بخش هنرمندان</b> به حالت قبل برگشت: هر قاعدۀ من روی owl-item و سایز آیتم‌ها حذف شد و owl خودش تعداد/ظاهر را تعیین می‌کند.
+
+        <b>برای ریل‌های موبایل</b> پنجره را زیر ۷۶۸px بیاورید: خواننده‌ها و آهنگ‌های صفحۀ اصلی اسلایدرِ لمسی (scroll-snap) می‌شوند و فهرست‌های بلند (صفحۀ خواننده، جست‌وجو) دو ستون فشرده.<br>
 <b>کشوی منو</b> بالا-راست همین صفحه با همان CSS واقعی باز می‌شود؛ در 3.3.2 backdrop-filterِ هدر، فرزندِ <code>position:fixed</code> را داخل جعبۀ ۶۵px هدر گیر می‌انداخت (علت «منو کلا رفته»).
 
 <b>پنجره را بکشید</b> (یا دکمۀ «عرض باریک») تا ببینید ظرف از ۱۳۰۰pxِ پله‌ای به <code>max-width + gutter</code> پیوسته رسیده: ستون‌ها با <code>auto-fill</code> کم/زیاد می‌شوند و هیچ برشِ یک‌طرفه‌ای نیست.
@@ -264,6 +269,13 @@ body{padding:0 0 90px;background:var(--ab-page)}
 	if (ico) ico.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ico.click(); } });
 	if (de) de.addEventListener('click', function(){ op(false); });
 	op(false);
+	var flashOn=false, flashBtn=document.getElementById('pv-flash');
+	if (flashBtn) flashBtn.addEventListener('click', function(){
+		flashOn=!flashOn;
+		var list=[document.getElementById('pv-artists'), document.getElementById('pv-vip')];
+		for (var i=0;i<list.length;i++){ if(!list[i]) continue; if (flashOn) { list[i].className=list[i].className.replace(/\s*owl-loaded/,''); } else { list[i].className+=' owl-loaded'; } }
+		flashBtn.innerHTML = flashOn ? 'فلاش: روشن (قبل از init)' : 'فلاشِ پیش از init';
+	});
 	var night=document.getElementById('pv-night'), glass=document.getElementById('ab-glass'), gbtn=document.getElementById('pv-glass'), wbtn=document.getElementById('pv-w'), wrap=document.querySelector('.tarlanweb_center'), meter=document.getElementById('pv-width');
 	night.addEventListener('click',function(){ document.body.className = document.body.className.indexOf('night')>-1 ? document.body.className.replace(/ ?night/,'') : (document.body.className+' night').replace(/\s+/g,' '); });
 	gbtn.addEventListener('click',function(){

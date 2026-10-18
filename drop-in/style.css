@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.3.0
+Version: 3.3.1
 */
 /*
 ==================================================================================
@@ -1502,7 +1502,7 @@ box-shadow: 0 6px 20px rgba(17,17,17,.08);border-radius: 5px;}
 .night{background: var(--ab-page);color: var(--ab-text);}
 .night #header{background: var(--ab-charcoal);color: var(--ab-text);}
 .night a{color: #ddd;}
-.night #header{background: var(--ab-charcoal) !important;-webkit-box-shadow: 0 8px 3px -5px #000;-moz-box-shadow: 0 8px 3px -5px #000;box-shadow: 0 8px 3px -5px #000;}
+.night #header{background: var(--ab-glass-bg-strong, var(--ab-charcoal)) !important;-webkit-box-shadow: 0 8px 3px -5px #000;-moz-box-shadow: 0 8px 3px -5px #000;box-shadow: 0 8px 3px -5px #000;}
 .night .menu_right .menu-item-has-children:hover::after{color: #fff;}
 .night .music_box_player{background: var(--ab-charcoal);color: #fff;box-shadow: unset;}
 .night .disabled{color: #666;}
@@ -2083,13 +2083,13 @@ body{padding-top:0;}
 .ab-quickbar{
 	margin:0 0 24px 0 !important;
 	padding:10px 16px !important;
-	background:var(--ab-blue-soft) !important;
-	border:1px solid var(--ab-line) !important;
-	border-radius:12px !important;
+	background:var(--ab-glass-bg-strong, var(--ab-blue-soft)) !important;
+	border:1px solid var(--ab-glass-border, var(--ab-line)) !important;
+	border-radius:var(--ab-radius-m, 12px) !important;
 }
 .night .ab-quickbar{
-	background:#222222 !important;
-	border-color:rgba(255,255,255,0.08) !important;
+	background:var(--ab-glass-bg-strong, #222222) !important;
+	border-color:var(--ab-glass-border, rgba(255,255,255,0.08)) !important;
 }
 .ab-quickbar__list{
 	display:flex !important;

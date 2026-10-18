@@ -1,5 +1,5 @@
 /*
-   لایۀ «شیشه‌ای» جوان‌صدا — ab-glass.css (نسخۀ 3.3.0)
+   لایۀ «شیشه‌ای» جوان‌صدا — ab-glass.css (نسخۀ 3.3.1)
    =====================================================================================
    این فایل فقط *پوسته و عمق بصری* را اضافه می‌کند؛ هیچ تراز، عرض، ساختار داده یا
    رفتاری در آن تعریف نشده است (آن‌ها در style.css بلوک ۲۶ هستند). بنابراین اگر این
@@ -161,13 +161,10 @@
 .vip_post.ab-vip-post .ab-vip-img{border-radius: calc(var(--ab-radius-m, 14px) - 2px)}
 
 /* ----------------------------------------------- بخش‌ها و اجزای صفحۀ اصلی --- */
-.ab-quickbar{
-	background: var(--ab-glass-bg-strong);
-	border: 1px solid var(--ab-glass-border);
-	border-radius: var(--ab-radius-m, 14px);
-	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
-}
-.night .ab-quickbar{background: var(--ab-glass-bg-strong);border-color: var(--ab-glass-border)}
+/* quickbar: پس‌زمینه/مرز/شعاع در خودِ style.css با همان توکن‌ها تعریف شده (با
+   !important، چون بلوک ۲۱ قالب آن‌ها را important زده بود)؛ اینجا فقط عمق اضافه
+   می‌شود تا دو منبع با هم نجنگند. */
+.ab-quickbar{box-shadow: var(--ab-glass-hl), var(--ab-depth-1)}
 .songs_title_box a{
 	border-radius: var(--ab-radius-pill, 999px);
 	border-color: var(--ab-glass-border);

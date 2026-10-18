@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.3.4
+Version: 3.3.5
 */
 /*
 ==================================================================================
@@ -2662,21 +2662,21 @@ body.ab-has-mh{padding-top:90px;}
    خاموشی: JAVANSEDA_POST_EXTRAS / JAVANSEDA_STICKY_PLAYER یا گزینهٔ fixbtn
    اگر فایل لایه حذف شود، این قواعد بی‌مصرف می‌مانند ولی چیزی را نمی‌شکنند.
    ========================================================================== */
-.ab-social-box{display:block;margin:14px 0 8px;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:12px;box-shadow:0 1px 2px rgba(17,17,17,.04);overflow:hidden}
-.ab-social-box__head{display:flex;align-items:center;flex-wrap:wrap;padding:11px 14px;border-bottom:1px solid #eef1f6}
-.ab-social-box__head>i{font-size:16px;color:#185ADB;margin-left:8px}
-.ab-social-box__title{font-size:14px;font-weight:700;color:#111111}
-.ab-social-box__hint{margin-right:auto;font-size:11.5px;color:#8a92a6}
+.ab-social-box{display:block;margin:14px 0 8px;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:12px;box-shadow:0 1px 2px rgba(17,17,17,.04);overflow:hidden}
+.ab-social-box__head{display:flex;align-items:center;flex-wrap:wrap;padding:11px 14px;border-bottom:1px solid var(--ab-line)}
+.ab-social-box__head>i{font-size:16px;color:var(--ab-blue);margin-left:8px}
+.ab-social-box__title{font-size:14px;font-weight:700;color:var(--ab-text)}
+.ab-social-box__hint{margin-right:auto;font-size:11.5px;color:var(--ab-muted)}
 .ab-social-box__row{display:block;padding:11px 11px 13px}
-.ab-social{display:inline-flex;align-items:center;margin:0 8px 8px 0;padding:7px 11px 7px 9px;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:10px;color:#111111;text-decoration:none;transition:border-color .16s ease,background-color .16s ease}
-.ab-social__icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:30px;height:30px;margin-left:9px;border-radius:8px;background:#f2f5fb;color:#185ADB;font-size:16px;transition:background-color .16s ease,color .16s ease}
+.ab-social{display:inline-flex;align-items:center;margin:0 8px 8px 0;padding:7px 11px 7px 9px;background:var(--ab-page);border:1px solid var(--ab-line);border-radius:10px;color:var(--ab-text);text-decoration:none;transition:border-color .16s ease,background-color .16s ease}
+.ab-social__icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:30px;height:30px;margin-left:9px;border-radius:8px;background:var(--ab-blue-soft);color:var(--ab-blue);font-size:16px;transition:background-color .16s ease,color .16s ease}
 .ab-social__txt{display:block;min-width:0;line-height:1.35}
-.ab-social__txt b{display:block;font-size:12.5px;font-weight:700;color:#111111;white-space:nowrap}
-.ab-social__txt em{display:block;max-width:150px;overflow:hidden;font-size:10.5px;font-style:normal;font-weight:400;color:#8a92a6;white-space:nowrap;text-overflow:ellipsis;direction:ltr;unicode-bidi:embed}
-.ab-social__arrow{font-size:13px;color:#c3cbd9;transition:color .16s ease}
-.ab-social:hover,.ab-social:focus{border-color:#185ADB;background:#f7f9fd;color:#185ADB;text-decoration:none}
-.ab-social:hover .ab-social__icon,.ab-social:focus .ab-social__icon{background:#185ADB;color:#FFFFFF}
-.ab-social:hover .ab-social__arrow,.ab-social:focus .ab-social__arrow{color:#185ADB}
+.ab-social__txt b{display:block;font-size:12.5px;font-weight:700;color:var(--ab-text);white-space:nowrap}
+.ab-social__txt em{display:block;max-width:150px;overflow:hidden;font-size:10.5px;font-style:normal;font-weight:400;color:var(--ab-muted);white-space:nowrap;text-overflow:ellipsis;direction:ltr;unicode-bidi:embed}
+.ab-social__arrow{font-size:13px;color:var(--ab-muted);transition:color .16s ease}
+.ab-social:hover,.ab-social:focus{border-color:var(--ab-blue);background:var(--ab-blue-soft);color:var(--ab-blue-accent);text-decoration:none}
+.ab-social:hover .ab-social__icon,.ab-social:focus .ab-social__icon{background:var(--ab-blue);color:var(--ab-white)}
+.ab-social:hover .ab-social__arrow,.ab-social:focus .ab-social__arrow{color:var(--ab-blue-accent)}
 /* --- نوار چسبانِ پخش (کنترل همان <audio id="audio"> قالب) — 3.2.4 --- */
 /* رنگ‌ها از متغیرهای قالب می‌آیند؛ `.night` همان متغیرها را بازنویسی می‌کند
    ⇒ نوار در حالت شب خودکار تیره می‌شود (مشکل «سفید ماندن» از همین‌جا رفع شد).
@@ -2759,18 +2759,18 @@ a.ab-sp__title:hover,a.ab-sp__title:focus{color:var(--ab-blue-accent);text-decor
 /* چیدمان افقی: خودِ باکس یک ردیفِ flex است؛ تیتر جلوی چیپ‌ها می‌نشیند و
    هر آیکن/برچسب/مقدار یک «کادر کوچک» جداست. ارتفاع کل ≈ یک خط متن (۳۴px) و
    در موبایل چیپ‌ها بدون اسکرول‌بار در خود خط می‌شکنند. */
-.ab-credits{display:flex;align-items:center;flex-wrap:wrap;margin:12px 0;padding:8px 11px;background:#f7f9fd;border:1px solid #eef1f6;border-radius:14px}
-.ab-credits__title{display:inline-flex;align-items:center;margin:0 2px 0 4px;padding:0;font-size:12.5px;font-weight:700;color:#8a92a6;line-height:1.5}
-.ab-credits__title i{font-size:14px;color:#185ADB;margin-left:5px}
+.ab-credits{display:flex;align-items:center;flex-wrap:wrap;margin:12px 0;padding:8px 11px;background:var(--ab-page);border:1px solid var(--ab-line);border-radius:14px}
+.ab-credits__title{display:inline-flex;align-items:center;margin:0 2px 0 4px;padding:0;font-size:12.5px;font-weight:700;color:var(--ab-muted);line-height:1.5}
+.ab-credits__title i{font-size:14px;color:var(--ab-blue);margin-left:5px}
 .ab-credits__row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;flex:1 1 300px;min-width:0}
-.ab-credit{display:inline-flex;align-items:center;max-width:100%;margin:0;padding:4px 10px;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:999px;box-shadow:0 1px 1px rgba(17,17,17,.03);font-size:12.5px;line-height:1.5;transition:border-color .16s ease,box-shadow .16s ease}
-.ab-credit:hover{border-color:#185ADB;box-shadow:0 1px 3px rgba(24,90,219,.15)}
-.ab-credit>i{flex:0 0 auto;font-size:13px;color:#185ADB;margin-left:6px}
-.ab-credit__k{flex:0 0 auto;margin-left:6px;font-size:11px;font-weight:500;color:#8a92a6;white-space:nowrap}
-.ab-credit__v{min-width:0;font-size:12.5px;font-weight:700;color:#111111}
-.ab-credit__v a{color:#111111;text-decoration:none;border-bottom:1px solid transparent;transition:color .16s ease,border-color .16s ease}
-.ab-credit__v a:hover,.ab-credit__v a:focus{color:#185ADB;border-bottom-color:#185ADB;text-decoration:none}
-.ab-credit__sep{margin:0 4px;color:#c3cbd9;font-weight:400}
+.ab-credit{display:inline-flex;align-items:center;max-width:100%;margin:0;padding:4px 10px;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:999px;box-shadow:0 1px 1px rgba(17,17,17,.03);font-size:12.5px;line-height:1.5;transition:border-color .16s ease,box-shadow .16s ease}
+.ab-credit:hover{border-color:var(--ab-blue);box-shadow:0 1px 3px rgba(24,90,219,.15)}
+.ab-credit>i{flex:0 0 auto;font-size:13px;color:var(--ab-blue);margin-left:6px}
+.ab-credit__k{flex:0 0 auto;margin-left:6px;font-size:11px;font-weight:500;color:var(--ab-muted);white-space:nowrap}
+.ab-credit__v{min-width:0;font-size:12.5px;font-weight:700;color:var(--ab-text)}
+.ab-credit__v a{color:var(--ab-text);text-decoration:none;border-bottom:1px solid transparent;transition:color .16s ease,border-color .16s ease}
+.ab-credit__v a:hover,.ab-credit__v a:focus{color:var(--ab-blue-accent);border-bottom-color:var(--ab-blue-accent);text-decoration:none}
+.ab-credit__sep{margin:0 4px;color:var(--ab-muted);font-weight:400}
 @media (max-width:767px){
 	.ab-credits{padding:7px 9px;border-radius:12px}
 	.ab-credits__title{width:100%;margin:0 0 2px}
@@ -2849,13 +2849,21 @@ html{-webkit-text-size-adjust: 100%;text-size-adjust: 100%}
 .song_boxs{margin: var(--ab-space-7) 0}
 .ab-section-anchor{display: block;height: 0;margin: 0;padding: 0}
 .songs_title_box{display: flex;align-items: center;gap: var(--ab-space-3);width: 100%}
-.songs_title_box h1,.songs_title_box h2,.songs_title_box h3{float: none;margin: 0;font-size: 19px;line-height: 1.5;font-weight: 700;letter-spacing: 0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 60%}
+.songs_title_box h1,.songs_title_box h2,.songs_title_box h3{float: none;margin: 0;font-size: 19px;line-height: 1.5;font-weight: 700;letter-spacing: 0;min-width: 0}
+/* تیتر بخش‌های خانه کوتاه است ⇒ یک‌خطی با «…». ولی تیتر صفحۀ دسته/برچسب (h1) می‌تواند
+   بلند باشد؛ در 3.3.0 تا 3.3.4 همان `nowrap` روی آن هم می‌افتاد و عنوان بریده می‌شد
+   («آهنگ ج…» که مالک دید) ⇒ برای h1/h2 دو خط مجاز با line-clamp. */
+.songs_title_box h3{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 60%}
+.songs_title_box h1,.songs_title_box h2{max-width: 72%;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden}
 .songs_title_box .liner{order: 2;flex: 1 1 auto;width: auto;height: 1px;margin: 0;background: var(--ab-line);border-radius: 1px}
 .songs_title_box a{order: 3;float: none;margin: 0;padding: 6px 13px;border-radius: var(--ab-radius-pill);border: 1px solid var(--ab-line);background: var(--ab-blue-soft);font-size: 12px;line-height: 1.6;white-space: nowrap}
 .songs_title_box .clear{display: none}
 
 /* ۴) کارت آهنگ: ارتفاع محتوا‌محور (به‌جای پله‌های ۲۰۰/۲۱۰/۲۳۰px) + هاور بدون پرش */
-.songs_post{width: 100%;height: 100%;min-height: 0;display: flex;flex-direction: column;padding: 0;border-radius: var(--ab-radius-m);overflow: hidden}
+.songs_post{width: 100%;height: 100%;min-height: 0;display: flex;flex-direction: column;padding: 0;border-radius: var(--ab-radius-m)}
+/* برش گوشه‌ها روی خودِ figure است، نه کل کارت: با overflow:hidden روی کارت،
+   حلقۀ :focus-visible لینکِ داخل کارت در لبه‌ها بریده می‌شد */
+.songs_post header figure{overflow: hidden;border-radius: var(--ab-radius-m) var(--ab-radius-m) 0 0}
 .songs_post header{flex: 1 1 auto}
 .songs_post footer{margin-top: auto;padding: 0 12px 12px}
 .songs_post header figure{margin: 0 0 var(--ab-space-3)}
@@ -3067,3 +3075,30 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 .vip_top_slider:not(.owl-loaded)>:nth-child(n+2),
 .artists_slider:not(.owl-loaded)>:nth-child(n+2){display:none}
 /* انتهای بلوک ۲۸ (v3.3.4) */
+
+/* ============================================================================================
+   بلوک ۲۹ (نسخۀ 3.3.5) — ایرادهای گزارش‌شدۀ صفحۀ دسته‌ها، ریل هنرمندان و نایت‌مود
+   ------------------------------------------------------------------------------------------
+   ۱) عنوان دسته با «…» بریده می‌شد: `white-space:nowrap` + `text-overflow:ellipsis` که برای
+      تیتر کوتاهِ بخش‌ها (h3) نوشته شده بود، روی `h1` صفحۀ دسته هم می‌افتاد.
+   ۲) تیتر صفحۀ دسته زیرش «کادر سفید خالی» داشت → در category.php گارد شد + در ab-glass.css
+      قاعدۀ .archive_txt_box هم با :has() مشروط شد تا در بقیۀ قالب‌ها هم کادرِ بی‌محتوا نسازد.
+   ۳) ریل هنرمندان «بهم چسبیده» بود: owl فاصلۀ خود را از margin می‌گیرد و تکهٔ owlِ قالب آن را
+      کامل ندارد؛ پس فضا را با paddingِ درونِ خودِ آیتم ساختیم (هیچ عرض/اندازه‌ای عوض نمی‌شود،
+      هیچ !important روی .owl-item نیست، و owl همان‌که هست تعداد آیتم را تعیین می‌کند).
+      نام هنرمند هم یک‌خطی با «…» شد تا ارتفاع همهٔ کارت‌ها یکسان بماند و جهت RTL بگیرد
+      (تکهٔ owl قالب `direction:ltr !important` می‌داد).
+   ========================================================================================== */
+.artist_boxs a{padding: 6px 9px 2px;direction: rtl;text-align: center}
+.artist_boxs a img{box-shadow: 0 0 0 1px var(--ab-line)}
+.artist_boxs a span{max-width: 100%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding: 0 2px;font-size: 12.5px;line-height: 1.8}
+.artists_slider .owl-item{padding-block: 2px}
+.night .artist_boxs a img{box-shadow: 0 0 0 1px rgba(255,255,255,.14)}
+@media (max-width: 767px){
+	.artist_boxs a{padding: 4px 7px 0}
+	.artist_boxs a span{font-size: 11.5px}
+}
+/* سازگاری نایت‌مود (v3.3.5): .ab-social* و .ab-credit* که در 3.2.x با رنگ صلبِ روشن نوشته شده بودند
+   به توکن‌های --ab-* تبدیل شدند تا در حالت شب «کارت سفید با متن مشکی» نشوند؛ در حالت روشن
+   تنها تفاوت‌ها ملایم‌تر شدن مرزها و کمی پررنگ‌تر شدن رنگ‌های کمکی است. */
+/* انتهای بلوک ۲۹ (v3.3.5) */

@@ -197,15 +197,17 @@
 
 /* ----------------------------------------------------------- صفحۀ نوشته تکی --- */
 .music_box_player,
-.download_box,
 .dl_linksv_box,
 .single_content_box .ab-social-box,
-.single_content_box .ab-credits{
+.single_content_box .ab-credits,
+.download_box:has(a){
 	border: 1px solid var(--ab-glass-border);
 	border-radius: var(--ab-radius-l, 20px);
 	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
 	background: var(--ab-glass-bg-strong);
 }
+/* .download_box عمداً با :has(a) است: در ردیف‌های آلبوم (single.php:419) ممکن است هیچ
+   لینکی ست نشده باشد؛ آن‌جا همان div خالی یک «کادر سفیدِ بی‌دلیل» می‌ساخت. */
 .single_content_box .ab-credits{background: var(--ab-blue-soft)}
 .single_featured_image{
 	border-radius: var(--ab-radius-l, 20px);
@@ -253,7 +255,12 @@
 /* ------------------------------------------------- نتیجهٔ جست‌وجو و برگه‌ها --- */
 .search .song_boxs,
 .page .song_boxs{background: transparent}
-.archive_txt_box{
+/* کادر توضیح دسته/۴۰۴: فقط وقتی واقعاً محتوا دارد.
+   دلیش: در 3.3.3 این قاعده بی‌قیدوش بود ⇒ هر `.archive_txt_box` بی‌محتوا (دستۀ بدون
+   توضیح) یک «کادر سفید خالی» زیر عنوان می‌ساخت. `:has()` در همهٔ مرورگرهای امروزی هست
+   و اگر نباشد، فقط حالت سادهٔ بدون کادر می‌ماند (هیچ‌چیز پنهان/نمی‌شکند). */
+.archive_txt_box{padding: 0 2px;border: 0;background: transparent;box-shadow:none}
+.archive_txt_box:has(p,ul,ol,blockquote,h2,h3,h4,strong,em,a,img,br){
 	padding: 14px 16px;
 	border: 1px solid var(--ab-glass-border);
 	border-radius: var(--ab-radius-m, 14px);

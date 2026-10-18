@@ -96,7 +96,7 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <div class="clear"></div>
 </div>
 
-<div class="song_boxs">
+<div class="song_boxs song_boxs_posts">
 <div class="songs_title_box"><h3>خواننده‌ها</h3><a href="#n">همهٔ خواننده‌ها</a><div class="clear"></div><div class="liner"></div></div>
 <div class="artist_boxs">
 <div class="artists_slider owl-carousel owl-theme owl-loaded" id="pv-artists"></div>
@@ -108,7 +108,7 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <!-- ================= صفحۀ نوشته تکی ================= -->
 <h2 class="pv-h">صفحۀ نوشته تکی — همان بلوک‌های single.php</h2>
 <p>کاور، پلیر، شناسنامۀ آهنگ (چیپ‌ها)، باکس اجتماعی و لینک‌های دانلود. اولویت: وضوح اطلاعات و دسترسی سریع.</p>
-<div class="song_boxs">
+<div class="song_boxs song_boxs_posts">
 <div class="songs_title_box"><h1 style="font-size:20px">دانلود آهنگ بوسه آخر از روزبه بمانی</h1><div class="clear"></div><div class="liner"></div></div>
 <div class="single_content_box">
 <div class="single_featured_cover"><div class="single_featured_image"><img src="../javanseda/images/nomusics.jpg" width="700" height="700" alt="کاور"></div></div>
@@ -231,6 +231,21 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <li><a href="#n"><i class="icofont-microphone-alt"></i> همهٔ خواننده‌ها</a></li>
 </ul>
 <img class="ab-404-art" src="../javanseda/images/error404.jpg" width="626" height="496" alt="صفحه پیدا نشد">
+</div>
+
+<h2 class="pv-h">۶) صفحۀ دسته/بایگانی — v3.3.5 <span>عنوان بلند باید بشکند و «کادر سفیدِ بی‌توضیح» نباید باشد</span></h2>
+<div class="pv-card">
+	<div class="songs_title_box" style="border:0;background:none;box-shadow:none;padding:0">
+		<h1 style="color:var(--ab-text)">آهنگ جدید، بهترین آهنگ‌های فارسی ماه و مجموعه‌ای از موزیک‌های بی‌کلام و ریمیکس</h1>
+		<span class="liner"></span>
+		<a class="ab-see-all" href="#">مشاهده همه</a>
+	</div>
+	<div class="song_boxs song_boxs_posts">
+		<!-- توضیح دسته خالی: با گارد v3.3.5 هیچ کادری رندر نمی‌شود -->
+		<div class="archive_txt_box"><div class="clear"></div></div>
+		<div class="songs_post"><div class="tarlanweb_border colr5" style="display:block;height:100%"><div class="img_hidden"><a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3C/svg%3E" alt="نمونه ۱"></a></div><h3><a href="#"><span>بهنام بانی — آهنگ نمونه (عنوان بلند برای آزمون شکستن خط)</span></a></h3></div></div>
+	</div>
+	<p class="pv-p">بالا: اگر `category_description()` خالی باشد، `<div class="archive_txt_box">` یا چاپ نمی‌شود (گارد PHP) و در صورت چاپ شدن هم کادر/مرز ندارد (گارد CSS `:has()`) ⇒ آن «کادر خالی سفید» زیر عنوان از بین می‌رود. عنوان بلند هم به‌جای «آهنگ ج…» تا دو خط می‌شکند.</p>
 </div>
 
 <div class="pv-note">

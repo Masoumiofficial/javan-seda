@@ -51,7 +51,7 @@ body.ab-has-mh{padding-top:90px;}
 <?php } ?>
 <?php /* v3.3.8 — هوک استاندارد بدنه (پلاگین‌ها/اسکیپ‌لینک از همین‌جا درج می‌شوند) */ ?>
 <?php if ( function_exists( 'wp_body_open' ) ) { wp_body_open(); } ?>
-<?php if ( ! defined( 'JAVANSEDA_SKIP_LINK' ) || JAVANSEDA_SKIP_LINK ) { ?>
+<?php if ( ( ! defined( 'JAVANSEDA_SKIP_LINK' ) || JAVANSEDA_SKIP_LINK ) && ( ! function_exists( 'javan_seda_ui_on' ) || javan_seda_ui_on( 'ab_skip_link', true, 'JAVANSEDA_SKIP_LINK' ) ) ) { ?> /* v3.4.1 — تنظیمات قالب: لینک «پرش» «پرش به محتوا» */
 <a class="ab-skip-link" href="#centers_box">پرش به محتوای اصلی</a>
 <?php } /* JAVANSEDA_SKIP_LINK */ ?>
 <header id="header">

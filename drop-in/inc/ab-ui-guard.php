@@ -28,6 +28,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( defined( 'JAVANSEDA_UI_GUARD' ) && ! JAVANSEDA_UI_GUARD ) {
 	return;
 }
+/* v3.4.1 — خاموش‌کردن گارد از تنظیمات قالب (کنترل رابط ← ab_ui_guard) */
+if ( function_exists( 'javan_seda_ui_on' ) && ! javan_seda_ui_on( 'ab_ui_guard', true, 'JAVANSEDA_UI_GUARD' ) ) {
+	return;
+}
 
 if ( ! function_exists( 'javan_seda_ui_layer_cache_key' ) ) {
 	function javan_seda_ui_layer_cache_key() {

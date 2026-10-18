@@ -1,5 +1,15 @@
 <?php
 /* ---------------------------------------------------------------------------
+   v3.4.1 — «کنترل رابط» (inc/ab-controls.php)
+   گزینه‌های تنظیمات قالب (بخش «کنترل رابط») + اولویت define() در wp-config.php.
+   این include باید پیش از بقیۀ لایه‌ها بیاید، چون آن‌ها توابع همین فایل را صدا می‌زنند.
+   ------------------------------------------------------------------------- */
+$_javan_seda_controls = trailingslashit( get_template_directory() ) . 'inc/ab-controls.php';
+if ( is_readable( $_javan_seda_controls ) ) {
+	require_once $_javan_seda_controls;
+}
+unset( $_javan_seda_controls );
+/* ---------------------------------------------------------------------------
    لایهٔ ایمنی «سایدبار / ابزارک نوشته‌ها» (v3.0.2)
    اگر این include حذف شود، ناحیه‌های left_side / left_side2 / left_side1
    فقط به فایل رمزنگاری‌شدهٔ functions.php وابسته می‌مانند.

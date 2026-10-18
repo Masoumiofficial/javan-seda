@@ -13,6 +13,7 @@ if ( get_query_var( 'paged' ) ) {
 <div id="centers_box">
 
 <!-- نوار زیر هدر — در نسخهٔ 3.1.2 به «اخبار روز» تبدیل شد (منبع: نوشته‌های دستهٔ news) -->
+<?php if ( ! function_exists( 'javan_seda_ui_on' ) || javan_seda_ui_on( 'ab_quickbar', true, 'JAVANSEDA_QUICKBAR' ) ) { ?>
 <?php
 /* لایهٔ سازگاری: اگر myfunctions.php اعمال نشده باشد، همین‌جا فایل اخبار را بارگذاری می‌کند */
 if ( ! function_exists( 'javan_seda_news_ticker' ) ) {
@@ -50,6 +51,7 @@ if ( function_exists( 'javan_seda_news_ticker' ) ) {
 	</ul>
 </nav>
 <?php } ?>
+<?php } /* JAVANSEDA_QUICKBAR / ab_quickbar */ ?>
 
 <?php get_template_part('inc/vip_slider'); ?>
 <?php get_template_part('inc/tarlanweb_player'); ?>

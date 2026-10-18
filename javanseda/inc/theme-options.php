@@ -28,6 +28,7 @@ array('id'=>'homes','title'=>'صفحه اصلی'),
 array('id'=>'dl_pages','title'=>'صفحه دانلود آهنگ'),
 array('id'=>'ads1','title'=>'تبلیغات'),
 array('id'=>'footer','title'=>'پانوشت'),
+array('id'=>'ab_ui','title'=>'کنترل رابط'),
 ),
 'settings'=>array( 
 // General
@@ -466,6 +467,168 @@ array(
 'std'=>'on',
 'type'=>'on-off',
 'section'=>'dl_pages'
+),
+
+/* ---- v3.4.1 — «کنترل رابط» + کنترلرهای فوتر (سورس: inc/ab-controls.php) ---- */
+array(
+'id'=>'ab_glass_ui',
+'label'=>'لایۀ شیشه‌ایِ کارت‌ها',
+'desc'=>'کارت/سایه/بلور روی باکس‌ها (css/ab-glass.css). خاموش = فقط استایل خودِ قالب.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_ui_guard',
+'label'=>'گاردِ لایۀ CSS',
+'desc'=>'اگر روزی style.css بازنویسی شود و بلوک انتهایی‌اش برود، کپیِ همان استایل از css/ab-ui.css لود می‌شود. پیشنهاد: روشن.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_card_stats',
+'label'=>'بازدید و رأی روی کاور',
+'desc'=>'عدد بازدید و میانگین رأی روی کارتِ آهنگ‌ها در صفحۀ اصلی و فهرست‌ها.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_sticky_player',
+'label'=>'نوار چسبان پخش',
+'desc'=>'نوار پایینِ صفحه در صفحۀ تکیِ آهنگ. خاموش = هیچ DOM یا اسکریپتی چاپ نمی‌شود.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_skip_link',
+'label'=>'لینک «پرش به محتوا»',
+'desc'=>'نخستین لینکِ صفحه برای کیبورد و صفحه‌خوان.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_quickbar',
+'label'=>'نوار دسترسی سریع',
+'desc'=>'نوار زیر هدرِ صفحۀ اصلی (تازه‌ترین آهنگ‌ها · همهٔ خواننده‌ها · پربازدیدترین‌ها / اخبار روز).',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_player_mode',
+'label'=>'شکل پلیرِ صفحۀ اصلی',
+'desc'=>'«کارت» = حالت فعلی (کادر، گردی، فهرست در پایین کارت). «فشرده» = همان کارت با ارتفاع کمتر. «ساده» = بدون کادر و سایه، مثل قالب مادر.',
+'std'=>'card',
+'type'=>'select',
+'choices'=>array(
+array('value'=>'card','label'=>'کارت'),
+array('value'=>'compact','label'=>'فشرده'),
+array('value'=>'legacy','label'=>'ساده (قالب مادر)'),
+),
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_player_list',
+'label'=>'فهرست آلبوم در پلیر',
+'desc'=>'«دکمه» = لینک «نمایش آلبوم» زیر پلیر (حالت فعلی). «باز» = فهرست همیشه نمایش داده می‌شود. «مخفی» = فهرست و دکمه حذف می‌شوند.',
+'std'=>'btn',
+'type'=>'select',
+'choices'=>array(
+array('value'=>'btn','label'=>'دکمه'),
+array('value'=>'open','label'=>'باز'),
+array('value'=>'hide','label'=>'مخفی'),
+),
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_player_volume',
+'label'=>'دکمۀ صدا در پلیر',
+'desc'=>'اسلایدر تنظیم صدا.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_player_gap',
+'label'=>'فاصلۀ پایین پلیر (px)',
+'desc'=>'فاصلۀ میان پلیر تا محتوای زیر آن؛ فقط عدد، بدون px. پیش‌فرض ۳۰، بازۀ مجاز ۰ تا ۹۶.',
+'std'=>'30',
+'type'=>'text',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_player_radius',
+'label'=>'گردی گوشۀ پلیر (px)',
+'desc'=>'گردی کارت پلیر؛ فقط عدد. ۰ = گوشۀ تیز، پیش‌فرض ۲۰.',
+'std'=>'20',
+'type'=>'text',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_player_border',
+'label'=>'کادر پلیر',
+'desc'=>'خط دور کارت پلیر.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_player_shadow',
+'label'=>'سایۀ پلیر',
+'desc'=>'سایۀ نرم زیر کارت پلیر.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_footer_cols',
+'label'=>'ستون‌های فوتر',
+'desc'=>'هر ستون که اینجا تیک نخورد اصلاً چاپ نمی‌شود و ستون‌های باقی‌مانده عرض را پر می‌کنند.',
+'std'=>array('about','links','cats','social'),
+'type'=>'checkbox',
+'choices'=>array(
+array('value'=>'about','label'=>'درباره ما'),
+array('value'=>'links','label'=>'لینک‌های مفید'),
+array('value'=>'cats','label'=>'دسته‌های پرطرفدار'),
+array('value'=>'social','label'=>'ما را دنبال کنید'),
+),
+'section'=>'footer'
+),
+array(
+'id'=>'ab_footer_pinned',
+'label'=>'دو لینک اصلی فوتر',
+'desc'=>'«همهٔ خواننده‌ها» و «تازه‌ترین آهنگ‌ها» در ستون لینک‌های مفید.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'footer'
+),
+array(
+'id'=>'ab_footer_links',
+'label'=>'لینک‌های دستی فوتر',
+'desc'=>'هر خط یک لینک به شکل: عنوان|آدرس — مثلاً «قوانین|https://ahangban.ir/rules». خطی که با # شروع شود نادیده گرفته می‌شود.',
+'std'=>'',
+'type'=>'textarea',
+'section'=>'footer'
+),
+array(
+'id'=>'ab_footer_search',
+'label'=>'جست‌وجو در فوتر',
+'desc'=>'فرم جست‌وجوی پایین صفحه (زیر لینک‌های شبکهٔ اجتماعی).',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'footer'
+),
+array(
+'id'=>'ab_footer_cats_num',
+'label'=>'تعداد رده‌های فوتر',
+'desc'=>'تعداد «دسته‌های پرطرفدار» در ستون سوم فوتر؛ فقط عدد. ۰ = همه، پیش‌فرض ۸.',
+'std'=>'8',
+'type'=>'text',
+'section'=>'footer'
 ),
 
 ));

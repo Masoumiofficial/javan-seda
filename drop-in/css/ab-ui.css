@@ -613,20 +613,30 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
    بازگشت: همین بلوک را از انتهای style.css حذف کنید (CSSِ خالص ⇒ کلید PHP ندارد).
    ========================================================================================== */
 
-/* ۱) کارت — تک‌منبع، در هوم و در صفحۀ نوشته یکسان */
+/* ۱) کارت — تک‌منبع، در هوم و در صفحۀ نوشته یکسان.
+      v3.4.1 — همه‌چیز از توکن‌های --ab-player-* خوانده می‌شود و همان توکن‌ها را
+      «تنظیمات قالب ← کنترل رابط» (inc/ab-controls.php) ست می‌کند. سه اصلاح مهم:
+      · height:auto — قالب مادر (خط 928) هنوز 80px ارتفاع می‌دهد؛ اینجا صریح
+        خنثی می‌شود تا با کم‌شدن هر بلوک، کارت له نشود.
+      · overflow:visible — با hidden ردیف آخر لیست آلبوم درست روی لبۀ پایین و
+        گوشۀ گرد بریده می‌شد (همان «چسبیدن به پایین» که گزارش شده بود).
+      · margin-bottom از توکن ⇒ فاصلۀ پایین پلیر تا محتوای زیرش یک‌دست و قابل‌تنظیم. */
 .music_box_player{
-	background: var(--ab-surface);
-	border: 1px solid var(--ab-line);
-	border-radius: var(--ab-radius-l, 20px);
-	box-shadow: var(--ab-depth-1, 0 1px 2px rgba(17,17,17,.05), 0 8px 22px rgba(17,17,17,.06));
-	padding: 14px 16px;
-	margin: 0 0 18px;
-	overflow: hidden;
+	background: var(--ab-player-bg, var(--ab-surface));
+	border: var(--ab-player-border, 1px solid var(--ab-line));
+	border-radius: var(--ab-player-radius, var(--ab-radius-l, 20px));
+	box-shadow: var(--ab-player-shadow, var(--ab-depth-1, 0 1px 2px rgba(17,17,17,.05), 0 8px 22px rgba(17,17,17,.06)));
+	padding: var(--ab-player-pad, 14px 16px);
+	margin: 0 0 var(--ab-player-gap, 30px);
+	height: auto;min-height: 0;overflow: visible;
 }
-.single_content_box .music_box_player{margin: 26px 0 0;padding: 14px 16px;background: var(--ab-surface);border: 1px solid var(--ab-line);box-shadow: var(--ab-depth-1, 0 8px 22px rgba(17,17,17,.06))}
+/* در صفحۀ اصلی پلیر داخل #index_music_player است؛ فاصلۀ همان پوسته هم توکنی شد
+   تا «زیرِ پلیر» فقط یک جا تعریف شود (بلوک ۳۰ مقدار 26px می‌داد). */
+#index_music_player{margin: 0 0 var(--ab-player-gap, 30px)}
+.single_content_box .music_box_player{margin: 26px 0 var(--ab-player-gap, 30px);padding: var(--ab-player-pad, 14px 16px);background: var(--ab-player-bg, var(--ab-surface));border: var(--ab-player-border, 1px solid var(--ab-line));border-radius: var(--ab-player-radius, var(--ab-radius-l, 20px));box-shadow: var(--ab-player-shadow, var(--ab-depth-1, 0 1px 2px rgba(17,17,17,.05), 0 8px 22px rgba(17,17,17,.06)));overflow: visible}
 
 /* ۲) ردیف کنترل‌ها: سه ستونِ انعطاف‌پذیر با فاصلۀ یکسان (دیگر float و عرض درصدی نیست) */
-.music_box_player .player{gap: 16px;align-items: center}
+.music_box_player .player{gap: var(--ab-player-row-gap, 16px);align-items: center}
 .player_controls{gap: 8px;align-items: center}
 .music_box_player .info-box{gap: 14px;align-items: center}
 .music_box_player .info-box .track-info-box{gap: 10px;align-items: baseline}
@@ -647,7 +657,7 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 .music_box_player .previous-track-btn,
 .music_box_player .next-track-btn,
 .music_box_player .album_show_hide{
-	width: 40px;height: 40px;float: none;font-size: 9px;line-height: 1;
+	width: var(--ab-player-btn, 40px);height: var(--ab-player-btn, 40px);float: none;font-size: 9px;line-height: 1;
 	display: inline-flex;align-items: center;justify-content:center;
 	border-radius: 999px;background: var(--ab-blue-soft);color: var(--ab-blue);cursor: pointer;
 	transition: background .16s ease, color .16s ease, transform .12s ease;
@@ -662,7 +672,7 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 .music_box_player .previous-track-btn.disabled,
 .music_box_player .next-track-btn.disabled{opacity: .42;pointer-events: none}
 .music_box_player .large-toggle-btn{
-	width: 52px;height: 52px;float: none;flex: 0 0 auto;
+	width: var(--ab-player-play, 52px);height: var(--ab-player-play, 52px);float: none;flex: 0 0 auto;
 	display: inline-flex;align-items: center;justify-content: center;
 	border-radius: 999px;background: var(--ab-blue);color: var(--ab-white);cursor: pointer;
 	box-shadow: var(--ab-depth-1, 0 6px 16px rgba(24,90,219,.28));
@@ -703,11 +713,15 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 	width: 92px;max-width: 28vw;height: 18px;margin: 0;accent-color: var(--ab-blue);cursor: pointer;
 }
 
-/* ۷) لیست آلبوم: از «پنل سفیدِ شناور» به بخشِ هم‌عرضِ پایینِ همان کارت (بی‌جعبۀ سوم) */
+/* ۷) لیست آلبوم: بخشِ پایینِ کارت، ولی *داخل* padding خودش.
+      v3.4.1 — مارجین منفی (‎-14px) و چسبیدن به لبۀ کارت حذف شد: قبلاً ردیف آخر دقیقاً به
+      لبۀ پایین کارت می‌چسبید و با گوشۀ گرد بریده می‌شد ⇒ «پایین پلیر کم و بقیه مشخصه».
+      حالا فهرست با فاصلۀ خودش تمام می‌شود و کارت تا محتوای زیرش فاصلۀ استاندارد دارد. */
 .music_box_player .play-list{
 	position: static;width: auto;max-width: none;left: auto;top: auto;z-index: auto;
-	margin: 14px -16px -14px;padding: 10px 16px 12px;
-	background: transparent;border-top: 1px solid var(--ab-line);border-radius: 0;box-shadow: none;
+	margin: var(--ab-player-list-gap, 14px) 0 0;padding: 10px 0 2px;
+	background: var(--ab-player-list-bg, transparent);
+	border-top: var(--ab-player-list-sep, 1px solid var(--ab-line));border-radius: 0;box-shadow: none;
 }
 #index_music_player .play-list{max-height: 296px;overflow: auto;overscroll-behavior: contain;-webkit-overflow-scrolling: touch}
 .music_box_player .play-list .play-list-row{
@@ -755,15 +769,15 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 	.music_box_player .volume_box{flex: 0 0 auto}
 }
 @media (max-width: 760px){
-	.music_box_player{padding: 12px 13px 10px}
+	.music_box_player{padding: 12px 13px}
 	.music_box_player .player{gap: 12px}
 	.music_box_player .progress-box .progress-cell{flex: 1 1 100%}
 	.music_box_player .volume_box{flex: 1 1 100%;order: 5;justify-content: flex-start}
 	.music_box_player .volume_box input[type=range]{width: 100%;max-width: 220px;flex: 1 1 auto}
-	.music_box_player .play-list{margin: 12px -13px -10px;padding: 8px 13px 10px}
+	.music_box_player .play-list{margin: 11px 0 0;padding: 8px 0 2px}
 }
 @media (max-width: 600px){
-	#index_music_player{margin-bottom: 20px}
+	#index_music_player{margin: 0 0 var(--ab-player-gap, 26px)}
 	.music_box_player .info-box{flex-direction: column;align-items: stretch;gap: 6px}
 	.music_box_player .info-box .track-info-box{flex-direction: row;align-items: center;gap: 8px}
 	.music_box_player .progress-box{flex: 1 1 100%;min-width: 0}
@@ -773,10 +787,10 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 	#index_music_player .play-list{max-height: 240px}
 }
 @media (max-width: 420px){
-	.music_box_player{padding: 11px 11px 9px}
+	.music_box_player{padding: 11px}
 	.music_box_player .info-box .track-info-box .track-title-text{font-size: 13px}
-	.music_box_player .play-list{margin: 11px -11px -9px;padding: 8px 11px 9px}
-	.music_box_player .play-list .play-list-row{padding: 8px 8px}
+	.music_box_player .play-list{margin: 10px 0 0;padding: 8px 0 2px}
+	.music_box_player .play-list .play-list-row{padding: 9px 8px}
 }
 @media (hover: none){
 	.music_box_player .previous-track-btn,.music_box_player .next-track-btn,.music_box_player .album_show_hide{width: 44px;height: 44px}
@@ -794,4 +808,40 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 	.music_box_player .next-track-btn:active,
 	.music_box_player .album_show_hide:active{transform: none}
 }
-/* انتهای بلوک ۳۳ (v3.4.0) */
+/* انتهای بلوک ۳۳ (v3.4.0 · اصلاحیۀ 3.4.1) */
+
+/* ============================================================================================
+   بلوک ۳۴ (نسخۀ 3.4.1) — حالت‌های پلیر که از «تنظیمات قالب ← کنترل رابط» انتخاب می‌شوند
+   ------------------------------------------------------------------------------------------
+   inc/ab-controls.php بر اساس گزینه‌ها فقط دو چیز تولید می‌کند:
+     · کلاس روی <body>  →  ab-player-compact / ab-player-legacy / ab-player-list-open /
+                           ab-player-list-hide / ab-player-novol
+     · توکن‌های --ab-player-* در :root (داخل <style id="ab-ui-controls">، بعد از استایل‌ها
+       enqueue می‌شود ⇒ با همان ویژگی برنده است، بدون !important)
+   این بلوک همان کلاس‌ها را به رفتار CSS وصل می‌کند. DOM پلیر دست‌نخورده است، چون
+   js/scripts.js به ترتیب فرزندهایِ .progress-box و .play-list-row وابسته است.
+   اگر این بلوک حذف شود فقط «حالت‌ها» از کار می‌افتند و پلیر به شکل 3.4.0 برمی‌گردد.
+   پالت #FFFFFF · #185ADB · #111111 — بدون گرادینت — بدون !important.
+   ========================================================================================== */
+
+/* «ساده (قالب مادر)»: کارت بی‌جعبه است، پس جعبۀ سفیدِ خودِ قالب برای پلیرِ صفحۀ اصلی زنده می‌شود */
+body.ab-player-legacy #index_music_player{background: #fff;border-radius: 7px;box-shadow: 0 6px 20px rgba(17,17,17,.08);padding: 6px 10px}
+body.ab-player-legacy .music_box_player .play-list{max-height: 220px}
+
+/* «فهرست آلبوم: باز» — قاعدۀ خط 1385 (‎#index_music_player .play-list{display:none}) را با
+   ویژگیِ بیشتر بازنویسی می‌کند، نه با !important؛ کلیک روی «نمایش آلبوم» هم مثل قبل کار می‌کند */
+body.ab-player-list-open #index_music_player .play-list{display: block}
+
+/* «فهرست آلبوم: مخفی» — خودِ فهرست و دکمۀ «نمایش آلبوم» (جعبه‌های آلبوم که از قبل
+   display:none !important دارند بی‌تأثیر می‌مانند) */
+body.ab-player-list-hide .music_box_player .play-list,
+body.ab-player-list-hide .music_box_player .album_show_hide{display: none}
+
+/* «دکمۀ صدا: خاموش» — flex gap فقط بین آیتم‌های موجود حساب می‌شود، پس ردیف نمی‌شکند */
+body.ab-player-novol .music_box_player .volume_box{display: none}
+
+/* بازگشت: گزینه‌ها را در «تنظیمات قالب ← کنترل رابط» روی حالت پیش‌فرض بگذارید
+   (کارت / دکمه / روشن) یا همین بلوک ۳۴ را از انتهای style.css حذف کنید. برای تنظیم
+   دستیِ دقیق‌تر هم می‌شود توکن‌ها را در «ظاهره ← سفارشی‌سازی ← CSS اضافی» بازنویسی کرد:
+     :root{--ab-player-gap:36px;--ab-player-radius:14px}                          */
+/* انتهای بلوک ۳۴ (v3.4.1) */

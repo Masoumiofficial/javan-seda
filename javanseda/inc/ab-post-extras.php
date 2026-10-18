@@ -393,6 +393,10 @@ if ( ! function_exists( 'javan_seda_sticky_player' ) ) {
 		if ( ! javan_seda_x_on() || ! JAVANSEDA_STICKY_PLAYER ) {
 			return;
 		}
+		/* v3.4.1 — «نوار چسبان پخش» از تنظیمات قالب؛ خاموش = هیچ DOM/اسکریپتی چاپ نمی‌شود */
+		if ( function_exists( 'javan_seda_ui_on' ) && ! javan_seda_ui_on( 'ab_sticky_player', true, 'JAVANSEDA_STICKY_PLAYER' ) ) {
+			return;
+		}
 		if ( ! function_exists( 'is_singular' ) ) {
 			return;
 		}

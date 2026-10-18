@@ -23,6 +23,10 @@ body{padding:0 0 90px;background:var(--ab-page)}
 .pv-note{margin:36px 0 0;padding:14px 16px;border:1px dashed var(--ab-line);border-radius:14px;font-size:12px;line-height:2;color:var(--ab-muted)}
 .pv-note b{color:var(--ab-text)}
 .pv-note code{direction:ltr;display:inline-block;font-size:11px}
+.pv-switch button{padding:5px 11px;border:1px solid var(--ab-line);border-radius:999px;background:var(--ab-surface);color:var(--ab-text);font:inherit;font-size:12px;cursor:pointer}
+.pv-switch button:hover,.pv-switch button:focus{border-color:var(--ab-blue);color:var(--ab-blue)}
+.pv-switch button.pv-on{background:var(--ab-blue);border-color:var(--ab-blue);color:var(--ab-white)}
+.pv-switch input[type=range]{height:18px;margin:0}
 
 /* v3.3.8 — لینک پرش (بلوک ۳۲ style.css) در همین‌جا هم شبیه‌سازی می‌شود تا
    رفتار «با Tab ظاهر شدن» قابل دیدن باشد. */
@@ -121,6 +125,31 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <code>.album_show_hide</code> باز می‌شود (<code>slideToggle</code>) — اینجا برای دیدنِ چیدمان، باز است.
 با کلید <code>JAVANSEDA_GLASS_UI=false</code> هم کارت سرِ جایش می‌ماند، چون جعبه از لایۀ شیشه‌ای
 به style.css منتقل شد.</p>
+<p class="pv-note" style="margin:0 0 10px">v3.4.1 — شکل پلیر، نمای فهرست آلبوم، دکمۀ صدا و فاصلۀ پایینِ آن حالا
+<b>گزینه در تنظیمات قالب</b> هستند (تنظیمات قالب ← کنترل رابط). این‌جا همان کلاس‌ها و توکن‌ها را با
+دکمه امتحان می‌کند ⇒ چیزی که می‌بینید دقیقاً خروجیِ قاعدۀ ۳۳/۳۴ در <code>style.css</code> است.</p>
+<div class="pv-switch" style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:0 0 14px;font-size:12px">
+	<span style="color:var(--ab-muted)">شکل:</span>
+	<button type="button" data-pv-mode="card" class="pv-on">کارت</button>
+	<button type="button" data-pv-mode="compact">فشرده</button>
+	<button type="button" data-pv-mode="legacy">ساده (قالب مادر)</button>
+	<span style="color:var(--ab-muted);margin-inline-start:10px">فهرست آلبوم:</span>
+	<button type="button" data-pv-list="btn" class="pv-on">دکمه</button>
+	<button type="button" data-pv-list="open">باز</button>
+	<button type="button" data-pv-list="hide">مخفی</button>
+	<span style="color:var(--ab-muted);margin-inline-start:10px">صدا:</span>
+	<button type="button" data-pv-vol="off" class="pv-on">روشن</button>
+	<label style="display:inline-flex;align-items:center;gap:7px;margin-inline-start:10px;color:var(--ab-muted)">
+		<span>فاصلۀ پایین</span>
+		<input type="range" min="0" max="96" step="2" value="30" data-pv-gap style="width:120px;accent-color:var(--ab-blue)">
+		<output data-pv-gap-out dir="ltr">30px</output>
+	</label>
+	<label style="display:inline-flex;align-items:center;gap:7px;color:var(--ab-muted)">
+		<span>گردی</span>
+		<input type="range" min="0" max="40" step="2" value="20" data-pv-rad style="width:110px;accent-color:var(--ab-blue)">
+		<output data-pv-rad-out dir="ltr">20px</output>
+	</label>
+</div>
 <div class="tarlanweb_center">
 <div id="index_music_player">
 <div class="music_box_player" data-ab-player="1">
@@ -143,7 +172,7 @@ body{padding:0 0 90px;background:var(--ab-page)}
     </div>
   </div>
 </div>
-<div class="play-list" style="display:block">
+<div class="play-list" style="display:block" data-open="1">
   <div class="play-list-row"><div class="small-toggle-btn"><i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i></div><div class="track-number">1.</div><div class="track-title active-track"><a class="playlist-track" href="#" data-play-track="1">روزبه بمانی - بوسه آخر</a></div></div>
   <div class="play-list-row"><div class="small-toggle-btn"><i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i></div><div class="track-number">2.</div><div class="track-title"><a class="playlist-track" href="#" data-play-track="2">هما - شب بی‌پاسخ</a></div></div>
   <div class="play-list-row"><div class="small-toggle-btn"><i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i></div><div class="track-number">3.</div><div class="track-title"><a class="playlist-track" href="#" data-play-track="3">محسن یگانه - تا صبح منتظرتم (ریمیکس طولانی)</a></div></div>
@@ -315,6 +344,41 @@ body{padding:0 0 90px;background:var(--ab-page)}
 </div>
 
 <script>
+/* کنترل‌های دمو — دقیقاً همان دو چیزی که inc/ab-controls.php تولید می‌کند:
+   کلاس روی <body> + توکن‌های --ab-player-* در :root. هیچ CSS تازه‌ای این‌جا نیست. */
+(function(){
+	var box=document.querySelector('#index_music_player .music_box_player');
+	var list=document.querySelector('#index_music_player .play-list');
+	var btn=document.querySelector('#index_music_player .album_show_hide');
+	var st=document.createElement('style'); st.id='pv-controls'; document.head.appendChild(st);
+	var mode='card', lis='btn', vol='on', gap=30, rad=20;
+	function paint(){
+		document.body.className=document.body.className.replace(/\s*ab-player-[a-z-]+/g,'');
+		if(mode!=='card') document.body.classList.add('ab-player-'+mode);
+		if(lis!=='btn') document.body.classList.add('ab-player-list-'+lis);
+		if(vol==='off') document.body.classList.add('ab-player-novol');
+		var t=[];
+		t.push('--ab-player-gap:'+gap+'px');
+		t.push('--ab-player-radius:'+rad+'px');
+		if(mode==='compact'){t.push('--ab-player-pad:10px 12px 11px');t.push('--ab-player-row-gap:10px');t.push('--ab-player-btn:36px');t.push('--ab-player-play:44px');t.push('--ab-player-list-gap:10px');}
+		if(mode==='legacy'){t.push('--ab-player-bg:transparent');t.push('--ab-player-border:0');t.push('--ab-player-radius:0');t.push('--ab-player-shadow:none');t.push('--ab-player-pad:15px');t.push('--ab-player-list-bg:transparent');t.push('--ab-player-list-sep:0');}
+		st.textContent=':root{'+t.join(';')+'}';
+		/* حالت «دکمه» مثل صفحۀ واقعی: فهرست بسته است و با کلیک باز می‌شود */
+		if(list){ list.style.display = (lis==='open') ? 'block' : (lis==='hide' ? 'none' : (list.getAttribute('data-open')==='1' ? 'block' : 'none')); }
+		if(btn){ btn.style.visibility = (lis==='hide') ? 'hidden' : ''; }
+	}
+	document.querySelectorAll('[data-pv-mode]').forEach(function(b){ b.addEventListener('click',function(){
+		mode=b.getAttribute('data-pv-mode'); document.querySelectorAll('[data-pv-mode]').forEach(function(x){x.classList.toggle('pv-on',x===b);}); paint(); }); });
+	document.querySelectorAll('[data-pv-list]').forEach(function(b){ b.addEventListener('click',function(){
+		lis=b.getAttribute('data-pv-list'); document.querySelectorAll('[data-pv-list]').forEach(function(x){x.classList.toggle('pv-on',x===b);}); paint(); }); });
+	var vb=document.querySelector('[data-pv-vol]');
+	if(vb) vb.addEventListener('click',function(){ vol=(vol==='on')?'off':'on'; vb.textContent=vol==='on'?'روشن':'خاموش'; vb.classList.toggle('pv-on',vol==='off'); paint(); });
+	if(btn) btn.addEventListener('click',function(){ if(!list||lis!=='btn') return; var o=list.getAttribute('data-open')==='1'?'0':'1'; list.setAttribute('data-open',o); list.style.display=o==='1'?'block':'none'; });
+	function rng(sel,out,cb){ var i=document.querySelector(sel), o=document.querySelector(out); if(i) i.addEventListener('input',function(){ o.textContent=i.value+'px'; cb(+i.value); }); }
+	rng('[data-pv-gap]','[data-pv-gap-out]',function(v){ gap=v; paint(); });
+	rng('[data-pv-rad]','[data-pv-rad-out]',function(v){ rad=v; paint(); });
+	paint();
+})();
 /* کارت‌ها را با همان ساختار inc/songs_post.php می‌سازیم (فقط برای دمو) */
 (function(){
 	var titles=[['روزبه بمانی','بوسه آخر'],['حامد حسینی','شب بی‌ستاره'],['ناصر زینعلی','دل بی‌تو'],['معین حبیبی','تا صبح'],['آصف آریا','راه تو'],['شهرام صولتی','یاد تو'],['مهدی رجبیان','سراب'],['نیما مسیحا','گم'],['سیروان یوسفی','باران'],['علیرضا طلیسچی','برگرد'],['رضا صادقی','تنها'],['بهنام بانی','دخون']];

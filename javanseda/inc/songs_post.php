@@ -8,7 +8,9 @@ if ( ! function_exists( 'javan_seda_card_stats' ) ) {
 	function javan_seda_card_stats( $ab_post_id = 0 ) {
 		static $on = null;
 		if ( null === $on ) {
-			$on = ( ! defined( 'JAVANSEDA_CARD_STATS' ) || JAVANSEDA_CARD_STATS ) && apply_filters( 'javanseda_card_stats', true );
+			$on = ( ! defined( 'JAVANSEDA_CARD_STATS' ) || JAVANSEDA_CARD_STATS )
+				&& ( ! function_exists( 'javan_seda_ui_on' ) || javan_seda_ui_on( 'ab_card_stats', true, 'JAVANSEDA_CARD_STATS' ) ) /* v3.4.1 — تنظیمات قالب */
+				&& apply_filters( 'javanseda_card_stats', true );
 		}
 		if ( ! $on ) {
 			return;

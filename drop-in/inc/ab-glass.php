@@ -28,6 +28,12 @@ if ( ! defined( 'JAVANSEDA_GLASS_BLUR' ) ) {
 
 if ( ! function_exists( 'javan_seda_glass_enabled' ) ) {
 	function javan_seda_glass_enabled() {
+		/* v3.4.1 — «لایۀ شیشۀ‌ای» در تنظیمات قالب (کنترل رابط ← ab_glass_ui).
+		   define() در wp-config.php همچنان برنده است؛ اگر inc/ab-controls.php نصب
+		   نباشد هم رفتار قبلی دست‌نخورده می‌ماند. */
+		if ( function_exists( 'javan_seda_ui_on' ) && ! javan_seda_ui_on( 'ab_glass_ui', true, 'JAVANSEDA_GLASS_UI' ) ) {
+			return false;
+		}
 		if ( defined( 'JAVANSEDA_GLASS_UI' ) && false === JAVANSEDA_GLASS_UI ) {
 			return false;
 		}

@@ -288,3 +288,22 @@ textarea:focus-visible,
 	:root{--ab-glass-blur: 10px}
 	#header{border-bottom-width: 1px}
 }
+
+/* ------------------------------------------------------------------------- سرعت (v3.3.6) ---
+   `backdrop-filter: blur() saturate()` گران‌ترین جزء این پوسته برای GPUهای موبایل است
+   (شش سطح هم‌زمان ⇒ اسکرول و تایپینگ سنگین). در ≤۸۰۰px فیلتر را برمی‌داریم و همان سطح
+   نیمه‌شفاف/مرز/سایه سر جایش می‌ماند؛ روی دسکتاپ شیشه دست‌نخورده است.
+   اگر خواستید در همهٔ دستگاه‌ها خاموش شود: define('JAVANSEDA_GLASS_BLUR', false)
+   و اگر کلاً شیشه لازم نیست: define('JAVANSEDA_GLASS_UI', false)
+*/
+@media (max-width: 800px){
+	.ab-glass,
+	#header.darkHeader,
+	#mobiles_header::before,
+	.menu_right li ul.sub-menu,
+	.ab-sticky,
+	.ab-404-panel{
+		-webkit-backdrop-filter: none;
+		backdrop-filter: none;
+	}
+}

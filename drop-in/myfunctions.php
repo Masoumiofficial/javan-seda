@@ -47,6 +47,12 @@ unset( $_javan_seda_credits );
 
 /* v3.1.0 — لایهٔ سازگاری ACF: فقط وقتی ACF فعال نباشد توابع را تعریف می‌کند
    و از خطای کشندهٔ «Call to undefined function get_field()» در single.php جلوگیری می‌کند. */
+/* v3.3.0 — لایۀ شیشه‌ای (css/ab-glass.css) : فقط پوسته؛ خاموشی:  define( 'JAVANSEDA_GLASS_UI', false ); */
+$_javan_seda_glass = trailingslashit( get_template_directory() ) . 'inc/ab-glass.php';
+if ( is_readable( $_javan_seda_glass ) ) {
+	require_once $_javan_seda_glass;
+}
+unset( $_javan_seda_glass );
 $_javan_seda_acf = trailingslashit( get_template_directory() ) . 'inc/acf-compat.php';
 if ( is_readable( $_javan_seda_acf ) ) {
 	require_once $_javan_seda_acf;

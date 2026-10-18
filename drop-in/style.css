@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.2.4
+Version: 3.3.0
 */
 /*
 ==================================================================================
@@ -241,8 +241,6 @@ border-radius: 5px;}
 .songs_title_box a:hover{border: 1px solid var(--ab-blue);background: var(--ab-blue);color: #fff;}
 .song_boxs_posts,.artist_boxs{width: 100%;height: auto;clear: both;}
 
-.song_boxs_posts ul{margin: 0 -15px;}
-.song_boxs_posts ul li{width: 16.66%;height: auto;padding: 15px;float: right;}
 .songs_post{width: 100%;position: relative;height: 265px;background: #fff;
 box-shadow: 0 6px 20px rgba(17,17,17,.08);border-radius: 7px;transition: all 0.3s ease-in-out;-moz-transition: all 0.3s ease-in-out;-webkit-transition: all 0.3s ease-in-out;}
 .songs_post header figure{margin-bottom: 10px;}
@@ -1586,8 +1584,6 @@ body{padding-top:0;}
 }
 @media (max-width: 800px){
 .tarlanweb_center{width: 700px;}
-.song_boxs_posts ul{margin:0 -10px;}
-.song_boxs_posts ul li{width: 25%;padding:10px;}
 .songs_post{height: 230px;}
 
 #header{display: none;}
@@ -1628,7 +1624,6 @@ body{padding-top:0;}
 }
 @media (max-width: 500px){
 .tarlanweb_center{width: 450px;}
-.song_boxs_posts ul li{width: 33.3%;}
 .songs_post{height: 235px;}
 .progress-box input[type="range"]{width: 60%;}
 .artist_det_tarlanweb{margin-top: 140px;}
@@ -1651,7 +1646,6 @@ body{padding-top:0;}
 .comment-form-author,.comment-form-email,.form-submit #submit,#reviews #submit,
 .rkianoosh_txt form input[type="submit"]{width: 100% !important;}
 .fix_bottom_right_box a{font-size: 12px;}
-.song_boxs_posts ul li{width: 50%;}
 .volume_box{display: none !important;}
 #searches{width: 100%;}
 .socials_box {float: none;padding-top: 20px;clear: both;width:100%;text-align:center;}
@@ -1670,8 +1664,6 @@ body{padding-top:0;}
 
 @media (max-width: 250px){
 .tarlanweb_center{width: 90%;}
-.song_boxs_posts ul{margin: 0;}
-.song_boxs_posts ul li{width: 100%;padding:10px 0;}
 .songs_post header figure img{width: 100%;}
 .songs_post{height: auto;}
 .music_box_player .info-box .track-info-box{top: -10px;}
@@ -2296,62 +2288,21 @@ body{padding-top:0;}
 	background:var(--ab-blue-accent) !important;
 }
 
-/* هماهنگی فواصل منظم ۲۴px در صفحه اصلی */
-#centers_box .song_boxs{
-	margin:0 0 24px 0 !important;
-}
+/* هماهنگی فواصل: با توکن‌های --ab-space-* در بلوک ۲۶ */
 .ab-section-anchor{
 	position:relative !important;
 	top:-20px !important;
 	visibility:hidden !important;
 }
 
-/* شبکه کارتهای ۶ستونی دسکتاپ، ۳ تبلت، ۲ موبایل */
-.song_boxs_posts ul{
-	display:grid !important;
-	grid-template-columns:repeat(6, minmax(0, 1fr)) !important;
-	gap:16px !important;
-	margin:0 !important;
-	padding:0 !important;
-	list-style:none !important;
-}
-.song_boxs_posts ul li{
-	width:auto !important;
-	float:none !important;
-	padding:0 !important;
-	margin:0 !important;
-}
-.song_boxs_posts ul li .songs_post{
-	height:100% !important;
-	display:flex !important;
-	flex-direction:column !important;
-	border-radius:8px !important;
-}
-.song_boxs_posts ul li .songs_post header figure img{
-	width:100% !important;
-	aspect-ratio:1 / 1 !important;
-	object-fit:cover !important;
-	border-radius:8px 8px 0 0 !important;
-}
-.song_boxs_posts ul li .songs_post header h2 a{
-	font-size:13.5px !important;
-	line-height:1.6 !important;
-	padding:8px 10px !important;
-}
-.song_boxs_posts ul li .songs_post footer{
-	margin-top:auto !important;
-	padding:0 10px 10px !important;
-}
+/* شبکهٔ کارت‌ها و ریتم فاصله: از 3.3.0 در «بلوک ۲۶» (انتهای همین فایل) است.
+   قواعد تکراریِ اینجا (که با !important نوشته شده بودند) حذف شدند تا یک منبعِ حقیقت بماند. */
 
 /* حالت تبلت و موبایل */
 @media (max-width: 991px){
 	.ab-footer__grid{
 		grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
 		gap:24px !important;
-	}
-	.song_boxs_posts ul{
-		grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
-		gap:14px !important;
 	}
 }
 
@@ -2381,13 +2332,6 @@ body{padding-top:0;}
 	}
 	.ab-quickbar__link{
 		font-size:12.5px !important;
-	}
-	#centers_box .song_boxs{
-		margin-bottom:16px !important;
-	}
-	.song_boxs_posts ul{
-		grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
-		gap:10px !important;
 	}
 	.vip_post.ab-vip-post header h2{
 		padding:8px 12px !important;
@@ -2547,7 +2491,7 @@ body.ab-has-mh{padding-top:90px;}
 /* ایمنی موبایل: ظرف ثابت‌عرض نباید محتوا را در عرض باریک ببُرد + جلوگیری از برش عمودی */
 #centers_box,.single_content_box{overflow:visible;}
 @media (max-width: 800px){
-	.tarlanweb_center{width:auto !important;max-width:100% !important;margin-right:12px;margin-left:12px;}
+	.tarlanweb_center{width:auto !important;max-width:100% !important;margin-right:auto;margin-left:auto;}
 	.single_posts_right,.single_posts_left{width:100% !important;float:none !important;}
 	#centers_box{width:100% !important;}
 	.single_featured_image{max-width:100% !important;height:auto !important;}
@@ -2840,3 +2784,157 @@ a.ab-sp__title:hover,a.ab-sp__title:focus{color:var(--ab-blue-accent);text-decor
    میکروفنِ موجود (icofont-radio-mic) جایگزین شد؛ اگر آیکون‌فونت را کامل عوض کردید، خط بعد را بردارید. */
 .icofont-microphone-alt:before{content:"\ea4e"}
 /* --- انتهای بلوک ۲۵ (v3.2.3 — چیپی/افقی) --- */
+
+/*
+==================================================================================
+   بلوک ۲۶ (نسخۀ 3.3.0) — تراز سراسری، ریتم فاصله، کارت‌ها و خوانایی متن فارسی
+   --------------------------------------------------------------------------------
+   • این بلوک «ساختار» است و دائمی: عرض ظرف‌ها، شبکهٔ کارت‌ها، فاصله‌ها، تایپوگرافی.
+     زیباییِ شیشه‌ای در فایل جداگانه است (css/ab-glass.css) تا با یک define() خاموش
+     شود و این اصلاحات ساختاری دست‌نخورده بمانند.
+   • علت ریشۀ «وسط‌چین نبودن»: .tarlanweb_center عرضِ ثابتِ پله‌ای داشت
+     (1300 → 1200 → 1100 → … → 250) بدون هیچ padding طرفین؛ بین پله‌ها حاشیه‌ها
+     ناگهان عوض می‌شد و حلقۀ منفیِ .song_boxs_posts ul{margin:0 -15px} ریل را ۳۰px
+     از ظرف بیرون می‌زد — با body{overflow-x:hidden} در RTL همان برشِ یک‌طرفه
+     «کج بودن» به‌نظر می‌رسید. راه‌حل: ظرف سیال با max-width + gutter پیوسته،
+     و شبکهٔ CSS Grid با gap (بدون مارجین منفی، بدون float).
+   • هیچ متن تازه‌ای چاپ نمی‌شود، هیچ هوک تازه‌ای روی the_content/template_include
+     نیست، پالت سازمانی بدون گرادینت است (#FFFFFF · #185ADB · #111111).
+   • در آخر فایل است ⇒ با همان ویژگی (0,1,0)/(0,2,0) بر پلّه‌های قبلی می‌برد و
+     نیازی به !important جدید نیست.
+================================================================================== */
+:root{
+--ab-container: 1280px;
+--ab-gutter: clamp(14px, 3.4vw, 32px);
+--ab-gap: 22px;
+--ab-gap-sm: 14px;
+--ab-radius-s: 10px;
+--ab-radius-m: 14px;
+--ab-radius-l: 20px;
+--ab-radius-xl: 26px;
+--ab-radius-pill: 999px;
+--ab-space-1: 4px;
+--ab-space-2: 8px;
+--ab-space-3: 12px;
+--ab-space-4: 16px;
+--ab-space-5: 24px;
+--ab-space-6: 32px;
+--ab-space-7: 44px;
+}
+html{-webkit-text-size-adjust: 100%;text-size-adjust: 100%}
+
+/* ۱) ظرف مرکزی: سیال، متوازن، با حاشیۀ پیوسته — و بدون وسط‌چین کردن متن */
+.tarlanweb_center{
+	width: auto;
+	max-width: var(--ab-container);
+	margin-right: auto;
+	margin-left: auto;
+	padding-right: var(--ab-gutter);
+	padding-left: var(--ab-gutter);
+	text-align: right;
+}
+#centers_box{width: auto;max-width: 100%;min-width: 0}
+.tarlanweb_center img,.tarlanweb_center video,.tarlanweb_center iframe,.tarlanweb_center object,.tarlanweb_center embed{max-width: 100%}
+.single_content_box img,.single_content_box iframe{max-width: 100%;height: auto}
+
+/* ۲) ریل‌های کارت: grid با gap به‌جای float + مارجین منفی ⇒ هیچ سرریزی بیرون ظرف.
+   عمداً از min() استفاده نشده (پشتیبانی سراسری) و اگر grid نباشد آیتم‌ها به‌صورت
+   بلوکِ تمام‌عرض روی هم می‌چینند — یعنی در مرورگر خیلی قدیمی هم نمی‌شکند. */
+.song_boxs_posts ul{display: grid;grid-template-columns: repeat(auto-fill, minmax(188px, 1fr));gap: var(--ab-gap);margin: 0;padding: 0;list-style: none}
+.song_boxs_posts ul li{width: auto;float: none;padding: 0;margin: 0;min-width: 0}
+.vip_img_box ul{display: grid;grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));gap: var(--ab-gap);margin: 0;padding: 0}
+.vip_img_box ul li{width: auto;float: none;padding: 0;margin: 0}
+
+/* ۳) ریتم بخش‌ها */
+.song_boxs{margin: var(--ab-space-7) 0}
+.ab-section-anchor{display: block;height: 0;margin: 0;padding: 0}
+.songs_title_box{display: flex;align-items: center;gap: var(--ab-space-3);width: 100%}
+.songs_title_box h1,.songs_title_box h2,.songs_title_box h3{float: none;margin: 0;font-size: 19px;line-height: 1.5;font-weight: 700;letter-spacing: 0;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 60%}
+.songs_title_box .liner{order: 2;flex: 1 1 auto;width: auto;height: 1px;margin: 0;background: var(--ab-line);border-radius: 1px}
+.songs_title_box a{order: 3;float: none;margin: 0;padding: 6px 13px;border-radius: var(--ab-radius-pill);border: 1px solid var(--ab-line);background: var(--ab-blue-soft);font-size: 12px;line-height: 1.6;white-space: nowrap}
+.songs_title_box .clear{display: none}
+
+/* ۴) کارت آهنگ: ارتفاع محتوا‌محور (به‌جای پله‌های ۲۰۰/۲۱۰/۲۳۰px) + هاور بدون پرش */
+.songs_post{width: 100%;height: 100%;min-height: 0;display: flex;flex-direction: column;padding: 0;border-radius: var(--ab-radius-m);overflow: hidden}
+.songs_post header{flex: 1 1 auto}
+.songs_post footer{margin-top: auto;padding: 0 12px 12px}
+.songs_post header figure{margin: 0 0 var(--ab-space-3)}
+.songs_post header figure img{width: 100%;height: auto;aspect-ratio: 1 / 1;object-fit: cover;border-radius: 0}
+.songs_post header h2{margin: 0;padding: 0 12px 6px;font-size: 14px;line-height: 1.6}
+.songs_post header h2 a{display: block;padding: 0;font-size: 14px;font-weight: 600;line-height: 1.6}
+.songs_post header h2 a span{display: block;font-size: 12px;font-weight: 400;color: var(--ab-muted)}
+.songs_post:hover,.artist_boxs a:hover{-webkit-transform: none;transform: none}
+.songs_post:hover header figure img,.artist_boxs a:hover img{-webkit-transform: scale(1.03);transform: scale(1.03)}
+.songs_post header figure img{transition: transform .28s var(--ab-ease, ease)}
+
+/* ۵) خوانایی متن فارسی در صفحۀ نوشته */
+.single_content_box{font-size: 15px;line-height: 2.05;word-break: normal;overflow-wrap: anywhere}
+.single_content_box p{margin: 0 0 var(--ab-space-4);line-height: 2.05}
+.single_content_box h2,.single_content_box h3,.single_content_box h4{margin: var(--ab-space-6) 0 var(--ab-space-3);font-size: 17px;line-height: 1.7;font-weight: 700}
+.single_content_box h3{font-size: 16px}
+.single_content_box ul,.single_content_box ol{margin: 0 0 var(--ab-space-4);padding-inline-start: 22px}
+.single_content_box ul{list-style: disc}
+.single_content_box ol{list-style: decimal}
+.single_content_box li{list-style: inherit;margin-bottom: var(--ab-space-1);line-height: 1.95}
+.single_content_box blockquote{margin: var(--ab-space-5) 0;padding: var(--ab-space-3) var(--ab-space-4);border-right: 3px solid var(--ab-blue);background: var(--ab-blue-soft);font-style: normal;line-height: 1.95}
+.single_content_box a{text-decoration-thickness: 1px;text-underline-offset: 3px}
+.single_content_box table{width: 100%;border-collapse: collapse}
+.single_content_box td,.single_content_box th{padding: 8px 10px;border: 1px solid var(--ab-line)}
+
+/* ۶) دیدگاه‌ها و فرم‌ها */
+.commentlist > li{border: 1px solid var(--ab-line);border-radius: var(--ab-radius-m);padding: var(--ab-space-4);line-height: 1.9}
+.commentlist > li ul.children{margin: var(--ab-space-4) 0 0;padding-inline-start: var(--ab-space-5);list-style: none}
+#commentform p{margin: 0 0 var(--ab-space-3)}
+#commentform input[type="text"],#commentform input[type="email"],#commentform input[type="url"],#commentform textarea{width: 100%;max-width: 520px;padding: 9px 12px;border: 1px solid var(--ab-line);border-radius: var(--ab-radius-s);font-size: 13.5px;line-height: 1.8}
+#commentform textarea{min-height: 120px}
+#commentform input[type="submit"]{padding: 9px 18px;border: 0;border-radius: var(--ab-radius-pill);background: var(--ab-blue);color: #fff;font-size: 13px;cursor:pointer}
+
+/* ۷) صفحۀ ۴۰۴ (ساختار؛ شیشه در ab-glass.css) */
+.ab-404-hero{display: grid;grid-template-columns: auto 1fr;gap: var(--ab-space-5);align-items: center;padding: var(--ab-space-6);margin: var(--ab-space-6) 0}
+.ab-404-badge{grid-column: 1;font-size: clamp(44px, 9vw, 76px);line-height: .95;font-weight: 800;color: var(--ab-blue);letter-spacing: -2px;text-align: center;direction: ltr}
+.ab-404-hero__body{grid-column: 2;min-width: 0}
+.ab-404-hero__body h1{margin: 0 0 var(--ab-space-2);font-size: 21px;line-height: 1.6}
+.ab-404-hero__body p{margin: 0;font-size: 13.5px;line-height: 2}
+.ab-404-actions{display: flex;flex-wrap: wrap;gap: var(--ab-space-3);align-items: center;margin: var(--ab-space-5) 0 0}
+/* جست‌وجو/لینک‌ها/تصویر ۴۰۴ از قبل در «بلوک ۲۱» همین فایل است؛ اینجا فقط شعاع‌ها و
+   فاصله‌ها با توکن هماهنگ می‌شوند (تکرار قواعدِ قبلی را اضافه نکردم). */
+.ab-404-search{margin: var(--ab-space-5) 0 0}
+.ab-404-links{margin: var(--ab-space-4) 0 0;padding: 0;list-style: none}
+.ab-404-links li{list-style: none}
+.ab-404-search input,.ab-404-search button,.ab-404-links a{border-radius: var(--ab-radius-pill)}
+.ab-404-links a{display: inline-flex;align-items: center}
+.ab-404-links a i{margin-left: 6px;color: var(--ab-blue);font-size: 15px}
+.ab-404-home{display: inline-flex;align-items:center;padding: 10px 20px;background: var(--ab-blue);color: #fff;font-size: 13px;line-height: 1.6;text-decoration:none}
+.ab-404-home i{margin-left: 7px}
+.ab-404-art{display: block;width: 100%;max-width: 560px;height: auto;margin: var(--ab-space-5) auto 0;border-radius: var(--ab-radius-l)}
+.ab-404 .songs_title_box h3,.ab-404 .songs_title_box h1{max-width: none}
+@media (max-width: 700px){
+	.ab-404-hero{grid-template-columns: 1fr;gap: var(--ab-space-3);text-align: center;justify-items: center}
+	.ab-404-hero__body{grid-column: 1;text-align: center}
+	.ab-404-actions,.ab-404-search,.ab-404-links{justify-content: center}
+	.songs_title_box h1,.songs_title_box h2,.songs_title_box h3{max-width: none;white-space: normal}
+	.song_boxs_posts ul{gap: var(--ab-gap-sm)}
+}
+
+.ab-404-back{display: inline-flex;align-items: center;padding: 10px 16px;border: 1px solid var(--ab-line);border-radius: var(--ab-radius-pill);background: var(--ab-blue-soft);font-size: 12.5px;line-height: 1.6;text-decoration: none}
+.ab-404-back i{margin-left: 7px;color: var(--ab-blue);font-size: 14px}
+
+/* ۸) لنگرهای کوچک: تراز آیکن/متن در چیپ‌ها و دکمه‌های مشترک */
+.ab-credits__title,.ab-sp__in,.songs_title_box a,.ab-404-links a,.dl_links_box a,.dl_linksv_box a{-webkit-font-smoothing: antialiased}
+@media (max-width: 767px){.song_boxs{margin: var(--ab-space-5) 0}}
+@media print{.ab-404-hero .ab-404-badge{display: none}}
+/* ۹) صفحۀ نوشته تکی: سلسله‌مراتب، ظرف و شبکۀ لینک‌های دانلود */
+.single_posts{padding: var(--ab-space-6) var(--ab-space-5);margin-bottom: var(--ab-space-6);border-radius: var(--ab-radius-l)}
+.single_posts > header{padding: 0}
+.tarlanweb_post_box header{margin: 0 0 var(--ab-space-4);clear: both}
+.tarlanweb_post_box header h1{font-size: clamp(19px, 2.3vw, 23px);line-height: 1.6;font-weight: 700;padding-bottom: 10px}
+.related_posts{padding: var(--ab-space-5);margin-bottom: var(--ab-space-6);border-radius: var(--ab-radius-l)}
+.dl_title{margin: 0 0 var(--ab-space-3);font-size: 15px;font-weight: 700;line-height: 1.7}
+.dl_linksv_box ul{display: grid;grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));gap: var(--ab-space-2);margin: 0;padding: 0;list-style: none}
+.dl_linksv_box ul li{width: auto;padding: 0;display: block;list-style: none}
+@media (max-width: 600px){
+	.single_posts{padding: var(--ab-space-4) var(--ab-space-3);border-radius: var(--ab-radius-m)}
+	.related_posts{padding: var(--ab-space-4) var(--ab-space-3)}
+}
+
+/* --- انتهای بلوک ۲۶ (v3.3.0 — تراز سراسری + کارت‌ها + خوانایی) --- */

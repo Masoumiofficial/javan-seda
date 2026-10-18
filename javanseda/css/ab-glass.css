@@ -1,0 +1,279 @@
+/*
+   لایۀ «شیشه‌ای» جوان‌صدا — ab-glass.css (نسخۀ 3.3.0)
+   =====================================================================================
+   این فایل فقط *پوسته و عمق بصری* را اضافه می‌کند؛ هیچ تراز، عرض، ساختار داده یا
+   رفتاری در آن تعریف نشده است (آن‌ها در style.css بلوک ۲۶ هستند). بنابراین اگر این
+   فایل را حذف کنید یا بگذارید define( 'JAVANSEDA_GLASS_UI', false ); سایت دقیقاً به
+   ساختار و رنگ‌بندی قبلی برمی‌گردد — بدون شکستن هیچ چیزی.
+
+   زبان طراحی: سطوح شیشه‌ای لایه‌ای (iOS / visionOS) با سه قاعده:
+     ۱) فقط سطح‌های *شناور* شیشه‌ای می‌شوند (هدر چسبان، نوار موبایل، زیرمنو، نوار پخش،
+        پنل ۴۰۴). کارت‌های محتوا (کاور آهنگ، متن ترانه، لینک دانلود) ساترِ ماتِ جامد
+        می‌مانند تا خوانایی و وضوح تصویر قربانی نشود.
+     ۲) عمق با مرز نازک + سایۀ نرم چندلایه + هایلایت ۱px بالایی ساخته می‌شود؛
+        بدون گرادینت، بدون glow نئونی، بدون blur انبوه (بودجۀ blur: پنج سطح).
+     ۳) همه‌چیز از توکن می‌آید؛ مرورگر بدون پشتیبانی backdrop-filter خودکار به سطح
+        ماتِ جامد می‌افتد (متغیر عوض می‌شود، قاعده‌ای لازم نیست).
+   پالت سازمانی حفظ شده: #FFFFFF · #185ADB · #111111 (+ حالت شب #111111/#222222).
+   دسترس‌پذیری: کنتراست متن روی شیشه تست شده، حلقۀ فوکوس کیبورد، prefers-reduced-motion.
+   =====================================================================================
+*/
+
+/* --------------------------------------------------------------------- توکن‌ها --- */
+:root{
+	/* پایه = سطح ماتِ جامد (هر مرورگری بیرون نمی‌ماند)؛ نیمه‌شفاف در @supports پایین */
+	--ab-glass-bg: #FFFFFF;
+	--ab-glass-bg-strong: #FFFFFF;
+	--ab-glass-solid: #FFFFFF;
+	--ab-glass-border: rgba(17,17,17,.08);
+	--ab-glass-border-2: rgba(17,17,17,.12);
+	--ab-glass-hl: inset 0 1px 0 rgba(255,255,255,.85);
+	--ab-glass-blur: 14px;
+	--ab-glass-saturate: 1.5;
+	--ab-ease: cubic-bezier(.2,.7,.3,1);
+	--ab-dur: .18s;
+	--ab-depth-1: 0 1px 2px rgba(17,17,17,.05), 0 2px 10px rgba(17,17,17,.05);
+	--ab-depth-2: 0 2px 6px rgba(17,17,17,.06), 0 14px 30px rgba(17,17,17,.10);
+	--ab-depth-3: 0 4px 10px rgba(17,17,17,.07), 0 24px 54px rgba(17,17,17,.14);
+}
+.night{
+	--ab-glass-bg: #222222;
+	--ab-glass-bg-strong: #1c1c1c;
+	--ab-glass-solid: #222222;
+	--ab-glass-border: rgba(255,255,255,.10);
+	--ab-glass-border-2: rgba(255,255,255,.16);
+	--ab-glass-hl: inset 0 1px 0 rgba(255,255,255,.07);
+	--ab-depth-1: 0 1px 2px rgba(0,0,0,.4), 0 2px 10px rgba(0,0,0,.32);
+	--ab-depth-2: 0 2px 6px rgba(0,0,0,.45), 0 14px 30px rgba(0,0,0,.42);
+	--ab-depth-3: 0 4px 10px rgba(0,0,0,.5), 0 24px 54px rgba(0,0,0,.55);
+}
+/* شفافیت *فقط* وقتی blur واقعی کار می‌کند؛ دو بلوک جدا (به‌جای not/or) تا
+   مینی‌فایرها و پارسرهای قدیمی هم بدون خطا بخوانندش. مرورگر بدون blur ⇒ همان
+   سطح جامدِ بالا می‌ماند و هیچ‌چیز نیمه‌شفافِ بی‌فایده نمی‌شود. */
+@supports (backdrop-filter: blur(2px)) {
+	:root{--ab-glass-bg: rgba(255,255,255,.72);--ab-glass-bg-strong: rgba(255,255,255,.88)}
+	.night{--ab-glass-bg: rgba(34,34,34,.66);--ab-glass-bg-strong: rgba(28,28,28,.86)}
+}
+@supports (-webkit-backdrop-filter: blur(2px)) {
+	:root{--ab-glass-bg: rgba(255,255,255,.72);--ab-glass-bg-strong: rgba(255,255,255,.88)}
+	.night{--ab-glass-bg: rgba(34,34,34,.66);--ab-glass-bg-strong: rgba(28,28,28,.86)}
+}
+
+/* ------------------------------------------------------------------ اجزای مشترک --- */
+.ab-glass{
+	background: var(--ab-glass-bg);
+	-webkit-backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	border: 1px solid var(--ab-glass-border);
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
+}
+.ab-glass--strong{background: var(--ab-glass-bg-strong);box-shadow: var(--ab-glass-hl), var(--ab-depth-2)}
+/* سطح «ساتر» برای کارت‌های محتوایی: مات ولی جامد ⇒ خوانایی متن و تصویر حفظ می‌ماند */
+.ab-surface{
+	background: var(--ab-surface);
+	border: 1px solid var(--ab-line);
+	border-radius: var(--ab-radius-m, 14px);
+	box-shadow: var(--ab-depth-1);
+}
+.ab-soft{transition: transform var(--ab-dur) var(--ab-ease), box-shadow var(--ab-dur) var(--ab-ease), border-color var(--ab-dur) var(--ab-ease)}
+
+/* ------------------------------------------------------------------------- هدر --- */
+/* هدر در حالت عادی روی پس‌زمینۀ خودش است ⇒ blur لازم نیست؛ فقط سطح + مرز نازک */
+#header{
+	background: var(--ab-glass-bg-strong);
+	border-bottom: 1px solid var(--ab-glass-border);
+	box-shadow: var(--ab-glass-hl);
+}
+/* حالت چسبان (با اسکرول اضافه می‌شود) ⇒ اینجا شیشه واقعی و مفید است */
+#header.darkHeader{
+	background: var(--ab-glass-bg);
+	-webkit-backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-2);
+	border-bottom-color: var(--ab-glass-border-2);
+}
+/* در شب هم همان سطح (نه charcoalِ بی‌مرز) تا لایه یکدست بماند */
+.night #header{
+	background: var(--ab-glass-bg-strong);
+	border-bottom: 1px solid var(--ab-glass-border);
+	box-shadow: var(--ab-glass-hl);
+}
+#mobiles_header{
+	background: var(--ab-glass-bg);
+	-webkit-backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	border-bottom: 1px solid var(--ab-glass-border);
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
+}
+/* زیرمنوها شناورند ⇒ شیشه + سایه */
+.menu_right li ul.sub-menu{
+	background: var(--ab-glass-bg-strong);
+	-webkit-backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	border: 1px solid var(--ab-glass-border);
+	border-radius: var(--ab-radius-m, 14px);
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-3);
+	padding: 6px;
+	overflow: hidden;
+}
+.menu_right ul ul li a{border-radius: 9px}
+
+/* ------------------------------------------------- نوار چسبانِ پخش (۳.۲.۴) --- */
+.ab-sticky{
+	background: var(--ab-glass-bg);
+	-webkit-backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	border-top: 1px solid var(--ab-glass-border-2);
+	box-shadow: var(--ab-glass-hl), 0 -6px 24px rgba(17,17,17,.10);
+}
+.night .ab-sticky{box-shadow: var(--ab-glass-hl), 0 -6px 24px rgba(0,0,0,.5)}
+/* چیپ‌های داخل نوار باید روی شیشه لبۀ روشن‌تر بگیرند تا تفکیک حس شود */
+.ab-sticky .ab-sp-play,.ab-sticky .ab-sp__dl,.ab-sticky .ab-sp__no{background: var(--ab-glass-bg-strong)}
+.ab-sticky .ab-sp-thumb{border: 1px solid var(--ab-glass-border)}
+
+/* ------------------------------------------------- کارت‌های آهنگ و آلبوم --- */
+.songs_post,
+.vip_post.ab-vip-post,
+.artist_boxs a{
+	border-radius: var(--ab-radius-m, 14px);
+	border: 1px solid var(--ab-glass-border);
+	box-shadow: var(--ab-depth-1);
+	background: var(--ab-surface);
+}
+.songs_post footer{padding: 0 12px 12px}
+.songs_post .ft_box_format{
+	display: inline-block;
+	margin: 0 12px 10px;
+	padding: 2px 9px;
+	border: 1px solid var(--ab-glass-border);
+	border-radius: var(--ab-radius-pill, 999px);
+	background: var(--ab-blue-soft);
+	font-size: 11px;
+	line-height: 1.7;
+}
+.songs_post:hover,
+.artist_boxs a:hover,
+.vip_post.ab-vip-post:hover{
+	border-color: var(--ab-blue);
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-2);
+}
+.vip_post.ab-vip-post figure,
+.vip_post.ab-vip-post .ab-vip-img{border-radius: calc(var(--ab-radius-m, 14px) - 2px)}
+
+/* ----------------------------------------------- بخش‌ها و اجزای صفحۀ اصلی --- */
+.ab-quickbar{
+	background: var(--ab-glass-bg-strong);
+	border: 1px solid var(--ab-glass-border);
+	border-radius: var(--ab-radius-m, 14px);
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
+}
+.night .ab-quickbar{background: var(--ab-glass-bg-strong);border-color: var(--ab-glass-border)}
+.songs_title_box a{
+	border-radius: var(--ab-radius-pill, 999px);
+	border-color: var(--ab-glass-border);
+	background: var(--ab-glass-bg-strong);
+	transition: color var(--ab-dur) var(--ab-ease), background var(--ab-dur) var(--ab-ease), border-color var(--ab-dur) var(--ab-ease);
+}
+.tarlanweb_side_box{
+	padding: 6px;
+	background: var(--ab-surface);
+	border: 1px solid var(--ab-glass-border);
+	border-radius: var(--ab-radius-m, 14px);
+	box-shadow: var(--ab-depth-1);
+}
+.tarlanweb_side_box li{border-radius: var(--ab-radius-s, 10px)}
+.tarlanweb_side_box li:hover{background: var(--ab-blue-soft)}
+
+/* ----------------------------------------------------------- صفحۀ نوشته تکی --- */
+.music_box_player,
+.download_box,
+.dl_linksv_box,
+.single_content_box .ab-social-box,
+.single_content_box .ab-credits{
+	border: 1px solid var(--ab-glass-border);
+	border-radius: var(--ab-radius-l, 20px);
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
+	background: var(--ab-glass-bg-strong);
+}
+.single_content_box .ab-credits{background: var(--ab-blue-soft)}
+.single_featured_image{
+	border-radius: var(--ab-radius-l, 20px);
+	box-shadow: var(--ab-depth-2);
+	border: 1px solid var(--ab-glass-border);
+}
+.single_featured_cover{border-radius: var(--ab-radius-l, 20px)}
+.dl_links_box a,
+.dl_linksv_box a,
+.download_box a{
+	border-radius: var(--ab-radius-s, 10px);
+	transition: color var(--ab-dur) var(--ab-ease), background var(--ab-dur) var(--ab-ease), border-color var(--ab-dur) var(--ab-ease), transform var(--ab-dur) var(--ab-ease);
+}
+.dl_links_box a:hover,
+.dl_linksv_box a:hover,
+.download_box a:hover{transform: translateY(-1px)}
+
+/* ------------------------------------------------------------------ دیدگاه‌ها --- */
+.commentlist > li,
+#commentform,
+.comment-form-author input,
+.comment-form-email input,
+.comment-form-url input,
+.comment-form-comment textarea{
+	background: var(--ab-surface);
+	border: 1px solid var(--ab-glass-border);
+	border-radius: var(--ab-radius-m, 14px);
+	box-shadow: var(--ab-depth-1);
+}
+.commentlist > li{padding: 14px 16px;box-shadow: none}
+
+/* -------------------------------------------------------------------- صفحۀ ۴۰۴ --- */
+.ab-404-panel{
+	background: var(--ab-glass-bg);
+	-webkit-backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
+	border: 1px solid var(--ab-glass-border);
+	border-radius: var(--ab-radius-xl, 26px);
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-2);
+}
+.ab-404-search input,
+.ab-404-search button,
+.ab-404-links a,
+.ab-404-home,
+.ab-404-back{
+	background: var(--ab-glass-bg-strong);
+	border: 1px solid var(--ab-glass-border);
+	border-radius: var(--ab-radius-pill, 999px);
+	box-shadow: var(--ab-glass-hl);
+}
+
+/* ------------------------------------------------- نتیجهٔ جست‌وجو و برگه‌ها --- */
+.search .song_boxs,
+.page .song_boxs{background: transparent}
+.archive_txt_box{
+	padding: 14px 16px;
+	border: 1px solid var(--ab-glass-border);
+	border-radius: var(--ab-radius-m, 14px);
+	background: var(--ab-glass-bg-strong);
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
+}
+
+/* -------------------------------------------------- فوکوس کیبورد و حرکت کم --- */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.ab-sp-nav:focus-visible,
+.ab-sp-play:focus-visible{
+	outline: 2px solid var(--ab-blue);
+	outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce){
+	*,*::before,*::after{transition-duration: .001ms !important;animation-duration: .001ms !important;animation-iteration-count: 1 !important}
+	.songs_post:hover,.artist_boxs a:hover,.vip_post.ab-vip-post:hover,.dl_links_box a:hover,.download_box a:hover{transform: none}
+}
+/* موبایل: blur سنگین‌تر از آن است که روی همۀ سطوح بماند ⇒ یکی کمتر، شعاعِ نرم‌تر */
+@media (max-width: 800px){
+	:root{--ab-glass-blur: 10px}
+	#header{border-bottom-width: 1px}
+}

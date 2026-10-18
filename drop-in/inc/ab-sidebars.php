@@ -245,10 +245,10 @@ if ( ! function_exists( 'javan_seda_sidebar' ) ) {
 if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 	function javan_seda_expected_hashes() {
 	return array(
-		'single.php'                => '9b37e1f9adc532dcf877a4a9b79075544ab9c68681c909b02a835807973531db',
+		'single.php'                => 'da3603eeeab3b2778c134e5ababdc2ac4cd36d28ec5c850c74c369bb6391373b',
 		'page.php'                  => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
 		'myfunctions.php'           => '163df7704bea0ac6b786916dc387aaaed6f9d8b93b7c4a69da24a903ac1ef48e',
-		'style.css'                 => 'd8fddc699823b81157d166fd453c24b2fe9a3413f5200f375ef769488d7c0bb0',
+		'style.css'                 => 'd6d49db7488b26b5dd662f8d4e30787812fd89bfc8c09110624af2d72f06c3cf',
 		'footer.php'                => '66d3257b118a2d0d9f095fa5bd471f467f94ca55f572c904a7809bb914c70b58',
 		'header.php'                => 'f5174209fae4506f9952e5ae838716df21bd3f1cbea413675a42863d585306dc',
 		'home.php'                  => 'e79d00aa628334dddf6f158efa1e00960423e04b71cab1d9bc27429f2de2b6ca',

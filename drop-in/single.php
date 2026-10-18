@@ -588,13 +588,28 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 <?php } ?>
 <?php } } ?>
 
-<?php $cm_off = ot_get_option('cm_off'); if('off' != $cm_off){ ?>
+<?php
+/* v3.4.6 — رفع «کامنت در دیتابیس هست ولی در فرانت نمایش داده نمی‌شود».
+   ریشه: حلقۀ «سایر آهنگ‌های این هنرمند» بالا با $second_query->the_post() کار می‌کند
+   و هیچ wp_reset_postdata() بعد از آن نبود ⇒ هنگام اجرای این خط، global $post و
+   $GLOBALS['id'] روی آخرین آهنگِ مربوطه ست بودند و comments_template() (که همان
+   $post را می‌خواند) کامنت‌های نوشتهٔ فعلی را کوئری نمی‌کرد. اول دادهٔ اصلی برگردانده
+   می‌شود؛ بعد باکس دیدگاه چاپ می‌شود.
+   ضمناً «نمایش دیدگاه‌ها» (cm_off) از این پس نظراتِ موجود را پنهان نمی‌کند؛ فقط فرم
+   ارسال را می‌بندد (با فیلتر موقت comments_open که بی‌درنگ برداشته می‌شود).
+   منطق بازدید/نظراتِ دیگر دست‌نخورده است. */
+wp_reset_postdata();
+$cm_off = function_exists( 'ot_get_option' ) ? ot_get_option( 'cm_off' ) : 'on';
+$cm_has = (int) get_comments_number() > 0;
+$cm_lock = ( 'off' === $cm_off && $cm_has );
+if ( $cm_lock ) { add_filter( 'comments_open', '__return_false', 99 ); }
+if ( 'off' !== $cm_off || $cm_has ) { ?>
 <div class="single_posts rkianoosh_comment_box">
-<h3 class="comm_titrs">نظر خود را بنویسید</h3>
+<h3 class="comm_titrs"><?php echo $cm_lock ? 'دیدگاه‌ها' : 'نظر خود را بنویسید'; ?></h3>
 <?php comments_template(); ?>
 <div class="clear"></div>
 </div>
-<?php } ?>
+<?php } if ( $cm_lock ) { remove_filter( 'comments_open', '__return_false', 99 ); } ?>
 
 <div class="clear"></div>
 </div>

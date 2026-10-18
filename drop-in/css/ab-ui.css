@@ -677,9 +677,15 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 
 /* ۵) نوار پیشرفت: خطِ ۶px با سرِ پخش (بدون !important: اندیکاتور همان عنصری است که JS
       عرضش را ست می‌کند؛ ::after فقط ظاهر است و ساختار DOM دست‌نخورده می‌ماند) */
-.music_box_player .progress-box{gap: 12px;align-items: center}
-.music_box_player .progress-box .progress-cell{height: 18px;float: none;display: flex;align-items: center}
-.music_box_player .progress-box .progress-cell .progress{height: 6px;background: var(--ab-line)}
+.music_box_player .progress-box{display: flex;flex-wrap: wrap;gap: 12px;align-items: center}
+/* صفحۀ پاک‌سازیِ clearfixهای قالب: .player / .info-box / .progress-box / ردیف‌ها
+   با :before/:afterِ `content:" ";display:table` شناور بودند؛ در flex همان‌ها
+   «آیتمِ فضای خالی» می‌سازند و gap را شلوغ می‌کنند ⇒ خاموش می‌شوند. */
+.music_box_player .player:before,.music_box_player .player:after,
+.music_box_player .info-box .track-info-box:before,.music_box_player .info-box .track-info-box:after,
+.music_box_player .play-list .play-list-row:before,.music_box_player .play-list .play-list-row:after{content: none;display: none}
+.music_box_player .progress-box .progress-cell{height: 18px;float: none;min-width: 0;flex: 1 1 auto;display: flex;align-items: center}
+.music_box_player .progress-box .progress-cell .progress{height: 6px;flex: 1 1 auto;width: auto;background: var(--ab-line)}
 .music_box_player .progress-box .progress-cell .progress .progress-buffer{background: var(--ab-blue-soft);border-radius: 999px}
 .music_box_player .progress-box .progress-cell .progress .progress-indicator{
 	background: var(--ab-blue);height: 100%;top: 0;border-radius: 999px;overflow: visible;
@@ -751,6 +757,7 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 @media (max-width: 760px){
 	.music_box_player{padding: 12px 13px 10px}
 	.music_box_player .player{gap: 12px}
+	.music_box_player .progress-box .progress-cell{flex: 1 1 100%}
 	.music_box_player .volume_box{flex: 1 1 100%;order: 5;justify-content: flex-start}
 	.music_box_player .volume_box input[type=range]{width: 100%;max-width: 220px;flex: 1 1 auto}
 	.music_box_player .play-list{margin: 12px -13px -10px;padding: 8px 13px 10px}

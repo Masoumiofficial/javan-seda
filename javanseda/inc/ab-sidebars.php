@@ -248,7 +248,7 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 		'single.php'                => '1057557be0fdd27e7e0b7dc92654ebccdab2ebe854a8447a4b0805a5b39d8e4b',
 		'page.php'                  => 'b83d394588a1cbce37f075dcb7c679497ab19b20975488af07637419aa27da8a',
 		'myfunctions.php'           => '9bb4113c7cc662d86f7f362234852af1053acb91e5b046adcee18348220d4c65',
-		'style.css'                 => 'b0d7170ce78253a4c8a324743fcdf4b0eda547590f87409d872da5c9c3bd49e7',
+		'style.css'                 => '9433427813440d1999fe8e1cdd02c13c531bd1eb7228e5dcc6a870340d085e3c',
 		'footer.php'                => 'c13dbc6fa03b10c8e5e568cb645d7fb0b1430c56760a0f3023a26f4528a1c83e',
 		'header.php'                => '74c88e0f3903a4c3a9b9ba1440586eb1fadb5a1007fddbf46642ca05254b074c',
 		'home.php'                  => '01a503d72ff6d90a5458c12e9d5c7da814e659826c64be367bae2ee07a2aa5d0',

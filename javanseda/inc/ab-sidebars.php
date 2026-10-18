@@ -260,7 +260,7 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 		'inc/ab-news-ticker.php'    => 'b9eebd2bc03497b9011a134e8cf7325a8952a2df18eea67ba9e010422b914d0e',
 		'inc/ab-perf.php'           => '03fbcbc96260de30f5919384c46a8dc4829b1429cf5f44b2f5d1efa10c786d1e',
 		'inc/ab-seo.php'            => 'd87768789152356cd9c03deb196a62581695208f8450c28d574b05f4e57bb984',
-		'inc/ab-controls.php'       => '0b147ea816f318f05d56cda19d641a6eac7fa362b74fbc59d5b254dc6884c9e3',
+		'inc/ab-controls.php'       => '2392bb393656f04d364984e3ba958244456ccede5d539332a88357f8e8d1b21b',
 		'inc/theme-options.php'     => 'c4628b18cf836ae6b71df199496edeb2add8fc8901117678f57c7b9f9c2a6219'
 	);
 }

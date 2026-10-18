@@ -248,8 +248,8 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 		'single.php'                => '7d224d76adf797c482dd694e2ba26175ca2bb3f66ca60a18e8764e0b7d30f2a4',
 		'page.php'                  => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
 		'myfunctions.php'           => '98f38de4a5dd492b1c3ddef73b33d6aafccdad50c6aa27643adbec379a8c8f76',
-		'style.css'                 => 'af2239d5dce9890270b94c1ed2749780aa6efb47ad98a715952268abd5d82ee2',
-		'footer.php'                => 'dfa276dde635d3982898f61a0bdb89fc5e397cb84b3a7a17fd1abc0deadbe815',
+		'style.css'                 => '4c7b3df9709e95db86695648076ebe36cb9ce616fe65eab1948352242658953d',
+		'footer.php'                => '66d3257b118a2d0d9f095fa5bd471f467f94ca55f572c904a7809bb914c70b58',
 		'header.php'                => 'e5c4a81155e7618c09271c12aa63db52928c044f560b0e60716dd875be563c8e',
 		'home.php'                  => 'e79d00aa628334dddf6f158efa1e00960423e04b71cab1d9bc27429f2de2b6ca',
 		'404.php'                   => 'c3d88ec0f32f51fd1b94fb55bcbc277408eae7f76d6ec2143ec01a532a611c35',
@@ -260,7 +260,7 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 		'inc/ab-news-ticker.php'    => 'b9eebd2bc03497b9011a134e8cf7325a8952a2df18eea67ba9e010422b914d0e',
 		'inc/ab-perf.php'           => '03fbcbc96260de30f5919384c46a8dc4829b1429cf5f44b2f5d1efa10c786d1e',
 		'inc/ab-seo.php'            => 'd87768789152356cd9c03deb196a62581695208f8450c28d574b05f4e57bb984',
-		'inc/ab-controls.php'       => '0b147ea816f318f05d56cda19d641a6eac7fa362b74fbc59d5b254dc6884c9e3',
+		'inc/ab-controls.php'       => '2392bb393656f04d364984e3ba958244456ccede5d539332a88357f8e8d1b21b',
 		'inc/theme-options.php'     => 'c4628b18cf836ae6b71df199496edeb2add8fc8901117678f57c7b9f9c2a6219'
 	);
 }

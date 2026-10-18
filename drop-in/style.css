@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.2.3
+Version: 3.2.4
 */
 /*
 ==================================================================================
@@ -2712,7 +2712,7 @@ body.ab-has-mh{padding-top:90px;}
 /* --- انتهای بلوک ۲۳ (v3.1.4) --- */
 
 /* ==========================================================================
-   بلوک ۲۴ (نسخۀ 3.2.0) — باکس «ما را دنبال کنید» + نوارِ چسبانِ پخش
+   بلوک ۲۴ (3.2.0 · نوار پخش در 3.2.4: تیره‌پسند، کوتاه‌تر، قبلی/بعدی) — باکس «ما را دنبال کنید» + نوارِ چسبانِ پخش
    فایل: inc/ab-post-extras.php  ·  فراخوانی: single.php (بالای باکس پلیر)
    پالت سازمانی: #FFFFFF · #185ADB · #111111 — بدون گرادینت، بدون رنگ جدید
    خاموشی: JAVANSEDA_POST_EXTRAS / JAVANSEDA_STICKY_PLAYER یا گزینهٔ fixbtn
@@ -2733,46 +2733,78 @@ body.ab-has-mh{padding-top:90px;}
 .ab-social:hover,.ab-social:focus{border-color:#185ADB;background:#f7f9fd;color:#185ADB;text-decoration:none}
 .ab-social:hover .ab-social__icon,.ab-social:focus .ab-social__icon{background:#185ADB;color:#FFFFFF}
 .ab-social:hover .ab-social__arrow,.ab-social:focus .ab-social__arrow{color:#185ADB}
-/* --- نوار چسبانِ پخش (کنترل همان <audio id="audio"> قالب) --- */
-.ab-sticky{position:fixed;right:0;left:0;bottom:0;z-index:9999;background:#FFFFFF;border-top:1px solid #e6e9ef;box-shadow:0 -2px 10px rgba(17,17,17,.07);padding-bottom:env(safe-area-inset-bottom)}
+/* --- نوار چسبانِ پخش (کنترل همان <audio id="audio"> قالب) — 3.2.4 --- */
+/* رنگ‌ها از متغیرهای قالب می‌آیند؛ `.night` همان متغیرها را بازنویسی می‌کند
+   ⇒ نوار در حالت شب خودکار تیره می‌شود (مشکل «سفید ماندن» از همین‌جا رفع شد).
+   ارتفاع: ≈60px به‌جای ≈84px · دکمۀ قبلی/بعدی · شمارۀ قطعه · اکولایزر روی تصویر. */
+.ab-sticky{position:fixed;right:0;left:0;bottom:0;z-index:9999;background:var(--ab-surface);border-top:1px solid var(--ab-line);box-shadow:0 -2px 10px rgba(17,17,17,.07);padding-bottom:env(safe-area-inset-bottom)}
+.ab-sticky::before{content:"";position:absolute;top:0;right:0;left:0;height:2px;background:var(--ab-blue);opacity:0;transition:opacity .18s ease}
+.ab-sticky.ab-sp--playing::before{opacity:1}
 #ab-sticky-player[hidden]{display:none}
 .ab-sticky[hidden]{display:none}
-body.ab-sticky-on{padding-bottom:84px}
-.ab-sp__in{display:flex;align-items:center;max-width:1080px;margin:0 auto;padding:8px 12px}
-.ab-sp-thumb{display:block;flex:0 0 auto;width:46px;height:46px;border-radius:8px;overflow:hidden;background:#f2f5fb}
-.ab-sp-thumb img{display:block;width:46px;height:46px;object-fit:cover}
-.ab-sp-thumb--none{display:flex;align-items:center;justify-content:center;color:#185ADB;font-size:19px}
-.ab-sp-play{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:38px;height:38px;margin:0 10px;padding:0;background:#FFFFFF;border:1px solid #e6ebf3;border-radius:50%;color:#185ADB;font-size:16px;line-height:1;cursor:pointer}
-.ab-sp-play:hover,.ab-sp-play:focus{background:#185ADB;border-color:#185ADB;color:#FFFFFF}
+.ab-sp-audio{display:none}
+body.ab-sticky-on{padding-bottom:60px}
+.ab-sp__in{display:flex;align-items:center;max-width:1100px;margin:0 auto;padding:4px 12px}
+.ab-sp-thumb{position:relative;display:block;flex:0 0 auto;width:34px;height:34px;border-radius:8px;overflow:hidden;background:var(--ab-blue-soft)}
+.ab-sp-thumb img{display:block;width:34px;height:34px;object-fit:cover}
+.ab-sp-thumb--none{display:flex;align-items:center;justify-content:center;color:var(--ab-blue-accent);font-size:15px}
+.ab-sp-eq{position:absolute;right:3px;bottom:3px;display:none;align-items:flex-end;height:10px}
+.ab-sp-eq i{display:block;width:2px;height:100%;margin-right:1px;background:var(--ab-blue);border-radius:1px;transform-origin:bottom;animation:ab-sp-eq .85s ease-in-out infinite alternate}
+.ab-sp-eq i:nth-child(2){animation-duration:.62s}
+.ab-sp-eq i:nth-child(3){animation-duration:1.05s}
+.ab-sp--playing .ab-sp-eq{display:flex}
+@keyframes ab-sp-eq{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.ab-sp-eq i{animation:none}}
+.ab-sp-play{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:32px;height:32px;margin:0 8px;padding:0;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:50%;color:var(--ab-blue-accent);font-size:14px;line-height:1;cursor:pointer;transition:background .16s ease,color .16s ease,border-color .16s ease,transform .12s ease}
+.ab-sp-play:hover,.ab-sp-play:focus{background:var(--ab-blue);border-color:var(--ab-blue);color:var(--ab-white)}
+.ab-sp-play:active{transform:scale(.94)}
+.ab-sp-nav{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:26px;height:26px;padding:0;border:1px solid transparent;border-radius:50%;background:none;color:var(--ab-muted);font-size:13px;line-height:1;cursor:pointer;text-decoration:none;transition:color .16s ease,border-color .16s ease}
+.ab-sp-nav:hover,.ab-sp-nav:focus{color:var(--ab-blue-accent);border-color:var(--ab-blue);text-decoration:none}
+.ab-sp__no{flex:0 0 auto;margin:0 8px 0 0;padding:1px 7px;border:1px solid var(--ab-line);border-radius:999px;background:var(--ab-page);font-size:10.5px;line-height:1.6;color:var(--ab-muted);white-space:nowrap}
+.ab-sp__no b{font-weight:700;color:var(--ab-blue-accent)}
 .ab-sp__meta{flex:1 1 auto;min-width:0}
-.ab-sp__title{display:block;font-size:13px;font-weight:700;color:#111111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ab-sp__artist{display:block;font-size:11px;color:#8a92a6;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.ab-sp__bar{display:flex;align-items:center;margin-top:5px}
-.ab-sp-range{flex:1 1 auto;width:100%;height:4px;margin:0 8px;-webkit-appearance:none;appearance:none;background:#e9edf4;border:0;border-radius:2px;outline:none;cursor:pointer;direction:ltr}
-.ab-sp-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border:2px solid #FFFFFF;border-radius:50%;background:#185ADB;box-shadow:0 0 0 1px #dfe4ee}
-.ab-sp-range::-moz-range-thumb{width:12px;height:12px;border:2px solid #FFFFFF;border-radius:50%;background:#185ADB}
+.ab-sp__title{display:block;font-size:12.5px;font-weight:700;line-height:1.45;color:var(--ab-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+a.ab-sp__title:hover,a.ab-sp__title:focus{color:var(--ab-blue-accent);text-decoration:none}
+.ab-sp__artist{display:block;font-size:10.5px;color:var(--ab-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab-sp__bar{display:flex;align-items:center;margin-top:3px;min-width:0}
+.ab-sp-slide{position:relative;display:flex;align-items:center;flex:1 1 auto;min-width:0}
+.ab-sp-track{position:absolute;top:50%;right:8px;left:8px;height:4px;margin-top:-2px;border-radius:2px;background:rgba(24,90,219,.16);overflow:hidden}
+.ab-sp-fill{position:absolute;top:0;left:0;display:block;width:0;height:100%;border-radius:2px;background:var(--ab-blue)}
+.ab-sp-range{position:relative;z-index:1;flex:1 1 auto;width:100%;height:4px;margin:0 8px;-webkit-appearance:none;appearance:none;background:transparent;border:0;outline:none;cursor:pointer;direction:ltr}
+.ab-sp-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border:2px solid var(--ab-surface);border-radius:50%;background:var(--ab-blue);box-shadow:0 0 0 1px var(--ab-line)}
+.ab-sp-range::-moz-range-thumb{width:12px;height:12px;border:2px solid var(--ab-surface);border-radius:50%;background:var(--ab-blue)}
+.ab-sp-range::-moz-range-track{height:4px;background:transparent;border:0}
+.ab-sp-range:focus-visible{outline:2px solid var(--ab-blue);outline-offset:3px}
 .ab-sp-range:disabled{opacity:.55;cursor:default}
-.ab-sp-time{flex:0 0 auto;font-size:10.5px;color:#8a92a6;white-space:nowrap;direction:ltr;unicode-bidi:embed}
-.ab-sp__dl{display:inline-flex;align-items:center;flex:0 0 auto;margin:0 8px;padding:7px 10px;border:1px solid #e6ebf3;border-radius:8px;background:#FFFFFF;color:#111111;font-size:12px}
-.ab-sp__dl i{margin-left:5px;color:#185ADB;font-size:15px}
-.ab-sp__dl:hover,.ab-sp__dl:focus{border-color:#185ADB;color:#185ADB;text-decoration:none}
-.ab-sp-close{flex:0 0 auto;width:30px;height:30px;padding:0;border:0;background:none;color:#8a92a6;font-size:15px;line-height:1;cursor:pointer}
-.ab-sp-close:hover,.ab-sp-close:focus{color:#111111}
+.ab-sp-time{flex:0 0 auto;font-size:10px;color:var(--ab-muted);white-space:nowrap;direction:ltr;unicode-bidi:embed}
+.ab-sp-time b{font-weight:500}
+.ab-sp__dl{display:inline-flex;align-items:center;flex:0 0 auto;margin:0 6px;padding:5px 9px;border:1px solid var(--ab-line);border-radius:8px;background:var(--ab-page);color:var(--ab-text);font-size:11.5px;line-height:1.4;transition:border-color .16s ease,color .16s ease}
+.ab-sp__dl i{margin-left:5px;color:var(--ab-blue-accent);font-size:14px}
+.ab-sp__dl:hover,.ab-sp__dl:focus{border-color:var(--ab-blue);color:var(--ab-blue-accent);text-decoration:none}
+.ab-sp-close{flex:0 0 auto;width:26px;height:26px;padding:0;border:0;background:none;color:var(--ab-muted);font-size:14px;line-height:1;cursor:pointer}
+.ab-sp-close:hover,.ab-sp-close:focus{color:var(--ab-text)}
+/* سه مورد که رنگِ صریحِ روشن داشتند و در شب باید عوض شوند */
+.night .ab-sticky{box-shadow:0 -2px 14px rgba(0,0,0,.5)}
+.night .ab-sp-track{background:rgba(255,255,255,.14)}
+.night .ab-sp-thumb{background:#2c2c2c}
 @media (max-width:767px){
 	.ab-social-box__row{padding:9px 9px 10px}
 	.ab-social{display:flex;width:100%;margin:0 0 7px}
 	.ab-social:last-child{margin-bottom:0}
 	.ab-social__txt em{max-width:none}
 	.ab-social__arrow{margin-right:auto}
-	.ab-sp__in{padding:6px 8px}
-	.ab-sp-thumb,.ab-sp-thumb img{width:38px;height:38px}
-	.ab-sp__artist{display:none}
+	.ab-sp__in{padding:3px 8px}
+	.ab-sp-thumb,.ab-sp-thumb img{width:30px;height:30px}
+	.ab-sp-play{width:28px;height:28px;margin:0 5px;font-size:12px}
+	.ab-sp-nav{width:24px;height:24px;font-size:11px}
+	.ab-sp__no{margin:0 5px 0 0;padding:1px 6px}
 	.ab-sp__dl span{display:none}
-	.ab-sp__dl{padding:7px 8px;margin:0 6px}
-	body.ab-sticky-on{padding-bottom:72px}
+	.ab-sp__dl{padding:5px 7px;margin:0 4px}
+	.ab-sp__artist{display:none}
+	body.ab-sticky-on{padding-bottom:50px}
 }
 @media print{.ab-sticky,.ab-social-box{display:none}}
-/* --- انتهای بلوک ۲۴ (v3.2.0) --- */
+/* --- انتهای بلوک ۲۴ (v3.2.4 — نوار پخش: شب‌تیره، کوتاه، با قبلی/بعدی) --- */
 
 /* ==========================================================================
    بلوک ۲۵ (3.2.1 / بازطراحی در 3.2.3) — «شناسنامۀ آهنگ» (خواننده · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید)

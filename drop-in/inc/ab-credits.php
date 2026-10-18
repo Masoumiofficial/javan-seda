@@ -262,6 +262,13 @@ if ( ! function_exists( 'javan_seda_credit_singer' ) ) {
 		return $value;
 	}
 }
+/* 3.4.8 — نامِ تازه با همان رفتار؛ خوانندۀ آهنگ «خواننده» برچسب می‌گیرد، نه «هنرمند»،
+   چون نقشِ فرد در این آهنگ است (برای تغییرش: فیلترِ javanseda_credit_singer_label) */
+if ( ! function_exists( 'javan_seda_credit_artist' ) ) {
+	function javan_seda_credit_artist( $post_id = 0 ) {
+		return javan_seda_credit_singer( $post_id );
+	}
+}
 
 /* ==========================================================================
    ۵) باکس «شناسنامۀ آهنگ»
@@ -287,7 +294,7 @@ if ( ! function_exists( 'javan_seda_credits_box' ) ) {
 		$rows = array();
 		$singer = javan_seda_credit_singer( $post_id );
 		if ( '' !== $singer ) {
-			$rows[] = array( 'label' => 'خواننده', 'icon' => 'icofont-radio-mic', 'value' => $singer );
+			$rows[] = array( 'label' => (string) apply_filters( 'javanseda_credit_singer_label', 'خواننده', $post_id ), 'icon' => 'icofont-radio-mic', 'value' => $singer );
 		}
 		foreach ( javan_seda_credits_fields() as $key => $cfg ) {
 			$value = javan_seda_credit_value( $key, $post_id );

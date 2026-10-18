@@ -137,44 +137,133 @@ if ( ! function_exists( 'javan_seda_artist_term_link' ) ) {
 	}
 }
 
+if ( ! function_exists( 'javan_seda_artist_ver' ) ) {
+	/** شمارۀ قالب — برای کلیدِ کش؛ با هر آپدیت خودبه‌خود بازمی‌گردد */
+	function javan_seda_artist_ver() {
+		static $v = null;
+		if ( null === $v ) {
+			$v = wp_get_theme()->get( 'Version' );
+			$v = ( '' === (string) $v ) ? '0' : preg_replace( '@[^A-Za-z0-9._-]@', '-', (string) $v );
+		}
+		return $v;
+	}
+}
+
+if ( ! function_exists( 'javan_seda_artist_url_cache_key' ) ) {
+	function javan_seda_artist_url_cache_key() {
+		return 'javan_seda_artist_dir_' . javan_seda_artist_ver();
+	}
+}
+
+if ( ! function_exists( 'javan_seda_artist_flush_url_cache' ) ) {
+	/**
+	 * با هر تغییرِ اسلاگ/برگه/تنظیم، کشِ آدرسِ فهرست پاک می‌شود.
+	 * (باگِ نسخهٔ قبل: کشِ ۱۲ ساعته باعث شد بعد از singer→artists شدنِ اسلاگِ برگه،
+	 *  لینکِ «بازگشت به فهرست» در صفحۀ هنرمند همان آدرسِ کهنه را نشان بدهد.)
+	 */
+	function javan_seda_artist_flush_url_cache() {
+		if ( function_exists( 'delete_transient' ) ) {
+			delete_transient( javan_seda_artist_url_cache_key() );
+			delete_transient( 'javanseda_artist_directory_url' ); // کلیدِ کهنهٔ 3.4.7
+			delete_transient( 'javan_seda_artists_index' );
+		}
+	}
+}
+foreach ( array( 'save_post', 'deleted_post', 'switch_theme', 'updated_option' ) as $jv_hook ) {
+	add_action( $jv_hook, 'javan_seda_artist_flush_url_cache', 50 );
+}
+
+if ( ! function_exists( 'javan_seda_artist_default_image' ) ) {
+	/**
+	 * تصویرِ پیش‌فرضِ هنرمند. از 3.4.8 فایلِ def-artist.webp اولویت دارد و
+	 * def-singer.webp فقط به‌عنوانِ فالبک نگه داشته می‌شود (تا نصبِ ناقص، کارت‌ها بی‌تصویر نشوند).
+	 */
+	function javan_seda_artist_default_image() {
+		$dir = get_template_directory();
+		foreach ( array( 'def-artist.webp', 'def-singer.webp' ) as $f ) {
+			if ( file_exists( $dir . '/images/' . $f ) ) {
+				return get_template_directory_uri() . '/images/' . $f;
+			}
+		}
+		return get_template_directory_uri() . '/images/def-singer.webp';
+	}
+}
+
 if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
 	/**
-	 * آدرس صفحۀ «همهٔ هنرمندان».
-	 * قالب مادر این را یک برگه می‌داند (اسلاگ فعلی: singers). اگر بعداً اسلاگ را
-	 * به artists عوض کردید، همان اولتش پیدا می‌شود؛ اگر هیچ‌کدام نبود، آدرسِ
-	 * آرشیوِ خودِ تاکسونومی را می‌دهیم تا لینک ۴۰۴ نشود.
+	 * آدرسِ یک‌جا‌و‌تنهای صفحۀ «همهٔ هنرمندان». ترتیب حل‌کردن:
+	 *   ۰) تنظیمات مادر: arti_url (ردیف «صفحه هنرمندان») — اگر پر باشد، حرفِ آخر با شماست
+	 *   ۱) برگه با اسلاگ artists → artist → singers → singer (get_page_by_path: ارزان، بدون کش)
+	 *   ۲) برگه‌ای که قالبش artist-template.php است (کوئریِ سنگین → کشِ ۱۲ ساعتهٔ نسخه‌دار)
+	 *   ۳) آرشیوِ خودِ تاکسونومی، و در پایان /singers/ تا هیچ لینکی مرده نشود
 	 */
 	function javan_seda_artists_index_url() {
 		static $url = null;
 		if ( null !== $url ) {
 			return $url;
 		}
-		$url    = '';
-		$slugs  = array( 'artists', 'artist', 'singers', 'singer' );
-		$slugs  = (array) apply_filters( 'javan_seda_artists_index_slugs', $slugs );
+
+		// ۰)_overrideِ مدیر_سایت
+		$opt = function_exists( 'ot_get_option' ) ? (string) ot_get_option( 'arti_url', '' ) : '';
+		$opt = trim( $opt );
+		if ( '' !== $opt && preg_match( '#^https?://#i', $opt ) ) {
+			$url = user_trailingslashit( $opt );
+			return $url;
+		}
+
+		// ۱) برگه بر پایهٔ اسلاگ
+		$slugs = array( 'artists', 'artist', 'singers', 'singer' );
+		$slugs = (array) apply_filters( 'javan_seda_artists_index_slugs', $slugs );
 		foreach ( $slugs as $s ) {
-			$page = get_page_by_path( sanitize_title( (string) $s ) );
+			$page = get_page_by_path( sanitize_title( (string) $s ), 'OBJECT', 'page' );
 			if ( $page ) {
 				$link = get_permalink( (int) $page->ID );
 				if ( $link && ! is_wp_error( $link ) ) {
 					$url = $link;
-					break;
+					return $url;
 				}
 			}
 		}
-		if ( '' === $url ) {
-			$tax = get_taxonomy( javan_seda_artist_tax() );
-			if ( $tax && ! empty( $tax->rewrite ) && is_array( $tax->rewrite ) && ! empty( $tax->rewrite['slug'] ) ) {
-				$url = home_url( '/' . trim( (string) $tax->rewrite['slug'], '/' ) . '/' );
+
+		// ۲) برگه‌ای که قالبش artist-template.php است (کلیدِ کش با شمارۀ قالب ⇒ با آپدیت معتبر نمی‌ماند)
+		$key     = javan_seda_artist_url_cache_key();
+		$cache  = ( function_exists( 'get_transient' ) && apply_filters( 'javan_seda_artist_url_cache', true ) ) ? get_transient( $key ) : '';
+		if ( is_string( $cache ) && '' !== $cache ) {
+			$url = $cache;
+			return $url;
+		}
+		$pages = get_posts(
+			array(
+				'post_type'        => 'page',
+				'post_status'      => 'publish',
+				'posts_per_page'   => 1,
+				'fields'           => 'ids',
+				'no_found_rows'    => true,
+				'meta_key'         => '_wp_page_template', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value'       => 'artist-template.php', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+			)
+		);
+		if ( $pages && ! empty( $pages[0] ) ) {
+			$link = get_permalink( (int) $pages[0] );
+			if ( $link && ! is_wp_error( $link ) ) {
+				$url = $link;
+				if ( function_exists( 'set_transient' ) ) {
+					set_transient( $key, $url, 12 * HOUR_IN_SECONDS );
+				}
+				return $url;
 			}
 		}
-		if ( '' === $url ) {
-			$url = home_url( '/singers/' );
+
+		// ۳) آرشیوِ تاکسونومی
+		$tax = get_taxonomy( javan_seda_artist_tax() );
+		if ( $tax && ! empty( $tax->rewrite ) && is_array( $tax->rewrite ) && ! empty( $tax->rewrite['slug'] ) ) {
+			$url = home_url( '/' . trim( (string) $tax->rewrite['slug'], '/' ) . '/' );
+			return $url;
 		}
+		$url = home_url( '/singers/' );
 		return $url;
 	}
 }
-
 /* -------------------------------------------------------------------------
    ۱) مهاجرتِ ستون taxonomy در wp_term_taxonomy (یک‌باره، نسخه‌دار)
    ------------------------------------------------------------------------- */
@@ -391,6 +480,21 @@ if ( ! function_exists( 'javan_seda_artist_legacy_redirect' ) ) {
 		$req = isset( $GLOBALS['wp']->request ) ? (string) $GLOBALS['wp']->request : '';
 		$req = trim( $req, '/' );
 		if ( '' === $req ) {
+			return;
+		}
+		$jv_404 = ( function_exists( 'is_404' ) && is_404() );
+		/* آدرسِ کهنۀ صفحۀ فهرست: /singers (اسلاگِ برگه پیش از یکدست‌سازی). فقط وقتی اجرا
+		   می‌شود که درخواست ۴۰۴ شده باشد، پس هیچ صفحۀ زنده‌ای را نمی‌پوشاند. */
+		if ( $jv_404 && ( 'singers' === $req || 'singer' === $req ) && function_exists( 'javan_seda_artists_index_url' ) ) {
+			$jv_index = javan_seda_artists_index_url();
+			$jv_path  = trim( (string) wp_parse_url( $jv_index, PHP_URL_PATH ), '/' );
+			if ( $jv_index && $jv_path !== $req ) {
+				if ( isset( $_SERVER['QUERY_STRING'] ) && '' !== (string) $_SERVER['QUERY_STRING'] ) {
+					$jv_index .= '?' . sanitize_text_field( wp_unslash( (string) $_SERVER['QUERY_STRING'] ) );
+				}
+				wp_redirect( $jv_index, 301 ); // phpcs:ignore
+				exit;
+			}
 			return;
 		}
 		if ( ! preg_match( '#^' . preg_quote( $from, '#' ) . '/([^/]+)(?:/page/(\d+))?/?$#u', $req, $m ) ) {

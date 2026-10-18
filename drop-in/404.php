@@ -22,13 +22,13 @@ get_header('');
 <div class="ab-404-hero__body">
 <h1>این صفحه پیدا نشد (۴۰۴)</h1>
 <div class="archive_txt_box">
-<p>ممکن است آهنگ حذف شده باشد، نشانی را اشتباه تایپ کرده باشید، یا لینک از جای دیگری شکسته باشد. نام آهنگ یا خواننده را جست‌وجو کنید — یا از فهرستِ زیر استفاده کنید.</p>
+<p>ممکن است آهنگ حذف شده باشد، نشانی را اشتباه تایپ کرده باشید، یا لینک از جای دیگری شکسته باشد. نام آهنگ یا هنرمند را جست‌وجو کنید — یا از فهرستِ زیر استفاده کنید.</p>
 <div class="clear"></div>
 </div>
 
 <form role="search" method="get" class="ab-404-search" action="<?php echo esc_url( home_url( '/' ) ); ?>">
-<label class="screen-reader-text" for="ab-404-q">جست‌وجوی آهنگ یا خواننده</label>
-<input id="ab-404-q" class="meta searchfield" type="search" name="s" placeholder="نام آهنگ یا خواننده …" aria-label="جست‌وجوی آهنگ">
+<label class="screen-reader-text" for="ab-404-q">جست‌وجوی آهنگ یا هنرمند</label>
+<input id="ab-404-q" class="meta searchfield" type="search" name="s" placeholder="نام آهنگ یا هنرمند …" aria-label="جست‌وجوی آهنگ">
 <button type="submit"><i class="icofont-search" aria-hidden="true"></i> جست‌وجو</button>
 </form>
 
@@ -44,7 +44,7 @@ get_header('');
 <li><a href="<?php echo esc_url( home_url( '/music/' ) ); ?>"><i class="icofont-music-note" aria-hidden="true"></i> تازه‌ترین آهنگ‌ها</a></li>
 <li><a href="<?php echo esc_url( home_url( '/music-video/' ) ); ?>"><i class="icofont-video" aria-hidden="true"></i> موزیک‌ویدیوها</a></li>
 <li><a href="<?php echo esc_url( home_url( '/album/' ) ); ?>"><i class="icofont-music-disk" aria-hidden="true"></i> آلبوم‌ها</a></li>
-<li><a href="<?php echo esc_url( javan_seda_artists_index_url() ); ?>"><i class="icofont-microphone-alt" aria-hidden="true"></i> همهٔ خواننده‌ها</a></li>
+<li><a href="<?php echo esc_url( javan_seda_artists_index_url() ); ?>"><i class="icofont-microphone-alt" aria-hidden="true"></i> همهٔ هنرمندان</a></li>
 </ul>
 
 <img class="ab-404-art" src="<?php echo esc_url( get_template_directory_uri() . '/images/error404.jpg' ); ?>" width="626" height="496" alt="صفحه پیدا نشد" loading="lazy" decoding="async">

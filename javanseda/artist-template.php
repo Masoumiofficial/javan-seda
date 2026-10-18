@@ -1,20 +1,20 @@
 <?php
 /**
- * Template Name: خواننده ها
+ * Template Name: هنرمندان
  *
  * صفحهٔ «همهٔ هنرمندان» — آدرسِ خودِ این برگه از javan_seda_artists_index_url() هم خوانده می‌شود.
  *
  * این فایل فقط «نمایش» است: نه تاکسونومی ثبت می‌کند، نه rewrite را تغییر می‌دهد،
  * نه در جایی از سایت دخالت می‌کند. اگر این فایل را بردارید، قالب قبلی دقیقاً مثل
- * قبل کار می‌کند. فقط روی همان برگه‌ای اثر دارد که قالبش «خواننده ها» انتخاب شده است.
+ * قبل کار می‌کند. فقط روی همان برگه‌ای اثر دارد که قالبش «هنرمندان» انتخاب شده است.
  *
  * قابلیت‌ها:
  *   • ترتیب واقعی حروف الفبای فارسی (ی/ي و ک/ك و آ/ا و حرکات یکسان‌سازی می‌شوند)
  *   • نوار حروف الفبا + بخش‌بندی گروهی (هر حرف یک بخش با لنگر #letter-…)
- *   • جست‌وجوی زندهٔ نام خواننده (بدون درخواست به سرور، با نرمال‌سازی فارسی)
+ *   • جست‌وجوی زندهٔ نام هنرمند (بدون درخواست به سرور، با نرمال‌سازی فارسی)
  *   • ترتیب بر اساس «بیشترین آهنگ» در کنار ترتیب الفبایی (?sort=songs)
  *   • فیلتر حرف با آدرس مخصوص خودش (?letter=ب) برای اشتراک‌گذاری و ایندکس شدن
- *   • تعداد آهنگ هر خواننده روی کارت + خط آمار کل + ساختار داده ItemList برای گوگل
+ *   • تعداد آهنگ هر هنرمند روی کارت + خط آمار کل + ساختار داده ItemList برای گوگل
  *   • تصویر تنبل‌بار (lazy) با srcset، دکمهٔ «اول صفحه»، پیام حالت خالی و حالت شب
  *
  * تنظیم‌ها و همه‌چیز از طریق فیلتر «javanseda_artists_config» قابل تغییر است.
@@ -31,16 +31,16 @@ if ( ! defined( 'ABSPATH' ) ) {
    ================================================================================== */
 $ab_cfg = array(
 	'taxonomy'    => javan_seda_artist_tax(), // نامک فعالِ تاکسونومی هنرمند (artist یا singer)
-	'hide_empty'  => true,     // خواننده‌های بدون آهنگ پنهان بمانند
+	'hide_empty'  => true,     // هنرمندانِ بدون آهنگ پنهان بمانند
 	'max_terms'   => 1200,     // بیشتر از این تعداد → حالت صفحه‌بندی (برای امنیت سرعت)
 	'per_page'    => 60,       // فقط در حالت صفحه‌بندی
 	'show_counts' => true,     // تعداد آهنگ روی هر کارت
 	'show_az'     => true,     // نوار حروف الفبا
 	'show_search' => true,     // جعبهٔ جست‌وجوی زنده
 	'show_sort'   => true,     // لینک‌های ترتیب (الفبا / بیشترین آهنگ)
-	'show_latin'  => true,     // نام لاتین/انگلیسی خواننده زیر نام فارسی
-	'show_top'    => true,     // ردیف «پرکارترین خواننده‌ها»
-	'top_limit'   => 12,       // چند خواننده در آن ردیف
+	'show_latin'  => true,     // نام لاتین/انگلیسی هنرمند زیر نام فارسی
+	'show_top'    => true,     // ردیف «پرکارترین هنرمندان»
+	'top_limit'   => 12,       // چند هنرمند در آن ردیف
 	'json_ld_max' => 200,      // حداکثر تعداد آیتم در داده‌ساختاریافته
 );
 $ab_cfg = apply_filters( 'javanseda_artists_config', $ab_cfg );
@@ -96,7 +96,7 @@ if ( ! function_exists( 'javanseda_artists_sort_key' ) ) {
 }
 
 if ( ! function_exists( 'javanseda_artists_image' ) ) {
-	/** تصویر خواننده از فیلد ACF «aimg2» (شناسه/آرایه/آدرس) + تصویر پیش‌فرض قالب */
+	/** تصویر هنرمند از فیلد ACF «aimg2» (شناسه/آرایه/آدرس) + تصویر پیش‌فرض قالب */
 	function javanseda_artists_image( $term, $size = 'medium' ) {
 		$image = function_exists( 'get_field' ) ? get_field( 'aimg2', $term ) : '';
 		$id    = 0;
@@ -137,7 +137,7 @@ if ( ! function_exists( 'javanseda_artists_image' ) ) {
 		}
 
 		if ( '' === $url ) {
-			$url = get_template_directory_uri() . '/images/def-singer.webp';
+			$url = function_exists( 'javan_seda_artist_default_image' ) ? javan_seda_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp';
 		}
 
 		return '<img class="ab-artist__img" src="' . esc_url( $url ) . '" alt="' . esc_attr( $alt ) . '" title="' . esc_attr( $alt ) . '" loading="lazy" decoding="async" width="200" height="200">';
@@ -145,7 +145,7 @@ if ( ! function_exists( 'javanseda_artists_image' ) ) {
 }
 
 if ( ! function_exists( 'javanseda_artists_latin_name' ) ) {
-	/** نام لاتین خواننده: اول فیلتر، بعد چند فیلد رایج ترم، در پایان از اسلاگ انگلیسی */
+	/** نام لاتین هنرمند: اول فیلتر، بعد چند فیلد رایج ترم، در پایان از اسلاگ انگلیسی */
 	function javanseda_artists_latin_name( $term ) {
 		if ( ! $term instanceof WP_Term ) {
 			return '';
@@ -236,7 +236,7 @@ if ( isset( $_GET['ab_artists_diag'] ) && current_user_can( 'manage_options' ) )
 
 	if ( is_wp_error( $ab_diag_terms ) ) {
 		$ab_diag_lines[] = 'خطا: ' . $ab_diag_terms->get_error_message();
-		$ab_diag_lines[] = 'یعنی تاکسونومی خواننده‌ها ثبت نشده است؛ صفحه نمی‌تواند هیچ خواننده‌ای نشان دهد.';
+		$ab_diag_lines[] = 'یعنی تاکسونومی هنرمندان ثبت نشده است؛ صفحه نمی‌تواند هیچ هنرمندی نشان دهد.';
 	} else {
 		$ab_diag_lines[] = '--- شمارش ترم‌ها ---';
 		$ab_diag_lines[] = 'کل ترم‌ها (با احتساب خالی‌ها): ' . $ab_diag_total;
@@ -272,7 +272,7 @@ if ( isset( $_GET['ab_artists_diag'] ) && current_user_can( 'manage_options' ) )
 
 	$ab_diag_lines[] = '';
 	$ab_diag_lines[] = '--- نکته ---';
-	$ab_diag_lines[] = 'اگر «فایل قالب در حال اجرا» همین فایل نبود، یعنی این برگه قالب «خواننده ها» را انتخاب نکرده است.';
+	$ab_diag_lines[] = 'اگر «فایل قالب در حال اجرا» همین فایل نبود، یعنی این برگه قالب «هنرمندان» را انتخاب نکرده است.';
 	echo esc_html( implode( "\n", $ab_diag_lines ) );
 	exit;
 }
@@ -346,7 +346,7 @@ if ( $ab_items ) {
 
 $ab_total = count( $ab_items );
 
-/* تعداد خواننده‌ها در هر حرف (برای نوار الفبا، پیش از اعمال فیلتر حرف) */
+/* تعداد هنرمندان در هر حرف (برای نوار الفبا، پیش از اعمال فیلتر حرف) */
 $ab_letter_counts = array();
 foreach ( $ab_items as $ab_item ) {
 	$ab_letter_counts[ $ab_item['letter'] ] = isset( $ab_letter_counts[ $ab_item['letter'] ] )
@@ -354,7 +354,7 @@ foreach ( $ab_items as $ab_item ) {
 		: 1;
 }
 
-/* پرکارترین خواننده‌ها — ردیف لینک‌های سریع (قبل از اعمال فیلترها) */
+/* پرکارترین هنرمندان — ردیف لینک‌های سریع (قبل از اعمال فیلترها) */
 $ab_top = array();
 if ( ! empty( $ab_cfg['show_top'] ) ) {
 	$ab_by_count = $ab_items;
@@ -438,7 +438,7 @@ if ( $ab_use_pagination ) {
 	}
 }
 
-/* آمار نمای فعلی: چند خواننده و چند آهنگ در همین صفحه دیده می‌شود */
+/* آمار نمای فعلی: چند هنرمند و چند آهنگ در همین صفحه دیده می‌شود */
 $ab_stat_artists = count( $ab_items );
 $ab_stat_songs   = 0;
 foreach ( $ab_items as $ab_item ) {
@@ -457,12 +457,25 @@ if ( '' === $ab_page_title ) {
 	$ab_page_title = 'لیست هنرمندان';
 }
 
+/* v3.4.8 — تیترِ این صفحه را می‌توان از تنظیمات قالب عوض کرد، بدونِ دست‌زدن به عنوانِ برگه:
+   «تنظیمات پوسته ← رابط کاربری ← تیترِ صفحۀ هنرمندان» */
+$ab_title_opt = function_exists( 'ot_get_option' ) ? trim( (string) ot_get_option( 'ab_artists_title', '' ) ) : '';
+if ( '' !== $ab_title_opt ) {
+	$ab_page_title = $ab_title_opt;
+	add_filter( 'document_title_parts', function ( $parts ) use ( $ab_title_opt ) {
+		if ( is_array( $parts ) && isset( $parts['title'] ) ) {
+			$parts['title'] = $ab_title_opt;
+		}
+		return $parts;
+	}, 20 );
+}
+
 if ( '' !== $ab_search ) {
 	$ab_h1 = $ab_page_title . ' — جست‌وجو برای «' . $ab_search . '»';
 } elseif ( '' !== $ab_letter ) {
 	$ab_h1 = $ab_page_title . ' — حرف «' . $ab_letter . '»';
 } elseif ( 'songs' === $ab_sort ) {
-	$ab_h1 = $ab_page_title . ' — پرکارترین خواننده‌ها';
+	$ab_h1 = $ab_page_title . ' — پرکارترین هنرمندان';
 } else {
 	$ab_h1 = $ab_page_title;
 }
@@ -492,7 +505,7 @@ get_template_part( 'inc/breadcrumbs' );
 <div class="tarlanweb_center">
 	<div id="centers_box">
 		<div class="clear2"></div>
-		<div class="song_boxs singers_box_tarlanweb">
+		<div class="song_boxs singers_box_tarlanweb ab-artists__grid">
 
 			<div class="songs_title_box">
 				<h1><?php echo esc_html( $ab_h1 ); ?></h1>
@@ -510,19 +523,19 @@ get_template_part( 'inc/breadcrumbs' );
 
 					<div class="ab-artists__notice">
 						<?php if ( $ab_error ) : ?>
-							<p><strong>فهرست خواننده‌ها فعلاً نمایش داده نمی‌شود.</strong></p>
+							<p><strong>فهرست هنرمندان فعلاً نمایش داده نمی‌شود.</strong></p>
 							<?php if ( current_user_can( 'manage_options' ) ) : ?>
 								<p class="ab-artists__admin">(فقط مدیر می‌بیند) دلیل: <?php echo esc_html( $ab_error->get_error_message() ); ?><br>
 								برای بررسی کامل، همین آدرس را با <code>?ab_artists_diag=1</code> باز کنید.</p>
 							<?php endif; ?>
 						<?php elseif ( '' !== $ab_search ) : ?>
 							<p>نتیجه‌ای برای «<?php echo esc_html( $ab_search ); ?>» پیدا نشد.</p>
-							<p><a href="<?php echo esc_url( $ab_url_all ); ?>">نمایش همهٔ خواننده‌ها</a></p>
+							<p><a href="<?php echo esc_url( $ab_url_all ); ?>">نمایش همهٔ هنرمندان</a></p>
 						<?php elseif ( '' !== $ab_letter ) : ?>
-							<p>برای حرف «<?php echo esc_html( $ab_letter ); ?>» خواننده‌ای ثبت نشده است.</p>
-							<p><a href="<?php echo esc_url( $ab_url_all ); ?>">نمایش همهٔ خواننده‌ها</a></p>
+							<p>برای حرف «<?php echo esc_html( $ab_letter ); ?>» هنرمندی ثبت نشده است.</p>
+							<p><a href="<?php echo esc_url( $ab_url_all ); ?>">نمایش همهٔ هنرمندان</a></p>
 						<?php else : ?>
-							<p>هنوز هیچ خواننده‌ای ثبت نشده است.</p>
+							<p>هنوز هیچ هنرمندی ثبت نشده است.</p>
 						<?php endif; ?>
 					</div>
 
@@ -530,19 +543,19 @@ get_template_part( 'inc/breadcrumbs' );
 
 					<?php if ( '' !== $ab_search ) : ?>
 						<p class="ab-artists__intro">
-							<?php echo esc_html( number_format_i18n( $ab_view_total ) ); ?> خواننده برای «<?php echo esc_html( $ab_search ); ?>» پیدا شد.
+							<?php echo esc_html( number_format_i18n( $ab_view_total ) ); ?> هنرمند برای «<?php echo esc_html( $ab_search ); ?>» پیدا شد.
 							<a href="<?php echo esc_url( $ab_url_all ); ?>">پاک‌کردن جست‌وجو</a>
 						</p>
 					<?php elseif ( '' !== $ab_letter ) : ?>
 						<p class="ab-artists__intro">
-							خواننده‌ها و هنرمندانی که نامشان با حرف «<?php echo esc_html( $ab_letter ); ?>» شروع می‌شود
-							(<?php echo esc_html( number_format_i18n( $ab_stat_artists ) ); ?> خواننده).
+							هنرمندانی که نامشان با حرف «<?php echo esc_html( $ab_letter ); ?>» شروع می‌شود
+							(<?php echo esc_html( number_format_i18n( $ab_stat_artists ) ); ?> هنرمند).
 							<a href="<?php echo esc_url( $ab_url_all ); ?>">نمایش همهٔ حروف الفبا</a>
 						</p>
 					<?php elseif ( 'songs' !== $ab_sort ) : ?>
 						<p class="ab-artists__intro">
-							فهرست کامل خواننده‌ها و هنرمندان به ترتیب حروف الفبای فارسی؛ برای دیدن آهنگ‌های هر خواننده روی نام او بزنید.
-							در حال حاضر <strong><?php echo esc_html( number_format_i18n( $ab_stat_artists ) ); ?></strong> خواننده در این فهرست هستند.
+							فهرست کامل هنرمندان به ترتیب حروف الفبای فارسی؛ برای دیدن آهنگ‌های هر هنرمند روی نام او بزنید.
+							در حال حاضر <strong><?php echo esc_html( number_format_i18n( $ab_stat_artists ) ); ?></strong> هنرمند در این فهرست هستند.
 						</p>
 					<?php endif; ?>
 
@@ -551,7 +564,7 @@ get_template_part( 'inc/breadcrumbs' );
 							<form class="ab-artists__search" method="get" action="<?php echo esc_url( $ab_base_url ); ?>" role="search" data-ab-searchbox>
 								<span class="ab-artists__search-icon" aria-hidden="true">⌕</span>
 								<input type="search" name="q" value="<?php echo esc_attr( $ab_search ); ?>" data-ab-search autocomplete="off" enterkeyhint="search"
-									placeholder="جست‌وجوی نام خواننده…" aria-label="جست‌وجوی نام خواننده">
+									placeholder="جست‌وجوی نام هنرمند…" aria-label="جست‌وجوی نام هنرمند">
 								<?php if ( '' !== $ab_letter ) : ?>
 									<input type="hidden" name="letter" value="<?php echo esc_attr( $ab_letter ); ?>">
 								<?php endif; ?>
@@ -565,7 +578,7 @@ get_template_part( 'inc/breadcrumbs' );
 							<?php
 							echo esc_html(
 								sprintf(
-									'%s خواننده · %s آهنگ',
+									'%s هنرمند · %s آهنگ',
 									number_format_i18n( $ab_stat_artists ),
 									number_format_i18n( $ab_stat_songs )
 								)
@@ -575,8 +588,8 @@ get_template_part( 'inc/breadcrumbs' );
 					</div>
 
 					<?php if ( ! empty( $ab_cfg['show_top'] ) && $ab_top && '' === $ab_search && '' === $ab_letter && 'songs' !== $ab_sort ) : ?>
-						<nav class="ab-artists__toplist" aria-label="پرکارترین خواننده‌ها">
-							<span class="ab-artists__toplist-title">پرکارترین خواننده‌ها:</span>
+						<nav class="ab-artists__toplist" aria-label="پرکارترین هنرمندان">
+							<span class="ab-artists__toplist-title">پرکارترین هنرمندان:</span>
 							<?php foreach ( $ab_top as $ab_top_item ) : ?>
 								<a class="ab-artists__pill" href="<?php echo esc_url( $ab_top_item['link'] ); ?>" title="<?php echo esc_attr( $ab_top_item['name'] ); ?>">
 									<?php echo esc_html( $ab_top_item['name'] ); ?><span class="ab-artists__pill-count"><?php echo esc_html( number_format_i18n( $ab_top_item['count'] ) ); ?></span>
@@ -600,9 +613,9 @@ get_template_part( 'inc/breadcrumbs' );
 								?>
 								<?php if ( $ab_char_count > 0 ) : ?>
 									<?php if ( '' === $ab_letter ) : ?>
-										<a class="ab-artists__chip" data-ab-chip="<?php echo esc_attr( $ab_char ); ?>" href="<?php echo esc_attr( '#letter-' . $ab_char ); ?>" title="<?php echo esc_attr( sprintf( '%s خواننده', number_format_i18n( $ab_char_count ) ) ); ?>"><?php echo esc_html( $ab_char ); ?></a>
+										<a class="ab-artists__chip" data-ab-chip="<?php echo esc_attr( $ab_char ); ?>" href="<?php echo esc_attr( '#letter-' . $ab_char ); ?>" title="<?php echo esc_attr( sprintf( '%s هنرمند', number_format_i18n( $ab_char_count ) ) ); ?>"><?php echo esc_html( $ab_char ); ?></a>
 									<?php else : ?>
-										<a class="ab-artists__chip<?php echo $ab_is_active ? ' is-active' : ''; ?>" data-ab-chip="<?php echo esc_attr( $ab_char ); ?>" href="<?php echo esc_url( $ab_url_letter[ $ab_char ] ); ?>" title="<?php echo esc_attr( sprintf( '%s خواننده', number_format_i18n( $ab_char_count ) ) ); ?>"><?php echo esc_html( $ab_char ); ?></a>
+										<a class="ab-artists__chip<?php echo $ab_is_active ? ' is-active' : ''; ?>" data-ab-chip="<?php echo esc_attr( $ab_char ); ?>" href="<?php echo esc_url( $ab_url_letter[ $ab_char ] ); ?>" title="<?php echo esc_attr( sprintf( '%s هنرمند', number_format_i18n( $ab_char_count ) ) ); ?>"><?php echo esc_html( $ab_char ); ?></a>
 									<?php endif; ?>
 								<?php else : ?>
 									<span class="ab-artists__chip is-empty" aria-hidden="true"><?php echo esc_html( $ab_char ); ?></span>
@@ -610,15 +623,15 @@ get_template_part( 'inc/breadcrumbs' );
 							<?php endforeach; ?>
 							<?php if ( isset( $ab_letter_counts['#'] ) ) : ?>
 								<?php if ( '' === $ab_letter ) : ?>
-									<a class="ab-artists__chip" data-ab-chip="#" href="#letter-other" title="<?php echo esc_attr( sprintf( '%s خواننده', number_format_i18n( $ab_letter_counts['#'] ) ) ); ?>">#</a>
+									<a class="ab-artists__chip" data-ab-chip="#" href="#letter-other" title="<?php echo esc_attr( sprintf( '%s هنرمند', number_format_i18n( $ab_letter_counts['#'] ) ) ); ?>">#</a>
 								<?php else : ?>
-									<a class="ab-artists__chip<?php echo ( '#' === $ab_letter ) ? ' is-active' : ''; ?>" data-ab-chip="#" href="<?php echo esc_url( add_query_arg( 'letter', rawurlencode( '#' ), $ab_base_url ) ); ?>" title="سایر خواننده‌ها">#</a>
+									<a class="ab-artists__chip<?php echo ( '#' === $ab_letter ) ? ' is-active' : ''; ?>" data-ab-chip="#" href="<?php echo esc_url( add_query_arg( 'letter', rawurlencode( '#' ), $ab_base_url ) ); ?>" title="سایر هنرمندان">#</a>
 								<?php endif; ?>
 							<?php endif; ?>
 						</nav>
 					<?php endif; ?>
 
-					<p class="ab-artists__empty" data-ab-empty hidden>خواننده‌ای با این نام پیدا نشد.</p>
+					<p class="ab-artists__empty" data-ab-empty hidden>هنرمندی با این نام پیدا نشد.</p>
 
 					<?php
 					foreach ( $ab_groups as $ab_group_letter => $ab_group_items ) :
@@ -627,7 +640,7 @@ get_template_part( 'inc/breadcrumbs' );
 						<section class="ab-artists__group" id="<?php echo esc_attr( $ab_group_id ); ?>" data-ab-group data-ab-letter="<?php echo esc_attr( $ab_group_letter ); ?>">
 							<h2 class="ab-artists__letter">
 								<span class="ab-artists__letter-char"><?php echo esc_html( '#' === $ab_group_letter ? 'سایر' : $ab_group_letter ); ?></span>
-								<span class="ab-artists__letter-count"><?php echo esc_html( sprintf( '%s خواننده', number_format_i18n( count( $ab_group_items ) ) ) ); ?></span>
+								<span class="ab-artists__letter-count"><?php echo esc_html( sprintf( '%s هنرمند', number_format_i18n( count( $ab_group_items ) ) ) ); ?></span>
 							</h2>
 							<div class="song_boxs_posts">
 								<ul>
@@ -704,7 +717,7 @@ get_template_part( 'inc/breadcrumbs' );
 
 <?php
 /* ----------------------------------------------------------------------------------
-   داده‌ساختاریافته: فهرست خواننده‌ها برای گوگل/موتورهای هوش مصنوعی
+   داده‌ساختاریافته: فهرست هنرمندان برای گوگل/موتورهای هوش مصنوعی
 ---------------------------------------------------------------------------------- */
 if ( ! $ab_error && $ab_items ) {
 	$ab_schema_items = array();

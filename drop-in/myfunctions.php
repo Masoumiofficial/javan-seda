@@ -50,11 +50,29 @@ if ( ! function_exists( 'javan_seda_artist_term_link' ) ) {
 		if ( ! is_wp_error( $link ) && ! empty( $link ) ) {
 			return $link;
 		}
-		return empty( $term->slug ) ? '' : home_url( '/singer/' . $term->slug . '/' );
+		if ( empty( $term->slug ) ) {
+			return '';
+		}
+		$jv_slug = function_exists( 'javan_seda_artist_slug' ) ? javan_seda_artist_slug() : 'singer';
+		return home_url( '/' . trim( $jv_slug, '/' ) . '/' . $term->slug . '/' );
 	}
 }
 if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
+	/** فالبک — لایۀ inc/ab-tax-artist.php این را با نسخهٔ کش‌دار جایگزین می‌کند */
 	function javan_seda_artists_index_url() {
+		$opt = function_exists( 'ot_get_option' ) ? trim( (string) ot_get_option( 'arti_url', '' ) ) : '';
+		if ( '' !== $opt && preg_match( '#^https?://#i', $opt ) ) {
+			return user_trailingslashit( $opt );
+		}
+		foreach ( array( 'artists', 'artist', 'singers', 'singer' ) as $slug ) {
+			$page = get_page_by_path( sanitize_title( $slug ), 'OBJECT', 'page' );
+			if ( $page ) {
+				$link = get_permalink( (int) $page->ID );
+				if ( $link && ! is_wp_error( $link ) ) {
+					return $link;
+				}
+			}
+		}
 		return home_url( '/singers/' );
 	}
 }
@@ -394,8 +412,12 @@ if ( JAVANSEDA_COVER_IN_CONTENT ) {
 if ( ! defined( 'JAVANSEDA_SINGER_FIX' ) ) {
 	define( 'JAVANSEDA_SINGER_FIX', false ); // برای فعال‌کردن: true
 }
+/* 3.4.8 — نامکِ تازه؛ JAVANSEDA_SINGER_FIX هم همچنان کار می‌کند */
+if ( ! defined( 'JAVANSEDA_ARTIST_FIX' ) ) {
+	define( 'JAVANSEDA_ARTIST_FIX', JAVANSEDA_SINGER_FIX );
+}
 
-if ( JAVANSEDA_SINGER_FIX ) {
+if ( JAVANSEDA_SINGER_FIX || JAVANSEDA_ARTIST_FIX ) {
 
 	/* ثبت جایگزین — فقط اگر تاکسونومی و پست‌تایپ هم‌نام وجود نداشته باشند */
 	add_action(
@@ -413,8 +435,8 @@ if ( JAVANSEDA_SINGER_FIX ) {
 				array( 'post' ),
 				array(
 					'labels'             => array(
-						'name'          => 'خواننده‌ها',
-						'singular_name' => 'خواننده',
+						'name'          => 'هنرمندان',
+						'singular_name' => 'هنرمند',
 					),
 					'public'             => true,
 					'publicly_queryable' => true,
@@ -439,12 +461,15 @@ if ( JAVANSEDA_SINGER_FIX ) {
 			if ( ! taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ) {
 				return;
 			}
-			$version = '2.1.0';
-			if ( get_option( 'javanseda_singer_rewrite_version' ) === $version ) {
-				return;
+			$version   = '2.2.0';
+			$jv_old    = get_option( 'javanseda_singer_rewrite_version' );
+			$jv_new    = get_option( 'javanseda_artist_rewrite_version' );
+			if ( $jv_new === $version || ( false === $jv_new && $jv_old === $version ) ) {
+				return; // همین نسخه اعمال شده
 			}
 			flush_rewrite_rules( false );
 			update_option( 'javanseda_singer_rewrite_version', $version );
+			update_option( 'javanseda_artist_rewrite_version', $version );
 		}
 	);
 }
@@ -455,7 +480,10 @@ if ( JAVANSEDA_SINGER_FIX ) {
 add_filter(
 	'template_include',
 	function ( $template ) {
-		if ( empty( $_GET['ab_singer_diag'] ) || ! current_user_can( 'manage_options' ) ) {
+		if ( empty( $_GET['ab_singer_diag'] ) && empty( $_GET['ab_artist_diag'] ) ) {
+			return $template;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return $template;
 		}
 
@@ -468,12 +496,15 @@ add_filter(
 		$lines[] = '=== گزارش تشخیص «صفحهٔ خواننده» — ترانه‌یار / جوان‌صدا ===';
 		$lines[] = 'WordPress: ' . get_bloginfo( 'version' ) . ' | PHP: ' . PHP_VERSION;
 		$lines[] = 'permalink_structure: ' . (string) get_option( 'permalink_structure' );
-		$lines[] = 'JAVANSEDA_SINGER_FIX: ' . ( JAVANSEDA_SINGER_FIX ? 'ON' : 'OFF (پیش‌فرض)' );
+		$lines[] = 'JAVANSEDA_SINGER_FIX / JAVANSEDA_ARTIST_FIX: ' . ( ( JAVANSEDA_SINGER_FIX || JAVANSEDA_ARTIST_FIX ) ? 'ON' : 'OFF (پیش‌فرض)' );
+		$lines[] = 'نامکِ فعالِ هنرمند: ' . ( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
+		$lines[] = 'آدرسِ فهرستِ هنرمندان: ' . ( function_exists( 'javan_seda_artists_index_url' ) ? javan_seda_artists_index_url() : '-' );
 
 		$lines[] = '';
-		$lines[] = '--- نوع ثبت «singer» ---';
-		$lines[] = 'taxonomy_exists(singer): ' . ( taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES' : 'NO' );
-		$lines[] = 'post_type_exists(singer): ' . ( post_type_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES  <-- صفحهٔ خواننده در این سایت «پست‌تایپ» است، نه آرشیو تاکسونومی' : 'NO' );
+		$jv_tax_name = function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer';
+		$lines[]    = '--- نوع ثبت «' . $jv_tax_name . '» ---';
+		$lines[] = 'taxonomy_exists(' . $jv_tax_name . '): ' . ( taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES' : 'NO' );
+		$lines[] = 'post_type_exists(' . $jv_tax_name . '): ' . ( post_type_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES  <-- صفحهٔ خواننده در این سایت «پست‌تایپ» است، نه آرشیو تاکسونومی' : 'NO' );
 		$lines[] = 'taxonomy_exists(post_tag): ' . ( taxonomy_exists( 'post_tag' ) ? 'YES' : 'NO' );
 		if ( taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ) {
 			$object  = get_taxonomy( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );

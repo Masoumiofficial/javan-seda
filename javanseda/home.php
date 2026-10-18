@@ -39,7 +39,7 @@ if ( function_exists( 'javan_seda_news_ticker' ) ) {
 		<li class="ab-quickbar__item">
 			<a href="<?php echo esc_url( javan_seda_artists_index_url() ); ?>" class="ab-quickbar__link">
 				<i class="icofont-microphone-alt"></i>
-				<span>همهٔ خواننده‌ها</span>
+				<span>همهٔ هنرمندان</span>
 			</a>
 		</li>
 		<li class="ab-quickbar__item">

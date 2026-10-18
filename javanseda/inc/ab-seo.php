@@ -123,7 +123,7 @@ if ( ! function_exists( 'javan_seda_seo_active' ) ) {
 	}
 }
 
-/** برچسب‌های «خواننده» و «آهنگ» از ACF (یا از عنوان)، برای ساختن توضیح یکدست */
+/** برچسب‌های «هنرمند» و «آهنگ» از ACF (یا از عنوان)، برای ساختن توضیح یکدست */
 if ( ! function_exists( 'javan_seda_seo_song_labels' ) ) {
 	function javan_seda_seo_song_labels( $post_id = 0 ) {
 		$post_id = $post_id ? (int) $post_id : get_the_ID();

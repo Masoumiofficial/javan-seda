@@ -9,9 +9,9 @@
  *
  * چه چیزی نسبت به نسخهٔ قبل اضافه شد؟
  *   • سرتیتر پروفایل کامل‌تر: تصویر + نام + شمارش دسته‌ها + «آخرین به‌روزرسانی» + متن معرفی
- *   • لینک بازگشت به فهرست همهٔ خواننده‌ها و به همان حرف در فهرست الفبایی (/singers/?letter=…)
+ *   • لینک بازگشت به فهرست همهٔ هنرمندان و به همان حرف در فهرست الفبایی (/singers/?letter=…)
  *   • مرتب‌سازی آهنگ‌ها با آدرس مستقل: ?sort=new (پیش‌فرض) | ?sort=old | ?sort=title
- *   • «خواننده‌های مشابه» بر اساس خواننده‌های مشترک در نوشته‌ها
+ *   • «هنرمندانِ مشابه» بر اساس هنرمندانِ مشترک در نوشته‌ها
  *   • داده‌ساختاریافتهٔ MusicGroup + ItemList برای گوگل
  *   • گزارش تشخیصی مدیر: ?ab_artist_diag=1
  *   • حفظ همان کلاس‌های CSS قبلی (artist_box_tarlanweb، artist_resume_box، song_boxs، …)
@@ -22,7 +22,7 @@
  *   javanseda_artist_type_labels    برچسب دسته‌ها
  *   javanseda_artist_directory_cache خاموش‌کردن کش ۱۲ساعتهٔ آدرس برگهٔ فهرست هنرمندان
  *   javanseda_artist_resume_labels  برچسب کوتاه نشان‌های سرتیتر (آهنگ/آلبوم/…)
- *   javanseda_artist_posts_limit    سقف تعداد نوشته‌های خواننده (پیش‌فرض -۱ = همه)
+ *   javanseda_artist_posts_limit    سقف تعداد نوشته‌های هنرمند (پیش‌فرض -۱ = همه)
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -36,8 +36,8 @@ $taranehyar_cfg = apply_filters(
 	'javanseda_artist_page_config',
 	array(
 		'show_sort'      => true,  // نوار «ترتیب: جدیدترین / قدیمی‌ترین / الفبایی»
-		'show_related'   => true,  // بخش «خواننده‌های مشابه»
-		'related_limit'  => 8,     // حداکثر تعداد خوانندهٔ مشابه
+		'show_related'   => true,  // بخش «هنرمندانِ مشابه»
+		'related_limit'  => 8,     // حداکثر تعداد هنرمندِ مشابه
 		'show_meta'      => true,  // شمارش دسته‌ها و تاریخ آخرین به‌روزرسانی
 		'show_dir_links' => true,  // لینک‌های بازگشت به فهرست الفبایی
 		'json_ld_max'    => 100,   // حداکثر آیتم در داده‌ساختاریافته
@@ -113,44 +113,34 @@ if ( ! function_exists( 'javanseda_artist_sort_key' ) ) {
 }
 
 if ( ! function_exists( 'javanseda_artist_directory_url' ) ) {
-	/** آدرس صفحهٔ «همهٔ هنرمندان»؛ اول بر اساس قالب artist-template.php، بعد حدس معمول */
+	/**
+	 * آدرسِ صفحۀ «همهٔ هنرمندان» — از 3.4.8 فقط یک رابطِ سازگار است.
+	 * منطقِ واقعی در javan_seda_artists_index_url() (لایۀ inc/ab-tax-artist.php) است:
+	 * arti_url ← اسلاگِ برگه (artists → artist → singers) ← قالبِ artist-template.php ← آرشیوِ تاکسونومی,
+	 * و کلیدِ کشش با شمارۀ قالب می‌سازد، پس بعدِ هر آپدیت دیگر مقدارِ کهنه سرو نمی‌شود.
+	 */
 	function javanseda_artist_directory_url() {
 		static $url = null;
 		if ( null !== $url ) {
 			return $url;
 		}
-
-			// چون جست‌وجوی برگه با متای قالب سنگین است، نتیجه ۱۲ ساعت کش می‌شود.
-			$cacheable = (bool) apply_filters( 'javanseda_artist_directory_cache', true );
-			$cached    = $cacheable ? get_transient( 'javanseda_artist_directory_url' ) : '';
-			if ( is_string( $cached ) && '' !== $cached ) {
-				$url = $cached;
-				return $url;
+		if ( function_exists( 'javan_seda_artists_index_url' ) ) {
+			$url = javan_seda_artists_index_url();
+		} else {
+			/* لایه نصب نشده؟ همان رفتارِ سادهٔ قبلی، بدونِ کش */
+			$page = get_page_by_path( 'artists', 'OBJECT', 'page' );
+			if ( ! $page ) {
+				$page = get_page_by_path( 'singers', 'OBJECT', 'page' );
 			}
-
-			$pages = get_posts(
-				array(
-					'post_type'        => 'page',
-					'post_status'      => 'publish',
-					'posts_per_page'   => 1,
-				'fields'           => 'ids',
-				'no_found_rows'    => true,
-				'suppress_filters' => false,
-				'meta_key'         => '_wp_page_template', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-				'meta_value'       => 'artist-template.php', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-			)
-		);
-
-			$url = ( $pages && ! empty( $pages[0] ) ) ? get_permalink( (int) $pages[0] ) : ( function_exists( 'javan_seda_artists_index_url' ) ? javan_seda_artists_index_url() : home_url( '/singers/' ) );
-			if ( ! $url ) {
-				$url = function_exists( 'javan_seda_artists_index_url' ) ? javan_seda_artists_index_url() : home_url( '/singers/' );
-			}
-			if ( $cacheable ) {
-				set_transient( 'javanseda_artist_directory_url', $url, 12 * HOUR_IN_SECONDS );
-			}
-			return $url;
+			$url = $page ? get_permalink( (int) $page->ID ) : '';
+		}
+		if ( ! $url || is_wp_error( $url ) ) {
+			$url = home_url( '/singers/' );
+		}
+		return apply_filters( 'javanseda_artist_directory_url', $url );
 	}
 }
+
 
 /* ==================================================================================
    ۲) ورودی‌های آدرس (?sort=)
@@ -182,7 +172,7 @@ if ( isset( $_GET['ab_artist_diag'] ) && current_user_can( 'manage_options' ) ) 
 	nocache_headers();
 	header( 'Content-Type: text/plain; charset=utf-8' );
 
-	$taranehyar_lines[] = '=== گزارش تشخیص «صفحهٔ خواننده» — ترانه‌یار ===';
+	$taranehyar_lines[] = '=== گزارش تشخیص «صفحهٔ هنرمند» — ترانه‌یار ===';
 	$taranehyar_lines[] = 'فایل قالب در حال اجرا: ' . __FILE__;
 	$taranehyar_lines[] = 'queried_object: ' . ( is_object( $taranehyar_diag_term ) ? get_class( $taranehyar_diag_term ) : gettype( $taranehyar_diag_term ) );
 	$taranehyar_lines[] = 'taxonomy_exists(' . javan_seda_artist_tax() . '): ' . ( taxonomy_exists( javan_seda_artist_tax() ) ? 'YES' : 'NO' );
@@ -190,7 +180,7 @@ if ( isset( $_GET['ab_artist_diag'] ) && current_user_can( 'manage_options' ) ) 
 	$taranehyar_lines[] = '';
 
 	if ( ! $taranehyar_diag_term instanceof WP_Term ) {
-		$taranehyar_lines[] = 'این درخواست یک ترم تاکسونومی نیست؛ یعنی وردپرس این آدرس را «آرشیو خواننده» نمی‌بیند.';
+		$taranehyar_lines[] = 'این درخواست یک ترم تاکسونومی نیست؛ یعنی وردپرس این آدرس را «آرشیو هنرمند» نمی‌بیند.';
 		$taranehyar_lines[] = 'راهنما: ?ab_artist_diag=1 (نسخۀ 3.4.7 به بعد؛ ?ab_singer_diag هم همان گزارش را می‌دهد)';
 	} else {
 		$taranehyar_lines[] = '--- ترم ---';
@@ -200,7 +190,7 @@ if ( isset( $_GET['ab_artist_diag'] ) && current_user_can( 'manage_options' ) ) 
 		$taranehyar_lines[] = 'تصویر aimg2: ' . ( '' !== (string) ( function_exists( 'get_field' ) ? get_field( 'aimg2', $taranehyar_diag_term ) : '' ) ? 'دارد' : 'ندارد (تصویر پیش‌فرض قالب)' );
 		$taranehyar_lines[] = 'توضیحات ترم (بیوگرافی): ' . ( '' !== trim( wp_strip_all_tags( (string) get_the_archive_description() ) ) ? 'دارد' : 'خالی است' );
 		$taranehyar_lines[] = '';
-		$taranehyar_lines[] = '--- نوشته‌های این خواننده و مقدار musics_type آن‌ها (۲۵ مورد اول) ---';
+		$taranehyar_lines[] = '--- نوشته‌های این هنرمند و مقدار musics_type آن‌ها (۲۵ مورد اول) ---';
 
 		$taranehyar_diag_query = new WP_Query(
 			array(
@@ -232,7 +222,7 @@ if ( isset( $_GET['ab_artist_diag'] ) && current_user_can( 'manage_options' ) ) 
 
 	$taranehyar_lines[] = '';
 	$taranehyar_lines[] = '--- لینک‌ها ---';
-	$taranehyar_lines[] = 'فهرست همهٔ خواننده‌ها: ' . javanseda_artist_directory_url();
+	$taranehyar_lines[] = 'فهرست همهٔ هنرمندان: ' . javanseda_artist_directory_url();
 
 	echo esc_html( implode( "\n", $taranehyar_lines ) );
 	exit;
@@ -249,7 +239,7 @@ if ( ! $taranehyar_term instanceof WP_Term ) {
 	<div class="tarlanweb_center">
 		<div class="artist_box_tarlanweb">
 			<div class="artist_box_detss">
-				<h1 class="artist_name_head">صفحهٔ این خواننده در دسترس نیست</h1>
+				<h1 class="artist_name_head">صفحهٔ این هنرمند در دسترس نیست</h1>
 				<div class="artist_txt_box">
 					<p>آدرس این صفحه با هیچ هنرمند ثبت‌شده‌ای مطابقت ندارد. اگر قبلاً این صفحه کار می‌کرد، احتمالاً قوانین پیوند یکتا (Permalink) نیاز به بازسازی دارد: پیشخوان ← تنظیمات ← پیوندهای یکتا ← ذخیرهٔ تغییرات.</p>
 					<p><a href="<?php echo esc_url( home_url( '/' ) ); ?>">بازگشت به صفحهٔ اصلی</a></p>
@@ -405,7 +395,7 @@ if ( $taranehyar_query->have_posts() ) {
 wp_reset_postdata();
 
 /* ------------------------------------------------------------------
-   خواننده‌های مشابه: بر اساس بیشترین اشتراک در نوشته‌های همین خواننده
+   هنرمندانِ مشابه: بر اساس بیشترین اشتراک در نوشته‌های همین هنرمند
 ------------------------------------------------------------------- */
 $taranehyar_related = array();
 if ( ! empty( $taranehyar_cfg['show_related'] ) && ! empty( $taranehyar_query->posts ) ) {
@@ -491,7 +481,7 @@ $taranehyar_sort_labels = array(
 			<?php if ( '' !== $taranehyar_image_url ) : ?>
 				<img src="<?php echo esc_url( $taranehyar_image_url ); ?>" width="200" height="200" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" title="<?php echo esc_attr( $taranehyar_term->name ); ?>">
 			<?php else : ?>
-				<img src="<?php echo esc_url( get_template_directory_uri() . '/images/def-singer.webp' ); ?>" width="200" height="200" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" title="<?php echo esc_attr( $taranehyar_term->name ); ?>">
+				<img src="<?php echo esc_url( function_exists( 'javan_seda_artist_default_image' ) ? javan_seda_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp' ); ?>" width="200" height="200" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" title="<?php echo esc_attr( $taranehyar_term->name ); ?>">
 			<?php endif; ?>
 			<div class="socials_box">
 				<span>صفحات مجازی هنرمند</span>
@@ -543,10 +533,10 @@ $taranehyar_sort_labels = array(
 
 			<?php if ( ! empty( $taranehyar_cfg['show_dir_links'] ) ) : ?>
 				<p class="ab-artist-page__links">
-					<a href="<?php echo esc_url( $taranehyar_directory_url ); ?>">همهٔ خواننده‌ها (فهرست الفبایی)</a>
+					<a href="<?php echo esc_url( $taranehyar_directory_url ); ?>">همهٔ هنرمندان (فهرست الفبایی)</a>
 					<?php if ( '' !== $taranehyar_letter ) : ?>
 						<span class="ab-artist-page__dot">•</span>
-						<a href="<?php echo esc_url( $taranehyar_letter_url ); ?>">خواننده‌های حرف «<?php echo esc_html( $taranehyar_letter ); ?>»</a>
+						<a href="<?php echo esc_url( $taranehyar_letter_url ); ?>">هنرمندانِ حرف «<?php echo esc_html( $taranehyar_letter ); ?>»</a>
 					<?php endif; ?>
 				</p>
 			<?php endif; ?>
@@ -577,7 +567,7 @@ $taranehyar_sort_labels = array(
 <?php if ( ! empty( $taranehyar_cfg['show_related'] ) && ! empty( $taranehyar_related ) ) : ?>
 	<div class="song_boxs ab-related">
 		<div class="songs_title_box">
-			<h3>خواننده‌های مشابه</h3>
+			<h3>هنرمندانِ مشابه</h3>
 			<div class="clear"></div><div class="liner"></div>
 		</div>
 		<div class="ab-related__list">
@@ -630,12 +620,12 @@ $taranehyar_sort_labels = array(
 <?php if ( 0 === $taranehyar_found ) : ?>
 	<div class="song_boxs">
 		<div class="songs_title_box">
-			<h3>آهنگی برای این خواننده ثبت نشده است</h3>
+			<h3>آهنگی برای این هنرمند ثبت نشده است</h3>
 			<div class="clear"></div><div class="liner"></div>
 		</div>
 		<div class="artist_txt_box">
-			<p>هنوز نوشته‌ای به این خواننده متصل نشده است. اگر آهنگ‌های این خواننده در سایت موجودند، در نوشته‌ها فیلد «خواننده» را به همین نام انتخاب کنید.</p>
-			<p><a href="<?php echo esc_url( $taranehyar_directory_url ); ?>">دیدن همهٔ خواننده‌ها</a> — <a href="<?php echo esc_url( home_url( '/' ) ); ?>">بازگشت به صفحهٔ اصلی</a></p>
+			<p>هنوز نوشته‌ای به این هنرمند متصل نشده است. اگر آهنگ‌های این هنرمند در سایت موجودند، در نوشته‌ها فیلد «هنرمند» را به همین نام انتخاب کنید.</p>
+			<p><a href="<?php echo esc_url( $taranehyar_directory_url ); ?>">دیدن همهٔ هنرمندان</a> — <a href="<?php echo esc_url( home_url( '/' ) ); ?>">بازگشت به صفحهٔ اصلی</a></p>
 			<div class="clear"></div>
 		</div>
 	</div>
@@ -653,7 +643,7 @@ $taranehyar_sort_labels = array(
 
 <?php
 /* ----------------------------------------------------------------------------------
-   داده‌ساختاریافته: خواننده (MusicGroup) + فهرست آثار
+   داده‌ساختاریافته: هنرمند (MusicGroup) + فهرست آثار
 ---------------------------------------------------------------------------------- */
 if ( $taranehyar_found > 0 ) {
 	$taranehyar_term_link = get_term_link( $taranehyar_term );

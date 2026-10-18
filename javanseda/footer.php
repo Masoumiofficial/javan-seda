@@ -17,7 +17,7 @@ if ( function_exists( 'javan_seda_ui_footer_cats' ) ) {
 	$ab_footer_cats_num = javan_seda_ui_footer_cats();
 }
 $ab_footer_links = array(
-	array( 'label' => 'همهٔ خواننده‌ها', 'url' => javan_seda_artists_index_url(), 'icon' => 'icofont-microphone-alt' ),
+	array( 'label' => 'همهٔ هنرمندان', 'url' => javan_seda_artists_index_url(), 'icon' => 'icofont-microphone-alt' ),
 	array( 'label' => 'تازه‌ترین آهنگ‌ها', 'url' => home_url('/#new-songs'), 'icon' => 'icofont-music-notes' ),
 );
 if ( function_exists( 'javan_seda_ui_footer_links' ) ) {
@@ -60,7 +60,7 @@ if ( function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
 		<div class="ab-footer__col ab-footer__col--links">
 			<h4 class="ab-footer__title">لینک‌های مفید</h4>
 			<nav class="ab-footer__nav" aria-label="لینک‌های مفید فوتر">
-				<?php /* v3.4.0 — دو پیوند اصلی (همهٔ خواننده‌ها / تازه‌ترین آهنگ‌ها) به‌جای ستون «دسته‌های پرطرفدار» اینجا می‌آیند: فوتر کوتاه‌تر و لینک‌ها در یک ستون.
+				<?php /* v3.4.0 — دو پیوند اصلی (همهٔ هنرمندان / تازه‌ترین آهنگ‌ها) به‌جای ستون «دسته‌های پرطرفدار» اینجا می‌آیند: فوتر کوتاه‌تر و لینک‌ها در یک ستون.
 				   v3.4.1 — همان دو پیوند + لینک‌های دستیِ شما، از تنظیمات قالب (ab_footer_pinned / ab_footer_links). */ ?>
 				<?php if (!empty($ab_footer_links)) { ?>
 				<ul class="ab-footer__menu ab-footer__menu--pinned">
@@ -132,7 +132,7 @@ if ( function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
 			<?php if ( ! function_exists( 'javan_seda_ui_footer_search' ) || javan_seda_ui_footer_search() ) { ?>
 			<form class="ab-footer__search" method="get" action="<?php echo esc_url(home_url('/')); ?>" role="search">
 				<label for="ab-footer-search-input" class="screen-reader-text">جستجو در سایت</label>
-				<input id="ab-footer-search-input" class="ab-footer__search-input" name="s" placeholder="جستجوی ترانه، خواننده..." type="text" required>
+				<input id="ab-footer-search-input" class="ab-footer__search-input" name="s" placeholder="جستجوی ترانه، هنرمند..." type="text" required>
 				<button type="submit" class="ab-footer__search-btn" aria-label="جستجو"><i class="icofont-search"></i></button>
 			</form>
 			<?php } ?>

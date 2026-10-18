@@ -214,7 +214,7 @@ if ( ! function_exists( 'javan_seda_x_sub' ) ) {
 }
 
 if ( ! function_exists( 'javan_seda_sticky_track' ) ) {
-	/** یک «قطعه» از روی یک نوشته: عنوان · خواننده · فایل پخش · آدرس نوشته · تصویر */
+	/** یک «قطعه» از روی یک نوشته: عنوان · هنرمند · فایل پخش · آدرس نوشته · تصویر */
 	function javan_seda_sticky_track( $post_id = 0 ) {
 		$post_id = (int) $post_id;
 		$src     = javan_seda_sticky_player_src( $post_id );

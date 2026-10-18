@@ -274,7 +274,7 @@ if ( ! function_exists( 'javan_seda_ui_footer_links' ) ) {
 		$out = array();
 		if ( javan_seda_ui_on( 'ab_footer_pinned', true ) ) {
 			$out[] = array(
-				'label' => 'همهٔ خواننده‌ها',
+				'label' => 'همهٔ هنرمندان',
 				'url'   => javan_seda_artists_index_url(),
 				'icon'  => 'icofont-microphone-alt',
 			);

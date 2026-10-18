@@ -10,7 +10,7 @@
 <img src="<?php echo $image; ?>" width="200" height="200" alt="<?php echo $term->name; ?>" title="<?php echo $term->name; ?>">
 <?php } ?>
 <div class="socials_box">
-<span>صفحات مجازی خواننده</span>
+<span>صفحات مجازی هنرمند</span>
 <?php if(get_field('afacebook',$term)){ ?><a href="<?php echo esc_url( get_field('afacebook', $term) ); ?>" class="icofont-facebook"></a><?php } if(get_field('atelegram',$term)){ ?><a href="<?php echo esc_url( get_field('atelegram', $term) ); ?>" class="icofont-paper-plane"></a><?php } if(get_field('ainstagram',$term)){ ?><a href="<?php echo esc_url( get_field('ainstagram', $term) ); ?>" class="icofont-instagram"></a><?php } if(get_field('atwitter',$term)){ ?><a href="<?php echo esc_url( get_field('atwitter', $term) ); ?>" class="icofont-twitter"></a><?php } if(get_field('ayoutube',$term)){ ?><a href="<?php echo esc_url( get_field('ayoutube', $term) ); ?>" class="icofont-youtube-play"></a><?php } ?>
 <div class="clear"></div>
 </div><div class="clear"></div>

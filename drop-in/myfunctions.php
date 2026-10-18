@@ -10,6 +10,15 @@ if ( is_readable( $_javan_seda_controls ) ) {
 }
 unset( $_javan_seda_controls );
 /* ---------------------------------------------------------------------------
+   v3.4.3 — پوستۀ صفحۀ «تنظیمات قالب» (فقط پیشخوان؛ inc/ab-admin-ui.php)
+   این فایل روی صفحۀ سایت هیچ چیزی چاپ نمی‌کند؛ اگر نبود، همه‌چیز مثل قبل.
+   ------------------------------------------------------------------------- */
+$_javan_seda_admin_ui = trailingslashit( get_template_directory() ) . 'inc/ab-admin-ui.php';
+if ( is_admin() && is_readable( $_javan_seda_admin_ui ) ) {
+	require_once $_javan_seda_admin_ui;
+}
+unset( $_javan_seda_admin_ui );
+/* ---------------------------------------------------------------------------
    لایهٔ ایمنی «سایدبار / ابزارک نوشته‌ها» (v3.0.2)
    اگر این include حذف شود، ناحیه‌های left_side / left_side2 / left_side1
    فقط به فایل رمزنگاری‌شدهٔ functions.php وابسته می‌مانند.

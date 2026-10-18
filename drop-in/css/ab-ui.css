@@ -568,9 +568,10 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 /* انتهای بلوک ۳۱ (v3.3.7) */
 
 /* ==========================================================================
-   بلوک ۳۲ (نسخۀ 3.3.8) — دسترس‌پذیریِ هدر، پلیرِ دومِ آلبوم، پرده‌بندیِ UI
+   بلوک ۳۲ (3.3.8 · اصلاح 3.3.9) — دسترس‌پذیریِ هدر + id یکتای پلیرها
    فایل‌ها: header.php (wp_body_open + .ab-skip-link) · single.php و
-            inc/tarlanweb_player.php (data-ab-player + id یکتا)
+            inc/tarlanweb_player.php (data-ab-player + id یکتا، بدون هیچ
+            display:none — در 3.3.8 پنهان‌سازی چیدمان پلیر را به‌هم ریخت)
    پالت سازمانی بدون گرادینت · خاموشی: JAVANSEDA_SKIP_LINK / JAVANSEDA_UI_GUARD
    ========================================================================== */
 
@@ -581,16 +582,14 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 .night .ab-skip-link{background:var(--ab-blue-accent);color:#0b0f16;box-shadow:0 6px 18px rgba(0,0,0,.5)}
 
 /* ۲) پلیر دوم: js/scripts.js فقط یک پلیر را bind می‌کند (getElementById + querySelector
-      سراسری) ⇒ در صفحۀ آهنگِ آلبوم‌دار، ردیف کنترلِ پلیر دوم «مرده» چاپ می‌شد و
-      اسکرول/کلیک روی دکمه‌هایش هیچ اتفاقی نمی‌افتاد. با idهای یکتا (audio-2 …) حالا
-      DOM معتبر است و این سه قاعده همان ردیف کنترلِ مرده را پنهان می‌کند، در حالی که
-      فهرست دانلودِ ردیف‌ها (.play-list) سرِ جایش می‌ماند. قاعده عمداً فقط
-      [data-ab-player="2"] است تا نوار پخش هوم/فوتر (=۱) هرگز بی‌دلیل بی‌کار نشود؛
-      اگر روزی JS چندنمونگی شد، همین سه خط را حذف کنید. */
-.music_box_player[data-ab-player="2"]{min-height:0;padding:10px 14px}
-.music_box_player[data-ab-player="2"] .player{display:none}
-.music_box_player[data-ab-player="2"] .play-list{margin:0 -14px;border-top:0}
+      سراسری) ⇒ در صفحۀ آهنگِ آلبوم‌دار، ردیف کنترلِ پلیر دوم به صدای پلیر اول وصل
+      نبود. کاری که کردیم فقط «یکتاکردن idها» است: پلیر اول همان audio/volume-bar را
+      نگه می‌دارد (پس JS قالب دقیقاً مثل قبل کار می‌کند) و بعدی‌ها audio-2,… می‌شوند تا
+      DOM معتبر شود. عمداً هیچ قاعدۀ display:none برای پلیرها افزوده نشد: ترتیب رندر
+      پلیرها بین home/single/sidebarها یکسان نیست و هر پنهان‌سازی بر اساس شمارهٔ
+      «اول/دوم» روی برخی صفحه‌ها پلیرِ درست را بی‌کار می‌کند (تجربۀ 3.3.8). اگر روزی
+      JS چندنمونگی شد، همان لحظه می‌توان روی data-ab-player استایل بست. */
 
 /* ۳) حالت خاموشی JAVANSEDA_SKIP_LINK: لینک پرش چاپ نمی‌شود، پس قاعده هم لازم نیست */
 
-/* انتهای بلوک ۳۲ (v3.3.8) */
+/* انتهای بلوک ۳۲ (v3.3.8 · اصلاحیۀ 3.3.9) */

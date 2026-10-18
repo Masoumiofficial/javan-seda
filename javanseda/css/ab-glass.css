@@ -197,7 +197,9 @@
 .tarlanweb_side_box li:hover{background: var(--ab-blue-soft)}
 
 /* ----------------------------------------------------------- صفحۀ نوشته تکی --- */
-.music_box_player,
+/* .music_box_player عمداً از این گروه بیرون رفت (v3.4.0): کارتِ پلیر فقط یک جا تعریف
+   می‌شود (بلوک ۳۳ style.css). قبلاً #index_music_player و .music_box_player هر دو جعبه
+   داشتند ⇒ «پلیر داخل یک باکس دیگر». */
 .dl_linksv_box,
 .single_content_box .ab-social-box,
 .single_content_box .ab-credits,

@@ -38,6 +38,11 @@
 		<div class="ab-footer__col ab-footer__col--links">
 			<h4 class="ab-footer__title">لینک‌های مفید</h4>
 			<nav class="ab-footer__nav" aria-label="لینک‌های مفید فوتر">
+				<?php /* v3.4.0 — دو پیوند اصلی (همهٔ خواننده‌ها / تازه‌ترین آهنگ‌ها) به‌جای ستون «دسته‌های پرطرفدار» اینجا می‌آیند: فوتر کوتاه‌تر و لینک‌ها در یک ستون. */ ?>
+				<ul class="ab-footer__menu ab-footer__menu--pinned">
+					<li><a href="<?php echo esc_url(home_url('/singers/')); ?>" class="ab-footer__cat-featured"><i class="icofont-microphone-alt" aria-hidden="true"></i> همهٔ خواننده‌ها</a></li>
+					<li><a href="<?php echo esc_url(home_url('/#new-songs')); ?>" class="ab-footer__cat-featured"><i class="icofont-music-notes" aria-hidden="true"></i> تازه‌ترین آهنگ‌ها</a></li>
+				</ul>
 				<?php
 				if (has_nav_menu('ft_menu')) {
 					wp_nav_menu(array(
@@ -61,8 +66,6 @@
 		<div class="ab-footer__col ab-footer__col--cats">
 			<h4 class="ab-footer__title">دسته‌های پرطرفدار</h4>
 			<ul class="ab-footer__cats">
-				<li><a href="<?php echo esc_url(home_url('/singers/')); ?>" class="ab-footer__cat-featured"><i class="icofont-microphone-alt"></i> همهٔ خواننده‌ها</a></li>
-				<li><a href="<?php echo esc_url(home_url('/#new-songs')); ?>" class="ab-footer__cat-featured"><i class="icofont-music-notes"></i> تازه‌ترین آهنگ‌ها</a></li>
 				<?php
 				$ab_categories = get_categories(array(
 					'orderby'    => 'count',

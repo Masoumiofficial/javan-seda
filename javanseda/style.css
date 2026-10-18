@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.3.9
+Version: 3.4.0
 */
 /*
 ==================================================================================
@@ -1939,6 +1939,13 @@ body{padding-top:0;}
 .ab-footer__cat-featured i{
 	font-size:14px !important;
 }
+/* v3.4.0 — «همهٔ خواننده‌ها» و «تازه‌ترین آهنگ‌ها» از ستون دسته‌ها به ستون «لینک‌های مفید»
+   منتقل شدند تا فوتر ارتفاع کمتری بگیرد. چون .ab-footer__menu li a رنگ را با !important
+   ست می‌کند، اینجا هم همان‌طور نوشته شد تا رنگ آبیِ همین پیوندها حفظ شود. */
+.ab-footer__menu li a.ab-footer__cat-featured{color:var(--ab-blue) !important;font-weight:700 !important}
+.ab-footer__menu li a.ab-footer__cat-featured:hover{color:var(--ab-blue-accent) !important}
+.night .ab-footer__menu li a.ab-footer__cat-featured{color:var(--ab-blue-accent) !important}
+.ab-footer__menu--pinned{padding-bottom:6px}
 
 .ab-footer__count{
 	font-size:11.5px !important;
@@ -3137,7 +3144,9 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 .music_box_player .play-list .play-list-row{margin: 7px 0}
 .music_box_player .play-list .play-list-row .track-title .playlist-track{color: var(--ab-text)}
 .single_content_box .music_box_player .play-list{margin-top: 12px}
-#index_music_player{background: var(--ab-surface);border: 1px solid var(--ab-line);border-radius: var(--ab-radius-m, 14px);box-shadow: var(--ab-depth-1)}
+#index_music_player{background: transparent;border: 0;border-radius: 0;box-shadow: none;padding: 0;margin: 0 0 26px}
+/* v3.4.0 — پوسته دیگر جعبه نیست (قبلاً همین‌جا + خط 927 قالب مادر هر دو بکس می‌ساختند);
+   تنها جعبه، کارتِ .music_box_player در بلوک ۳۳ است. */
 /* انیمیشن «در حال پخش»: فقط compositor، بدون تغییر عرض */
 .nowPlayingIcon span{width: 22px;transform-origin: right center;-webkit-backface-visibility: hidden;backface-visibility: hidden}
 .nowPlayingIcon span:nth-child(1){-webkit-animation: ab-bar 1.3s ease-in-out infinite;animation: ab-bar 1.3s ease-in-out infinite}
@@ -3234,3 +3243,196 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 /* ۳) حالت خاموشی JAVANSEDA_SKIP_LINK: لینک پرش چاپ نمی‌شود، پس قاعده هم لازم نیست */
 
 /* انتهای بلوک ۳۲ (v3.3.8 · اصلاحیۀ 3.3.9) */
+
+/* ============================================================================================
+   بلوک ۳۳ (نسخۀ 3.4.0) — پلیر: یک باکس، ردیفِ منظم، کنترل لمسیِ بزرگ، لیست آلبوم تمیز
+   ------------------------------------------------------------------------------------------
+   گزارش: «پلیرِ صفحۀ اصلی بد است، چسبیده به هم، و خودش باکس دارد و داخل یک باکس دیگر».
+   علتِ باکسِ دوبل: #index_music_player دو بار جعبه می‌گرفت (خط 927ِ قالب مادر + بلوک ۳۰)
+   و .music_box_player هم کارتِ لایۀ شیشه‌ای (css/ab-glass.css:200) را داشت ⇒ سه تعریف روی
+   دو عنصر با سه شعاع مختلف (7px / 14px / 20px). الآن: پوسته بی‌جعبه شد (بلوک ۳۰ اصلاح شد)
+   و .music_box_player از گروه کارتِ ab-glass.css بیرون رفت ⇒ تنها جعبه، همین بلوک است.
+   چرا فقط CSS و نه بازنویسی تمپلیت؟ چون js/scripts.js به ساختار DOM وابسته است:
+     · .progress-box.children[0].children[0].children[1] ⇒ اندیکاتورِ پخش (خط 148)
+     · .play-list-row با ترتیب [دکمه، شمارۀ ترک، لینک] (خط 217)
+     · .album_show_hide ⇒ slideToggle روی #index_music_player .play-list (خط 97)
+   پس هیچ تگِ تازه‌ای لازم نشد و «لیست تا کلیک پنهان بماند» (خط 1385) هم دست‌نخورده است.
+   پالت سازمانی (#FFFFFF · #185ADB · #111111) · بدون گرادینت · بدون !importantِ تازه.
+   بازگشت: همین بلوک را از انتهای style.css حذف کنید (CSSِ خالص ⇒ کلید PHP ندارد).
+   ========================================================================================== */
+
+/* ۱) کارت — تک‌منبع، در هوم و در صفحۀ نوشته یکسان */
+.music_box_player{
+	background: var(--ab-surface);
+	border: 1px solid var(--ab-line);
+	border-radius: var(--ab-radius-l, 20px);
+	box-shadow: var(--ab-depth-1, 0 1px 2px rgba(17,17,17,.05), 0 8px 22px rgba(17,17,17,.06));
+	padding: 14px 16px;
+	margin: 0 0 18px;
+	overflow: hidden;
+}
+.single_content_box .music_box_player{margin: 26px 0 0;padding: 14px 16px;background: var(--ab-surface);border: 1px solid var(--ab-line);box-shadow: var(--ab-depth-1, 0 8px 22px rgba(17,17,17,.06))}
+
+/* ۲) ردیف کنترل‌ها: سه ستونِ انعطاف‌پذیر با فاصلۀ یکسان (دیگر float و عرض درصدی نیست) */
+.music_box_player .player{gap: 16px;align-items: center}
+.player_controls{gap: 8px;align-items: center}
+.music_box_player .info-box{gap: 14px;align-items: center}
+.music_box_player .info-box .track-info-box{gap: 10px;align-items: baseline}
+
+/* ۳) تیتر و زمان: تیتر با برشِ نرم به‌جای له‌کردنِ نوار پیشرفت */
+.music_box_player .info-box .track-info-box .track-title-text{
+	display: block;max-width: 100%;font-size: 14px;font-weight: 700;line-height: 1.5;
+	color: var(--ab-text);white-space: nowrap;overflow: hidden;text-overflow: ellipsis;
+}
+.music_box_player .info-box .track-info-box .audio-time{
+	direction: ltr;unicode-bidi: isolate;font-variant-numeric: tabular-nums;letter-spacing: .02em;
+	font-size: 11.5px;color: var(--ab-muted);white-space: nowrap;
+}
+
+/* ۴) دکمه‌ها: هدف ۴۰px (۴۴px روی لمسی)، دایره‌ای، با حالت hover/active/focus
+      سایز آیکن بدون !important عوض می‌شود: قاعدۀ قالب `font: 2em IcoFont !important` است،
+      پس `2em` را با کوچک‌کردن font-size خودِ ظرف کنترل می‌کنیم (9px ⇒ 18px). */
+.music_box_player .previous-track-btn,
+.music_box_player .next-track-btn,
+.music_box_player .album_show_hide{
+	width: 40px;height: 40px;float: none;font-size: 9px;line-height: 1;
+	display: inline-flex;align-items: center;justify-content:center;
+	border-radius: 999px;background: var(--ab-blue-soft);color: var(--ab-blue);cursor: pointer;
+	transition: background .16s ease, color .16s ease, transform .12s ease;
+}
+.music_box_player .previous-track-btn:hover,
+.music_box_player .next-track-btn:hover,
+.music_box_player .album_show_hide:hover{background: var(--ab-blue);color: var(--ab-white)}
+.music_box_player .previous-track-btn:active,
+.music_box_player .next-track-btn:active,
+.music_box_player .album_show_hide:active{transform: scale(.93)}
+.music_box_player .album_show_hide i{font-size: 18px;line-height: 1}
+.music_box_player .previous-track-btn.disabled,
+.music_box_player .next-track-btn.disabled{opacity: .42;pointer-events: none}
+.music_box_player .large-toggle-btn{
+	width: 52px;height: 52px;float: none;flex: 0 0 auto;
+	display: inline-flex;align-items: center;justify-content: center;
+	border-radius: 999px;background: var(--ab-blue);color: var(--ab-white);cursor: pointer;
+	box-shadow: var(--ab-depth-1, 0 6px 16px rgba(24,90,219,.28));
+	transition: background .16s ease, transform .12s ease;
+}
+.music_box_player .large-toggle-btn:hover{background: var(--ab-blue-accent)}
+.music_box_player .large-toggle-btn:active{transform: scale(.95)}
+.music_box_player .large-toggle-btn .icofont-play-alt-1,
+.music_box_player .large-toggle-btn .icofont-pause{
+	font-size: 22px;line-height: 1;display: block;position: static;
+}
+
+/* ۵) نوار پیشرفت: خطِ ۶px با سرِ پخش (بدون !important: اندیکاتور همان عنصری است که JS
+      عرضش را ست می‌کند؛ ::after فقط ظاهر است و ساختار DOM دست‌نخورده می‌ماند) */
+.music_box_player .progress-box{gap: 12px;align-items: center}
+.music_box_player .progress-box .progress-cell{height: 18px;float: none;display: flex;align-items: center}
+.music_box_player .progress-box .progress-cell .progress{height: 6px;background: var(--ab-line)}
+.music_box_player .progress-box .progress-cell .progress .progress-buffer{background: var(--ab-blue-soft);border-radius: 999px}
+.music_box_player .progress-box .progress-cell .progress .progress-indicator{
+	background: var(--ab-blue);height: 100%;top: 0;border-radius: 999px;overflow: visible;
+}
+.music_box_player .progress-box .progress-cell .progress .progress-indicator::after{
+	content: "";position: absolute;right: -6px;top: 50%;transform: translateY(-50%);
+	width: 12px;height: 12px;border-radius: 999px;background: var(--ab-white);
+	box-shadow: 0 0 0 2px var(--ab-blue);
+}
+
+/* ۶) صدا: اسلایدر اصلیِ مرورگر با accent-color (سبک‌تر و قابل‌اعتمادتر از بازسازیش) */
+.music_box_player .volume_box{display: flex;align-items: center;gap: 8px;flex: 0 0 auto;min-width: 0}
+.music_box_player .volume_box > i{font-size: 16px;line-height: 1;color: var(--ab-muted)}
+.music_box_player .volume_box input[type=range]{
+	width: 92px;max-width: 28vw;height: 18px;margin: 0;accent-color: var(--ab-blue);cursor: pointer;
+}
+
+/* ۷) لیست آلبوم: از «پنل سفیدِ شناور» به بخشِ هم‌عرضِ پایینِ همان کارت (بی‌جعبۀ سوم) */
+.music_box_player .play-list{
+	position: static;width: auto;max-width: none;left: auto;top: auto;z-index: auto;
+	margin: 14px -16px -14px;padding: 10px 16px 12px;
+	background: transparent;border-top: 1px solid var(--ab-line);border-radius: 0;box-shadow: none;
+}
+#index_music_player .play-list{max-height: 296px;overflow: auto;overscroll-behavior: contain;-webkit-overflow-scrolling: touch}
+.music_box_player .play-list .play-list-row{
+	display: flex;align-items: center;gap: 10px;margin: 0 0 2px;padding: 7px 10px;
+	border-radius: var(--ab-radius-s, 10px);transition: background .14s ease;
+}
+.music_box_player .play-list .play-list-row:hover{background: var(--ab-blue-soft)}
+.music_box_player .play-list .play-list-row .track-number{
+	flex: 0 0 20px;width: 20px;display: block;font-size: 12px;color: var(--ab-muted);text-align: center;
+}
+.music_box_player .play-list .play-list-row .track-title{flex: 1 1 auto;min-width: 0;display: block}
+.music_box_player .play-list .play-list-row .track-title .playlist-track{
+	display: block;font-size: 13px;line-height: 1.6;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;
+}
+.music_box_player .play-list .play-list-row .small-toggle-btn{
+	width: 26px;height: 26px;flex: 0 0 auto;margin: 0;display: inline-flex;align-items: center;justify-content: center;
+	border-radius: 999px;background: var(--ab-blue-soft);color: var(--ab-blue);overflow: hidden;
+}
+.music_box_player .play-list-row:has(.active-track){background: var(--ab-blue-soft)}
+
+/* ۸) شب‌رنگ */
+.night .music_box_player,
+.night .single_content_box .music_box_player{
+	background: var(--ab-charcoal);border-color: rgba(255,255,255,.10);box-shadow: none;
+}
+.night .music_box_player .previous-track-btn,
+.night .music_box_player .next-track-btn,
+.night .music_box_player .album_show_hide{background: rgba(255,255,255,.07);color: #fff}
+.night .music_box_player .previous-track-btn:hover,
+.night .music_box_player .next-track-btn:hover,
+.night .music_box_player .album_show_hide:hover{background: var(--ab-blue);color: #fff}
+.night .music_box_player .info-box .track-info-box .track-title-text{color: #fff}
+.night .music_box_player .progress-box .progress-cell .progress{background: rgba(255,255,255,.14)}
+.night .music_box_player .progress-box .progress-cell .progress .progress-buffer{background: rgba(24,90,219,.4)}
+.night .music_box_player .progress-box .progress-cell .progress .progress-indicator::after{background: #0b0f16}
+.night .music_box_player .play-list{border-top-color: rgba(255,255,255,.10)}
+.night .music_box_player .play-list .play-list-row .small-toggle-btn{background: rgba(255,255,255,.08);color: #fff}
+.night .music_box_player .play-list .play-list-row:hover{background: rgba(255,255,255,.05)}
+
+/* ۹) ریسپانسیو
+      ≤1000px : اسلایدر صدا زیرِ نوار می‌رود تا پیشرفت نفس بکشد
+      ≤600px  : تیتر+پیشرفت در خط بالا (تمام‌عرض)، دکمه‌ها در خط پایین و وسط‌چین
+      ≤420px  : لیست آلبوم کوتاه‌تر و صدای تمام‌عرض */
+@media (max-width: 1000px){
+	.music_box_player .volume_box{flex: 0 0 auto}
+}
+@media (max-width: 760px){
+	.music_box_player{padding: 12px 13px 10px}
+	.music_box_player .player{gap: 12px}
+	.music_box_player .volume_box{flex: 1 1 100%;order: 5;justify-content: flex-start}
+	.music_box_player .volume_box input[type=range]{width: 100%;max-width: 220px;flex: 1 1 auto}
+	.music_box_player .play-list{margin: 12px -13px -10px;padding: 8px 13px 10px}
+}
+@media (max-width: 600px){
+	#index_music_player{margin-bottom: 20px}
+	.music_box_player .info-box{flex-direction: column;align-items: stretch;gap: 6px}
+	.music_box_player .info-box .track-info-box{flex-direction: row;align-items: center;gap: 8px}
+	.music_box_player .progress-box{flex: 1 1 100%;min-width: 0}
+	.music_box_player .large-toggle-btn{width: 48px;height: 48px}
+	.music_box_player .large-toggle-btn .icofont-play-alt-1,.music_box_player .large-toggle-btn .icofont-pause{font-size: 20px}
+	.music_box_player .previous-track-btn,.music_box_player .next-track-btn,.music_box_player .album_show_hide{width: 44px;height: 44px}
+	#index_music_player .play-list{max-height: 240px}
+}
+@media (max-width: 420px){
+	.music_box_player{padding: 11px 11px 9px}
+	.music_box_player .info-box .track-info-box .track-title-text{font-size: 13px}
+	.music_box_player .play-list{margin: 11px -11px -9px;padding: 8px 11px 9px}
+	.music_box_player .play-list .play-list-row{padding: 8px 8px}
+}
+@media (hover: none){
+	.music_box_player .previous-track-btn,.music_box_player .next-track-btn,.music_box_player .album_show_hide{width: 44px;height: 44px}
+	.music_box_player .large-toggle-btn{width: 54px;height: 54px}
+	.music_box_player .play-list .play-list-row{padding: 10px}
+}
+@media (prefers-reduced-motion: reduce){
+	.music_box_player .large-toggle-btn,
+	.music_box_player .previous-track-btn,
+	.music_box_player .next-track-btn,
+	.music_box_player .album_show_hide,
+	.music_box_player .play-list .play-list-row{transition: none}
+	.music_box_player .large-toggle-btn:active,
+	.music_box_player .previous-track-btn:active,
+	.music_box_player .next-track-btn:active,
+	.music_box_player .album_show_hide:active{transform: none}
+}
+/* انتهای بلوک ۳۳ (v3.4.0) */

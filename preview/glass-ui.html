@@ -24,12 +24,13 @@ body{padding:0 0 90px;background:var(--ab-page)}
 .pv-note b{color:var(--ab-text)}
 .pv-note code{direction:ltr;display:inline-block;font-size:11px}
 
-/* v3.3.8 — دو قاعدۀ تازهٔ style.css (بلوک ۳۲) در همین‌جا هم شبیه‌سازی می‌شود تا
-   رفتار لینک پرش و پنهان‌شدن کنترلِ پلیر دوم قابل دیدن باشد. */
+/* v3.3.8 — لینک پرش (بلوک ۳۲ style.css) در همین‌جا هم شبیه‌سازی می‌شود تا
+   رفتار «با Tab ظاهر شدن» قابل دیدن باشد. */
 .ab-skip-link{position:absolute;top:8px;right:8px;left:auto;z-index:99998;display:inline-block;padding:9px 15px;background:var(--ab-blue);color:#fff;font-size:13px;font-weight:700;line-height:1.4;border-radius:10px;text-decoration:none;box-shadow:0 6px 18px rgba(17,17,17,.18);transform:translateY(-220%);transition:transform .16s ease}
 .ab-skip-link:focus,.ab-skip-link:focus-visible{transform:none;outline:2px solid var(--ab-blue-accent);outline-offset:2px;color:#fff}
 .night .ab-skip-link{background:var(--ab-blue-accent);color:#0b0f16}
-.music_box_player[data-ab-player="2"] .player{display:none}
+/* v3.4.0 — پلیر: قواعد بلوک ۳۳ِ style.css روی همین دمو هم اعمال می‌شود
+   (این فایل style.css قالب را واقعی لینک کرده، پس پیش‌نمایش دقیق است). */
 </style>
 </head>
 <body>
@@ -114,6 +115,43 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <div class="clear"></div>
 </div>
 
+<!-- ============ پلیر بالای صفحۀ اصلی (v3.4.0) ============ -->
+<h2 class="pv-h">۵) پلیرِ صفحۀ اصلی — <span dir="ltr">#index_music_player</span> <span>«یک باکس، نه دو تا» · v3.4.0</span></h2>
+<p>همان نشانه‌گذاری <code>inc/tarlanweb_player.php</code>؛ در صفحۀ واقعی «فهرست آلبوم» با دکمۀ
+<code>.album_show_hide</code> باز می‌شود (<code>slideToggle</code>) — اینجا برای دیدنِ چیدمان، باز است.
+با کلید <code>JAVANSEDA_GLASS_UI=false</code> هم کارت سرِ جایش می‌ماند، چون جعبه از لایۀ شیشه‌ای
+به style.css منتقل شد.</p>
+<div class="tarlanweb_center">
+<div id="index_music_player">
+<div class="music_box_player" data-ab-player="1">
+<audio id="audio-pv" preload="none"><source src="#" data-track-number="1"><source src="#" data-track-number="2"><source src="#" data-track-number="3"></audio>
+<div class="player">
+  <div class="player_controls">
+    <i class="previous-track-btn disabled"><span class="screen-reader-text">Previous track button</span></i>
+    <div class="large-toggle-btn"><i class="icofont-play-alt-1"><span class="screen-reader-text">Large toggle button</span></i></div>
+    <div class="album_show_hide"><i class="icofont-navigation-menu"></i></div>
+    <i class="next-track-btn"><span class="screen-reader-text">Next track button</span></i>
+  </div>
+  <div class="info-box">
+    <div class="track-info-box">
+      <div class="track-title-text"> روزبه بمانی - بوسه آخر (نسخهٔ استودیویی ۳۲۰ کیلوبیت)</div>
+      <div class="audio-time"><span class="duration">03:41</span> / <span class="current-time">01:12</span></div>
+    </div>
+    <div class="progress-box">
+      <div class="progress-cell"><div class="progress"><div class="progress-buffer" style="width:74%"></div><div class="progress-indicator" style="width:33%"></div></div></div>
+      <div class="volume_box"><i class="icofont-volume-bar"></i><input type="range" id="volume-bar-pv" min="0" max="100" step="5" value="80"></div>
+    </div>
+  </div>
+</div>
+<div class="play-list" style="display:block">
+  <div class="play-list-row"><div class="small-toggle-btn"><i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i></div><div class="track-number">1.</div><div class="track-title active-track"><a class="playlist-track" href="#" data-play-track="1">روزبه بمانی - بوسه آخر</a></div></div>
+  <div class="play-list-row"><div class="small-toggle-btn"><i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i></div><div class="track-number">2.</div><div class="track-title"><a class="playlist-track" href="#" data-play-track="2">هما - شب بی‌پاسخ</a></div></div>
+  <div class="play-list-row"><div class="small-toggle-btn"><i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i></div><div class="track-number">3.</div><div class="track-title"><a class="playlist-track" href="#" data-play-track="3">محسن یگانه - تا صبح منتظرتم (ریمیکس طولانی)</a></div></div>
+</div>
+</div>
+</div>
+</div>
+
 <!-- ================= صفحۀ نوشته تکی ================= -->
 <h2 class="pv-h">صفحۀ نوشته تکی — همان بلوک‌های single.php</h2>
 <p>کاور، پلیر، شناسنامۀ آهنگ (چیپ‌ها)، باکس اجتماعی و لینک‌های دانلود. اولویت: وضوح اطلاعات و دسترسی سریع.</p>
@@ -122,7 +160,7 @@ body{padding:0 0 90px;background:var(--ab-page)}
 <div class="single_content_box">
 <div class="single_featured_cover"><div class="single_featured_image"><img src="../javanseda/images/nomusics.jpg" width="700" height="700" alt="کاور"></div></div>
 
-<div class="music_box_player taktarcks">
+<div class="music_box_player taktarcks" data-ab-player="1">
 <audio id="audio" preload="none"><source src="#" data-track-number="1"></audio>
 <div class="player"><div class="player_controls"><i class="previous-track-btn disabled"><span class="screen-reader-text">Previous</span></i><div class="large-toggle-btn"><i class="icofont-play-alt-1"></i></div><i class="next-track-btn"><span class="screen-reader-text">Next</span></i></div>
 <div class="info-box"><div class="track-info-box"><div class="track-title-text"> روزبه بمانی - بوسه آخر</div><div class="audio-time"><span class="duration">03:42</span> / <span class="current-time">00:00</span></div></div>

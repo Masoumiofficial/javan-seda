@@ -48,10 +48,16 @@
   gap: 4px;
   margin: 18px 0 20px;
   padding: 6px;
+  position: sticky;
+  top: 32px; /* نوار ابزار مدیریت وردپرس روی دسکتاپ ۳۲px است */
+  scroll-padding-inline-start: 8px;
   background: var(--abadm-surface);
   border: 1px solid var(--abadm-line);
   border-radius: calc(var(--abadm-radius) + 2px);
   box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+}
+body:not(.admin-bar) .wrap.settings-wrap .ui-tabs-nav {
+  top: 0;
 }
 .wrap.settings-wrap .ui-tabs-nav li {
   display: inline-flex;
@@ -119,6 +125,7 @@
   width: auto;
 }
 .inside > .format-settings {
+  max-width: 1220px;
   margin: 0 0 12px;
   padding: 15px 18px 16px;
   background: var(--abadm-surface);
@@ -165,6 +172,15 @@
 }
 .format-settings .description p {
   margin: 0 0 .35em;
+}
+.format-settings .description,
+.format-settings .label {
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.format-settings .description a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .format-settings .format-setting-inner {
   margin: 0;
@@ -320,6 +336,9 @@
   border: 1px solid #c8d0da;
   border-radius: 7px;
 }
+.format-settings .ot-numeric-slider-helper-input {
+  font-variant-numeric: tabular-nums;
+}
 .format-settings .ot-numeric-slider-helper-input:focus {
   border-color: var(--abadm-blue);
   box-shadow: 0 0 0 3px rgba(24, 90, 219, .15);
@@ -463,17 +482,120 @@
   }
 }
 @media screen and (max-width: 782px) {
+  /* نوار تب به‌جای شکستن خطوط، با انگشت افقی اسکرول می‌شود */
   .wrap.settings-wrap .ui-tabs-nav {
     position: static;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
     margin: 12px 0 16px;
+    padding: 5px;
+  }
+  .wrap.settings-wrap .ui-tabs-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .wrap.settings-wrap .ui-tabs-nav li {
+    flex: 0 0 auto;
+  }
+  .wrap.settings-wrap .ui-tabs-nav li a {
+    padding: 7px 12px;
+    white-space: nowrap;
+    font-size: 12.5px;
   }
   .inside > .format-settings {
-    padding: 14px;
+    padding: 13px 14px;
     border-radius: 12px;
   }
   .format-settings .ot-numeric-slider-wrap {
     max-width: none;
   }
+  /* ۱۶px = جلوگیری از زوم خودکار iOS هنگام تایپ در فیلد */
+  .format-settings input[type=text],
+  .format-settings input[type=url],
+  .format-settings input[type=email],
+  .format-settings input[type=number],
+  .format-settings select,
+  .format-settings textarea {
+    font-size: 16px;
+    max-width: 100%;
+  }
+  .format-settings select {
+    width: 100%;
+  }
+  .settings-wrap .option-tree-ui-button {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+  }
+}
+@media screen and (max-width: 480px) {
+  .inside > .format-settings {
+    margin-bottom: 10px;
+    padding: 12px;
+  }
+  .settings-wrap .option-tree-ui-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ------------------------------- مصون‌سازی اجزای تودرتو (تایپوگرافی/فهرست/آپلود) */
+/* OT داخل بعضی ردیف‌ها خودش .ui-tabs می‌سازد؛ نوار تبِ بالا برای آن‌ها نیست ⇒ به
+   حالت بلوکی برمی‌گردند تا چیدمانشان به‌هم نریزد. */
+.format-setting-inner .ui-tabs-nav {
+  position: static;
+  display: block;
+  float: none;
+  width: auto;
+  margin: 0 0 8px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+.format-setting-inner .ui-tabs-nav li {
+  display: inline-block;
+  margin: 0 0 4px;
+  background: #fff;
+  border: 1px solid var(--abadm-line);
+  border-radius: 8px;
+}
+.format-setting-inner .ui-tabs-nav li.ui-state-active {
+  background: var(--abadm-blue-soft);
+  border-color: #cfe0fb;
+  color: var(--abadm-ink);
+}
+.format-setting-inner .ui-tabs-nav li a {
+  padding: 5px 10px;
+  color: #404a59;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+/* تصویر/پیش‌نمایش/جدول‌ها هیچ‌وقت از کارت بیرون نمی‌زنند */
+.format-setting-inner img,
+.format-setting-inner .screenshot,
+.format-setting-inner .ot-media-preview,
+.format-setting-inner .widefat,
+.format-setting-inner .option-tree-setting-table {
+  max-width: 100%;
+}
+.format-setting-inner img,
+.format-setting-inner .screenshot {
+  height: auto;
+}
+.format-setting-inner .option-tree-ui-upload-parent,
+.format-setting-inner .ot-upload-setting-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.format-settings .format-setting-inner input[type=text],
+.format-settings .format-setting-inner textarea {
+  min-width: 0;
 }
 @media screen and (prefers-reduced-motion: reduce) {
   .wrap.settings-wrap .ui-tabs-nav li a,

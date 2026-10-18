@@ -115,6 +115,61 @@ if ( ! function_exists( 'javan_seda_ui_player_mode' ) ) {
 	}
 }
 
+/**
+ * v3.4.5 — کاورِ صفحۀ پست: اندازه (پیکسل) + شکل (مربع یا نسبت اصلی).
+ * تنها چیزی که به بیرون داده می‌شود یک توکن (--ab-post-img-size) و یک کلاس بدنه
+ * (ab-post-img-square) است؛ قواعدش در بلوک ۳۷ِ style.css است.
+ */
+if ( ! function_exists( 'javan_seda_ui_post_img_size' ) ) {
+	/** عدد صحیح داخل بازۀ اسلایدر (۲۴۰ تا ۹۰۰، پیش‌فرض ۵۰۰). */
+	function javan_seda_ui_post_img_size() {
+		return javan_seda_ui_num( 'ab_post_img_size', 500, 240, 900 );
+	}
+}
+
+if ( ! function_exists( 'javan_seda_post_cover_size' ) ) {
+	/**
+	 * کدام سایز وردپرس درخواست شود؟
+	 *
+	 * ab_cover (۵۰۰×۵۰۰ کات‌شده) فقط برای تصویرهای شاخصی فایل دارد که بعد از
+	 * 3.4.5 بارگذاری شده‌اند؛ برای بقیه همان 'large' قبلی می‌ماند تا نه چیزی خراب
+	 * شود و نه فایل بی‌جهت بزرگ‌تر دانلود شود. نبود این فایل = رفتار پیشین.
+	 *
+	 * @return string
+	 */
+	function javan_seda_post_cover_size() {
+		if ( ! function_exists( 'wp_get_attachment_image_src' ) ) {
+			return 'large';
+		}
+		$id = function_exists( 'get_post_thumbnail_id' ) ? get_post_thumbnail_id() : 0;
+		if ( ! $id ) {
+			return 'large';
+		}
+		$src = wp_get_attachment_image_src( $id, 'ab_cover' );
+		if ( is_array( $src ) && isset( $src[1], $src[2] ) && 500 === (int) $src[1] && 500 === (int) $src[2] ) {
+			return 'ab_cover';
+		}
+		return 'large';
+	}
+}
+
+if ( ! function_exists( 'javan_seda_post_cover_args' ) ) {
+	/**
+	 * alt/title + «sizes» درست: تا srcset نزدیک‌ترین فایل را به همان عرضی بردارد
+	 * که در تنظیمات انتخاب شده (بی‌این، مرورگر فایل ۱۰۲۴ پیکسلی large را می‌خواست).
+	 *
+	 * @return array
+	 */
+	function javan_seda_post_cover_args() {
+		$px = javan_seda_ui_post_img_size();
+		return array(
+			'alt'   => get_the_title(),
+			'title' => get_the_title(),
+			'sizes' => sprintf( '(max-width: %1$dpx) 100vw, %1$dpx', $px ),
+		);
+	}
+}
+
 if ( ! function_exists( 'javan_seda_ui_body_class' ) ) {
 	/** کلاس‌هایی که بلوک ۳۳ِ style.css روی اساسشان کار می‌کند. */
 	function javan_seda_ui_body_class( $classes ) {
@@ -124,6 +179,9 @@ if ( ! function_exists( 'javan_seda_ui_body_class' ) ) {
 		}
 		if ( ! javan_seda_ui_on( 'ab_player_volume', true ) ) {
 			$classes[] = 'ab-player-novol';
+		}
+		if ( javan_seda_ui_on( 'ab_post_img_crop', true ) ) {
+			$classes[] = 'ab-post-img-square';
 		}
 		$list = javan_seda_ui_choice( 'ab_player_list', array( 'btn', 'open', 'hide' ), 'btn' );
 		if ( 'btn' !== $list ) {
@@ -148,6 +206,7 @@ if ( ! function_exists( 'javan_seda_ui_head_css' ) ) {
 		$root = array();
 		$root[] = '--ab-player-gap:' . javan_seda_ui_num( 'ab_player_gap', 30, 0, 96 ) . 'px';
 		$root[] = '--ab-player-radius:' . javan_seda_ui_num( 'ab_player_radius', 20, 0, 40 ) . 'px';
+		$root[] = '--ab-post-img-size:' . javan_seda_ui_post_img_size() . 'px';
 		if ( ! javan_seda_ui_on( 'ab_player_border', true ) ) {
 			$root[] = '--ab-player-border:0';
 		}

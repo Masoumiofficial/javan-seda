@@ -23,12 +23,12 @@ function custom_theme_options() {
 ),
 'sections'=> array( 
 array('id'=>'general','title'=>'همگانی'),
-array('id'=>'socials','title'=>'شبکه های اجتماعی'),
 array('id'=>'homes','title'=>'صفحه اصلی'),
 array('id'=>'dl_pages','title'=>'صفحه دانلود آهنگ'),
-array('id'=>'ads1','title'=>'تبلیغات'),
-array('id'=>'footer','title'=>'پانوشت'),
 array('id'=>'ab_ui','title'=>'کنترل رابط'),
+array('id'=>'footer','title'=>'پانوشت'),
+array('id'=>'socials','title'=>'شبکه های اجتماعی'),
+array('id'=>'ads1','title'=>'تبلیغات'),
 ),
 'settings'=>array( 
 // General
@@ -768,6 +768,34 @@ array(
 'operator'=>'or',
 'class'=>'ab-sub'
 ),
+array(
+'id'=>'ab_ui_h_cover',
+'label'=>'',
+'desc'=>'تصویر کاور پست<span>کاورِ بالای صفحۀ هر آهنگ/نوشته. این دو ردیف فایلِ عکس را عوض نمی‌کنند؛ فقط همان را در اندازهٔ دلخواه نشان می‌دهند.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'ab_ui',
+'class'=>'ab-h'
+),
+array(
+'id'=>'ab_post_img_size',
+'label'=>'اندازۀ کاور (px)',
+'desc'=>'اندازۀ کادر کاور در صفحۀ پست، بر حسب پیکسل. پیش‌فرض ۵۰۰ یعنی ۵۰۰×۵۰۰. در موبایل و ستون باریک خودش کوچک‌تر می‌شود و از کادر نمی‌زند.',
+'std'=>'500',
+'type'=>'numeric-slider',
+'min_max_step'=>'240,900,20',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_post_img_crop',
+'label'=>'کات مربعی کاور',
+'desc'=>'روشن = عکس در همان کادر مربع از وسط کات می‌شود. خاموش = عرض همان عدد می‌ماند و ارتفاع نسبت اصلیِ عکس را می‌گیرد.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui',
+'class'=>'ab-sub'
+),
+
 
 /* ---- کنترل پانوشت (این ردیف‌ها در تب «پانوشت» دیده می‌شوند) ---- */
 array(

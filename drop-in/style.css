@@ -5,7 +5,7 @@ Theme URI: https://www.rtl-theme.com/author/tarlanweb/
 Author: Reza Kianoosh
 Author URI: https://www.rtl-theme.com/author/tarlanweb/
 Description: قالب وردپرس جوان صدا 
-Version: 3.4.4
+Version: 3.4.5
 */
 /*
 ==================================================================================
@@ -3615,3 +3615,45 @@ body.ab-player-novol .music_box_player .volume_box{display: none}
 	.music_box_player .volume_box input[type=range]{width: 100%;max-width: 220px;flex: 1 1 auto}
 }
 /* انتهای بلوک ۳۶ (v3.4.4) */
+/* ============================================================================================
+   بلوک ۳۷ (نسخۀ 3.4.5) — کاورِ صفحۀ پست: ۵۰۰×۵۰۰، از تنظیمات قابل تنظیم
+   ------------------------------------------------------------------------------------------
+   درخواست: «سایز تصویر تو پست ۵۰۰×۵۰۰ باشه». کاور پست در single.php داخل
+   <figure class="single_featured_image"> است و قالب مادر روی img هیچ عرضی نمی‌گذاشت
+   (خط 1260: width:auto;height:auto;max-width:100%) ⇒ اندازه فقط از فایلِ source می‌آمد.
+     · عرض = --ab-post-img-size (توکنی که inc/ab-controls.php از «تنظیمات قالب» در :root
+       می‌گذارد؛ پیش‌فرض ۵۰۰px، بازۀ اسلایدر ۲۴۰ تا ۹۰۰)
+     · body.ab-post-img-square ⇒ مربع: aspect-ratio روی figure و object-fit:cover روی img
+       (کات از وسط؛ اگر «کات مربعی» را خاموش کنید نسبت اصلیِ عکس حفظ می‌شود)
+     · max-width:100% همه‌جا می‌ماند ⇒ در ستون باریک و موبایل هیچ‌وقت بیرون نمی‌زند؛
+       قاعدۀ 2507 (max-width/height:auto !important زیر 800px) با همین فرض نوشته شده و
+       دست‌نخورده است. ارتفاعِ figure از aspect-ratio می‌آید، پس !importantِ آن هم مشمول
+       img ما نمی‌شود.
+     · @supports: برای مرورگرهای بدون aspect-ratio (سافاری ۱۴ و قدیمی‌تر) ارتفاع صریح
+   PHP هیچ ارتفاع/عرضی به img نمی‌نویسد؛ فقط sizes و سایزِ source درست می‌شود
+   (javan_seda_post_cover_size/args) ⇒ srcset نزدیک‌ترین فایل را برمی‌دارد، پس ۵۰۰px
+   روی دسکتاپ ۱۰۲۴ پیکسل دانلود نمی‌کند.
+   بازگشت: «تنظیمات قالب ← کنترل رابط ← کات مربعی کاور» = خاموش (مربع نبود) یا حذف همین
+   بلوک از انتهای style.css. بدون !important · بدون گرادینت · پالت #FFFFFF #185ADB #111111
+   ========================================================================================== */
+.single_featured_cover .single_featured_image{
+	width: var(--ab-post-img-size, 500px);
+	max-width: 100%;
+}
+.single_featured_cover .single_featured_image img{
+	display: block;width: 100%;height: auto;max-width: 100%;
+}
+body.ab-post-img-square .single_featured_cover .single_featured_image{
+	aspect-ratio: 1 / 1;
+}
+body.ab-post-img-square .single_featured_cover .single_featured_image img{
+	height: 100%;object-fit: cover;object-position: center;
+}
+@supports not (aspect-ratio: 1 / 1){
+	body.ab-post-img-square .single_featured_cover .single_featured_image{
+		height: var(--ab-post-img-size, 500px);max-height: 100vw;
+	}
+}
+/* در فهرست‌ها/جست‌وجو هم همان کادر استفاده می‌شود؛ اگر cover در محتوا تزریق شده باشد (*JAVANSEDA_COVER_IN_CONTENT*)
+   چون کلاس‌ها یکی‌اند، همین قواعد یک‌دست می‌گیرد. */
+/* انتهای بلوک ۳۷ (v3.4.5) */

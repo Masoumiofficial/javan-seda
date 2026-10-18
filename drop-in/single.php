@@ -40,14 +40,19 @@ if ( function_exists( 'is_plugin_active' ) && is_plugin_active( 'kk-star-ratings
 <?php
 /* تصویر شاخص نوشته (کاور پست) به‌صورت خودکار در ابتدای بخش توضیحات درج می‌شود
    تا نیازی به گذاشتن دستی همان تصویر داخل متن توضیحات نباشد.
-   اندازهٔ نمایش را در متغیر زیر می‌توانید تغییر دهید:
-   'large' یا 'full' = اندازهٔ بزرگ/اصلی تصویر | 'thumb1' = ۶۴۰×۳۶۰ | 'thumb2' = ۱۹۰×۱۹۰ */
-$taranehyar_featured_size = 'large';
+   اندازه از «تنظیمات قالب ← کنترل رابط ← تصویر کاور پست» می‌آید (پیش‌فرض ۵۰۰×۵۰۰ با
+   کاتِ مربعی). اگر فایلش موجود باشد سایز ab_cover (۵۰۰² کات‌شده) درخواست می‌شود و
+   srcset/sizes خودش نزدیک‌ترین را برمی‌دارد؛ اگر نبود به 'large' برمی‌گردد.
+   تغییر دستی: 'large' یا 'full' = اندازهٔ بزرگ/اصلی | 'thumb1' = ۶۴۰×۳۶۰ */
+$taranehyar_featured_size  = function_exists( 'javan_seda_post_cover_size' ) ? javan_seda_post_cover_size() : 'large';
+$taranehyar_featured_args  = function_exists( 'javan_seda_post_cover_args' )
+	? javan_seda_post_cover_args()
+	: array( 'alt' => get_the_title(), 'title' => get_the_title() );
 if ( has_post_thumbnail() ) {
 	?>
 	<div class="single_featured_cover">
 		<figure class="single_featured_image">
-			<?php the_post_thumbnail( $taranehyar_featured_size, array( 'alt' => get_the_title(), 'title' => get_the_title() ) ); ?>
+			<?php the_post_thumbnail( $taranehyar_featured_size, $taranehyar_featured_args ); ?>
 		</figure>
 	</div>
 	<?php

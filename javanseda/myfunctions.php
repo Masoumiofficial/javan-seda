@@ -93,6 +93,7 @@ add_image_size( 'thumb3', 60, 60, true);
 add_image_size( 'thumb2', 190, 190, true);
 add_image_size( 'thumb2x', 380, 380, true); /* v3.3.8 — برای srcset/دستگاه‌های DPR2 (کارت‌ها روی موبایل شارپ می‌شوند) */
 add_image_size( 'thumb1', 640, 360, true);
+add_image_size( 'ab_cover', 500, 500, true); /* v3.4.5 — کادر کاور پست؛ برای آپلودهای تازه فایل ۵۰۰² می‌سازد (برای بقیه fallback خودِ وردپرس) */
 } ?>
 <?php
 function shapeSpace_script_loader_tag($tag, $handle, $src) {
@@ -311,8 +312,9 @@ if ( JAVANSEDA_COVER_IN_CONTENT ) {
 		if ( is_singular( 'post' ) && is_main_query() && in_the_loop() && has_post_thumbnail() ) {
 			$cover = '<div class="single_featured_cover"><figure class="single_featured_image">' . get_the_post_thumbnail(
 				get_the_ID(),
-				'large',
-				array( 'alt' => get_the_title(), 'title' => get_the_title() )
+				function_exists( 'javan_seda_post_cover_size' ) ? javan_seda_post_cover_size() : 'large',
+				function_exists( 'javan_seda_post_cover_args' ) ? javan_seda_post_cover_args()
+					: array( 'alt' => get_the_title(), 'title' => get_the_title() )
 			) . '</figure></div>';
 			return $cover . $content;
 		}

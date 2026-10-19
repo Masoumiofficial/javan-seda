@@ -577,7 +577,16 @@ if ( JAVANSEDA_TERM_FIELDS && is_admin() && ! function_exists( 'javan_seda_term_
 		echo '<strong>هر کدام را دوست داشتید پر کنید — هر دو یک داده را می‌خوانند.</strong> اگر فیلدهای ACF غیب شده‌اند، بلوک همین پایین کار را راه می‌اندازد.';
 		echo '</p></div>';
 	}
-	add_action( 'admin_notices', 'javan_seda_term_fields_notice' );
+	add_action(
+		'admin_notices',
+		function () {
+			if ( function_exists( 'javan_seda_safe' ) ) {
+				javan_seda_safe( 'javan_seda_term_fields_notice', array(), null );
+			} else {
+				javan_seda_term_fields_notice();
+			}
+		}
+	);
 }
 
 /* =========================================================================
@@ -749,7 +758,17 @@ if ( ! function_exists( 'javan_seda_term_footer_script' ) ) {
 		echo '<script>' . $js . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput -- رشتهٔ ثابت
 	}
 }
-add_action( 'wp_footer', 'javan_seda_term_footer_script', 99 );
+add_action(
+	'wp_footer',
+	function () {
+		if ( function_exists( 'javan_seda_safe' ) ) {
+			javan_seda_safe( 'javan_seda_term_footer_script', array(), null );
+		} else {
+			javan_seda_term_footer_script();
+		}
+	},
+	99
+);
 
 if ( ! function_exists( 'javan_seda_term_desc_top' ) ) {
 	/** دوربستِ امن (3.4.10) — خطا در این لایه صفحۀ سایت را نمی‌اندازد، فقط در لاگ می‌نشیند */

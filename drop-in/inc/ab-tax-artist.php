@@ -229,13 +229,27 @@ if ( ! function_exists( 'javan_seda_artist_acf_rules' ) ) {
 	   صفحه‌های پیشخوان/ویرایش بسته نشود. */
 	foreach ( array( 'acf/get_field_groups', 'acf/local_fields' ) as $jv_acf_hook ) {
 		add_filter( $jv_acf_hook, function ( $groups ) {
-			if ( ! is_array( $groups ) ) {
+			static $jv_busy = false;
+			if ( $jv_busy || ! is_array( $groups ) ) {
+				return $groups; // محافظِ بازگشتِ بی‌نهایت
+			}
+			/* خاموش‌کردنِ دستی برای عیب‌یابی (در wp-config.php):
+			   define( 'JAVANSEDA_ARTIST_ACF_RULES', false );  یا
+			   define( 'JAVANSEDA_TERM_FIELDS', false );  — کل لایۀ فیلدهای ترم */
+			if ( defined( 'JAVANSEDA_ARTIST_ACF_RULES' ) && ! JAVANSEDA_ARTIST_ACF_RULES ) {
 				return $groups;
 			}
-			if ( function_exists( 'javan_seda_safe' ) ) {
-				return javan_seda_safe( 'javan_seda_artist_acf_rules', array( $groups ), $groups );
+			if ( defined( 'JAVANSEDA_TERM_FIELDS' ) && ! JAVANSEDA_TERM_FIELDS ) {
+				return $groups;
 			}
-			return javan_seda_artist_acf_rules( $groups );
+			$jv_busy = true;
+			if ( function_exists( 'javan_seda_safe' ) ) {
+				$jv_out = javan_seda_safe( 'javan_seda_artist_acf_rules', array( $groups ), $groups );
+			} else {
+				$jv_out = javan_seda_artist_acf_rules( $groups );
+			}
+			$jv_busy = false;
+			return is_array( $jv_out ) ? $jv_out : $groups;
 		}, 20 );
 	}
 }
@@ -360,10 +374,26 @@ if ( ! function_exists( 'javan_seda_artist_views_total_impl' ) ) {
 if ( ! function_exists( 'javan_seda_fa_digits' ) ) {
 	/** رقم‌های لاتین → فارسی، روی هر رشته (بی‌نیاز از mbstring) */
 	function javan_seda_fa_digits( $text ) {
-		return str_replace(
-			array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
-			array( '\u{06F0}', '\u{06F1}', '\u{06F2}', '\u{06F3}', '\u{06F4}', '\u{06F5}', '\u{06F6}', '\u{06F7}', '\u{06F8}', '\u{06F9}' ),
-			(string) $text
+		/* 3.4.11 — رفعِ رقم‌های به‌هم‌ریخته روی صفحۀ هنرمند:
+		   ۱) جایگزین‌ها «\u{06F0}» داخل نقل‌قولِ تکی بودند و در هیچ نسخۀ PHP به
+		      کاراکتر تبدیل نمی‌شوند، پس همان متنِ خام چاپ می‌شد.
+		   ۲) str_replace ده بار پشتِ هم اجرا می‌شد و رقم‌های داخلِ متنِ تازه
+		      جابه‌جا شده را هم دوباره عوض می‌کرد (نتیجه: «\u{0\u{06F6}F4}…»).
+		   حالا خودِ رقمِ فارسی در فایل است و strtr تک‌گذر است. */
+		return strtr(
+			(string) $text,
+			array(
+				'0' => '۰',
+				'1' => '۱',
+				'2' => '۲',
+				'3' => '۳',
+				'4' => '۴',
+				'5' => '۵',
+				'6' => '۶',
+				'7' => '۷',
+				'8' => '۸',
+				'9' => '۹',
+			)
 		);
 	}
 }
@@ -409,7 +439,11 @@ if ( ! function_exists( 'javan_seda_lc' ) ) {
 if ( ! function_exists( 'javan_seda_artist_normalize_name' ) ) {
 	function javan_seda_artist_normalize_name( $text ) {
 		$text = javan_seda_lc( trim( (string) $text ) );
-		$text = str_replace( array( "\u{200c}", "\u{200b}", "\u{200e}" ), ' ', $text );
+		/* 3.4.11: بایت‌های UTF-8، نه «u{…» — آن شکلِ escape فقط در PHP 7.0+ معنا
+		   می‌شود و روی PHP 5.6 رشتهٔ خامِ «\u{200c}» جایگزین می‌شد؛ یعنی نیم‌فاصله هیچ‌وقت
+		   از نامِ هنرمند پاک نمی‌شد و تطبیقِ نام در /artist/ سخت‌تر انجام می‌شد.
+		   نیم‌فاصله E2 80 8C · ZWSP E2 80 8B · LRM E2 80 8E */
+		$text = str_replace( array( "\xE2\x80x8C", "\xE2\x80x8B", "\xE2\x80x8E" ), ' ', $text );
 		$text = preg_replace( '/[\x{064B}-\x{0658}\x{0670}]/u', '', $text );
 		$text = str_replace( array( 'ي', 'ك', '­' ), array( 'ی', 'ک', '' ), $text );
 		$text = preg_replace( '/\s+/u', ' ', $text );

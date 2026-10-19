@@ -16,12 +16,76 @@ if ( ! function_exists( 'javan_seda_safe_log' ) ) {
 		if ( function_exists( 'update_option' ) ) {
 			update_option( 'javan_seda_safe_log_ts', time(), false );
 		}
-		if ( is_object( $e ) && function_exists( 'error_log' ) ) {
-			error_log( '[javan-seda] ' . get_class( $e ) . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine() );
+		if ( ! is_object( $e ) ) {
+			return;
 		}
+		$msg = '[javan-seda] ' . get_class( $e ) . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
+		if ( function_exists( 'error_log' ) ) {
+			error_log( $msg );
+		}
+		javan_seda_error_log_file( $msg );
 	}
 }
 
+/* ---------------------------------------------------------------------------
+   v3.4.11 — لاگِ مرکزیِ خطا و ناظرِ fatal
+   اگر خطا آن‌جا باشد که try/catch به آن نمی‌رسد (سینتکس، حافظه، فایلِ ناقص)،
+   این ناظر در لحظۀ آخرِ اجرا پیام، فایل، شمارهٔ سطر، مصرف حافظه، آدرس صفحه و
+   نسخۀ PHP را می‌نویسد. مقصد: error_log هاست + wp-content/javan-seda-error.log
+   (بدون نیاز به روشن‌کردن WP_DEBUG). اگر لاگ از ۶۴ کیلوبایت گذشت، خودش را
+   از نو می‌سازد تا هاست را پر نکند.
+   ------------------------------------------------------------------------- */
+if ( ! function_exists( 'javan_seda_error_log_file' ) ) {
+	function javan_seda_error_log_file( $msg ) {
+		if ( ! function_exists( 'is_admin' ) ) {
+			return;
+		}
+		$dir = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ( defined( 'ABSPATH' ) ? ABSPATH . 'wp-content' : '' );
+		if ( '' === $dir || ! is_dir( $dir ) || ! is_writable( $dir ) ) {
+			return;
+		}
+		$log = trailingslashit( $dir ) . 'javan-seda-error.log';
+		if ( is_file( $log ) && (int) filesize( $log ) > 65536 ) {
+			@file_put_contents( $log, '' ); // فقط ۶۴KBِ آخر نگه داشته می‌شود
+		}
+		@file_put_contents( $log, gmdate( 'Y-m-d H:i:s' ) . 'Z  ' . $msg . "\n", FILE_APPEND | LOCK_EX );
+	}
+}
+
+if ( ! function_exists( 'javan_seda_fatal_watch' ) ) {
+	/**
+	 * آخرین خطای مرگبارِ PHP را می‌گیرد — حتی خطاهایی که هیچ try/catch ای
+	 * به آن‌ها نمی‌رسد. فقط برای fatal‌های داخل همین پوسته در فایلِ لاگ می‌نویسد
+	 * تا خطای افزونه‌های دیگر را ما به گردن نگیریم.
+	 */
+	function javan_seda_fatal_watch() {
+		$e = error_get_last();
+		if ( ! is_array( $e ) || empty( $e['message'] ) ) {
+			return;
+		}
+		$types = array( E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR );
+		if ( ! in_array( (int) $e['type'], $types, true ) ) {
+			return;
+		}
+		$file = isset( $e['file'] ) ? (string) $e['file'] : '';
+		$mine = ( false !== strpos( $file, 'javanseda' ) );
+		$mem  = function_exists( 'memory_get_usage' ) ? round( memory_get_usage( true ) / 1048576, 1 ) : 0;
+		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? substr( (string) sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), 0, 180 ) : '-';
+		$msg  = '[javan-seda ' . ( $mine ? 'FATAL' : 'PHP' ) . '] ' . $e['message'] . ' @ ' . $file . ':' . (int) $e['line']
+			. ' | php=' . PHP_VERSION
+			. ' | mem=' . $mem . 'MB/' . ini_get( 'memory_limit' )
+			. ' | wp=' . ( function_exists( 'get_bloginfo' ) ? get_bloginfo( 'version' ) : '?' )
+			. ' | admin=' . ( function_exists( 'is_admin' ) && is_admin() ? '1' : '0' )
+			. ' | uri=' . $uri;
+		if ( function_exists( 'error_log' ) ) {
+			error_log( $msg );
+		}
+		if ( $mine ) {
+			javan_seda_error_log_file( $msg );
+		}
+	}
+	register_shutdown_function( 'javan_seda_fatal_watch' );
+}
 if ( ! function_exists( 'javan_seda_safe' ) ) {
 	/**
 	 * javan_seda_safe( 'نام_تابع', array( آرگومان‌ها ), مقدارِ_جایگزین )
@@ -131,7 +195,10 @@ if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
    (فقط فیلدهای ACF و توضیحِ تک‌خطیِ خودش). خاموشی: JAVANSEDA_TERM_FIELDS = false
    ------------------------------------------------------------------------- */
 $_javan_seda_terms_ui = trailingslashit( get_template_directory() ) . 'inc/ab-terms-ui.php';
-if ( is_readable( $_javan_seda_terms_ui ) ) {
+if ( defined( 'JAVANSEDA_TERM_FIELDS' ) && ! JAVANSEDA_TERM_FIELDS ) {
+	$_javan_seda_terms_ui = ''; // کل لایه خاموش: نه پیشخوان، نه بلوک‌های نمایشی
+}
+if ( '' !== $_javan_seda_terms_ui && is_readable( $_javan_seda_terms_ui ) ) {
 	require_once $_javan_seda_terms_ui;
 }
 unset( $_javan_seda_terms_ui );

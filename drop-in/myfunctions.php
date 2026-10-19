@@ -80,6 +80,18 @@ if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
    v3.4.3 — پوستۀ صفحۀ «تنظیمات قالب» (فقط پیشخوان؛ inc/ab-admin-ui.php)
    این فایل روی صفحۀ سایت هیچ چیزی چاپ نمی‌کند؛ اگر نبود، همه‌چیز مثل قبل.
    ------------------------------------------------------------------------- */
+/* ---------------------------------------------------------------------------
+   v3.4.9 — «فیلدهای ترم» (inc/ab-terms-ui.php)
+   صفحۀ ویرایشِ هنرمند را در پیشخوان کامل می‌کند (تصویر، نام لاتین، صفحات مجازی،
+   بیوگرافیِ کوتاه و نشانیِ بیوگرافیِ کامل) و به دسته‌ها/برچسب‌ها «توضیح کوتاه» و
+   «توضیح کاملِ با دکمۀ بیشتر/کمتر» اضافه می‌کند. اگر فایل نبود، همه‌چیز مثل قبل
+   (فقط فیلدهای ACF و توضیحِ تک‌خطیِ خودش). خاموشی: JAVANSEDA_TERM_FIELDS = false
+   ------------------------------------------------------------------------- */
+$_javan_seda_terms_ui = trailingslashit( get_template_directory() ) . 'inc/ab-terms-ui.php';
+if ( is_readable( $_javan_seda_terms_ui ) ) {
+	require_once $_javan_seda_terms_ui;
+}
+unset( $_javan_seda_terms_ui );
 $_javan_seda_admin_ui = trailingslashit( get_template_directory() ) . 'inc/ab-admin-ui.php';
 if ( is_admin() && is_readable( $_javan_seda_admin_ui ) ) {
 	require_once $_javan_seda_admin_ui;

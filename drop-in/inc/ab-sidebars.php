@@ -248,7 +248,7 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 		'single.php'                => '974d71338fb89856abc086031dc17223ecc19dc83e8d7f4257e7ddda4a228224',
 		'page.php'                  => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
 		'myfunctions.php'           => 'bcd4acb182ccc0fdd986515688dd66ad32bf53a71f79579d84ddad0ac8b1203d',
-		'style.css'                 => '1cc4eba8149cf0887b42bbeec43b0f84230bee4dc44f860c7fdb0f17b9022f73',
+		'style.css'                 => 'e768b42db6170065e6895895969a2a01e40790eff8ef936cd8a6661bccedc2c0',
 		'footer.php'                => '763bb6dbad2f26ae9df1e2b41270863791c2e7a122a5399d8a62179ee25697b3',
 		'header.php'                => 'f5174209fae4506f9952e5ae838716df21bd3f1cbea413675a42863d585306dc',
 		'home.php'                  => '966a2e2a68d1d683ab5ce0d365865357134dc337a79a6b8d79fb1759e1f4feb9',
@@ -261,11 +261,15 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 		'inc/ab-perf.php'           => '03fbcbc96260de30f5919384c46a8dc4829b1429cf5f44b2f5d1efa10c786d1e',
 		'inc/ab-seo.php'            => '6ff2158a004966a17eaf8dd6f006d25fba0280da7dd92786e22a6171a957c31a',
 		'inc/ab-controls.php'       => 'c3157106aeb83713c301317e224d6c43b78dc5e73f2c7633ceac92ff2fa86fbd',
-		'inc/theme-options.php'     => '1bd958798b259c922db74cc421eb0deeadbb65ee20e105d86a2890a785099468',
-		'taxonomy-artist.php'       => '351c159421fa0b8f0dc1acff6a32160f25538a77a687d9bce2bd4277ceca336a',
+		'inc/theme-options.php'     => '900b93944e0d323a8df6e8012d99f2bca9cafd0af65b7f0e35fe3b50d3ba0101',
+		'taxonomy-artist.php'       => '094b4fff7427717a0858780d742ff7a121f994bc69d646f9ca2147172340cda1',
 		'taxonomy-singer.php'       => '314121b1277eaf1afff36382ad87691fae56f1e743395cf0078240a8fcfc6807',
-		'inc/ab-tax-artist.php'     => '6b2587fc01fa6c8262ef73c427bb80ae1b0e44ac8fb350d6a04be954b52d8da9',
+		'inc/ab-tax-artist.php'     => '471327078e79c7a0d31a92da51c1222d51254f1b859e1952eef301fd2266e325',
 		'inc/ab-credits.php'        => '02ccdfb730a2a2fad9f2d731f07fea5a1491f9da3059f753f0e813a06079719a',
+		'inc/ab-terms-ui.php'       => '29dffbe6fa9c661c81445db0d32719962085e906f132695e641df8f44602053b',
+		'artist-template.php'       => 'b70caec7651d8cef5cc1c1ad5e6aa6f1decf32253b56e2eb677223df50429dea',
+		'inc/artist_slider.php'     => 'd54f1bf3869c41afc04b80a1dfd4ddf336357317ea45b4bd375f6ee289919b03',
+		'category.php'              => 'abf7cd768eb63f1af27d9d4fd2f61d96a7e5a83a4840bd053fd17a8b6a8d5634',
 	);
 }
 }

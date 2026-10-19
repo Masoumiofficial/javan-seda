@@ -40,6 +40,8 @@ $taranehyar_cfg = apply_filters(
 		'related_limit'  => 8,     // حداکثر تعداد هنرمندِ مشابه
 		'show_meta'      => true,  // شمارش دسته‌ها و تاریخ آخرین به‌روزرسانی
 		'show_dir_links' => true,  // لینک‌های بازگشت به فهرست الفبایی
+		'show_bio'       => true,  // بلوکِ بیوگرافی (کوتاه + دکمۀ «کامل»)
+		'show_views'     => true,  // مجموعِ بازدیدِ آثارِ همین هنرمند (فقط خواندنی)
 		'json_ld_max'    => 100,   // حداکثر آیتم در داده‌ساختاریافته
 	)
 );
@@ -254,7 +256,13 @@ if ( ! $taranehyar_term instanceof WP_Term ) {
 	return;
 }
 
+/* v3.4.9 — فیلدها از دو مسیر پر می‌شوند: ACF (اگر افزونه فعال باشد) یا بلوکِ
+   «جوان‌صدا — اطلاعات تکمیلی» در همان صفحۀ ویرایش که term_meta را می‌نویسد.
+   این کلوزر هر دو را می‌خواند؛ اگر هیچ‌کدام پر نباشد رشتهٔ خالی ⇒ بخشِ خالی چاپ نمی‌شود. */
 $taranehyar_term_field = function ( $key ) use ( $taranehyar_term ) {
+	if ( function_exists( 'javan_seda_term_field' ) ) {
+		return javan_seda_term_field( $key, $taranehyar_term, '' );
+	}
 	return function_exists( 'get_field' ) ? get_field( $key, $taranehyar_term ) : '';
 };
 
@@ -262,17 +270,26 @@ $taranehyar_image     = $taranehyar_term_field( 'aimg2' );
 $taranehyar_image_url = '';
 if ( is_array( $taranehyar_image ) && isset( $taranehyar_image['url'] ) ) {
 	$taranehyar_image_url = $taranehyar_image['url'];
+} elseif ( is_numeric( $taranehyar_image ) ) {
+	$taranehyar_image_url = (string) wp_get_attachment_image_url( (int) $taranehyar_image, 'medium' );
 } elseif ( is_string( $taranehyar_image ) ) {
 	$taranehyar_image_url = $taranehyar_image;
 }
+if ( '' === (string) $taranehyar_image_url && function_exists( 'javan_seda_term_image' ) ) {
+	// عکسِ ترم خالی است ⇒ عکسِ ردیفِ «هنرمندانِ صفحۀ اصلی» و در پایان تصویرِ پیش‌فرضِ قالب
+	$jv_img               = javan_seda_term_image( $taranehyar_term, 'medium' );
+	$taranehyar_image_url = ! empty( $jv_img['url'] ) ? (string) $jv_img['url'] : '';
+}
 
-$taranehyar_socials = array(
-	'afacebook'  => 'facebook',
-	'atelegram'  => 'telegram',
-	'ainstagram' => 'instagram',
-	'atwitter'   => 'twitter',
-	'ayoutube'   => 'youtube',
-);
+$taranehyar_socials = function_exists( 'javan_seda_artist_socials' )
+	? javan_seda_artist_socials()
+	: array(
+		'afacebook'  => 'facebook',
+		'atelegram'  => 'telegram',
+		'ainstagram' => 'instagram',
+		'atwitter'   => 'twitter',
+		'ayoutube'   => 'youtube',
+	);
 
 /* ------------------------------------------------------------------
    نگاشت نوع محتوا: هر مقدار ناشناخته در «سایر موارد» می‌افتد (پنهان نمی‌شود)
@@ -522,13 +539,54 @@ $taranehyar_sort_labels = array(
 
 			<div class="clear2"></div>
 			<?php
+			/* v3.4.9 — بیوگرافی دو تکه شد: «کوتاه» همیشه بالا می‌آید و «کامل» یا به یک
+			   نوشتهٔ جدا لینک می‌شود (فیلدِ ab_bio_post) یا همین‌جا با دکمه باز می‌شود.
+			   اگر آن دو فیلد پر نشده باشند، رفتارِ قبلی (توضیحِ کاملِ ترم) دست‌نخورده می‌ماند. */
 			$taranehyar_description = get_the_archive_description();
-			if ( ! empty( $taranehyar_description ) ) :
+			$taranehyar_bio         = ( ! empty( $taranehyar_cfg['show_bio'] ) && function_exists( 'javan_seda_term_bio' ) )
+				? javan_seda_term_bio( $taranehyar_term )
+				: array();
+			if ( ! empty( $taranehyar_bio['short'] ) || ! empty( $taranehyar_bio['full'] ) || ! empty( $taranehyar_bio['url'] ) ) :
 				?>
+				<div class="artist_txt_box ab-artist-bio">
+					<?php if ( '' !== (string) $taranehyar_bio['short'] ) : ?>
+						<div class="ab-artist-bio__short"><?php echo wp_kses_post( $taranehyar_bio['short'] ); ?></div>
+					<?php endif; ?>
+					<?php if ( ! empty( $taranehyar_bio['inline'] ) ) : ?>
+						<?php
+						echo javan_seda_term_more_html( // phpcs:ignore WordPress.Security.EscapeOutput -- خروجیِ escape‌شدهٔ خودِ این فایل است
+							array(
+								'id'          => 'ab-artist-bio-' . (int) $taranehyar_term->term_id,
+								'title'       => '',
+								'full'        => wp_strip_all_tags( $taranehyar_bio['full'] ),
+								'button_more' => 'مشاهدۀ بیوگرافی کامل',
+								'button_less' => 'بستنِ بیوگرافی',
+								'class'       => 'ab-term-more--bio',
+							)
+						);
+						?>
+					<?php elseif ( ! empty( $taranehyar_bio['url'] ) ) : ?>
+						<p class="ab-artist-bio__more">
+							<a class="ab-artist-bio__btn" href="<?php echo esc_url( $taranehyar_bio['url'] ); ?>">
+								بیوگرافی کامل <?php echo esc_html( $taranehyar_term->name ); ?>
+								<i class="icofont-arrow-left" aria-hidden="true"></i>
+							</a>
+						</p>
+					<?php endif; ?>
+					<div class="clear"></div>
+				</div>
+			<?php elseif ( ! empty( $taranehyar_description ) ) : ?>
 				<div class="artist_txt_box">
 					<?php echo wp_kses_post( $taranehyar_description ); ?>
 					<div class="clear"></div>
 				</div>
+			<?php endif; ?>
+
+			<?php if ( ! empty( $taranehyar_cfg['show_views'] ) && function_exists( 'javan_seda_artist_views_html' ) ) : ?>
+				<?php $taranehyar_views = javan_seda_artist_views_html( $taranehyar_term ); ?>
+				<?php if ( '' !== $taranehyar_views ) : ?>
+					<p class="ab-artist-page__views"><?php echo $taranehyar_views; // phpcs:ignore WordPress.Security.EscapeOutput -- داخلِ تابع escape شده ?></p>
+				<?php endif; ?>
 			<?php endif; ?>
 
 			<?php if ( ! empty( $taranehyar_cfg['show_dir_links'] ) ) : ?>

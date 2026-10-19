@@ -41,12 +41,15 @@ $ab_cfg = array(
 	'show_latin'  => true,     // نام لاتین/انگلیسی هنرمند زیر نام فارسی
 	'show_top'    => true,     // ردیف «پرکارترین هنرمندان»
 	'top_limit'   => 12,       // چند هنرمند در آن ردیف
+	'show_views'  => true,     // مجموعِ بازدیدِ آثار هر هنرمند روی کارت (فقط خواندنی)
+	'views_max'   => 40,       // اگر فهرست بلندتر از این باشد، بازدید روی کارت حساب نمی‌شود (حفاظتِ سرعت)
 	'json_ld_max' => 200,      // حداکثر تعداد آیتم در داده‌ساختاریافته
 );
 $ab_cfg = apply_filters( 'javanseda_artists_config', $ab_cfg );
 
 $ab_taxonomy = isset( $ab_cfg['taxonomy'] ) ? (string) $ab_cfg['taxonomy'] : javan_seda_artist_tax();
 $ab_total    = 0;
+$ab_views_budget = false; // بعداً در بخشِ ساخت آیتم‌ها روشن می‌شود
 
 /* ==================================================================================
    ۱) توابع کمکی — نرمال‌سازی فارسی، کلید مرتب‌سازی الفبایی، تصویر کارت
@@ -136,6 +139,16 @@ if ( ! function_exists( 'javanseda_artists_image' ) ) {
 			}
 		}
 
+		if ( '' === $url && function_exists( 'javan_seda_term_image' ) ) {
+			// 3.4.9 — عکسِ ردیفِ «هنرمندانِ صفحۀ اصلی» هم منبعِ معتبر است (یک آپلود برای هر دو جا)
+			$jv = javan_seda_term_image( $term, $size );
+			if ( ! empty( $jv['id'] ) ) {
+				$id = (int) $jv['id'];
+			}
+			if ( ! empty( $jv['url'] ) ) {
+				$url = (string) $jv['url'];
+			}
+		}
 		if ( '' === $url ) {
 			$url = function_exists( 'javan_seda_artist_default_image' ) ? javan_seda_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp';
 		}
@@ -192,7 +205,7 @@ if ( '' !== $ab_letter && ! isset( $ab_index[ $ab_letter ] ) && '#' !== $ab_lett
 }
 
 $ab_sort = isset( $_GET['sort'] ) ? sanitize_key( wp_unslash( $_GET['sort'] ) ) : 'name';
-if ( ! in_array( $ab_sort, array( 'name', 'songs' ), true ) ) {
+if ( ! in_array( $ab_sort, array( 'name', 'songs', 'views' ), true ) ) {
 	$ab_sort = 'name';
 }
 
@@ -307,6 +320,11 @@ if ( ! $ab_error && $ab_terms ) {
 	/* همهٔ متای ترم‌ها یک‌جا خوانده شود (جلوگیری از صدها کوئری برای تصویرها) */
 	update_termmeta_cache( wp_list_pluck( $ab_terms, 'term_id' ) );
 
+	/* مجموعِ بازدید فقط وقتی حساب می‌شود که فهرست کوتاه باشد یا ترتیبِ «پربازدیدترین» خواسته شده باشد */
+	$ab_views_budget = ( ! empty( $ab_cfg['show_views'] ) || 'views' === $ab_sort )
+		&& count( $ab_terms ) <= (int) ( isset( $ab_cfg['views_max'] ) ? $ab_cfg['views_max'] : 150 )
+		&& function_exists( 'javan_seda_artist_views_total' );
+
 	foreach ( $ab_terms as $ab_term ) {
 		if ( ! $ab_term instanceof WP_Term ) {
 			continue;
@@ -320,6 +338,7 @@ if ( ! $ab_error && $ab_terms ) {
 		$ab_first = $ab_chars ? $ab_chars[0] : '#';
 
 		$ab_items[] = array(
+			'views'  => $ab_views_budget ? (int) javan_seda_artist_views_total( $ab_term ) : 0,
 			'term'   => $ab_term,
 			'name'   => $ab_term->name,
 			'latin'  => javanseda_artists_latin_name( $ab_term ),
@@ -336,6 +355,9 @@ if ( $ab_items ) {
 	usort(
 		$ab_items,
 		function ( $a, $b ) use ( $ab_sort ) {
+			if ( 'views' === $ab_sort && (int) $a['views'] !== (int) $b['views'] ) {
+				return ( (int) $b['views'] - (int) $a['views'] );
+			}
 			if ( 'songs' === $ab_sort && $a['count'] !== $b['count'] ) {
 				return ( $b['count'] - $a['count'] );
 			}
@@ -476,6 +498,8 @@ if ( '' !== $ab_search ) {
 	$ab_h1 = $ab_page_title . ' — حرف «' . $ab_letter . '»';
 } elseif ( 'songs' === $ab_sort ) {
 	$ab_h1 = $ab_page_title . ' — پرکارترین هنرمندان';
+} elseif ( 'views' === $ab_sort ) {
+	$ab_h1 = $ab_page_title . ' — پربازدیدترین';
 } else {
 	$ab_h1 = $ab_page_title;
 }
@@ -487,6 +511,7 @@ if ( ! $ab_base_url ) {
 
 $ab_url_all    = $ab_base_url;
 $ab_url_songs  = add_query_arg( 'sort', 'songs', $ab_base_url );
+$ab_url_views  = add_query_arg( 'sort', 'views', $ab_base_url );
 $ab_url_name   = $ab_base_url;
 $ab_url_letter = array();
 foreach ( javanseda_artists_chars( $ab_alphabet ) as $ab_char ) {
@@ -509,10 +534,14 @@ get_template_part( 'inc/breadcrumbs' );
 
 			<div class="songs_title_box">
 				<h1><?php echo esc_html( $ab_h1 ); ?></h1>
-				<?php if ( 'songs' === $ab_sort ) : ?>
+				<?php if ( 'songs' === $ab_sort || 'views' === $ab_sort ) : ?>
 					<a href="<?php echo esc_url( $ab_url_name ); ?>">ترتیب الفبا</a>
 				<?php elseif ( ! empty( $ab_cfg['show_sort'] ) ) : ?>
 					<a href="<?php echo esc_url( $ab_url_songs ); ?>">پرتعدادترین</a>
+					<?php if ( ! empty( $ab_views_budget ) ) : ?>
+						<span class="ab-artists__sep">•</span>
+						<a href="<?php echo esc_url( $ab_url_views ); ?>">پربازدیدترین</a>
+					<?php endif; ?>
 				<?php endif; ?>
 				<div class="clear"></div>
 			</div>
@@ -663,6 +692,18 @@ get_template_part( 'inc/breadcrumbs' );
 													<?php endif; ?>
 												</span>
 												<span class="ab-artist__name"><?php echo esc_html( $ab_item['name'] ); ?></span>
+												<?php if ( ! empty( $ab_cfg['show_views'] ) && ! empty( $ab_item['views'] ) ) : ?>
+													<span class="ab-artist__views" title="مجموع بازدید آثار این هنرمند">
+														<i class="icofont-eye-alt" aria-hidden="true"></i>
+														<?php
+														$ab_views_text = number_format_i18n( (int) $ab_item['views'] );
+														if ( function_exists( 'javan_seda_fa_digits' ) ) {
+															$ab_views_text = javan_seda_fa_digits( $ab_views_text );
+														}
+														echo esc_html( $ab_views_text );
+														?>
+													</span>
+												<?php endif; ?>
 												<?php if ( '' !== $ab_latin_attr ) : ?>
 													<span class="ab-artist__latin" dir="ltr" lang="en"><?php echo esc_html( $ab_latin_attr ); ?></span>
 												<?php endif; ?>

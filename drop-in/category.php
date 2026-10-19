@@ -11,7 +11,11 @@
 <?php /* v3.3.5 — اگر خانۀ دسته توضیح نداشته باشد، div خالی چاپ نشود:
    همان «کادر سفیدِ خالی» که زیر عنوان دیده می‌شد (قواعد شیشه به .archive_txt_box
    پدینگ و مرز می‌دهد، پس یک div بی‌محتوا = یک کادر خالی). */
-$ab_cat_desc = trim( (string) category_description() );
+/* v3.4.9 — «توضیح کوتاه» (بلوکِ جوان‌صدا در پیشخوان ← ویرایش دسته) جایش را
+   می‌گیرد؛ اگر پر نشده باشد همان توضیحِ همیشگی نمایش داده می‌شود. */
+$ab_cat_desc = function_exists( 'javan_seda_term_desc_top' )
+	? trim( (string) javan_seda_term_desc_top( get_queried_object() ) )
+	: trim( (string) category_description() );
 if ( '' !== wp_strip_all_tags( $ab_cat_desc ) ) : ?>
 <div class="archive_txt_box">
 <?php echo $ab_cat_desc; ?>
@@ -31,6 +35,14 @@ if ( '' !== wp_strip_all_tags( $ab_cat_desc ) ) : ?>
 <?php else: get_template_part('inc/no-content'); endif; ?>
 <div class="clear"></div>
 </div>
+<?php /* v3.4.9 — توضیحِ کاملِ دسته: پایینِ همین باکس، بسته و با دکمۀ «بیشتر/کمتر» */
+$ab_cat_full = function_exists( 'javan_seda_term_desc_bottom' ) ? javan_seda_term_desc_bottom( get_queried_object() ) : '';
+if ( '' !== trim( wp_strip_all_tags( (string) $ab_cat_full ) ) ) : ?>
+<div class="archive_txt_box ab-term-more__wrap">
+<?php echo $ab_cat_full; // phpcs:ignore WordPress.Security.EscapeOutput -- داخلِ جاوا_seda escape شده ?>
+<div class="clear"></div>
+</div>
+<?php endif; ?>
 <!-- song_boxs -->
 <?php get_template_part('inc/pagination'); ?>
 <div class="clear"></div>

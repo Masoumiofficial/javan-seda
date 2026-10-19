@@ -79,6 +79,15 @@ if ( ! function_exists( 'javan_seda_term_field' ) ) {
 }
 
 if ( ! function_exists( 'javan_seda_term_image' ) ) {
+	/** دوربستِ امن (3.4.10) — خطا در این لایه صفحۀ سایت را نمی‌اندازد، فقط در لاگ می‌نشیند */
+	function javan_seda_term_image( $term = null, $size = 'medium' ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_term_image_impl( $term, $size );
+		}
+		return javan_seda_safe( 'javan_seda_term_image_impl', array( $term, $size ), array( "id" => 0, "url" => "", "alt" => "", "size" => "" ) );
+	}
+}
+if ( ! function_exists( 'javan_seda_term_image_impl' ) ) {
 	/**
 	 * تصویرِ ترم را به شکل آرایه برمی‌گرداند: array( 'id', 'url', 'alt' ).
 	 * منابع، به ترتیب: فیلد aimg2 (ACF/term_meta) → ردیفِ دستیِ «هنرمندانِ صفحۀ اصلی»
@@ -88,7 +97,7 @@ if ( ! function_exists( 'javan_seda_term_image' ) ) {
 	 * یک بار در فیلدِ ترم و یک بار در «تنظیمات پوسته ← هنرمندانِ صفحۀ اصلی».
 	 * از این نسخه، یک آپلود برای هر دو جا کافی است.
 	 */
-	function javan_seda_term_image( $term = null, $size = 'medium' ) {
+	function javan_seda_term_image_impl( $term = null, $size = 'medium' ) {
 		$out = array(
 			'id'   => 0,
 			'url'  => '',
@@ -149,6 +158,9 @@ if ( ! function_exists( 'javan_seda_term_image_html' ) ) {
 	/** تگ <img> آماده (با lazy/decoding و altِ پر) — همان چیزی که کارت‌ها لازم دارند */
 	function javan_seda_term_image_html( $term = null, $size = 'medium', $atts = array() ) {
 		$img  = javan_seda_term_image( $term, $size );
+		if ( empty( $img ) ) {
+			$img = array( 'id' => 0, 'url' => '', 'alt' => '', 'size' => $size );
+		}
 		$atts = wp_parse_args(
 			(array) $atts,
 			array(
@@ -317,7 +329,16 @@ if ( JAVANSEDA_TERM_FIELDS && is_admin() ) {
 	}
 
 	if ( ! function_exists( 'javan_seda_term_fields_enqueue' ) ) {
-		function javan_seda_term_fields_enqueue( $hook = '' ) {
+	/** دوربستِ امن (3.4.10) — خطا در این لایه صفحۀ سایت را نمی‌اندازد، فقط در لاگ می‌نشیند */
+	function javan_seda_term_fields_enqueue( $hook = '' ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_term_fields_enqueue_impl( $hook );
+		}
+		return javan_seda_safe( 'javan_seda_term_fields_enqueue_impl', array( $hook ), null );
+	}
+}
+if ( ! function_exists( 'javan_seda_term_fields_enqueue_impl' ) ) {
+		function javan_seda_term_fields_enqueue_impl( $hook = '' ) {
 			unset( $hook );
 			if ( ! javan_seda_term_fields_is_term_screen() ) {
 				return;
@@ -407,15 +428,33 @@ if ( JAVANSEDA_TERM_FIELDS && is_admin() ) {
 	}
 
 	if ( ! function_exists( 'javan_seda_term_fields_ui' ) ) {
+	/** دوربستِ امن (3.4.10) — خطا در این لایه صفحۀ سایت را نمی‌اندازد، فقط در لاگ می‌نشیند */
+	function javan_seda_term_fields_ui( $term, $tax = '' ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_term_fields_ui_impl( $term, $tax );
+		}
+		return javan_seda_safe( 'javan_seda_term_fields_ui_impl', array( $term, $tax ), null );
+	}
+}
+if ( ! function_exists( 'javan_seda_term_fields_ui_impl' ) ) {
 		/** صفحۀ «ویرایش» — ردیف‌ها داخل همان جدولِ فرم */
-		function javan_seda_term_fields_ui( $term, $tax = '' ) {
+		function javan_seda_term_fields_ui_impl( $term, $tax = '' ) {
 			javan_seda_term_fields_html( $term, true );
 		}
 	}
 
 	if ( ! function_exists( 'javan_seda_term_fields_ui_add' ) ) {
+	/** دوربستِ امن (3.4.10) — خطا در این لایه صفحۀ سایت را نمی‌اندازد، فقط در لاگ می‌نشیند */
+	function javan_seda_term_fields_ui_add( $tax ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_term_fields_ui_add_impl( $tax );
+		}
+		return javan_seda_safe( 'javan_seda_term_fields_ui_add_impl', array( $tax ), null );
+	}
+}
+if ( ! function_exists( 'javan_seda_term_fields_ui_add_impl' ) ) {
 		/** صفحۀ «افزودن» — فرمِ ترم آن‌جا <table> ندارد، پس یک بلوک ساده */
-		function javan_seda_term_fields_ui_add( $tax ) {
+		function javan_seda_term_fields_ui_add_impl( $tax ) {
 			$fields = javan_seda_term_field_defs( (string) $tax );
 			if ( ! $fields ) {
 				return;
@@ -445,7 +484,16 @@ if ( JAVANSEDA_TERM_FIELDS && is_admin() ) {
 	}
 
 	if ( ! function_exists( 'javan_seda_term_fields_save' ) ) {
-		function javan_seda_term_fields_save( $term_id, $tt_id = 0, $taxonomy = '' ) {
+	/** دوربستِ امن (3.4.10) — خطا در این لایه صفحۀ سایت را نمی‌اندازد، فقط در لاگ می‌نشیند */
+	function javan_seda_term_fields_save( $term_id, $tt_id = 0, $taxonomy = '' ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_term_fields_save_impl( $term_id, $tt_id, $taxonomy );
+		}
+		return javan_seda_safe( 'javan_seda_term_fields_save_impl', array( $term_id, $tt_id, $taxonomy ), null );
+	}
+}
+if ( ! function_exists( 'javan_seda_term_fields_save_impl' ) ) {
+		function javan_seda_term_fields_save_impl( $term_id, $tt_id = 0, $taxonomy = '' ) {
 			unset( $tt_id );
 			$tax = (string) $taxonomy;
 			if ( '' === $tax && isset( $_POST['taxonomy'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
@@ -536,13 +584,22 @@ if ( JAVANSEDA_TERM_FIELDS && is_admin() && ! function_exists( 'javan_seda_term_
    ۴) نمایش — بیوگرافیِ هنرمند و توضیحِ دسته/برچسب
    ========================================================================= */
 if ( ! function_exists( 'javan_seda_term_bio' ) ) {
+	/** دوربستِ امن (3.4.10) — خطا در این لایه صفحۀ سایت را نمی‌اندازد، فقط در لاگ می‌نشیند */
+	function javan_seda_term_bio( $term = null ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_term_bio_impl( $term );
+		}
+		return javan_seda_safe( 'javan_seda_term_bio_impl', array( $term ), array( 'short' => '', 'full' => '', 'url' => '', 'inline' => false ) );
+	}
+}
+if ( ! function_exists( 'javan_seda_term_bio_impl' ) ) {
 	/**
 	 * بیوی هنرمند: کوتاه + کامل + نشانی.
 	 * short = فیلدِ ab_bio_short ← خلاصۀ «توضیحِ ترم»
 	 * full  = «توضیحِ ترم» (اگر بلندتر از کوتاه باشد)
 	 * url   = ab_bio_post (شمارۀ نوشته یا آدرس) — اگر باشد، دکمه به جای بازکردنِ inline لینک می‌شود
 	 */
-	function javan_seda_term_bio( $term = null ) {
+	function javan_seda_term_bio_impl( $term = null ) {
 		$bio = array(
 			'short'  => '',
 			'full'   => '',
@@ -695,11 +752,20 @@ if ( ! function_exists( 'javan_seda_term_footer_script' ) ) {
 add_action( 'wp_footer', 'javan_seda_term_footer_script', 99 );
 
 if ( ! function_exists( 'javan_seda_term_desc_top' ) ) {
+	/** دوربستِ امن (3.4.10) — خطا در این لایه صفحۀ سایت را نمی‌اندازد، فقط در لاگ می‌نشیند */
+	function javan_seda_term_desc_top( $term = null ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_term_desc_top_impl( $term );
+		}
+		return javan_seda_safe( 'javan_seda_term_desc_top_impl', array( $term ), '' );
+	}
+}
+if ( ! function_exists( 'javan_seda_term_desc_top_impl' ) ) {
 	/**
 	 * توضیحِ بالای صفحۀ آرشیو: «توضیح کوتاه» اگر پر شده باشد، وگرنه توضیحِ همیشگی.
 	 * خروجی escape شده است؛ اگر خالی باشد رشتهٔ خالی می‌دهد تا کادرِ خالی چاپ نشود.
 	 */
-	function javan_seda_term_desc_top( $term = null ) {
+	function javan_seda_term_desc_top_impl( $term = null ) {
 		$id    = javan_seda_term_id( $term );
 		$short = ( '' === $id ) ? '' : (string) get_term_meta( $id, 'ab_desc_short', true );
 		$short = trim( wp_strip_all_tags( $short ) );
@@ -719,8 +785,17 @@ if ( ! function_exists( 'javan_seda_term_desc_top' ) ) {
 }
 
 if ( ! function_exists( 'javan_seda_term_desc_bottom' ) ) {
-	/** توضیحِ کاملِ پایینِ صفحۀ آرشیو، با دکمۀ بیشتر/کمتر */
+	/** دوربستِ امن (3.4.10) — خطا در این لایه صفحۀ سایت را نمی‌اندازد، فقط در لاگ می‌نشیند */
 	function javan_seda_term_desc_bottom( $term = null ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_term_desc_bottom_impl( $term );
+		}
+		return javan_seda_safe( 'javan_seda_term_desc_bottom_impl', array( $term ), '' );
+	}
+}
+if ( ! function_exists( 'javan_seda_term_desc_bottom_impl' ) ) {
+	/** توضیحِ کاملِ پایینِ صفحۀ آرشیو، با دکمۀ بیشتر/کمتر */
+	function javan_seda_term_desc_bottom_impl( $term = null ) {
 		$id = javan_seda_term_id( $term );
 		if ( ! $id ) {
 			return '';

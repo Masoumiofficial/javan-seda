@@ -225,8 +225,19 @@ if ( ! function_exists( 'javan_seda_artist_acf_rules' ) ) {
 		}
 		return $groups;
 	}
-	add_filter( 'acf/get_field_groups', 'javan_seda_artist_acf_rules', 20 );
-	add_filter( 'acf/local_fields', 'javan_seda_artist_acf_rules', 20 );
+	/* 3.4.10: اگر ACF ساختارِ گروه‌ها را غیرمنتظره فرستاد، فیلتر بی‌تغییر برمی‌گردد تا
+	   صفحه‌های پیشخوان/ویرایش بسته نشود. */
+	foreach ( array( 'acf/get_field_groups', 'acf/local_fields' ) as $jv_acf_hook ) {
+		add_filter( $jv_acf_hook, function ( $groups ) {
+			if ( ! is_array( $groups ) ) {
+				return $groups;
+			}
+			if ( function_exists( 'javan_seda_safe' ) ) {
+				return javan_seda_safe( 'javan_seda_artist_acf_rules', array( $groups ), $groups );
+			}
+			return javan_seda_artist_acf_rules( $groups );
+		}, 20 );
+	}
 }
 
 /* =========================================================================
@@ -277,11 +288,20 @@ if ( ! function_exists( 'javan_seda_artist_views_flush_for' ) ) {
 }
 
 if ( ! function_exists( 'javan_seda_artist_views_total' ) ) {
+	/** دوربستِ امن (3.4.10) */
+	function javan_seda_artist_views_total( $term = 0 ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_artist_views_total_impl( $term );
+		}
+		return javan_seda_safe( 'javan_seda_artist_views_total_impl', array( $term ), 0 );
+	}
+}
+if ( ! function_exists( 'javan_seda_artist_views_total_impl' ) ) {
 	/**
 	 * مجموعِ بازدیدِ همهٔ آثارِ یک هنرمند.
 	 * $term: WP_Term | term_id.  آرایۀ خالی/ترمِ نامعتبر ⇒ ۰
 	 */
-	function javan_seda_artist_views_total( $term = 0 ) {
+	function javan_seda_artist_views_total_impl( $term = 0 ) {
 		static $local = array();
 
 		$term_id = 0;
@@ -321,7 +341,7 @@ if ( ! function_exists( 'javan_seda_artist_views_total' ) ) {
 				)
 			);
 			$val = 0;
-			if ( is_array( $ids ) ) {
+			if ( is_array( $ids ) && $ids && function_exists( 'update_postmeta_cache' ) ) {
 				update_postmeta_cache( $ids );
 				foreach ( $ids as $id ) {
 					$val += (int) get_post_meta( (int) $id, 'views', true );
@@ -373,9 +393,22 @@ if ( ! function_exists( 'javan_seda_artist_views_html' ) ) {
      · «ثابت در بالا» دو جا دارد: تیکِ «ab_home_pin» در صفحۀ ویرایش هنرمند،
        و لیستِ اسامیِ ab_home_artists_pin در تنظیمات.
    ========================================================================= */
+if ( ! function_exists( 'javan_seda_lc' ) ) {
+	/**
+	 * کوچک‌کردنِ حروف با حفظِ فارسی/عربی. اگر افزونۀ mbstring روی هاست نصب نباشد
+	 * strtolower برای ASCII کافی است و حروفِ فارسی دست‌نخورده می‌مانند.
+	 */
+	function javan_seda_lc( $text ) {
+		$text = (string) $text;
+		if ( function_exists( 'mb_strtolower' ) ) {
+			return mb_strtolower( $text, 'UTF-8' );
+		}
+		return strtolower( $text );
+	}
+}
 if ( ! function_exists( 'javan_seda_artist_normalize_name' ) ) {
 	function javan_seda_artist_normalize_name( $text ) {
-		$text = mb_strtolower( trim( (string) $text ), 'UTF-8' );
+		$text = javan_seda_lc( trim( (string) $text ) );
 		$text = str_replace( array( "\u{200c}", "\u{200b}", "\u{200e}" ), ' ', $text );
 		$text = preg_replace( '/[\x{064B}-\x{0658}\x{0670}]/u', '', $text );
 		$text = str_replace( array( 'ي', 'ك', '­' ), array( 'ی', 'ک', '' ), $text );
@@ -385,7 +418,16 @@ if ( ! function_exists( 'javan_seda_artist_normalize_name' ) ) {
 }
 
 if ( ! function_exists( 'javan_seda_artist_home_settings' ) ) {
-	function javan_seda_artist_home_settings() {
+	/** دوربستِ امن (3.4.10) */
+	function javan_seda_artist_home_settings(  ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_artist_home_settings_impl(  );
+		}
+		return javan_seda_safe( 'javan_seda_artist_home_settings_impl', array(  ), array() );
+	}
+}
+if ( ! function_exists( 'javan_seda_artist_home_settings_impl' ) ) {
+	function javan_seda_artist_home_settings_impl() {
 		$has = function_exists( 'ot_get_option' );
 		$set = array(
 			'auto'  => ( 'off' !== (string) ( $has ? ot_get_option( 'ab_home_artists_auto', 'off' ) : 'off' ) ),
@@ -404,8 +446,17 @@ if ( ! function_exists( 'javan_seda_artist_home_settings' ) ) {
 }
 
 if ( ! function_exists( 'javan_seda_artist_term_from' ) ) {
-	/** از «نام» یا «آدرس» → ترمِ هنرمند (یا null) */
+	/** دوربستِ امن (3.4.10) */
 	function javan_seda_artist_term_from( $needle ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_artist_term_from_impl( $needle );
+		}
+		return javan_seda_safe( 'javan_seda_artist_term_from_impl', array( $needle ), null );
+	}
+}
+if ( ! function_exists( 'javan_seda_artist_term_from_impl' ) ) {
+	/** از «نام» یا «آدرس» → ترمِ هنرمند (یا null) */
+	function javan_seda_artist_term_from_impl( $needle ) {
 		$needle = trim( (string) $needle );
 		if ( '' === $needle ) {
 			return null;
@@ -445,7 +496,6 @@ if ( ! function_exists( 'javan_seda_artist_term_from' ) ) {
 			array(
 				'taxonomy'   => $tax,
 				'hide_empty' => false,
-				'number'     => 0,
 			)
 		);
 		if ( is_array( $all ) ) {
@@ -498,6 +548,15 @@ if ( ! function_exists( 'javan_seda_artist_home_row_for' ) ) {
 }
 
 if ( ! function_exists( 'javan_seda_artist_home_rows' ) ) {
+	/** دوربستِ امن (3.4.10) */
+	function javan_seda_artist_home_rows( $args = array() ) {
+		if ( ! function_exists( 'javan_seda_safe' ) ) {
+			return javan_seda_artist_home_rows_impl( $args );
+		}
+		return javan_seda_safe( 'javan_seda_artist_home_rows_impl', array( $args ), array() );
+	}
+}
+if ( ! function_exists( 'javan_seda_artist_home_rows_impl' ) ) {
 	/**
 	 * ردیف‌های «محبوبترین هنرمندان». خروجی: آرایه‌ای از
 	 * array( 'term','name','url','img','views','count','pinned' )
@@ -506,7 +565,7 @@ if ( ! function_exists( 'javan_seda_artist_home_rows' ) ) {
 	 * حالت خودکار (ab_home_artists_auto) => از خودِ ترم‌ها، با ترتیبِ انتخابی
 	 * و ثابت‌هایِ بالا (تیکِ «ab_home_pin» یا لیستِ ab_home_artists_pin).
 	 */
-	function javan_seda_artist_home_rows( $args = array() ) {
+	function javan_seda_artist_home_rows_impl( $args = array() ) {
 		$args = (array) wp_parse_args(
 			$args,
 			javan_seda_artist_home_settings()

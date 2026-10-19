@@ -1,5 +1,48 @@
 <?php
 /* ---------------------------------------------------------------------------
+   v3.4.10 — حائلِ امنِ لایه‌ها
+   هر بلوکِ اختیاریِ این پوسته از این تابع رد می‌شود: اگر روزی چیزی خطا بدهد
+   (افزونۀ ناآشنا، هاستِ بی‌mbstring، فایلِ ناقص) خطا در لاگ نوشته می‌شود و
+   صفحۀ سایت **نمی‌افتد**؛ فقط همان بلوک جا‌افتاده حذف می‌شود. try/catch هر دو نسخۀ PHP را می‌پوشاند.
+   ------------------------------------------------------------------------- */
+if ( ! function_exists( 'javan_seda_safe_log' ) ) {
+	function javan_seda_safe_log( $e ) {
+		/* عمداً بی‌شرط است: اگر روزی لایه‌ای خطا بدهد، همین یک سطر در error_log
+		   (یا wp-content/debug.log) علت را لو می‌دهد و لازم نیست کاربر WP_DEBUG
+		   را روشن کند. برای سیل‌نشدنِ لاگ، هر ساعت فقط یک بار نوشته می‌شود. */
+		if ( function_exists( 'get_option' ) && get_option( 'javan_seda_safe_log_ts' ) > ( time() - HOUR_IN_SECONDS ) ) {
+			return;
+		}
+		if ( function_exists( 'update_option' ) ) {
+			update_option( 'javan_seda_safe_log_ts', time(), false );
+		}
+		if ( is_object( $e ) && function_exists( 'error_log' ) ) {
+			error_log( '[javan-seda] ' . get_class( $e ) . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine() );
+		}
+	}
+}
+
+if ( ! function_exists( 'javan_seda_safe' ) ) {
+	/**
+	 * javan_seda_safe( 'نام_تابع', array( آرگومان‌ها ), مقدارِ_جایگزین )
+	 * خروجیِ تابع اگر false/null هم بشود قابل قبول است؛ مهم این است که fatal ندهیم.
+	 */
+	function javan_seda_safe( $fn, $args = array(), $fallback = '' ) {
+		if ( ! is_callable( $fn ) ) {
+			return $fallback;
+		}
+		try {
+			return call_user_func_array( $fn, (array) $args );
+		} catch ( \Throwable $jv_e ) {
+			javan_seda_safe_log( $jv_e );
+			return $fallback;
+		} catch ( \Exception $jv_e ) { // PHP 5.6
+			javan_seda_safe_log( $jv_e );
+			return $fallback;
+		}
+	}
+}
+/* ---------------------------------------------------------------------------
    v3.4.1 — «کنترل رابط» (inc/ab-controls.php)
    گزینه‌های تنظیمات قالب (بخش «کنترل رابط») + اولویت define() در wp-config.php.
    این include باید پیش از بقیۀ لایه‌ها بیاید، چون آن‌ها توابع همین فایل را صدا می‌زنند.

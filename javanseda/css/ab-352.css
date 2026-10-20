@@ -211,3 +211,136 @@
 		transition: none;
 	}
 }
+
+/* ============================================================================================
+   بلوک ۳.۵.۳ — کارتِ هنرمند در ریل «هنرمندان منتخب» صفحهٔ اصلی
+   --------------------------------------------------------------------------------------------
+   همان رفتارِ کارت‌های آهنگ: با hover/focus روی کارت، تصویر «مات» می‌شود و «مجموع بازدید
+   آثار» روی همان دایره می‌آید؛ روی دستگاه لمسی (hover:none) عدد همیشه دیده می‌شود.
+   نام همیشه بیرون از تصویر و زیرِ آن است (مطابق درخواست).
+   هیچ قاعدهٔ قبلی حذف نشده؛ فقط با انتخابگرِ دقیق‌تر تکمیل/خنثی شده‌اند.
+   ============================================================================================ */
+.artist_boxs a.ab-artist-card {
+	display: block;
+	width: 180px;
+	max-width: 100%;
+	margin: 0 auto;
+	padding: 0;
+	direction: rtl;
+	text-align: center;
+	text-decoration: none;
+}
+
+.artist_boxs a.ab-artist-card .ab-artist-card__media {
+	position: relative;
+	display: block;
+	width: 150px;
+	max-width: 100%;
+	margin: 0 auto;
+	padding: 0;
+	line-height: 0;
+	border-radius: 50%;
+	overflow: visible; /* حلقهٔ نازکِ تصویر (box-shadow) بریده نشود */
+}
+
+.artist_boxs a.ab-artist-card .ab-artist-card__media img {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-width: 100%;
+	margin: 0;
+	padding: 0;
+	border-radius: 50%;
+}
+
+.artist_boxs a.ab-artist-card .ab-artist-card__name {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	margin: 6px 0 0;
+	padding: 0 2px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 12.5px;
+	line-height: 1.8;
+}
+
+/* لایهٔ آمار: دایره‌ای، فقط روی عکس، کلیک‌پذیر نیست (لینکِ کارت سالم می‌ماند) */
+.artist_boxs a.ab-artist-card .ab-card-stats {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	margin: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .26);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity .16s ease;
+}
+
+.night .artist_boxs a.ab-artist-card .ab-card-stats {
+	background: rgba(17, 17, 17, .38);
+}
+
+.artist_boxs a.ab-artist-card:hover .ab-card-stats,
+.artist_boxs a.ab-artist-card:focus-visible .ab-card-stats {
+	opacity: 1;
+}
+
+@supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
+	.artist_boxs a.ab-artist-card:hover .ab-card-stats,
+	.artist_boxs a.ab-artist-card:focus-visible .ab-card-stats {
+		-webkit-backdrop-filter: blur(7px) saturate(1.08);
+		backdrop-filter: blur(7px) saturate(1.08);
+	}
+}
+
+.artist_boxs a.ab-artist-card .ab-card-stats__in {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.artist_boxs a.ab-artist-card .ab-cs-num {
+	max-width: calc(100% - 10px);
+	margin: 0;
+	padding: 4px 10px;
+	font-size: 12px;
+	white-space: nowrap;
+}
+
+.artist_boxs a.ab-artist-card .screen-reader-text {
+	padding: 0;
+	max-width: none;
+}
+
+/* دستگاه لمسی: بدون hover، عدد همیشه دیده می‌شود (همان رفتار کارت‌های آهنگ) */
+@media (hover: none) {
+	.artist_boxs a.ab-artist-card .ab-card-stats {
+		opacity: 1;
+		background: transparent;
+		padding: 0;
+	}
+}
+
+/* موبایل باریک: تصویر تمام‌عرضِ کارت مثل قبل */
+@media (max-width: 450px) {
+	.artist_boxs a.ab-artist-card .ab-artist-card__media,
+	.artist_boxs a.ab-artist-card .ab-artist-card__media img {
+		width: 100%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.artist_boxs a.ab-artist-card .ab-card-stats {
+		transition: none;
+	}
+}
+/* انتهای بلوک ۳.۵.۳ */

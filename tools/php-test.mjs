@@ -10,14 +10,27 @@ const file = process.argv[2] || 'tests/run-352.php';
 const root = process.cwd();
 const theme = path.join(root, 'javanseda');
 
-const incFiles = ['ab-artist-fields.php', 'ab-cat-desc.php', 'ab-terms-admin.php', 'ab-post-artist.php'];
+const incFiles = [
+  'ab-artist-fields.php',
+  'ab-cat-desc.php',
+  'ab-terms-admin.php',
+  'ab-post-artist.php',
+  'ab-home-meta.php',
+  'ab-artist-cards.php',
+  'artist_slider.php',
+];
 const files = incFiles.map((name) => ({
   parent: '/tmp/theme/inc',
   name,
   url: 'file://' + path.join(theme, 'inc', name),
 }));
+/* فایل‌های ریشهٔ قالب (آزمونِ سرچشمه: اینکه <title> دستی برنگشته باشد) */
+for (const name of ['header.php', 'myfunctions.php', 'style.css']) {
+  files.push({ parent: '/tmp/theme', name, url: 'file://' + path.join(theme, name) });
+}
+files.push({ parent: '/tmp/theme/css', name: 'ab-352.css', url: 'file://' + path.join(theme, 'css', 'ab-352.css') });
 files.push({ parent: '/preload/tests', name: 'stubs-wp.php', url: 'file://' + path.join(root, 'tests', 'stubs-wp.php') });
-files.push({ parent: '/preload/tests', name: 'run-352.php', url: 'file://' + path.resolve(file) });
+files.push({ parent: '/preload/tests', name: path.basename(file), url: 'file://' + path.resolve(file) });
 
 const php = new PhpNode({ files });
 let out = '';

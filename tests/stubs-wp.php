@@ -22,6 +22,12 @@ $GLOBALS['__calls']    = array();
 $GLOBALS['__objterms'] = array();
 $GLOBALS['__hooks']    = array();
 $GLOBALS['__is_cat']   = false;
+$GLOBALS['__is_home']  = false;
+$GLOBALS['__is_front'] = false;
+$GLOBALS['__is_feed']  = false;
+$GLOBALS['__is_admin'] = false;
+$GLOBALS['__ot']       = array();
+$GLOBALS['__blog']     = array( 'name' => 'آهنگ‌بان', 'description' => 'توضیح کوتاه سایت' );
 $GLOBALS['__query_obj'] = null;
 
 class WP_Term {
@@ -138,7 +144,9 @@ function esc_url_raw( $url ) {
 	return $url;
 }
 function esc_url( $url ) {
-	return esc_url_raw( $url );
+	/* رفتارِ نزدیک به وردپرس: کاراکترهایی که می‌توانند از attribute خارج شوند کد می‌شوند */
+	$url = esc_url_raw( $url );
+	return str_replace( array( '"', "'", '<', '>' ), array( '%22', '%27', '%3C', '%3E' ), $url );
 }
 function wp_kses_post( $html ) {
 	$html = (string) $html;
@@ -217,6 +225,9 @@ function get_term( $id, $tax = '' ) {
 function get_term_by( $field, $value, $tax = '' ) {
 	foreach ( $GLOBALS['__terms'] as $t ) {
 		if ( 'slug' === $field && $t->slug === $value ) {
+			return $t;
+		}
+		if ( 'name' === $field && $t->name === $value ) {
 			return $t;
 		}
 	}
@@ -320,11 +331,30 @@ function wp_nonce_field( $action, $name ) {
 function is_category() {
 	return ! empty( $GLOBALS['__is_cat'] );
 }
+function is_home() {
+	return ! empty( $GLOBALS['__is_home'] );
+}
+function is_front_page() {
+	return ! empty( $GLOBALS['__is_front'] );
+}
+function is_feed() {
+	return ! empty( $GLOBALS['__is_feed'] );
+}
+function get_bloginfo( $what = '' ) {
+	$b = isset( $GLOBALS['__blog'] ) ? (array) $GLOBALS['__blog'] : array();
+	return isset( $b[ $what ] ) ? $b[ $what ] : '';
+}
+function ot_get_option( $key, $default = '' ) {
+	if ( array_key_exists( $key, $GLOBALS['__ot'] ) ) {
+		return $GLOBALS['__ot'][ $key ];
+	}
+	return array_key_exists( $key, $GLOBALS['__options'] ) ? $GLOBALS['__options'][ $key ] : $default;
+}
 function get_queried_object() {
 	return $GLOBALS['__query_obj'];
 }
 function is_admin() {
-	return false;
+	return ! empty( $GLOBALS['__is_admin'] );
 }
 
 /* ---------- $wpdb ---------- */

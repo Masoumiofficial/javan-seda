@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html dir="rtl" lang="fa-IR">
 <head>
-<title><?php if(is_front_page() || is_home()){echo get_bloginfo('name');} else{echo wp_title('');}?></title>
+<?php
+/* v3.5.3 — عنوان دیگر دستی چاپ نمی‌شود: `add_theme_support('title-tag')` در myfunctions.php
+   فعال شد و وردپرس/افزونهٔ سئو عنوان را از فیلترهای استاندارد می‌سازد. ترکیبِ «عنوان دستی +
+   title-tag» دو <title> می‌ساخت؛ این گارد فقط برای وقتی است که پشتیبانی غیرفعال شده باشد. */
+if ( function_exists( 'wp_get_document_title' ) && ! ( function_exists( 'current_theme_supports' ) && current_theme_supports( 'title-tag' ) ) ) : ?>
+<title><?php echo esc_html( wp_get_document_title() ); ?></title>
+<?php endif; ?>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta property="dc:creator" content="tarlanweb.ir Design Group - call by 09158856205" />

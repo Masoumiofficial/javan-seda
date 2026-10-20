@@ -61,6 +61,28 @@ if ( is_readable( $_javan_seda_cat_desc ) ) {
 }
 unset( $_javan_seda_cat_desc );
 
+/* ---------------------------------------------------------------------------
+   v3.5.3 — «کارتِ هنرمند» (inc/ab-artist-cards.php)
+   ریل «هنرمندان منتخب» صفحهٔ اصلی: همان لایهٔ ماتِ کارت‌های آهنگ + مجموع بازدید.
+   فقط خواندنی است و هیچ کلید/تنظیمی را عوض نمی‌کند؛ اگر نبود، اسلایدر مثل قبل است.
+   ------------------------------------------------------------------------- */
+$_javan_seda_artist_cards = trailingslashit( get_template_directory() ) . 'inc/ab-artist-cards.php';
+if ( is_readable( $_javan_seda_artist_cards ) ) {
+	require_once $_javan_seda_artist_cards;
+}
+unset( $_javan_seda_artist_cards );
+
+/* ---------------------------------------------------------------------------
+   v3.5.3 — «متای صفحهٔ اصلی» (inc/ab-home-meta.php)
+   عنوان متا و توضیحات متای صفحهٔ اصلی از «تنظیمات قالب → صفحه اصلی» می‌آید.
+   اگر خالی باشد، رفتار ۳.۵.۲ (نام سایت / توضیح کوتاه) حفظ می‌شود.
+   ------------------------------------------------------------------------- */
+$_javan_seda_home_meta = trailingslashit( get_template_directory() ) . 'inc/ab-home-meta.php';
+if ( is_readable( $_javan_seda_home_meta ) ) {
+	require_once $_javan_seda_home_meta;
+}
+unset( $_javan_seda_home_meta );
+
 /* اگر لایۀ بالا روی سرور نبود، همه‌چیز دقیقاً مثل قبل کار می‌کند: نامک singer
    و آدرسِ همان صفحۀ «همهٔ خواننده‌ها». (هیچ فایلی به تنهایی نمی‌تواند بشکند.) */
 if ( ! function_exists( 'javan_seda_artist_tax' ) ) {
@@ -189,8 +211,13 @@ if ( $_javan_seda_uiguard && is_readable( $_javan_seda_uiguard ) ) {
 }
 unset( $_javan_seda_uiguard );
 add_theme_support( 'post-thumbnails' );
-if ( function_exists( 'add_theme_support' ) ) { /* v3.3.8 — مارکاپ مدرن برای فرم/گالر‌ی/کپشن و حذف type از enqueueها؛ title-tag عمداً افزوده نشد چون لایۀ ab-seo.php عنوان را خودش می‌سازد */
+if ( function_exists( 'add_theme_support' ) ) { /* v3.3.8 — مارک‌اپ مدرن برای فرم/گالری/کپشن و حذف type از enqueueها */
 	add_theme_support( 'html5', array( 'search-form', 'gallery', 'caption', 'style', 'script' ) );
+	/* v3.5.3 — عنوانِ استاندارد: تا ۳.۵.۲ در header.php دستی چاپ می‌شد و برای صفحهٔ اصلی
+	   همیشه فقط نام سایت بود (نه فیلدِ قابل ویرایش، نه سازگاری با افزونهٔ سئو). حالا
+	   `document_title_parts` مرجع است و inc/ab-home-meta.php فقط صفحهٔ اصلی را بازنویسی
+	   می‌کند؛ بقیهٔ صفحه‌ها همان عنوانِ وردپرس را می‌گیرند. */
+	add_theme_support( 'title-tag' );
 }
 if (function_exists('add_image_size')){
 add_image_size( 'thumb4', 150, 150, true);

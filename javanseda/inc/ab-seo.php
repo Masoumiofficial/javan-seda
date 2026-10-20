@@ -189,7 +189,12 @@ if ( ! function_exists( 'javan_seda_seo_description' ) ) {
 		} elseif ( is_search() ) {
 			$txt = 'نتایج جست‌وجو برای «' . get_search_query() . '» در ' . get_bloginfo( 'name' );
 		} elseif ( is_home() || is_front_page() ) {
+			/* v3.5.3 — اول فیلدِ «توضیحات متا» در تنظیمات قالب؛ اگر خالی بود همان
+			   توضیح کوتاهِ سایت (رفتار ۳.۵.۲). */
 			$txt = get_bloginfo( 'description' );
+			if ( function_exists( 'javan_seda_home_description' ) ) {
+				$txt = javan_seda_home_description( $txt );
+			}
 			if ( '' === trim( (string) $txt ) ) {
 				$txt = 'تازه‌ترین آهنگ‌های ایرانی، موزیک‌ویدیو و آلبوم‌ها — پخش آنلاین و دانلود با کیفیت ۱۲۸ و ۳۲۰';
 			}

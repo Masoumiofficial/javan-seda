@@ -27,6 +27,9 @@ $GLOBALS['__is_front'] = false;
 $GLOBALS['__is_feed']  = false;
 $GLOBALS['__is_admin'] = false;
 $GLOBALS['__ot']       = array();
+$GLOBALS['__query_vars']        = array();
+$GLOBALS['__comments_total']    = 0;
+$GLOBALS['__comment_total_pages'] = 1;
 $GLOBALS['__blog']     = array( 'name' => 'آهنگ‌بان', 'description' => 'توضیح کوتاه سایت' );
 $GLOBALS['__query_obj'] = null;
 
@@ -93,6 +96,12 @@ function apply_filters( $tag, $value ) {
 		$args[0] = call_user_func_array( $fn, $args );
 	}
 	return $args[0];
+}
+function __return_false() {
+	return false;
+}
+function __return_true() {
+	return true;
 }
 function has_filter( $tag, $fn = false ) {
 	return ! empty( $GLOBALS['__hooks'][ $tag ] );
@@ -355,6 +364,74 @@ function get_queried_object() {
 }
 function is_admin() {
 	return ! empty( $GLOBALS['__is_admin'] );
+}
+
+/* ---------- دیدگاه‌ها ---------- */
+function get_query_var( $var, $default = '' ) {
+	return isset( $GLOBALS['__query_vars'][ $var ] ) ? $GLOBALS['__query_vars'][ $var ] : $default;
+}
+function get_comments_number( $post_id = 0 ) {
+	return (int) $GLOBALS['__comments_total'];
+}
+function get_comment_pages_count() {
+	return (int) $GLOBALS['__comment_total_pages'];
+}
+function get_comments_pagenum_link( $pagenum = 1, $max_page = 0 ) {
+	return 'https://ex/?p=10&cpage=' . (int) $pagenum . '#comments';
+}
+/* شبیه‌سازیِ نزدیک به هسته: آرایه‌ای از لینک‌ها/برچسب‌ها، با aria-current برای صفحۀ جاری */
+function paginate_comments_links( $args = array() ) {
+	$args = wp_parse_args( (array) $args, array(
+		'echo'      => true,
+		'type'      => 'plain',
+		'prev_text' => '«',
+		'next_text' => '»',
+	) );
+	$total   = max( 1, (int) $GLOBALS['__comment_total_pages'] );
+	$current = max( 1, min( $total, (int) get_query_var( 'cpage' ) ) );
+	$out     = array();
+	if ( $current > 1 ) {
+		$out[] = '<a class="prev page-numbers" href="' . get_comments_pagenum_link( $current - 1 ) . '">' . $args['prev_text'] . '</a>';
+	}
+	for ( $i = 1; $i <= $total; $i++ ) {
+		if ( $i === $current ) {
+			$out[] = '<span aria-current="page" class="page-numbers current">' . $i . '</span>';
+		} else {
+			$out[] = '<a class="page-numbers" href="' . get_comments_pagenum_link( $i ) . '">' . $i . '</a>';
+		}
+	}
+	if ( $current < $total ) {
+		$out[] = '<a class="next page-numbers" href="' . get_comments_pagenum_link( $current + 1 ) . '">' . $args['next_text'] . '</a>';
+	}
+	if ( 'array' === $args['type'] ) {
+		return $out;
+	}
+	$html = implode( '\n', $out );
+	if ( $args['echo'] ) {
+		echo $html;
+		return;
+	}
+	return $html;
+}
+function wp_parse_args( $args, $defaults = array() ) {
+	if ( is_object( $args ) ) {
+		$args = get_object_vars( $args );
+	} elseif ( ! is_array( $args ) ) {
+		$args = array();
+	}
+	return array_merge( (array) $defaults, $args );
+}
+function is_singular( $types = '' ) {
+	return true;
+}
+function get_the_ID() {
+	return 10;
+}
+function wp_doing_ajax() {
+	return ! empty( $GLOBALS['__doing_ajax'] );
+}
+function wp_doing_cron() {
+	return false;
 }
 
 /* ---------- $wpdb ---------- */

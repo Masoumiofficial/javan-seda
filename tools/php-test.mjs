@@ -18,6 +18,7 @@ const incFiles = [
   'ab-home-meta.php',
   'ab-artist-cards.php',
   'artist_slider.php',
+  'ab-comments.php',
 ];
 const files = incFiles.map((name) => ({
   parent: '/tmp/theme/inc',
@@ -25,9 +26,11 @@ const files = incFiles.map((name) => ({
   url: 'file://' + path.join(theme, 'inc', name),
 }));
 /* فایل‌های ریشهٔ قالب (آزمونِ سرچشمه: اینکه <title> دستی برنگشته باشد) */
-for (const name of ['header.php', 'myfunctions.php', 'style.css']) {
+for (const name of ['header.php', 'myfunctions.php', 'style.css', 'comments.php']) {
   files.push({ parent: '/tmp/theme', name, url: 'file://' + path.join(theme, name) });
 }
+files.push({ parent: '/tmp/theme/inc', name: 'theme-options.php', url: 'file://' + path.join(theme, 'inc', 'theme-options.php') });
+files.push({ parent: '/tmp/theme/inc', name: 'ab-controls.php', url: 'file://' + path.join(theme, 'inc', 'ab-controls.php') });
 files.push({ parent: '/tmp/theme/css', name: 'ab-352.css', url: 'file://' + path.join(theme, 'css', 'ab-352.css') });
 files.push({ parent: '/preload/tests', name: 'stubs-wp.php', url: 'file://' + path.join(root, 'tests', 'stubs-wp.php') });
 files.push({ parent: '/preload/tests', name: path.basename(file), url: 'file://' + path.resolve(file) });

@@ -344,3 +344,186 @@
 	}
 }
 /* انتهای بلوک ۳.۵.۳ */
+
+/* ============================================================================================
+   بلوک ۳.۵.۴ — دیدگاه‌ها: سرتیتر، ناوبریِ صفحه‌بندی و خواناییِ موبایل
+   --------------------------------------------------------------------------------------------
+   مسئله: با زیادشدن دیدگاه‌ها، صفحۀ نوشته بی‌نهایت بلند می‌شد. حالا دیدگاه‌ها صفحه‌بندی
+   می‌شوند و این بلوک فقط ظاهرِ ناوبری را می‌سازد؛ هیچ قاعدهٔ قبلی حذف نشده است.
+   اعداد فارسی از PHP می‌آیند؛ این‌جا فقط چیدمان و حالت‌ها (hover/focus/شب) است.
+   ============================================================================================ */
+.ab-comments-title {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 26px 0 12px;
+	padding: 0 0 10px;
+	border-bottom: 1px solid var(--ab-line, rgba(17, 17, 17, .10));
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.7;
+	color: var(--ab-text, #222);
+}
+
+.ab-comments-title__count {
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--ab-muted, #666);
+}
+
+.ab-cpager {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	margin: 14px 0;
+	padding: 0;
+}
+
+.ab-cpager--top {
+	margin-bottom: 16px;
+}
+
+.ab-cpager--bottom {
+	margin-top: 18px;
+}
+
+.ab-cpager__summary {
+	margin: 0;
+	padding: 0;
+	font-size: 12px;
+	line-height: 1.9;
+	color: var(--ab-muted, #666);
+	text-align: center;
+}
+
+.ab-cpager__list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ab-cpager__item {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ab-cpager .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 36px;
+	height: 36px;
+	padding: 0 11px;
+	border: 1px solid var(--ab-line, rgba(17, 17, 17, .12));
+	border-radius: var(--ab-radius-pill, 999px);
+	background: var(--ab-surface, #fff);
+	color: var(--ab-text, #222);
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1;
+	text-decoration: none;
+	transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.ab-cpager a.page-numbers:hover,
+.ab-cpager a.page-numbers:focus-visible {
+	background: var(--ab-blue-soft, #EAF1FE);
+	border-color: var(--ab-blue, #185ADB);
+	color: var(--ab-blue-accent, #185ADB);
+}
+
+.ab-cpager .page-numbers:focus-visible {
+	outline: 2px solid var(--ab-blue-accent, #185ADB);
+	outline-offset: 2px;
+}
+
+.ab-cpager .page-numbers.current {
+	background: var(--ab-blue, #185ADB);
+	border-color: var(--ab-blue, #185ADB);
+	color: #fff;
+}
+
+.ab-cpager .page-numbers.dots {
+	min-width: 18px;
+	padding: 0 2px;
+	border-color: transparent;
+	background: transparent;
+	color: var(--ab-muted, #666);
+	font-weight: 400;
+}
+
+.ab-cpager .ab-cpager__step {
+	padding: 0 14px;
+	font-weight: 700;
+}
+
+.night .ab-cpager .page-numbers,
+.night .ab-comments-title {
+	background: var(--ab-charcoal, #1d1f28);
+	border-color: rgba(255, 255, 255, .14);
+	color: var(--ab-text, #E8EAEF);
+}
+
+.night .ab-cpager .page-numbers.current {
+	background: var(--ab-blue-accent, #185ADB);
+	border-color: var(--ab-blue-accent, #185ADB);
+	color: #fff;
+}
+
+.night .ab-cpager .page-numbers.dots {
+	background: transparent;
+	border-color: transparent;
+}
+
+.night .ab-comments-title {
+	background: transparent;
+}
+
+/* ناوبری در موبایل: دکمه‌ها کمی کوچک‌تر، بدون سرریز افقی */
+@media (max-width: 480px) {
+	.ab-cpager .page-numbers {
+		min-width: 33px;
+		height: 33px;
+		padding: 0 9px;
+		font-size: 12px;
+	}
+
+	.ab-cpager .ab-cpager__step {
+		padding: 0 11px;
+	}
+
+	.ab-cpager__summary {
+		font-size: 11.5px;
+	}
+}
+
+/* عمقِ تودرتویی در موبایل: پاسخ‌ها یک پله تو می‌روند، نه بیشتر (صفحۀ بلند نشود) */
+@media (max-width: 600px) {
+	.commentlist .children {
+		padding-inline-start: 10px;
+	}
+
+	.commentlist .children .children {
+		padding-inline-start: 0;
+	}
+
+	.commentlist .children .children .comment-content {
+		border-inline-start: 2px solid var(--ab-line, rgba(17, 17, 17, .12));
+		padding-inline-start: 9px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ab-cpager .page-numbers {
+		transition: none;
+	}
+}
+/* انتهای بلوک ۳.۵.۴ */

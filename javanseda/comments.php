@@ -28,8 +28,11 @@ if ( ! $jv_have && $jv_comments_id && (int) get_comments_number() > 0 ) {
 	if ( get_option( 'page_comments' ) ) {
 		$jv_per = (int) get_option( 'comments_per_page' );
 		if ( $jv_per > 0 ) {
+			/* v3.5.4 — پارامترِ `page` در WP_Comment_Query وجود ندارد؛ با `offset`
+			   دقیقاً همان بازهٔ صفحۀ جاری خوانده می‌شود (هم‌راستا با مسیرِ اصلی). */
+			$jv_page           = max( 1, (int) get_query_var( 'cpage' ) );
 			$jv_args['number'] = $jv_per;
-			$jv_args['page']  = max( 1, (int) get_query_var( 'cpage' ) );
+			$jv_args['offset'] = ( $jv_page - 1 ) * $jv_per;
 		}
 	}
 	$jv_fallback = get_comments( $jv_args );
@@ -47,8 +50,15 @@ $jv_need_login = ( get_option( 'comment_registration' ) && ! is_user_logged_in()
 
 <?php if ( $jv_have || $jv_fallback ) : ?>
 
-<?php if ( $jv_have && get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) : ?>
-
+<?php
+/* v3.5.4 — سرتیتر + ناوبریِ صفحه‌بندی (بالا و پایینِ فهرست).
+   اگر لایهٔ تازه روی سرور نبود، همان ناوبریِ سادهٔ قبلی چاپ می‌شود (سازگاری کامل). */
+$jv_pager = function_exists( 'javan_seda_comments_pager' );
+if ( $jv_pager ) {
+	echo javan_seda_comments_heading(); /* html امن؛ داخل تابع escape شده است */
+	echo javan_seda_comments_pager( array( 'position' => 'top' ) );
+} elseif ( $jv_have && get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) {
+	?>
 <nav id="comment-nav-above">
 
 <div class="nav-previous"><?php previous_comments_link( 'دیدگاه‌های قبلی' ); ?></div>
@@ -56,10 +66,13 @@ $jv_need_login = ( get_option( 'comment_registration' ) && ! is_user_logged_in()
 <div class="nav-next"><?php next_comments_link( 'دیدگاه‌های جدید' ); ?></div>
 
 </nav>
-
-<?php endif; ?>
+	<?php
+}
+?>
 
 <ol class="commentlist"><?php if ( $jv_have ) { wp_list_comments( array( 'callback' => 'comment_loop_cd' ) ); } else { wp_list_comments( array( 'callback' => 'comment_loop_cd' ), $jv_fallback ); } ?></ol>
+
+<?php if ( $jv_pager ) { echo javan_seda_comments_pager( array( 'position' => 'bottom' ) ); } ?>
 
 <?php elseif ( ! comments_open() && ! is_page() && post_type_supports( get_post_type(), 'comments' ) ) : ?>
 

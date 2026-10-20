@@ -83,6 +83,17 @@ if ( is_readable( $_javan_seda_home_meta ) ) {
 }
 unset( $_javan_seda_home_meta );
 
+/* ---------------------------------------------------------------------------
+   v3.5.4 — «دیدگاه‌ها» (inc/ab-comments.php)
+   صفحه‌بندیِ استانداردِ وردپرس روی فرانت + ناوبریِ شماره‌دار و شمارشِ فارسی.
+   تعداد در «تنظیمات قالب → کنترل رابط» است؛ خاموشی: JAVANSEDA_COMMENT_PAGING.
+   ------------------------------------------------------------------------- */
+$_javan_seda_comments = trailingslashit( get_template_directory() ) . 'inc/ab-comments.php';
+if ( is_readable( $_javan_seda_comments ) ) {
+	require_once $_javan_seda_comments;
+}
+unset( $_javan_seda_comments );
+
 /* اگر لایۀ بالا روی سرور نبود، همه‌چیز دقیقاً مثل قبل کار می‌کند: نامک singer
    و آدرسِ همان صفحۀ «همهٔ خواننده‌ها». (هیچ فایلی به تنهایی نمی‌تواند بشکند.) */
 if ( ! function_exists( 'javan_seda_artist_tax' ) ) {

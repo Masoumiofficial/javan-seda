@@ -165,25 +165,48 @@ if ( is_array( $jv_ext ) ) {
 }
 $lic[] = 'افزونۀ رمزگشا: ' . ( $jv_sim ? implode( ' · ', $jv_sim ) : 'هیچ (نه ionCube، نه ixed، نه sourceGuard)' );
 $lic[] = 'php.ini: ' . ( php_ini_loaded_file() ? php_ini_loaded_file() : '?' );
-foreach ( array( 'functions.php', 'RTL_License_41d6c5f704e3a746.php' ) as $jv_lf ) {
+/* خودِ سطرِ اولِ فایلِ رمزدار این معنی را می‌دهد:
+ *   if(extension_loaded('ionCube Loader')){die('The file … is corrupted.');}
+ * پس «corrupted» فقط وقتی ظاهر می‌شود که لودر **حاضر** است ولی فایل را decode
+ * نکرده — یعنی بایت‌های فایلِ روی سرور با چیزی که لودر انتظار دارد نمی‌خواند
+ * (بازنویسیِ خط‌شکن یا truncate‌شدن در transfer، یا buildِ نامتقابل با نسخهٔ PHP).
+ * اگر لودر اصلاً نصب نبود، پیامِ دیگری می‌دادید: «ionCube Loader … needs to be installed». */
+$jv_ref = array(
+	'functions.php'                      => array( 95498, 'd99663ca6df0b6d8' ),
+	'RTL_License_41d6c5f704e3a746.php'    => array( 64615, '8e4e2975b4c9df88' ),
+);
+foreach ( $jv_ref as $jv_lf => $jv_expect ) {
 	$jv_p = ( isset( $theme ) && $theme ? $theme : dirname( __FILE__ ) ) . '/' . $jv_lf;
-	if ( is_file( $jv_p ) ) {
-		$jv_h = (string) @file_get_contents( $jv_p, false, null, 0, 130 );
-		$lic[] = sprintf(
-			'%s: %d B · %s · sha256 %s',
-			$jv_lf,
-			(int) filesize( $jv_p ),
-			( false !== strpos( $jv_h, 'ICB0' ) ) ? 'ICB0 ✓ (رمزِ لایسنسِ اصلی)' : 'ICB0 ✗ (این فایل رمزگذاری‌شده نیست!)',
-			substr( (string) @hash( 'sha256', (string) @file_get_contents( $jv_p ) ), 0, 20 )
-		);
-	} else {
+	if ( ! is_file( $jv_p ) ) {
 		$lic[] = $jv_lf . ': پیدا نشد ⚠';
+		continue;
 	}
+	$jv_raw = (string) @file_get_contents( $jv_p );
+	$jv_sz  = strlen( $jv_raw );
+	$jv_sha = (string) @hash( 'sha256', $jv_raw );
+	$jv_crlf = substr_count( $jv_raw, "\r\n" );
+	$jv_lf_n = substr_count( $jv_raw, "\n" );
+	$jv_enc  = ( $jv_crlf === $jv_lf_n && $jv_crlf > 0 ) ? 'CRLF × ' . $jv_crlf
+		: ( ( 0 === $jv_crlf ) ? 'LF × ' . $jv_lf_n : '⚠ خط‌شکنِ مخلوط (' . $jv_crlf . ' CRLF / ' . $jv_lf_n . " LF)" );
+	$lic[] = sprintf(
+		"%s\n    اندازه %d B · sha256 %s…\n    هدرِ رمز: %s · انتها: %s · خط‌شکن: %s\n    نسبت به کپیِ مخزن: %s",
+		$jv_lf,
+		$jv_sz,
+		substr( $jv_sha, 0, 20 ),
+		( false !== strpos( substr( $jv_raw, 0, 200 ), 'ICB0' ) ) ? 'ICB0 ✓' : 'ICB0 ✗ (رمزگذاری‌نشده!)',
+		( "\n" === substr( $jv_raw, -1 ) ? 'newline دارد' : 'بدونِ newlineِ انتهایی' ),
+		$jv_enc,
+		( $jv_sz === $jv_expect[0] && 0 === strpos( $jv_sha, $jv_expect[1] ) )
+			? 'دقیقاً همان بایت‌های مخزن (يعنی بسته‌های کاملِ قالب جایگزینش کرده‌اند)'
+			: '✦ با کپیِ مخزن فرق دارد ← ' . $jv_expect[0] . ' B / ' . $jv_expect[1] . '… (مخزن)'
+	);
 }
-$lic[] = 'مرجعِ مخزن: functions.php = 95498 B / d99663ca6df0b6d8…  |  RTL_License = 64615 B / 8e4e2975b4c9df88…';
+$lic[] = '⚠ نکتهٔ مهم: کپیِ «مخزن» دلیلِ سلامت نیست. این فایل از یک بارگذاریِ دستی وارد گیت‌هاب شده و ما هیچ‌وقت آن را با فایلِ اصلیِ rtl-theme.com مقایسه نکرده‌ایم. تا نسخۀ ۳.۴.۸ پوسته فقط به‌صورت drop-in نصب می‌شد (بدونِ functions.php) و فایلِ لایسنسِ اصلیِ سرور دست‌نخورده می‌ماند؛ از ۳.۴.۹ بستهٔ کاملِ قالب این فایل را هم بازنویسی کرد. اگر «corrupted» از همان اولِ نصبِ بستهٔ کامل شروع شد، درمانش **برگرداندنِ فایلِ اصلیِ خودِ فروشنده** است (از فایلِ دانلودیِ rtl-theme.com، نه از بکاپِ بعد از ۳.۴.۹) و از این پس فقط drop-in نصب شود.';
+
 if ( PHP_VERSION_ID >= 80300 ) {
-	$lic[] = '⚠ نتیجه: PHP 8.3 یا بالاتر است. فایل‌های لایسنسِ این قالب در مرداد ۱۴۰۲ با PHP Encoder رمزگذاری شده‌اند و روی 8.3/8.4 توسط لودر باز نمی‌شوند؛ در این حالت خودِ سطرِ اولِ فایل اجرا می‌شود و die() پیامِ «The file … is corrupted.» را چاپ می‌کند. پس این پیام تقصیر کدِ پوسته نیست.';
-	$lic[] = '  ⇒ در پنل هاست نسخۀ PHP را روی 8.1 یا 8.2 بگذارید (DirectAdmin: Account/Domain → PHP Version Selector · cPanel: Select PHP Version) و مطمئن شوید افزونۀ ionCube Loader برای همان نسخه فعال است. اگر فقط PHP 8.3+ دارید، از rtl-theme.com buildِ سازگار با PHP 8 بخواهید.';
+	$lic[] = 'نتیجه (۱): PHP 8.3/8.4 است. لودرِ ionCube نسخه‌به‌نسخه است؛ اگر برای این نسخۀ PHP لودرِ سازگار نصب نباشد، decode انجام نمی‌شود و همان die() اجرا می‌شود. ⇒ یا PHP را روی 8.1/8.2 بگذارید، یا لودرِ ionCubeِ همان نسخه را از هاست بخواهید.';
+	$lic[] = 'نتیجه (۲): اگر نسخۀ PHP را عوض کردید و خطا همان‌جا ماند، علتش بایت‌های فایل است نه PHP — بخشِ بالا را ببینید.';
+	$lic[] = 'نتیجه (۳): هیچ دو سطر بالا را با هم عوض نکنید؛ یکی‌یکی تست کنید تا معلوم شود کدام رفع کرده است.';
 } elseif ( PHP_VERSION_ID >= 80000 ) {
 	$lic[] = 'نتیجه: PHP 8.0/8.1 — معمولاً همین بازه برای این فایل‌ها درست کار می‌کند. اگر همچنان «corrupted» است، یا لودرِ همسان فعال نیست یا فایلِ روی سرور با فایلِ لایسنسِ خودِ سرور هم‌خوانی ندارد (بکاپِ همان سرور را برگردانید، نه کپیِ مخزن).';
 } else {

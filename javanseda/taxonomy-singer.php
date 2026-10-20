@@ -1,4 +1,19 @@
 <?php
+/* ─────────────── جوان‌صدا ۳.۵.۰ — قفلِ بازگشتِ امن ───────────────
+   اگر این قالب (یا هر چیزی که لایۀ ما به آن افزوده) روی این سرور خطا بدهد،
+   بدون پاک‌کردن هیچ فایلی همین صفحه را به نسخۀ «اصلیِ فروشنده» برگردانید:
+       define( 'JAVANSEDA_ORIGINAL_TEMPLATES', true );   // در wp-config.php
+   فایلِ اصلی همین مسیر: original/taxonomy-singer.php
+   ─────────────────────────────────────────────────────────────── */
+if ( defined( 'JAVANSEDA_ORIGINAL_TEMPLATES' ) && JAVANSEDA_ORIGINAL_TEMPLATES ) {
+	$jv_orig = dirname( __FILE__ ) . '/original/taxonomy-singer.php';
+	if ( is_readable( $jv_orig ) ) {
+		include $jv_orig;
+		return;
+	}
+}
+?>
+<?php
 /**
  * سازگاری (v3.4.7) — صفحۀ اختصاصی هنرمند به taxonomy-artist.php رفته است.
  *

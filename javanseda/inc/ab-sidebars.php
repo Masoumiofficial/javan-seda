@@ -245,15 +245,15 @@ if ( ! function_exists( 'javan_seda_sidebar' ) ) {
 if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 	function javan_seda_expected_hashes() {
 	return array(
-		'single.php'                => '974d71338fb89856abc086031dc17223ecc19dc83e8d7f4257e7ddda4a228224',
-		'page.php'                  => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
+		'single.php'                => '49ae5a16bd29008f4237317e624cbd64443e2f95318877c0c3ccab25f15f6435',
+		'page.php'                  => '38357a3c30ec601c46e7840bc81800387001718316417808dc467dcb29e11b4f',
 		'myfunctions.php'           => '06b905708f29132b2da46239e411b29798fd3c1d3284ccab613f52877385b123',
-		'style.css'                 => 'a074c5c8b35570bf429091ea6b7f5f9a5db155cda33e7ae49494f9057c0081ec',
-		'footer.php'                => '763bb6dbad2f26ae9df1e2b41270863791c2e7a122a5399d8a62179ee25697b3',
-		'header.php'                => 'f5174209fae4506f9952e5ae838716df21bd3f1cbea413675a42863d585306dc',
-		'home.php'                  => '966a2e2a68d1d683ab5ce0d365865357134dc337a79a6b8d79fb1759e1f4feb9',
-		'404.php'                   => 'ec68e3a768d8893d628ac64c1ed8c69c36199e100b553a71323182a822b55849',
-		'search.php'                => '4ba4d8ad7f2bb134a4b7cefd116d5e27f3a5e4a787e65cc8fbae2b96c599a288',
+		'style.css'                 => 'e2d7d3e7723fa2b6f8793c05d0d7c8e4f81f528b61d1a80e40edab70a609e0e2',
+		'footer.php'                => 'a0d08d8d092119f4b8718701ff8d94a6a93b43fb8558034aa178550d147ea654',
+		'header.php'                => '9b7fb125a30b2243e8e6d43bb86eaebeaa71d2d7031c5a7e3c469a06d14328de',
+		'home.php'                  => '73ce96a810f28bf383ea50843631fc887ca94d4d75888b33554a95406fd589f3',
+		'404.php'                   => '6a128f404ddf2142924e7af70901b089c3265a61aca0dacb28d007f7f94d9801',
+		'search.php'                => '79fabcfefa0a2b0169205ba8bb8cec0a4609ae5edba6deaebfa0efd2046b1eb5',
 		'inc/vip_slider.php'        => '988b7cba33eeaab8fefae98a010e5e57ec3d94f627acc3f13601be9115379c2d',
 		'inc/songs_post.php'        => '82348ad0c372f90cedc1aad7042f075a2a669119682d643c44870b7c944259e0',
 		'inc/tarlanweb_player.php'  => '20a59a9df1cba22f6495a034a04be4dfcf5187168ade479fa80d692d907ac063',
@@ -262,14 +262,14 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 		'inc/ab-seo.php'            => '6ff2158a004966a17eaf8dd6f006d25fba0280da7dd92786e22a6171a957c31a',
 		'inc/ab-controls.php'       => 'c3157106aeb83713c301317e224d6c43b78dc5e73f2c7633ceac92ff2fa86fbd',
 		'inc/theme-options.php'     => '900b93944e0d323a8df6e8012d99f2bca9cafd0af65b7f0e35fe3b50d3ba0101',
-		'taxonomy-artist.php'       => '094b4fff7427717a0858780d742ff7a121f994bc69d646f9ca2147172340cda1',
-		'taxonomy-singer.php'       => '314121b1277eaf1afff36382ad87691fae56f1e743395cf0078240a8fcfc6807',
+		'taxonomy-artist.php'       => '01b7a9bb4ecfd56bbc2272d4d6e8b0d2e595ad828ea204f4dbcc821f2c633382',
+		'taxonomy-singer.php'       => 'dc12629a289762ba152076ff99ba6f277e5bac4d8a29a66158ff69b59a64cb0e',
 		'inc/ab-tax-artist.php'     => '7ebfd9c7f9c7c12cbe4f1215877bccf7212c93e5c5f5636e7f6bca1fc2989f42',
 		'inc/ab-credits.php'        => '02ccdfb730a2a2fad9f2d731f07fea5a1491f9da3059f753f0e813a06079719a',
 		'inc/ab-terms-ui.php'       => '1e5a61132ea63c6bc89ae88bd36c7fa24ba380daa7c92e875743eec7272bbd3a',
-		'artist-template.php'       => 'b70caec7651d8cef5cc1c1ad5e6aa6f1decf32253b56e2eb677223df50429dea',
+		'artist-template.php'       => 'e782dcc237d50d713880ede80751d2e63ae66b99f9072828b2e47bfb9b091a53',
 		'inc/artist_slider.php'     => 'd54f1bf3869c41afc04b80a1dfd4ddf336357317ea45b4bd375f6ee289919b03',
-		'category.php'              => 'abf7cd768eb63f1af27d9d4fd2f61d96a7e5a83a4840bd053fd17a8b6a8d5634',
+		'category.php'              => '17376a4226bd172490852afc9bae990f3cf2393eae7fc782874fc1ee738a6d9c',
 	);
 }
 }

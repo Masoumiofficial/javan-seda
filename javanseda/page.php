@@ -1,3 +1,18 @@
+<?php
+/* ─────────────── جوان‌صدا ۳.۵.۰ — قفلِ بازگشتِ امن ───────────────
+   اگر این قالب (یا هر چیزی که لایۀ ما به آن افزوده) روی این سرور خطا بدهد،
+   بدون پاک‌کردن هیچ فایلی همین صفحه را به نسخۀ «اصلیِ فروشنده» برگردانید:
+       define( 'JAVANSEDA_ORIGINAL_TEMPLATES', true );   // در wp-config.php
+   فایلِ اصلی همین مسیر: original/page.php
+   ─────────────────────────────────────────────────────────────── */
+if ( defined( 'JAVANSEDA_ORIGINAL_TEMPLATES' ) && JAVANSEDA_ORIGINAL_TEMPLATES ) {
+	$jv_orig = dirname( __FILE__ ) . '/original/page.php';
+	if ( is_readable( $jv_orig ) ) {
+		include $jv_orig;
+		return;
+	}
+}
+?>
 <?php get_header(''); ?>
 <?php get_template_part('inc/breadcrumbs'); ?>
 <!-- centers_box -->

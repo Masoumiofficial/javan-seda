@@ -23,6 +23,10 @@
 if ( ! function_exists( 'javan_seda_check_out' ) ) {
 	/** یک بلوکِ خروجی، بلافاصله flush می‌شود تا اگر بعدش fatal داد، متن نپرد */
 	function javan_seda_check_out( $title, $body = '' ) {
+		if ( ! empty( $GLOBALS['javan_seda_check_raw'] ) ) {
+			echo '== ' . $title . ' ==' . "\n" . ( '' !== $body ? $body . "\n" : '' );
+			return;
+		}
 		echo '<h2>' . htmlspecialchars( $title ) . '</h2>';
 		if ( '' !== $body ) {
 			echo '<pre>' . htmlspecialchars( $body ) . '</pre>';
@@ -83,16 +87,20 @@ if ( ! function_exists( 'mb_cut' ) ) {
 	}
 }
 
+$GLOBALS['javan_seda_check_raw'] = ( isset( $_GET['raw'] ) && '1' === (string) $_GET['raw'] );
+
 @ini_set( 'display_errors', '1' );
 @error_reporting( E_ALL );
 header( 'Content-Type: text/html; charset=utf-8' );
 header( 'Cache-Control: no-store' );
+if ( empty( $GLOBALS['javan_seda_check_raw'] ) ) {
 echo '<!doctype html><html dir="ltr"><head><meta charset="utf-8"><title>javan-seda check</title>'
 	. '<style>body{font:14px/1.7 tahoma,sans-serif;max-width:900px;margin:24px auto;padding:0 14px}'
 	. 'h1{font-size:19px}h2{font-size:15px;margin:22px 0 6px}pre{background:#f4f4f4;padding:10px;'
 	. 'white-space:pre-wrap;word-break:break-word;border-left:3px solid #185ADB;font:12px/1.6 monospace;direction:ltr}'
 	. '.bad{color:#b00}.ok{color:#080}</style></head><body>';
 echo '<h1>جوان‌سدا — چراغ‌قوهٔ عیب‌یابی</h1>';
+}
 
 $admin_mode = ( isset( $_GET['admin'] ) && '1' === (string) $_GET['admin'] );
 
@@ -139,6 +147,50 @@ javan_seda_check_out(
 	. 'حالت: ' . ( $admin_mode ? 'پیشخوان (admin=1)' : 'عادی' )
 );
 
+/* ---------- ۱-پ) PHP و لودرِ لایسنس (مهم‌ترین بخش وقتی سایت با «corrupted» می‌میرد) ---------- */
+$lic = array();
+$lic[] = 'PHP: ' . PHP_VERSION . '  (PHP_VERSION_ID=' . PHP_VERSION_ID . ')  ·  ' . php_uname( 's' );
+$lic[] = 'ionCube Loader: ' . ( extension_loaded( 'ionCube Loader' )
+	? 'بارگذاری شده · نسخه ' . ( phpversion( 'ionCube Loader' ) ? phpversion( 'ionCube Loader' ) : '?' )
+	: 'بارگذاری نشده ✗' );
+$jv_sim = array();
+$jv_ext = function_exists( 'get_loaded_extensions' ) ? @get_loaded_extensions() : array();
+if ( is_array( $jv_ext ) ) {
+	foreach ( $jv_ext as $jv_e ) {
+		if ( false !== stripos( $jv_e, 'ioncube' ) || false !== stripos( $jv_e, 'ixed' ) || false !== stripos( $jv_e, 'guard' ) ) {
+			$jv_sim[] = $jv_e . ( phpversion( $jv_e ) ? ' ' . phpversion( $jv_e ) : '' );
+		}
+	}
+}
+$lic[] = 'افزونۀ رمزگشا: ' . ( $jv_sim ? implode( ' · ', $jv_sim ) : 'هیچ (نه ionCube، نه ixed، نه sourceGuard)' );
+$lic[] = 'php.ini: ' . ( php_ini_loaded_file() ? php_ini_loaded_file() : '?' );
+foreach ( array( 'functions.php', 'RTL_License_41d6c5f704e3a746.php' ) as $jv_lf ) {
+	$jv_p = ( isset( $theme ) && $theme ? $theme : dirname( __FILE__ ) ) . '/' . $jv_lf;
+	if ( is_file( $jv_p ) ) {
+		$jv_h = (string) @file_get_contents( $jv_p, false, null, 0, 130 );
+		$lic[] = sprintf(
+			'%s: %d B · %s · sha256 %s',
+			$jv_lf,
+			(int) filesize( $jv_p ),
+			( false !== strpos( $jv_h, 'ICB0' ) ) ? 'ICB0 ✓ (رمزِ لایسنسِ اصلی)' : 'ICB0 ✗ (این فایل رمزگذاری‌شده نیست!)',
+			substr( (string) @hash( 'sha256', (string) @file_get_contents( $jv_p ) ), 0, 20 )
+		);
+	} else {
+		$lic[] = $jv_lf . ': پیدا نشد ⚠';
+	}
+}
+$lic[] = 'مرجعِ مخزن: functions.php = 95498 B / d99663ca6df0b6d8…  |  RTL_License = 64615 B / 8e4e2975b4c9df88…';
+if ( PHP_VERSION_ID >= 80300 ) {
+	$lic[] = '⚠ نتیجه: PHP 8.3 یا بالاتر است. فایل‌های لایسنسِ این قالب در مرداد ۱۴۰۲ با PHP Encoder رمزگذاری شده‌اند و روی 8.3/8.4 توسط لودر باز نمی‌شوند؛ در این حالت خودِ سطرِ اولِ فایل اجرا می‌شود و die() پیامِ «The file … is corrupted.» را چاپ می‌کند. پس این پیام تقصیر کدِ پوسته نیست.';
+	$lic[] = '  ⇒ در پنل هاست نسخۀ PHP را روی 8.1 یا 8.2 بگذارید (DirectAdmin: Account/Domain → PHP Version Selector · cPanel: Select PHP Version) و مطمئن شوید افزونۀ ionCube Loader برای همان نسخه فعال است. اگر فقط PHP 8.3+ دارید، از rtl-theme.com buildِ سازگار با PHP 8 بخواهید.';
+} elseif ( PHP_VERSION_ID >= 80000 ) {
+	$lic[] = 'نتیجه: PHP 8.0/8.1 — معمولاً همین بازه برای این فایل‌ها درست کار می‌کند. اگر همچنان «corrupted» است، یا لودرِ همسان فعال نیست یا فایلِ روی سرور با فایلِ لایسنسِ خودِ سرور هم‌خوانی ندارد (بکاپِ همان سرور را برگردانید، نه کپیِ مخزن).';
+} else {
+	$lic[] = 'نتیجه: PHP 5/7 — بازۀ امنِ فایل‌های لایسنسِ این قالب.';
+}
+javan_seda_check_out( 'PHP، لودرِ لایسنس و فایل‌های رمزگذاری‌شده', implode( "
+", $lic ) );
+
 /* ---------- ۳) فایل‌های پوسته ---------- */
 $watch = array(
 	'style.css',
@@ -168,22 +220,6 @@ foreach ( $watch as $rel ) {
 		$rel,
 		is_file( $f ) ? 'هست  ' . date( 'Y-m-d H:i', (int) filemtime( $f ) ) : 'نیست',
 		is_file( $f ) ? filesize( $f ) . 'B' : '-'
-	);
-}
-/* فایل‌های لایسنس (ionCube) — اگر این‌ها جابه‌جا شوند، کل سایت می‌میرد */
-foreach ( array( 'functions.php', 'RTL_License_41d6c5f704e3a746.php' ) as $jv_lic ) {
-	$jv_f = $theme . '/' . $jv_lic;
-	if ( ! is_file( $jv_f ) ) {
-		$lines[] = sprintf( '%-34s %s', $jv_lic, 'نیست ⚠' );
-		continue;
-	}
-	$jv_head = (string) @file_get_contents( $jv_f, false, null, 0, 90 );
-	$lines[] = sprintf(
-		'%-34s %8d B · %s · sha256 %s',
-		$jv_lic,
-		(int) filesize( $jv_f ),
-		( false !== strpos( $jv_head, 'ICB0' ) ) ? 'ICB0 ✓' : 'ICB0 ✗',
-		substr( (string) @hash( 'sha256', (string) @file_get_contents( $jv_f ) ), 0, 16 )
 	);
 }
 $lines[] = 'wp-content/uploads: ' . ( is_dir( $root . '/wp-content/uploads' ) ? 'نوشته‌پذیر? ' . ( is_writable( $root . '/wp-content/uploads' ) ? 'بله' : 'نه' ) : 'نیست' );

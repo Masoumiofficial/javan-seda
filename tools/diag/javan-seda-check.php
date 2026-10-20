@@ -170,6 +170,22 @@ foreach ( $watch as $rel ) {
 		is_file( $f ) ? filesize( $f ) . 'B' : '-'
 	);
 }
+/* فایل‌های لایسنس (ionCube) — اگر این‌ها جابه‌جا شوند، کل سایت می‌میرد */
+foreach ( array( 'functions.php', 'RTL_License_41d6c5f704e3a746.php' ) as $jv_lic ) {
+	$jv_f = $theme . '/' . $jv_lic;
+	if ( ! is_file( $jv_f ) ) {
+		$lines[] = sprintf( '%-34s %s', $jv_lic, 'نیست ⚠' );
+		continue;
+	}
+	$jv_head = (string) @file_get_contents( $jv_f, false, null, 0, 90 );
+	$lines[] = sprintf(
+		'%-34s %8d B · %s · sha256 %s',
+		$jv_lic,
+		(int) filesize( $jv_f ),
+		( false !== strpos( $jv_head, 'ICB0' ) ) ? 'ICB0 ✓' : 'ICB0 ✗',
+		substr( (string) @hash( 'sha256', (string) @file_get_contents( $jv_f ) ), 0, 16 )
+	);
+}
 $lines[] = 'wp-content/uploads: ' . ( is_dir( $root . '/wp-content/uploads' ) ? 'نوشته‌پذیر? ' . ( is_writable( $root . '/wp-content/uploads' ) ? 'بله' : 'نه' ) : 'نیست' );
 $lines[] = 'wp-content نوشتنی: ' . ( is_writable( $root . '/wp-content' ) ? 'بله' : 'نه' );
 javan_seda_check_out( 'فایل‌های پوسته (نسخهٔ واقعیِ روی سرور)', implode( "\n", $lines ) );

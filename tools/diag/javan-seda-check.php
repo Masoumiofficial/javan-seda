@@ -14,6 +14,7 @@
  *     https://سایت شما/wp-content/javan-seda-check.php            ← حالت عادی
  *     https://سایت شما/wp-content/javan-seda-check.php?admin=1    ← حالت پیشخوان
  *     https://سایت شما/wp-content/javan-seda-check.php?admin=1&full=1     ← اجرای واقعیِ داشبورد
+ *     https://سایت شما/wp-content/javan-seda-check.php?admin=1&route=/artists/   ← اجرای یک صفحۀ مشخص و چاپِ خطای همان صفحه
  *   خروجی را برای ما بفرستید و سپس همین فایل را پاک کنید.
  *
  * بعد از اتمام کار پاکش کنید (این فایل عمداً هیچ دادهٔ حساسی چاپ نمی‌کند:
@@ -307,6 +308,133 @@ if ( function_exists( 'get_terms' ) ) {
 	$tests[] = 'get_terms → ' . ( is_wp_error( $t ) ? 'WP_Error: ' . $t->get_error_message() : (int) count( $t ) . ' ترم' );
 }
 javan_seda_check_out( 'آزمایشِ تابع‌های حساس', implode( "\n", $tests ) );
+
+/* ---------- ۶-پ) اجرای یک مسیرِ واقعی (?admin=1&route=/artists/) ----------
+ * تا وقتی خطا با `die()` تمام شود، هیچ لاگی روی سرور نمی‌ماند. این حالت همان
+ * مسیری که شما در مرورگر می‌زنید را روی همین سرور اجرا می‌کند (با همان PHP،
+ * همان افزونه‌ها، همان پوسته) و فقط «چرا نمرندر شد» را چاپ می‌کند: متنِ خطای
+ * مرگبار با فایل و شمارهٔ سطر، وضعیتِ شرطی‌ها، و نتیجهٔ کوئری.
+ * نمونه:  javan-seda-check.php?admin=1&route=/artists/
+ *          javan-seda-check.php?admin=1&route=/artist/mohsen-yeganeh/&raw=1
+ * -------------------------------------------------------------------------- */
+if ( ! function_exists( 'javan_seda_route_report' ) ) {
+	/** گزارشِ حالتِ «مسیر» — هم از پایانِ اسکریپت و هم از shutdown صدا زده می‌شود */
+	function javan_seda_route_report() {
+		if ( ! empty( $GLOBALS['javan_seda_route_done'] ) ) {
+			return;
+		}
+		$GLOBALS['javan_seda_route_done'] = true;
+
+		$lines = array();
+		$e     = function_exists( 'error_get_last' ) ? error_get_last() : null;
+		if ( is_array( $e ) && in_array( (int) $e['type'], array( 1, 2, 4, 8, 16, 32, 64, 4096, 8192 ), true ) ) {
+			$lines[] = 'خطا (' . (int) $e['type'] . '): ' . $e['message'];
+			$lines[] = 'در: ' . ( isset( $e['file'] ) ? $e['file'] : '?' ) . ' : سطر ' . ( isset( $e['line'] ) ? (int) $e['line'] : '?' );
+			$f = isset( $e['file'] ) ? $e['file'] : '';
+			if ( '' !== $f && is_readable( $f ) && ! empty( $e['line'] ) ) {
+				$head = @file_get_contents( $f, false, null, 0, 400 );
+				if ( false === $head || false === strpos( $head, 'ICB0' ) ) { // از فایلِ رمزدار سطر چاپ نمی‌کنیم
+					$all   = file( $f );
+					$from  = max( 0, (int) $e['line'] - 3 );
+					$to    = min( count( $all ), $from + 5 );
+					$snip  = array();
+					for ( $i = $from; $i < $to; $i++ ) {
+						$snip[] = '    ' . ( $i + 1 ) . ' | ' . trim( (string) $all[ $i ] );
+					}
+					$lines[] = "سطرهای اطرافِ خطا:\n" . implode( "\n", $snip );
+				}
+			}
+			if ( preg_match( '#public_html/wp-content/([^:"]+)#', $e['message'], $m ) ) {
+				$lines[] = 'مسیرِ مقصر (نسبی): wp-content/' . $m[1];
+			}
+		} else {
+			$lines[] = 'هیچ خطای مرگباری برای این مسیر ثبت نشد.';
+		}
+		if ( ! empty( $GLOBALS['javan_seda_route_lines'] ) ) {
+			$lines = array_merge( $lines, (array) $GLOBALS['javan_seda_route_lines'] );
+		}
+		$lines[] = '—— اگر «خطا» در فایل‌های خودِ پوسته (inc/ab-*.php یا myfunctions.php) است، مسیر و شمارهٔ سطر را برای ما بفرستید. ——';
+
+		javan_seda_check_out( 'نتیجهٔ اجرای مسیر: ' . ( isset( $GLOBALS['javan_seda_route'] ) ? $GLOBALS['javan_seda_route'] : '?' ), implode( "\n", $lines ) );
+
+		if ( empty( $GLOBALS['javan_seda_check_raw'] ) ) {
+			echo '</body></html>';
+		}
+	}
+}
+
+if ( $admin_mode && isset( $_GET['route'] ) && '' !== trim( (string) $_GET['route'] ) ) {
+
+	$route = trim( (string) $_GET['route'] );
+	if ( '/' !== substr( $route, 0, 1 ) ) {
+		$route = '/' . $route;
+	}
+
+	$GLOBALS['javan_seda_route']       = $route;
+	$GLOBALS['javan_seda_route_lines'] = array();
+	$GLOBALS['javan_seda_check_dead']  = true; // گزارشِ این بخش خودش چاپ می‌شود
+	register_shutdown_function( 'javan_seda_route_report' );
+
+	javan_seda_check_out( 'اجرای مسیر: ' . $route, 'در حال بالا آوردنِ همان درخواست… (بدنۀ HTML چاپ نمی‌شود)' );
+
+	$qpos                    = strpos( $route, '?' );
+	$_SERVER['REQUEST_URI']  = $route;
+	$_SERVER['QUERY_STRING'] = ( false === $qpos ) ? '' : substr( $route, $qpos + 1 );
+
+	/* پارامترهای خودِ پروب نباید به درخواستِ واقعی برسند */
+	foreach ( array( 'route', 'admin', 'full', 'raw', 'p', 'page_id', 'post_type', 'taxonomy', 'term', 'name' ) as $k ) {
+		unset( $_GET[ $k ], $_POST[ $k ] );
+	}
+
+	ob_start();
+	if ( function_exists( 'wp' ) ) {
+		@wp();
+	}
+	$loader = $root . '/wp-includes/template-loader.php';
+	if ( is_readable( $loader ) ) {
+		@require_once $loader;   // خودِ وردپرس do_action('template_redirect') را اینجا می‌زند
+	}
+	$buf = ob_get_contents();
+	ob_end_clean();
+
+	$len           = strlen( (string) $buf );
+	$rl            = &$GLOBALS['javan_seda_route_lines'];
+	$rl[]          = 'طول بدنهٔ پاسخ: ' . $len . ' بایت' . ( $len < 700 ? '  ← صفحه عملاً رندر نشده' : '' );
+	if ( false !== stripos( (string) $buf, 'is corrupted' ) ) {
+		$rl[] = 'در بدنه: «is corrupted» ⇒ functions.php هنوز decode نمی‌شود؛ نسخۀ PHP هاست را پایین بیاورید (راجع به این فایل، بخشِ «PHP و لودرِ لایسنس» را ببینید).';
+	}
+	if ( false !== stripos( (string) $buf, 'There has been a critical error' ) || false !== stripos( (string) $buf, 'خطای مهم' ) ) {
+		$rl[] = 'در بدنه: پیامِ «خطای مهم وردپرس» — یعنی WP_Recovery_Mode آن را گرفته؛ متنِ اصلی در «خطا»ی همین گزارش است.';
+	}
+	if ( function_exists( 'is_404' ) ) {
+		$rl[] = 'شرطی‌ها: is_404=' . ( is_404() ? 'بله' : 'نه' ) . ' · is_archive=' . ( is_archive() ? 'بله' : 'نه' )
+			. ' · is_tax=' . ( is_tax() ? 'بله' : 'نه' ) . ' · is_singular=' . ( is_singular() ? 'بله' : 'نه' )
+			. ' · is_home=' . ( is_home() ? 'بله' : 'نه' ) . ' · is_search=' . ( is_search() ? 'بله' : 'نه' );
+	}
+	if ( function_exists( 'get_queried_object' ) ) {
+		$o = get_queried_object();
+		if ( is_object( $o ) && isset( $o->taxonomy ) ) {
+			$rl[] = 'ترمِ درخواستی: ' . $o->taxonomy . '/' . ( isset( $o->slug ) ? $o->slug : '?' ) . ' (id ' . ( isset( $o->term_id ) ? (int) $o->term_id : 0 ) . ')'
+				. ' · count=' . ( isset( $o->count ) ? (int) $o->count : '?' );
+		} elseif ( is_object( $o ) && isset( $o->post_type ) ) {
+			$rl[] = 'نوشتهٔ درخواستی: ' . $o->post_type . '/' . ( isset( $o->post_name ) ? $o->post_name : '?' );
+		} else {
+			$rl[] = 'شیءِ درخواستی: هیچ (یعنی مسیر به هیچ نوشته/ترمی نگاشت نشد ←_rewrite/فلشِ پیوندها)';
+		}
+	}
+	if ( isset( $GLOBALS['wp_query'] ) && is_object( $GLOBALS['wp_query'] ) ) {
+		$q = $GLOBALS['wp_query'];
+		$rl[] = 'کوئری: found_posts=' . (int) $q->found_posts . ' · posts=' . count( (array) $q->posts )
+			. ' · max_num_pages=' . (int) $q->max_num_pages . ' · is_main=' . ( $q->is_main_query() ? 'بله' : 'نه' );
+		if ( ! empty( $q->request ) ) {
+			$rl[] = 'SQL: ' . mb_cut( preg_replace( '/\s+/', ' ', (string) $q->request ), 320 );
+		}
+	}
+	$rl[] = 'حافظۀ مصرفی: ' . round( memory_get_usage( true ) / 1048576, 1 ) . ' MB از ' . ini_get( 'memory_limit' );
+
+	javan_seda_route_report();
+	return;
+}
 
 /* ---------- ۷) اجرای تمام‌قدِ داشبورد (?admin=1&full=1) ---------- */
 if ( $admin_mode && isset( $_GET['full'] ) && '1' === (string) $_GET['full'] && is_file( $root . '/wp-admin/admin.php' ) ) {

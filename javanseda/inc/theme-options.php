@@ -23,14 +23,25 @@ function custom_theme_options() {
 ),
 'sections'=> array( 
 array('id'=>'general','title'=>'همگانی'),
-array('id'=>'socials','title'=>'شبکه های اجتماعی'),
 array('id'=>'homes','title'=>'صفحه اصلی'),
 array('id'=>'dl_pages','title'=>'صفحه دانلود آهنگ'),
-array('id'=>'ads1','title'=>'تبلیغات'),
+array('id'=>'ab_ui','title'=>'کنترل رابط'),
 array('id'=>'footer','title'=>'پانوشت'),
+array('id'=>'socials','title'=>'شبکه های اجتماعی'),
+array('id'=>'ads1','title'=>'تبلیغات'),
 ),
 'settings'=>array( 
 // General
+array(
+'id'=>'general_guide',
+'label'=>'',
+'desc'=>'<strong>کمترین نیاز به تغییر.</strong> اگر نشانک و لوگو را یک بار بگذارید، بقیهٔ این تب اختیاری است. «کلمه کلیدی» تیترِ جایگزینِ هدر است و اگر خالی بماند نام سایت چاپ می‌شود.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'general',
+'class'=>'ab-guide'
+),
+
 array(
 'id'=>'favicon',
 'label'=>'فاویکون',
@@ -47,6 +58,16 @@ array(
 'type'=>'upload',
 'section'=>'general'
 ),
+array(
+'id'=>'general_h_dark',
+'label'=>'',
+'desc'=>'حالت شب<span>«حالت شب» = دکمۀ تغییر تم در هدر. «تم تاریک» = همان حالت به‌صورت پیش‌فرضِ تاریک برای همهٔ بازدیدکننده‌ها.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'general',
+'class'=>'ab-h'
+),
+
 array(
 'id'=>'sun_moon',
 'label'=>'حالت شب',
@@ -73,8 +94,8 @@ array(
 ),
 array(
 'id'=>'reltag',
-'label'=>'مطالب بیشتر خواننده',
-'desc'=>'مطالب بیشتر خواننده بر اساس برچسب یا همان tag نمایش داده شود؟',
+'label'=>'مطالب بیشتر هنرمند',
+'desc'=>'مطالب بیشتر هنرمند بر اساس برچسب یا همان tag نمایش داده شود؟',
 'std'=>'off',
 'type'=>'on-off',
 'section'=>'general',
@@ -82,7 +103,7 @@ array(
 array(
 'id' => 'navar_txt',
 'label'=>'توضیحات',
-'desc'=>'اگر از برچسب ها برای ساخت آرشیو خواننده استفاده کرده اید این بخش را بر روی on یا بله قرار دهید. <br> در غیر اینصورت اگر از بخش خواننده که زیر برچسب ها اضافه شده و مخصوص این قالب است استفاده کرده اید این گزینه را بر روی off یا خیر قرار دهید. پیشنهاد ما استفاده از فیلد مخصوص خواننده که در زیر برچسب اضافه شده است. هستَ!<br> برای سفارش <a target="_blank" href="http://tarlanweb.ir">طراحی قالب وردپرس اختصاصی</a> و یا ویرایش قالب فعلی با شماره 09158856205 تماس بگیرید.',
+'desc'=>'اگر از برچسب ها برای ساخت آرشیو هنرمند استفاده کرده اید این بخش را بر روی on یا بله قرار دهید. <br> در غیر اینصورت اگر از بخش هنرمند که زیر برچسب ها اضافه شده و مخصوص این قالب است استفاده کرده اید این گزینه را بر روی off یا خیر قرار دهید. پیشنهاد ما استفاده از فیلد مخصوص هنرمند که در زیر برچسب اضافه شده است. هستَ!<br> برای سفارش <a target="_blank" href="http://tarlanweb.ir">طراحی قالب وردپرس اختصاصی</a> و یا ویرایش قالب فعلی با شماره 09158856205 تماس بگیرید.',
 'type'=>'textblock',
 'section'=>'general',
 ),
@@ -96,6 +117,16 @@ array(
 ),
 // homes
 array(
+'id'=>'homes_guide',
+'label'=>'',
+'desc'=>'<strong>این تب شلوغ‌ترین تب است</strong>، پس سه‌بخش شده: ویژه و پلیر، بلوک‌های صفحه، ردیف هنرمندان. هر ردیف همان‌جا توضیحش را دارد؛ اگر گزینه‌ای را نمی‌بینید، یعنی بلوکش خاموش است.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'homes',
+'class'=>'ab-guide'
+),
+
+array(
 'id'=>'fixbvip',
 'label'=>'اسلایدر ویژه',
 'desc'=>'اسلایدر ویژه نمایش داده شود؟',
@@ -106,11 +137,22 @@ array(
 array(
 'id'=>'vip_num',
 'label'=>'تعداد اسلایدها',
-'desc'=>'کتعداد اسلایدها قابل نمایش را وارد کنید.',
-'type'=>'text',
+'desc'=>'تعداد اسلایدهای قابل نمایش در «ویژه». پیش‌فرض ۴.',
+'type'=>'numeric-slider',
+'min_max_step'=>'1,30,1',
 'std'=>'4',
 'section'=>'homes'
 ),
+array(
+'id'=>'homes_h_player',
+'label'=>'',
+'desc'=>'پلیر و فهرست‌ها<span>«پلیر ایندکس» همان پخش‌کنندۀ پایینِ کارت‌هاست؛ شکل و فاصلۀ آن از تب «کنترل رابط» تنظیم می‌شود.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'homes',
+'class'=>'ab-h'
+),
+
 array(
 'id'=>'indpl',
 'label'=>'پلیر ایندکس',
@@ -121,12 +163,23 @@ array(
 ),
 array(
 'id'=>'v_num',
-'label'=>'تعداد آهنگها',
-'desc'=>'تعداد آهنگهای قابل نمایش را وارد کنید.',
-'type'=>'text',
+'label'=>'تعداد آهنگ‌ها (این بلوک)',
+'desc'=>'تعداد آهنگ‌های قابل نمایش در این بلوک. برای اینکه همه بیایند عدد را بزرگ کنید (مثلاً ۱۰۰).',
+'type'=>'numeric-slider',
+'min_max_step'=>'1,100,1',
 'std'=>'8',
 'section'=>'homes'
 ),
+array(
+'id'=>'homes_h_blocks',
+'label'=>'',
+'desc'=>'بلوک‌های صفحۀ اصلی<span>هر بلوک دو ردیف دارد: یکی روشن/خاموش‌کردنش و یکی تیترش. «تعداد آهنگ‌ها» هم برای بلوک پربازدیدترین‌هاست.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'homes',
+'class'=>'ab-h'
+),
+
 array(
 'id'=>'index_hj',
 'label'=>'جدیدترین مطالب',
@@ -161,10 +214,27 @@ array(
 ),
 array(
 'id'=>'index_nm',
-'label'=>'تعداد آهنگها',
-'desc'=>'تعداد آهنگهای قابل نمایش در باکس پربازدیدترین مطالب را وارد کنید.',
-'type'=>'text',
+'label'=>'تعداد آهنگ‌های پربازدیدترین‌ها',
+'desc'=>'چند آهنگ در باکس «پربازدیدترین مطالب ماه» چاپ شود.',
+'type'=>'numeric-slider',
+'min_max_step'=>'1,60,1',
 'std'=>'8',
+'section'=>'homes'
+),
+array(
+'id'=>'home_meta_title',
+'label'=>'عنوان متا صفحه اصلی',
+'desc'=>'عنوانی که در تب مرورگر و نتیجهٔ گوگل دیده می‌شود.<span>اگر خالی باشد، فقط «نام سایت» چاپ می‌شود (مثل قبل). صفحهٔ اصلی این قالب یک برگه نیست، پس این تنها جای ویرایش عنوان آن است. اگر افزونهٔ سئو (Yoast / Rank Math / AIOSEO) فعال باشد، همان افزونه عنوان را می‌سازد و این فیلد کنار می‌رود.</span>',
+'type'=>'text',
+'std'=>'',
+'section'=>'homes'
+),
+array(
+'id'=>'home_meta_desc',
+'label'=>'توضیحات متا صفحه اصلی',
+'desc'=>'توضیح یک‌دو جمله‌ای (حدود ۱۵۰ نویسه) برای گوگل و اشتراک‌گذاری در تلگرام/شبکه‌ها.<span>اگر خالی باشد، از «تنظیمات → همگانی → توضیح کوتاه» استفاده می‌شود. تگ HTML لازم نیست.</span>',
+'type'=>'textarea',
+'std'=>'',
 'section'=>'homes'
 ),
 array(
@@ -192,13 +262,15 @@ array(
 )
 )),
 array(
-'id'=>'indpl',
-'label'=>'پلیر ایندکس',
-'desc'=>'پلیر ایندکس نمایش داده شود؟',
-'std'=>'on',
-'type'=>'on-off',
+'id'=>'homes_h_artists',
+'label'=>'',
+'desc'=>'ردیف هنرمندان و هنرمندان<span>«نمایش اسلایدر» = ردیف کاورهای هنرمند در صفحۀ اصلی؛ «صفحۀ هنرمندان» = آدرسی که لینک «همهٔ هنرمندان» به آن می‌رود.</span>',
+'type'=>'textblock',
+'std'=>'',
 'section'=>'homes',
+'class'=>'ab-h'
 ),
+
 array(
 'id'=>'arti_off',
 'label'=>'نمایش اسلایدر',
@@ -218,23 +290,23 @@ array(
 array(
 'id'=>'arti_url',
 'label'=>'صفحه هنرمندان',
-'desc'=>'آدرس صفحه خوانندگان بیشتر را  به همراه http:// وارد کنید.',
+'desc'=>'آدرس صفحه هنرمندان بیشتر را  به همراه http:// وارد کنید.',
 'type'=>'text',
 'std'=>'',
 'section'=>'homes'
 ),
 array(
 'id'=>'siing_t',
-'label'=>'خواننده ها',
-'desc'=>'لیست خواننده ها را ایجاد کنید.',
+'label'=>'هنرمندان',
+'desc'=>'لیست هنرمندان را ایجاد کنید.',
 'type'=>'list-item',
 'section'=>'homes',
 'choices'=>array(),
 'settings'=>array(
 array(
 'id'=>'siing_u',
-'label'=>'صفحه خواننده',
-'desc'=>'آدرس صفحه خواننده را به همراه http:// را وارد کنید.',
+'label'=>'صفحه هنرمند',
+'desc'=>'آدرس صفحه هنرمند را به همراه http:// را وارد کنید.',
 'std'=> '',
 'type'=>'text',
 'choices'=>array()
@@ -248,13 +320,34 @@ array(
 ))),
 //socials
 array(
+'id'=>'socials_guide',
+'label'=>'',
+'desc'=>'هر ردیف = یک شبکه. آدرس را کامل (با https://) بنویسید؛ هر کدام که خالی بماند، دکمۀ آن شبکه در پانوشت و صفحۀ پست نمایش داده نمی‌شود.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'socials',
+'class'=>'ab-guide'
+),
+
+array(
 'id'=>'fixbtn',
-'label'=>'لینکهای ثابت',
-'desc'=>'لینکهای تلگرام  و اینستاگرام  به شکل ثابت نمایش داده شوند ؟',
+'label'=>'باکس شبکه‌های اجتماعی در صفحهٔ پست',
+'desc'=>'بالای لینک‌های دانلود هر آهنگ، دکمه‌های تلگرام/اینستاگرام/بله/روبیکا نمایش داده شود ؟ (در نسخهٔ 3.2.0 این گزینه جای «لینک‌های ثابتِ پایین صفحه» را گرفته)',
+'old_label'=>'لینکهای ثابت',
 'std'=>'on',
 'type'=>'on-off',
 'section'=>'socials',
 ),
+array(
+'id'=>'socials_h_links',
+'label'=>'',
+'desc'=>'آدرس و متن هر شبکه<span>هر ردیفِ «متن …» فقط نوشتهٔ دکمۀ همان شبکه را در صفحۀ پست عوض می‌کند.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'socials',
+'class'=>'ab-h'
+),
+
 array(
 'id'=>'telegram',
 'label'=>'تلگرام',
@@ -285,6 +378,38 @@ array(
 'desc'=>'متن لینک ثابت  اینستاگرام را وارد کنید',
 'type'=>'text',
 'std'=>'صفحه اینستاگرام ',
+'section'=>'socials'
+),
+array(
+'id'=>'bale',
+'label'=>'بله',
+'desc'=>'لینک کانال/صفحهٔ بله را وارد کنید (https://bale.ai/...)',
+'type'=>'text',
+'std'=>'',
+'section'=>'socials'
+),
+array(
+'id'=>'baletxt',
+'label'=>'متن بله',
+'desc'=>'متن دکمهٔ بله در باکس صفحهٔ پست',
+'type'=>'text',
+'std'=>'کانال بله ',
+'section'=>'socials'
+),
+array(
+'id'=>'rubika',
+'label'=>'روبیکا',
+'desc'=>'لینک کانال/صفحهٔ روبیکا را وارد کنید',
+'type'=>'text',
+'std'=>'',
+'section'=>'socials'
+),
+array(
+'id'=>'rubikatxt',
+'label'=>'متن روبیکا',
+'desc'=>'متن دکمهٔ روبیکا در باکس صفحهٔ پست',
+'type'=>'text',
+'std'=>'کانال روبیکا ',
 'section'=>'socials'
 ),
 array(
@@ -321,6 +446,16 @@ array(
 ),
 //footer
 array(
+'id'=>'footer_guide',
+'label'=>'',
+'desc'=>'پانوشت چهار ستون است: درباره ما · لینک‌های مفید · دسته‌های پرطرفدار · ما را دنبال کنید. دو ردیف اولِ همین تب قدیمیِ قالب‌اند؛ برای کم‌وزیادکردن خودِ ستون‌ها به پایین همین تب نگاه کنید.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'footer',
+'class'=>'ab-guide'
+),
+
+array(
 'id'=>'upb',
 'label'=>' دکمه بالارونده',
 'desc'=>'دکمه بالارونده نمایش داده شود ؟',
@@ -337,6 +472,16 @@ array(
 'section'=>'footer'
 ),
 //ads1
+array(
+'id'=>'ads_guide',
+'label'=>'',
+'desc'=>'دو جای متفاوت برای تبلیغ: «صفحۀ دانلود» = پایینِ باکس لینک‌ها، «بالای لینک دانلود» = درست قبل از دکمه‌ها. ردیف‌های «جاوا» برای کدی است که داخل اسکریپت می‌رود (تگ باز و بسته‌اش را ننویسید). برای حذف یک تبلیغ، محتوا را کامل پاک کنید و ذخیره کنید.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'ads1',
+'class'=>'ab-guide'
+),
+
 array(
 'id'=>'ads_bt',
 'label'=>'تبلیغات صفحه دانلود',
@@ -371,10 +516,21 @@ array(
 ),
 // dl_pages
 array(
+'id'=>'dl_pages_guide',
+'label'=>'',
+'desc'=>'این تب فقط باکس‌های زیرِ پلیرِ صفحۀ دانلود آهنگ را کم‌وزیاد می‌کند؛ فایل و لینک دانلود دست‌نخورده می‌مانند.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'dl_pages',
+'class'=>'ab-guide'
+),
+
+array(
 'id'=>'pppf',
-'label'=>'مطالب خواننده',
-'desc'=>'تعداد سایر آهنگهای خواننده را وارد کنید.',
-'type'=>'text',
+'label'=>'مطالب هنرمند',
+'desc'=>'تعداد «سایر آهنگ‌های هنرمند» در صفحۀ دانلود. پیش‌فرض ۱۲.',
+'type'=>'numeric-slider',
+'min_max_step'=>'1,60,1',
 'std'=>'12',
 'section'=>'dl_pages'
 ),
@@ -401,6 +557,379 @@ array(
 'std'=>'on',
 'type'=>'on-off',
 'section'=>'dl_pages',
+),
+array(
+'id'=>'dl_pages_h_extra',
+'label'=>'',
+'desc'=>'باکس‌های افزودۀ این نسخه<span>این پنج ردیف در قالب مادر نبود؛ اضافه شدند تا شناسنامۀ آهنگ و متن ترانه جای درست خودشان بنشینند.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'dl_pages',
+'class'=>'ab-h'
+),
+
+array(
+'id'=>'credits_box',
+'label'=>'شناسنامۀ آهنگ (تهیه‌کنندگان)',
+'desc'=>'ردیف‌های هنرمند · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید در صفحۀ پست نمایش داده شود؟ (داده از فیلدهای artist/composer/lyricist/arranger/mixer/producer)',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'dl_pages'
+),
+array(
+'id'=>'credits_title',
+'label'=>'تیتر باکس شناسنامۀ آهنگ',
+'desc'=>'اگر خالی بماند، «شناسنامۀ آهنگ» چاپ می‌شود',
+'type'=>'text',
+'std'=>'',
+'section'=>'dl_pages'
+),
+array(
+'id'=>'credits_before_player',
+'label'=>'شناسنامه بالای پلیر',
+'desc'=>'روشن = بالای باکس پلیر؛ خاموش = بعد از لینک‌های دانلود (حالت پیش‌فرض)',
+'std'=>'off',
+'type'=>'on-off',
+'section'=>'dl_pages'
+),
+array(
+'id'=>'lyrics_after_download',
+'label'=>'متن ترانه زیر لینک دانلود',
+'desc'=>'روشن = متن آهنگ بعد از لینک‌های دانلود چاپ شود (حالت پیش‌فرض 3.3.2)؛ خاموش = بالای پلیر و زیر توضیحات',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'dl_pages'
+),
+
+/* ---------------------------------------------------------------------------
+   v3.4.1 — «کنترل رابط»: هر ردیف اینجا یک کلید واقعی است که در کد مصرف می‌شود
+   (سورس: inc/ab-controls.php).  v3.4.3 — همان کلیدها با جداکنندهٔ بخش‌بخش،
+   بلوک راهنما، اسلایدر عددی و ردیف‌های شرطی (فقط در حالت مربوطه دیده می‌شوند).
+   --------------------------------------------------------------------------- */
+array(
+'id'=>'ab_ui_guide',
+'label'=>'',
+'desc'=>'<strong>هر ردیف یک کلید واقعی است</strong> — یعنی همان گزینه در فایل قالب مصرف می‌شود، چیزی برای «امتحان کردن» نیست. بعد از «ذخیرهٔ تغییرات» کافی است صفحۀ سایت را یک بار تازه کنید (روی کیبورد: Ctrl + Shift + R). خاموش‌کردن هر کدام، سایت را دقیقاً به حالت قبل برمی‌گرداند.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'ab_ui',
+'class'=>'ab-guide'
+),
+array(
+'id'=>'ab_admin_ui',
+'label'=>'پوستۀ همین صفحه',
+'desc'=>'چیدمانِ صفحۀ تنظیمات: تب‌های بالا، ردیف‌های کارتی، اسلایدرهای عددی و همین متن‌های راهنما (css/ab-admin.css). با خاموش‌کردنش صفحه به ظاهر پیش‌فرض Option Tree برمی‌گردد و هیچ گزینه‌ای عوض نمی‌شود.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_ui_h_layers',
+'label'=>'',
+'desc'=>'لایه‌های ظاهری<span>هر سه مورد فقط فایل CSS را عوض می‌کنند؛ تغییری در محتوا و ساختار صفحۀ شما نمی‌دهند.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'ab_ui',
+'class'=>'ab-h'
+),
+array(
+'id'=>'ab_glass_ui',
+'label'=>'لایۀ شیشه‌ایِ کارت‌ها',
+'desc'=>'کارت/سایه/بلور روی باکس‌ها (css/ab-glass.css). خاموش = فقط استایل خودِ قالب.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_ui_guard',
+'label'=>'گاردِ لایۀ CSS',
+'desc'=>'اگر روزی style.css بازنویسی شود و بلوک انتهایی‌اش برود، کپیِ همان استایل از css/ab-ui.css لود می‌شود. پیشنهاد: روشن.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_card_stats',
+'label'=>'بازدید و رأی روی کاور',
+'desc'=>'عدد بازدید و میانگین رأی روی کارتِ آهنگ‌ها در صفحۀ اصلی و فهرست‌ها.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_ui_h_comments',
+'label'=>'',
+'desc'=>'دیدگاه‌ها<span>اگر زیر هر آهنگ ده‌ها دیدگاه ثبت شود، صفحۀ نوشته بی‌نهایت بلند می‌شود. با روشن‌بودنِ این دو گزینه، دیدگاه‌ها مثل آرشیو صفحه‌بندی می‌شوند: شمارۀ صفحه، «قدیمی‌تر/جدیدتر» و شمارشِ «نمایش ۲۱ تا ۴۰ از ۱۲۳».</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'ab_ui',
+'class'=>'ab-h'
+),
+array(
+'id'=>'ab_comments_paging',
+'label'=>'صفحه‌بندی دیدگاه‌ها',
+'desc'=>'دیدگاه‌های هر نوشته در چند صفحه نمایش داده شوند (پیشنهاد: روشن). خاموش = همۀ دیدگاه‌ها در یک صفحه، مثل قبل.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_comments_per_page',
+'label'=>'تعداد دیدگاه در هر صفحه',
+'desc'=>'بین ۵ تا ۱۰۰. پیش‌فرض ۲۰. این عدد جای «تنظیمات → گفتگو → دیدگاه‌ها در هر صفحه» را در نمای سایت می‌گیرد (تنظیمات وردپرس دست‌نخورده می‌ماند).',
+'std'=>'20',
+'type'=>'numeric-slider',
+'min_max_step'=>'5,100,5',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_ui_h_chrome',
+'label'=>'',
+'desc'=>'عناصر اضافهٔ صفحه<span>خاموش = آن عنصر اصلاً در HTML صفحۀ شما چاپ نمی‌شود (نه اینکه فقط مخفی شود).</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'ab_ui',
+'class'=>'ab-h'
+),
+array(
+'id'=>'ab_sticky_player',
+'label'=>'نوار چسبان پخش',
+'desc'=>'نوار پایینِ صفحه در صفحۀ تکیِ آهنگ.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_skip_link',
+'label'=>'لینک «پرش به محتوا»',
+'desc'=>'نخستین لینکِ صفحه برای کیبورد و صفحۀ‌خوان. با ماوس دیده نمی‌شود، پس خاموش‌کردنش ظاهر را عوض نمی‌کند.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_quickbar',
+'label'=>'نوار دسترسی سریع',
+'desc'=>'نوار زیر هدرِ صفحۀ اصلی (تازه‌ترین آهنگ‌ها · همهٔ هنرمندان · پربازدیدترین‌ها / اخبار روز). اگر اخبار ۴۰۴ باشد، خودش لینک اخبار حذف می‌شود.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_ui_h_player',
+'label'=>'',
+'desc'=>'پلیرِ صفحۀ اصلی<span>اگر پلیر شلوغ یا بیرون‌زده به‌نظر رسید، اول «شکل پلیر» را روی «ساده» بگذارید: همان پلیر قالب مادر، بدون کادر و سایه.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'ab_ui',
+'class'=>'ab-h'
+),
+array(
+'id'=>'ab_player_mode',
+'label'=>'شکل پلیرِ صفحۀ اصلی',
+'desc'=>'«کارت» = حالت فعلی (کادر، گوشۀ گرد، فهرست در پایین کارت). «فشرده» = همان کارت با ارتفاع کمتر. «ساده» = بدون کادر و سایه، مثل قالب مادر.',
+'std'=>'card',
+'type'=>'select',
+'choices'=>array(
+array('value'=>'card','label'=>'کارت'),
+array('value'=>'compact','label'=>'فشرده'),
+array('value'=>'legacy','label'=>'ساده (قالب مادر)'),
+),
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_player_list',
+'label'=>'فهرست آلبوم در پلیر',
+'desc'=>'«دکمه» = لینک «نمایش آلبوم» زیر پلیر. «باز» = فهرست همیشه نمایش داده می‌شود. «مخفی» = فهرست و دکمه حذف می‌شوند.',
+'std'=>'btn',
+'type'=>'select',
+'choices'=>array(
+array('value'=>'btn','label'=>'دکمه'),
+array('value'=>'open','label'=>'باز'),
+array('value'=>'hide','label'=>'مخفی'),
+),
+'section'=>'ab_ui',
+'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
+'operator'=>'or',
+'class'=>'ab-sub'
+),
+array(
+'id'=>'ab_player_volume',
+'label'=>'دکمۀ صدا در پلیر',
+'desc'=>'اسلایدر تنظیم صدا.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui',
+'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
+'operator'=>'or',
+'class'=>'ab-sub'
+),
+array(
+'id'=>'ab_player_gap',
+'label'=>'فاصلۀ پایین پلیر',
+'desc'=>'فاصلۀ میان پلیر تا محتوای زیر آن، بر حسب پیکسل. پیش‌فرض ۳۰؛ ۰ = چسبیده به محتوای زیر.',
+'std'=>'30',
+'type'=>'numeric-slider',
+'min_max_step'=>'0,96,1',
+'section'=>'ab_ui',
+'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
+'operator'=>'or',
+'class'=>'ab-sub'
+),
+array(
+'id'=>'ab_player_radius',
+'label'=>'گردی گوشۀ پلیر',
+'desc'=>'گردی کارت پلیر بر حسب پیکسل. ۰ = گوشۀ تیز، پیش‌فرض ۲۰.',
+'std'=>'20',
+'type'=>'numeric-slider',
+'min_max_step'=>'0,40,1',
+'section'=>'ab_ui',
+'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
+'operator'=>'or',
+'class'=>'ab-sub'
+),
+array(
+'id'=>'ab_player_border',
+'label'=>'کادر پلیر',
+'desc'=>'خط دور کارت پلیر.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui',
+'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
+'operator'=>'or',
+'class'=>'ab-sub'
+),
+array(
+'id'=>'ab_player_shadow',
+'label'=>'سایۀ پلیر',
+'desc'=>'سایۀ نرم زیر کارت پلیر.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui',
+'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
+'operator'=>'or',
+'class'=>'ab-sub'
+),
+array(
+'id'=>'ab_ui_h_cover',
+'label'=>'',
+'desc'=>'تصویر کاور پست<span>کاورِ بالای صفحۀ هر آهنگ/نوشته. این دو ردیف فایلِ عکس را عوض نمی‌کنند؛ فقط همان را در اندازهٔ دلخواه نشان می‌دهند.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'ab_ui',
+'class'=>'ab-h'
+),
+array(
+'id'=>'ab_post_img_size',
+'label'=>'اندازۀ کاور (px)',
+'desc'=>'اندازۀ کادر کاور در صفحۀ پست، بر حسب پیکسل. پیش‌فرض ۵۰۰ یعنی ۵۰۰×۵۰۰. در موبایل و ستون باریک خودش کوچک‌تر می‌شود و از کادر نمی‌زند.',
+'std'=>'500',
+'type'=>'numeric-slider',
+'min_max_step'=>'240,900,20',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_post_img_crop',
+'label'=>'کات مربعی کاور',
+'desc'=>'روشن = عکس در همان کادر مربع از وسط کات می‌شود. خاموش = عرض همان عدد می‌ماند و ارتفاع نسبت اصلیِ عکس را می‌گیرد.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui',
+'class'=>'ab-sub'
+),
+/* ---- هنرمند: نامکِ تاکسونومی و آدرسِ آرشیو (v3.4.7) ---- */
+array(
+'id'=>'ab_ui_h_artist',
+'label'=>'',
+'desc'=>'نامکِ «هنرمند»<span>در قالب مادر این تاکسونومی singer است، ولی بقیۀ پروژه artist را به کار می‌برد (فیلد ACFِ artist، کلاس‌ها، فایلِ فهرست هنرمندان). این دو ردیف همان دوگانگی را یکی می‌کند: نامک فعال + آدرسِ آرشیو. مهاجرت فقط یک ستونِ دیتابیس است و با خاموش‌کردن همین کلید برمی‌گردد.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'ab_ui',
+'class'=>'ab-h'
+),
+array(
+'id'=>'ab_artist_tax',
+'label'=>'نامک artist فعال باشد',
+'desc'=>'روشن = فهرست‌ها، لینک‌ها و اصطلاحات زیر نامک artist (مهاجرت خودکارِ یک‌بار). خاموش = همان singer همیشگی؛ هیچ داده‌ای از دست نمی‌رود.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'ab_ui'
+),
+array(
+'id'=>'ab_artist_slug',
+'label'=>'آدرسِ آرشیو هنرمند',
+'desc'=>'بخشِ اولِ آدرس، بدون اسلش. پیش‌فرض artist ⇒ /artist/mohsen-yeganeh. اگر singer بگذارید آدرس‌های قبلی برمی‌گردند. آدرس‌های قدیمی همیشه با ۳۰۱ به آدرسِ تازه می‌روند. صفحۀ فهرست هم با همین ردیف‌ها آدرسش را از arti_url یا اسلاگِ برگه (artists) می‌گیرد',
+'std'=>'artist',
+'type'=>'text',
+'section'=>'ab_ui',
+'class'=>'ab-sub small-text'
+),
+array(
+'id'=>'ab_artists_title',
+'label'=>'تیترِ صفحۀ هنرمندان',
+'desc'=>'اگر پر شود، تیتر و H1ِ همان صفحه را می‌پوشاند (مثلاً «هنرمندان») — تا لازم نباشد عنوانِ خودِ برگه را در پیشخوان عوض کنید.',
+'std'=>'',
+'type'=>'text',
+'section'=>'ab_ui',
+'class'=>'ab-sub small-text'
+),
+/* ---- کنترل پانوشت (این ردیف‌ها در تب «پانوشت» دیده می‌شوند) ---- */
+array(
+'id'=>'footer_h_ctrl',
+'label'=>'',
+'desc'=>'کنترل خودِ پانوشت<span>ستون‌ها را یکی‌یکی خاموش/روشن کنید؛ هر ستون که تیک نخورد اصلاً چاپ نمی‌شود و سه ستون دیگر عرض را پر می‌کنند.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'footer',
+'class'=>'ab-h'
+),
+
+array(
+'id'=>'ab_footer_cols',
+'label'=>'ستون‌های فوتر',
+'desc'=>'هر ستون که اینجا تیک نخورد اصلاً چاپ نمی‌شود و ستون‌های باقی‌مانده عرض را پر می‌کنند.',
+'std'=>array('about','links','cats','social'),
+'type'=>'checkbox',
+'choices'=>array(
+array('value'=>'about','label'=>'درباره ما'),
+array('value'=>'links','label'=>'لینک‌های مفید'),
+array('value'=>'cats','label'=>'دسته‌های پرطرفدار'),
+array('value'=>'social','label'=>'ما را دنبال کنید'),
+),
+'section'=>'footer'
+),
+array(
+'id'=>'ab_footer_pinned',
+'label'=>'دو لینک اصلی فوتر',
+'desc'=>'«همهٔ هنرمندان» و «تازه‌ترین آهنگ‌ها» در ستون لینک‌های مفید.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'footer'
+),
+array(
+'id'=>'ab_footer_links',
+'label'=>'لینک‌های دستی فوتر',
+'desc'=>'هر خط یک لینک به شکل: عنوان|آدرس — مثلاً «قوانین|https://ahangban.ir/rules». خطی که با # شروع شود نادیده گرفته می‌شود.',
+'std'=>'',
+'type'=>'textarea',
+'section'=>'footer'
+),
+array(
+'id'=>'ab_footer_search',
+'label'=>'جست‌وجو در فوتر',
+'desc'=>'فرم جست‌وجوی پایین صفحه (زیر لینک‌های شبکهٔ اجتماعی).',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'footer'
+),
+array(
+'id'=>'ab_footer_cats_num',
+'label'=>'تعداد رده‌های فوتر',
+'desc'=>'چند «دستهٔ پرطرفدار» در ستون سوم پانوشت چاپ شود. ۰ = همه‌شان.',
+'std'=>'8',
+'type'=>'numeric-slider',
+'min_max_step'=>'0,20,1',
+'section'=>'footer'
 ),
 
 ));

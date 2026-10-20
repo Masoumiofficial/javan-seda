@@ -1,0 +1,529 @@
+/* ============================================================================================
+   جوان‌صدا ۳.۵.۲ — استایلِ بخش‌های تازه (مستقل از style.css تا هیچ قاعدهٔ موجودی عوض نشود)
+   --------------------------------------------------------------------------------------------
+   • .ab-cat-intro      توضیح کوتاه بالای آرشیو دسته
+   • .ab-cat-desc       توضیح کامل پایین آرشیو + «نمایش بیشتر/کمتر»
+   • .ab-resume__views  نشانِ «مجموع بازدید آثار» در سرتیتر هنرمند
+   • .ab-artist-bio     بیوگرافی کوتاه + دکمهٔ «بیوگرافی کامل»
+   همهٔ رنگ‌ها از متغیرهای خودِ قالب (style.css، بلوک پالت) می‌آیند؛ اگر نبودند،
+   مقدار پشتیبان همان پالت است. حالت شب با .night پوشش داده شده است.
+   ============================================================================================ */
+
+/* ---------- توضیح کوتاه دسته ---------- */
+.ab-cat-intro {
+	background: var(--ab-blue-soft, #EAF1FE);
+	border: 1px solid var(--ab-line, rgba(24, 90, 219, 0.16));
+	border-radius: 10px;
+	padding: 14px 16px;
+	margin: 0 0 18px;
+	color: var(--ab-text, #222);
+	line-height: 2.1;
+	font-size: 15px;
+}
+
+.ab-cat-intro > *:first-child {
+	margin-top: 0;
+}
+
+.ab-cat-intro > *:last-child {
+	margin-bottom: 0;
+}
+
+.night .ab-cat-intro {
+	background: #161A22;
+	border-color: rgba(255, 255, 255, 0.10);
+	color: #E8EAEF;
+}
+
+/* ---------- توضیح کامل دسته ---------- */
+.ab-cat-desc {
+	margin: 26px 0 0;
+	padding: 18px 20px;
+	background: var(--ab-surface, #fff);
+	border: 1px solid var(--ab-line, rgba(24, 90, 219, 0.16));
+	border-radius: 12px;
+}
+
+.ab-cat-desc__title {
+	margin: 0 0 10px;
+	font-size: 18px;
+	line-height: 1.9;
+	color: var(--ab-text, #222);
+}
+
+.ab-cat-desc__body {
+	position: relative;
+	max-height: 2000px;
+	overflow: hidden;
+	line-height: 2.1;
+	color: var(--ab-text, #222);
+	transition: max-height 0.28s ease;
+}
+
+.ab-cat-desc__body.is-clamped {
+	max-height: 190px;
+}
+
+.ab-cat-desc__body.is-clamped::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	bottom: 0;
+	height: 76px;
+	pointer-events: none;
+	background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--ab-surface, #fff) 78%);
+}
+
+.night .ab-cat-desc {
+	background: #15181F;
+	border-color: rgba(255, 255, 255, 0.10);
+}
+
+.night .ab-cat-desc__title,
+.night .ab-cat-desc__body {
+	color: #E8EAEF;
+}
+
+.night .ab-cat-desc__body.is-clamped::after {
+	background: linear-gradient(to bottom, rgba(21, 24, 31, 0), #15181F 78%);
+}
+
+.ab-cat-desc__actions {
+	margin: 12px 0 0;
+	text-align: center;
+}
+
+.ab-cat-desc__toggle {
+	display: inline-block;
+	padding: 9px 22px;
+	border: 1px solid var(--ab-blue, #185ADB);
+	border-radius: 8px;
+	background: transparent;
+	color: var(--ab-blue, #185ADB);
+	font: inherit;
+	font-size: 14px;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.ab-cat-desc__toggle:hover,
+.ab-cat-desc__toggle:focus-visible {
+	background: var(--ab-blue, #185ADB);
+	color: #fff;
+	outline: 2px solid transparent;
+}
+
+.ab-cat-desc__toggle:focus-visible {
+	box-shadow: 0 0 0 3px rgba(24, 90, 219, 0.35);
+}
+
+.ab-cat-desc__toggle[hidden] {
+	display: none;
+}
+
+.night .ab-cat-desc__toggle {
+	border-color: #7AA2F7;
+	color: #7AA2F7;
+}
+
+.night .ab-cat-desc__toggle:hover,
+.night .ab-cat-desc__toggle:focus-visible {
+	background: #7AA2F7;
+	color: #10131A;
+}
+
+/* ---------- سرتیتر هنرمند ---------- */
+.ab-resume__views .ab-resume__num {
+	font-weight: 700;
+}
+
+.ab-artist-latin {
+	display: inline-block;
+	margin: 0 0 6px;
+	color: var(--ab-muted, #555);
+	font-size: 13px;
+	direction: ltr;
+	unicode-bidi: isolate;
+}
+
+.night .ab-artist-latin {
+	color: #A9B4C6;
+}
+
+.ab-artist-bio {
+	margin: 12px 0 0;
+	line-height: 2.1;
+	color: var(--ab-text, #222);
+}
+
+.night .ab-artist-bio {
+	color: #E8EAEF;
+}
+
+.ab-artist-bio__more {
+	display: inline-block;
+	margin-top: 10px;
+	padding: 8px 18px;
+	border: 1px solid var(--ab-blue, #185ADB);
+	border-radius: 8px;
+	color: var(--ab-blue, #185ADB);
+	text-decoration: none;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.ab-artist-bio__more:hover,
+.ab-artist-bio__more:focus-visible {
+	background: var(--ab-blue, #185ADB);
+	color: #fff;
+	text-decoration: none;
+}
+
+.night .ab-artist-bio__more {
+	border-color: #7AA2F7;
+	color: #7AA2F7;
+}
+
+.night .ab-artist-bio__more:hover,
+.night .ab-artist-bio__more:focus-visible {
+	background: #7AA2F7;
+	color: #10131A;
+}
+
+@media (max-width: 600px) {
+	.ab-cat-desc {
+		padding: 14px 15px;
+	}
+
+	.ab-cat-desc__body.is-clamped {
+		max-height: 150px;
+	}
+
+	.ab-cat-intro {
+		padding: 12px 13px;
+		font-size: 14px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ab-cat-desc__body,
+	.ab-cat-desc__toggle {
+		transition: none;
+	}
+}
+
+/* ============================================================================================
+   بلوک ۳.۵.۳ — کارتِ هنرمند در ریل «هنرمندان منتخب» صفحهٔ اصلی
+   --------------------------------------------------------------------------------------------
+   همان رفتارِ کارت‌های آهنگ: با hover/focus روی کارت، تصویر «مات» می‌شود و «مجموع بازدید
+   آثار» روی همان دایره می‌آید؛ روی دستگاه لمسی (hover:none) عدد همیشه دیده می‌شود.
+   نام همیشه بیرون از تصویر و زیرِ آن است (مطابق درخواست).
+   هیچ قاعدهٔ قبلی حذف نشده؛ فقط با انتخابگرِ دقیق‌تر تکمیل/خنثی شده‌اند.
+   ============================================================================================ */
+.artist_boxs a.ab-artist-card {
+	display: block;
+	width: 180px;
+	max-width: 100%;
+	margin: 0 auto;
+	padding: 0;
+	direction: rtl;
+	text-align: center;
+	text-decoration: none;
+}
+
+.artist_boxs a.ab-artist-card .ab-artist-card__media {
+	position: relative;
+	display: block;
+	width: 150px;
+	max-width: 100%;
+	margin: 0 auto;
+	padding: 0;
+	line-height: 0;
+	border-radius: 50%;
+	overflow: visible; /* حلقهٔ نازکِ تصویر (box-shadow) بریده نشود */
+}
+
+.artist_boxs a.ab-artist-card .ab-artist-card__media img {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-width: 100%;
+	margin: 0;
+	padding: 0;
+	border-radius: 50%;
+}
+
+.artist_boxs a.ab-artist-card .ab-artist-card__name {
+	display: block;
+	width: 100%;
+	max-width: 100%;
+	margin: 6px 0 0;
+	padding: 0 2px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 12.5px;
+	line-height: 1.8;
+}
+
+/* لایهٔ آمار: دایره‌ای، فقط روی عکس، کلیک‌پذیر نیست (لینکِ کارت سالم می‌ماند) */
+.artist_boxs a.ab-artist-card .ab-card-stats {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0;
+	margin: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .26);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity .16s ease;
+}
+
+.night .artist_boxs a.ab-artist-card .ab-card-stats {
+	background: rgba(17, 17, 17, .38);
+}
+
+.artist_boxs a.ab-artist-card:hover .ab-card-stats,
+.artist_boxs a.ab-artist-card:focus-visible .ab-card-stats {
+	opacity: 1;
+}
+
+@supports ((-webkit-backdrop-filter: blur(2px)) or (backdrop-filter: blur(2px))) {
+	.artist_boxs a.ab-artist-card:hover .ab-card-stats,
+	.artist_boxs a.ab-artist-card:focus-visible .ab-card-stats {
+		-webkit-backdrop-filter: blur(7px) saturate(1.08);
+		backdrop-filter: blur(7px) saturate(1.08);
+	}
+}
+
+.artist_boxs a.ab-artist-card .ab-card-stats__in {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+.artist_boxs a.ab-artist-card .ab-cs-num {
+	max-width: calc(100% - 10px);
+	margin: 0;
+	padding: 4px 10px;
+	font-size: 12px;
+	white-space: nowrap;
+}
+
+.artist_boxs a.ab-artist-card .screen-reader-text {
+	padding: 0;
+	max-width: none;
+}
+
+/* دستگاه لمسی: بدون hover، عدد همیشه دیده می‌شود (همان رفتار کارت‌های آهنگ) */
+@media (hover: none) {
+	.artist_boxs a.ab-artist-card .ab-card-stats {
+		opacity: 1;
+		background: transparent;
+		padding: 0;
+	}
+}
+
+/* موبایل باریک: تصویر تمام‌عرضِ کارت مثل قبل */
+@media (max-width: 450px) {
+	.artist_boxs a.ab-artist-card .ab-artist-card__media,
+	.artist_boxs a.ab-artist-card .ab-artist-card__media img {
+		width: 100%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.artist_boxs a.ab-artist-card .ab-card-stats {
+		transition: none;
+	}
+}
+/* انتهای بلوک ۳.۵.۳ */
+
+/* ============================================================================================
+   بلوک ۳.۵.۴ — دیدگاه‌ها: سرتیتر، ناوبریِ صفحه‌بندی و خواناییِ موبایل
+   --------------------------------------------------------------------------------------------
+   مسئله: با زیادشدن دیدگاه‌ها، صفحۀ نوشته بی‌نهایت بلند می‌شد. حالا دیدگاه‌ها صفحه‌بندی
+   می‌شوند و این بلوک فقط ظاهرِ ناوبری را می‌سازد؛ هیچ قاعدهٔ قبلی حذف نشده است.
+   اعداد فارسی از PHP می‌آیند؛ این‌جا فقط چیدمان و حالت‌ها (hover/focus/شب) است.
+   ============================================================================================ */
+.ab-comments-title {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 26px 0 12px;
+	padding: 0 0 10px;
+	border-bottom: 1px solid var(--ab-line, rgba(17, 17, 17, .10));
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1.7;
+	color: var(--ab-text, #222);
+}
+
+.ab-comments-title__count {
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--ab-muted, #666);
+}
+
+.ab-cpager {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	margin: 14px 0;
+	padding: 0;
+}
+
+.ab-cpager--top {
+	margin-bottom: 16px;
+}
+
+.ab-cpager--bottom {
+	margin-top: 18px;
+}
+
+.ab-cpager__summary {
+	margin: 0;
+	padding: 0;
+	font-size: 12px;
+	line-height: 1.9;
+	color: var(--ab-muted, #666);
+	text-align: center;
+}
+
+.ab-cpager__list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ab-cpager__item {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ab-cpager .page-numbers {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 36px;
+	height: 36px;
+	padding: 0 11px;
+	border: 1px solid var(--ab-line, rgba(17, 17, 17, .12));
+	border-radius: var(--ab-radius-pill, 999px);
+	background: var(--ab-surface, #fff);
+	color: var(--ab-text, #222);
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1;
+	text-decoration: none;
+	transition: background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.ab-cpager a.page-numbers:hover,
+.ab-cpager a.page-numbers:focus-visible {
+	background: var(--ab-blue-soft, #EAF1FE);
+	border-color: var(--ab-blue, #185ADB);
+	color: var(--ab-blue-accent, #185ADB);
+}
+
+.ab-cpager .page-numbers:focus-visible {
+	outline: 2px solid var(--ab-blue-accent, #185ADB);
+	outline-offset: 2px;
+}
+
+.ab-cpager .page-numbers.current {
+	background: var(--ab-blue, #185ADB);
+	border-color: var(--ab-blue, #185ADB);
+	color: #fff;
+}
+
+.ab-cpager .page-numbers.dots {
+	min-width: 18px;
+	padding: 0 2px;
+	border-color: transparent;
+	background: transparent;
+	color: var(--ab-muted, #666);
+	font-weight: 400;
+}
+
+.ab-cpager .ab-cpager__step {
+	padding: 0 14px;
+	font-weight: 700;
+}
+
+.night .ab-cpager .page-numbers,
+.night .ab-comments-title {
+	background: var(--ab-charcoal, #1d1f28);
+	border-color: rgba(255, 255, 255, .14);
+	color: var(--ab-text, #E8EAEF);
+}
+
+.night .ab-cpager .page-numbers.current {
+	background: var(--ab-blue-accent, #185ADB);
+	border-color: var(--ab-blue-accent, #185ADB);
+	color: #fff;
+}
+
+.night .ab-cpager .page-numbers.dots {
+	background: transparent;
+	border-color: transparent;
+}
+
+.night .ab-comments-title {
+	background: transparent;
+}
+
+/* ناوبری در موبایل: دکمه‌ها کمی کوچک‌تر، بدون سرریز افقی */
+@media (max-width: 480px) {
+	.ab-cpager .page-numbers {
+		min-width: 33px;
+		height: 33px;
+		padding: 0 9px;
+		font-size: 12px;
+	}
+
+	.ab-cpager .ab-cpager__step {
+		padding: 0 11px;
+	}
+
+	.ab-cpager__summary {
+		font-size: 11.5px;
+	}
+}
+
+/* عمقِ تودرتویی در موبایل: پاسخ‌ها یک پله تو می‌روند، نه بیشتر (صفحۀ بلند نشود) */
+@media (max-width: 600px) {
+	.commentlist .children {
+		padding-inline-start: 10px;
+	}
+
+	.commentlist .children .children {
+		padding-inline-start: 0;
+	}
+
+	.commentlist .children .children .comment-content {
+		border-inline-start: 2px solid var(--ab-line, rgba(17, 17, 17, .12));
+		padding-inline-start: 9px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ab-cpager .page-numbers {
+		transition: none;
+	}
+}
+/* انتهای بلوک ۳.۵.۴ */

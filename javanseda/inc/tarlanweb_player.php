@@ -1,18 +1,18 @@
 <?php $indpl = ot_get_option('indpl'); if('off' != $indpl){ ?>
 <!-- index_music_player -->
 <div id="index_music_player">
-<div class="music_box_player">
+<div class="music_box_player" data-ab-player="<?php $ab_pu = javan_seda_player_uid(); echo (int) $ab_pu; ?>">
 <?php $vip_np=ot_get_option('v_num'); $my_custom_query= new WP_Query(
 array('post_type'=>'post','post_status'=>'publish','posts_per_page'=>$vip_np,'orderby'=>'meta_value',
-        'order'=>'DESC','meta_query'=>array(array('key'=>'plym','value'=>'1')) ));
+        'order'=>'DESC','no_found_rows'=>true,'ignore_sticky_posts'=>true,'update_post_term_cache'=>false,'meta_query'=>array(array('key'=>'plym','value'=>'1')) ));
 if($my_custom_query->have_posts()) : ?>
-<audio id="audio" preload="none" tabindex="0">
+<audio id="audio<?php echo ( ! empty( $ab_pu ) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" preload="none" tabindex="0">
 <?php $rkian=1; while($my_custom_query->have_posts()) : $my_custom_query->the_post();?>
-<source src="<?php the_field('music128'); ?>" data-track-number="<?php echo $rkian; ?>" />
+<source src="<?php echo esc_url( get_field('music128') ); ?>" data-track-number="<?php echo (int) $rkian; ?>" />
 <?php $rkian++; endwhile; ?>  
 Your browser does not support HTML5 audio.
 </audio>
-<?php if($rkian = 1){ ?> 
+<?php if($rkian > 1){ ?> 
 <div class="player">
 <div class="player_controls">
 <i class="previous-track-btn disabled"><span class="screen-reader-text">Previous track button</span></i>
@@ -22,7 +22,7 @@ Your browser does not support HTML5 audio.
 </div>
     <div class="info-box">
       <div class="track-info-box">
-        <div class="track-title-text"> <?php the_field('artist') ?> - <?php the_field('song'); ?> </div>
+        <div class="track-title-text"> <?php echo esc_html( get_field('artist') ); ?> - <?php echo esc_html( get_field('song') ); ?> </div>
         <div class="audio-time">
         	<span class="duration">00:00</span> /
           <span class="current-time">00:00</span> 
@@ -38,7 +38,7 @@ Your browser does not support HTML5 audio.
         </div>
 <div class="volume_box">
 <i class="icofont-volume-bar"></i>
-<input type="range" id="volume-bar" min="0" max="100" step="5" value="100">
+<input type="range" id="volume-bar<?php echo ( isset($ab_pu) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" min="0" max="100" step="5" value="100">
 </div>
 </div>
 </div>
@@ -46,11 +46,11 @@ Your browser does not support HTML5 audio.
 </div>
 <!-- /.player -->
 <?php } ?>
-<?php endif; wp_reset_query(); ?>
+<?php endif; wp_reset_postdata(); ?>
 
 <?php $vip_np=ot_get_option('v_num'); $my_custom_query= new WP_Query(
 array('post_type'=>'post','post_status'=>'publish','posts_per_page'=>$vip_np,'orderby'=>'meta_value',
-        'order'=>'DESC','meta_query'=>array(array('key'=>'plym','value'=>'1')) ));
+        'order'=>'DESC','no_found_rows'=>true,'ignore_sticky_posts'=>true,'update_post_term_cache'=>false,'meta_query'=>array(array('key'=>'plym','value'=>'1')) ));
 if($my_custom_query->have_posts()) : ?>
 <div class="play-list">
 <?php $rkian=1; while($my_custom_query->have_posts()) : $my_custom_query->the_post();?>
@@ -62,12 +62,12 @@ if($my_custom_query->have_posts()) : ?>
         <?php echo $rkian; ?>. 
       </div>
       <div class="track-title">
-        <a class="playlist-track" href="#" data-play-track="<?php echo $rkian; ?>"><?php the_field('artist') ?> - <?php the_field('song'); ?></a>
+        <a class="playlist-track" href="#" data-play-track="<?php echo (int) $rkian; ?>"><?php echo esc_html( get_field('artist') ); ?> - <?php echo esc_html( get_field('song') ); ?></a>
       </div>
     </div>
 <?php $rkian++; endwhile; ?> 
 </div>
-<?php endif; wp_reset_query(); ?>
+<?php endif; wp_reset_postdata(); ?>
 
 </div>
 </div>

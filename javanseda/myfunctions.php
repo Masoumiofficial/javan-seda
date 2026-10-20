@@ -1,10 +1,242 @@
 <?php
+/* ---------------------------------------------------------------------------
+   v3.4.1 — «کنترل رابط» (inc/ab-controls.php)
+   گزینه‌های تنظیمات قالب (بخش «کنترل رابط») + اولویت define() در wp-config.php.
+   این include باید پیش از بقیۀ لایه‌ها بیاید، چون آن‌ها توابع همین فایل را صدا می‌زنند.
+   ------------------------------------------------------------------------- */
+$_javan_seda_controls = trailingslashit( get_template_directory() ) . 'inc/ab-controls.php';
+if ( is_readable( $_javan_seda_controls ) ) {
+	require_once $_javan_seda_controls;
+}
+unset( $_javan_seda_controls );
+/* ---------------------------------------------------------------------------
+   v3.4.7 — «نامک یکتای هنرمند» (inc/ab-tax-artist.php)
+   تاکسونومی خواننده‌ها در مادر singer است ولی بقیۀ پروژه artist را به کار می‌برد
+   (فیلد ACFِ artist، کلاس‌های ab-artist__*، فایل artist-template.php). این لایه
+   همان داده را زیر نامک artist می‌برد و نامک قدیمی را پنهان نگه می‌دارد.
+   باید پیش از لایه‌های دیگر بیاید چون آن‌ها توابعش را صدا می‌زنند.
+   خاموشی کامل:  define( 'JAVANSEDA_ARTIST_TAX', false );  در wp-config.php
+   ------------------------------------------------------------------------- */
+$_javan_seda_artist_tax = trailingslashit( get_template_directory() ) . 'inc/ab-tax-artist.php';
+if ( is_readable( $_javan_seda_artist_tax ) ) {
+	require_once $_javan_seda_artist_tax;
+}
+unset( $_javan_seda_artist_tax );
+
+/* ---------------------------------------------------------------------------
+   v3.5.2 — «دادهٔ هنرمند» (inc/ab-artist-fields.php)
+   خواندنِ یکدستِ کلیدهای موجودِ هنرمند (aimg2, afacebook, …, ab_bio_short,
+   ab_bio_post) با ترتیب «ACF → term meta»، به‌همراه مجموع بازدید آثار.
+   باید پیش از فرم‌های پیشخوان و پیش از قالب‌ها بیاید.
+   ------------------------------------------------------------------------- */
+$_javan_seda_artist_fields = trailingslashit( get_template_directory() ) . 'inc/ab-artist-fields.php';
+if ( is_readable( $_javan_seda_artist_fields ) ) {
+	require_once $_javan_seda_artist_fields;
+}
+unset( $_javan_seda_artist_fields );
+
+/* ---------------------------------------------------------------------------
+   v3.5.2 — «فرم‌های پیشخوان» (inc/ab-terms-admin.php + inc/ab-post-artist.php)
+   فیلدهای هنرمند و توضیح کوتاه/کامل دسته، جست‌وجوی AJAX و جعبهٔ «هنرمندِ اثر».
+   این فایل‌ها فقط هوک ثبت می‌کنند؛ اگر نبودند قالب مثل قبل کار می‌کند.
+   ------------------------------------------------------------------------- */
+$_javan_seda_terms_admin = trailingslashit( get_template_directory() ) . 'inc/ab-terms-admin.php';
+if ( is_readable( $_javan_seda_terms_admin ) ) {
+	require_once $_javan_seda_terms_admin;
+}
+unset( $_javan_seda_terms_admin );
+
+$_javan_seda_post_artist = trailingslashit( get_template_directory() ) . 'inc/ab-post-artist.php';
+if ( is_readable( $_javan_seda_post_artist ) ) {
+	require_once $_javan_seda_post_artist;
+}
+unset( $_javan_seda_post_artist );
+
+/* ---------------------------------------------------------------------------
+   v3.5.2 — «توضیح دسته در فرانت» (inc/ab-cat-desc.php)
+   ------------------------------------------------------------------------- */
+$_javan_seda_cat_desc = trailingslashit( get_template_directory() ) . 'inc/ab-cat-desc.php';
+if ( is_readable( $_javan_seda_cat_desc ) ) {
+	require_once $_javan_seda_cat_desc;
+}
+unset( $_javan_seda_cat_desc );
+
+/* ---------------------------------------------------------------------------
+   v3.5.3 — «کارتِ هنرمند» (inc/ab-artist-cards.php)
+   ریل «هنرمندان منتخب» صفحهٔ اصلی: همان لایهٔ ماتِ کارت‌های آهنگ + مجموع بازدید.
+   فقط خواندنی است و هیچ کلید/تنظیمی را عوض نمی‌کند؛ اگر نبود، اسلایدر مثل قبل است.
+   ------------------------------------------------------------------------- */
+$_javan_seda_artist_cards = trailingslashit( get_template_directory() ) . 'inc/ab-artist-cards.php';
+if ( is_readable( $_javan_seda_artist_cards ) ) {
+	require_once $_javan_seda_artist_cards;
+}
+unset( $_javan_seda_artist_cards );
+
+/* ---------------------------------------------------------------------------
+   v3.5.3 — «متای صفحهٔ اصلی» (inc/ab-home-meta.php)
+   عنوان متا و توضیحات متای صفحهٔ اصلی از «تنظیمات قالب → صفحه اصلی» می‌آید.
+   اگر خالی باشد، رفتار ۳.۵.۲ (نام سایت / توضیح کوتاه) حفظ می‌شود.
+   ------------------------------------------------------------------------- */
+$_javan_seda_home_meta = trailingslashit( get_template_directory() ) . 'inc/ab-home-meta.php';
+if ( is_readable( $_javan_seda_home_meta ) ) {
+	require_once $_javan_seda_home_meta;
+}
+unset( $_javan_seda_home_meta );
+
+/* ---------------------------------------------------------------------------
+   v3.5.4 — «دیدگاه‌ها» (inc/ab-comments.php)
+   صفحه‌بندیِ استانداردِ وردپرس روی فرانت + ناوبریِ شماره‌دار و شمارشِ فارسی.
+   تعداد در «تنظیمات قالب → کنترل رابط» است؛ خاموشی: JAVANSEDA_COMMENT_PAGING.
+   ------------------------------------------------------------------------- */
+$_javan_seda_comments = trailingslashit( get_template_directory() ) . 'inc/ab-comments.php';
+if ( is_readable( $_javan_seda_comments ) ) {
+	require_once $_javan_seda_comments;
+}
+unset( $_javan_seda_comments );
+
+/* اگر لایۀ بالا روی سرور نبود، همه‌چیز دقیقاً مثل قبل کار می‌کند: نامک singer
+   و آدرسِ همان صفحۀ «همهٔ خواننده‌ها». (هیچ فایلی به تنهایی نمی‌تواند بشکند.) */
+if ( ! function_exists( 'javan_seda_artist_tax' ) ) {
+	function javan_seda_artist_tax() {
+		return 'singer';
+	}
+}
+if ( ! function_exists( 'javan_seda_artist_slug' ) ) {
+	function javan_seda_artist_slug() {
+		return 'singer';
+	}
+}
+if ( ! function_exists( 'javan_seda_artist_term_link' ) ) {
+	function javan_seda_artist_term_link( $term ) {
+		if ( ! $term ) {
+			return '';
+		}
+		if ( ! is_object( $term ) ) {
+			$term = get_term_by( 'slug', (string) $term, 'singer' );
+		}
+		if ( ! $term || is_wp_error( $term ) ) {
+			return '';
+		}
+		$link = get_term_link( $term );
+		if ( ! is_wp_error( $link ) && ! empty( $link ) ) {
+			return $link;
+		}
+		if ( empty( $term->slug ) ) {
+			return '';
+		}
+		$jv_slug = function_exists( 'javan_seda_artist_slug' ) ? javan_seda_artist_slug() : 'singer';
+		return home_url( '/' . trim( $jv_slug, '/' ) . '/' . $term->slug . '/' );
+	}
+}
+if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
+	/** فالبک — لایۀ inc/ab-tax-artist.php این را با نسخهٔ کش‌دار جایگزین می‌کند */
+	function javan_seda_artists_index_url() {
+		$opt = function_exists( 'ot_get_option' ) ? trim( (string) ot_get_option( 'arti_url', '' ) ) : '';
+		if ( '' !== $opt && preg_match( '#^https?://#i', $opt ) ) {
+			return user_trailingslashit( $opt );
+		}
+		foreach ( array( 'artists', 'artist', 'singers', 'singer' ) as $slug ) {
+			$page = get_page_by_path( sanitize_title( $slug ), 'OBJECT', 'page' );
+			if ( $page ) {
+				$link = get_permalink( (int) $page->ID );
+				if ( $link && ! is_wp_error( $link ) ) {
+					return $link;
+				}
+			}
+		}
+		return home_url( '/singers/' );
+	}
+}
+/* ---------------------------------------------------------------------------
+   v3.4.3 — پوستۀ صفحۀ «تنظیمات قالب» (فقط پیشخوان؛ inc/ab-admin-ui.php)
+   این فایل روی صفحۀ سایت هیچ چیزی چاپ نمی‌کند؛ اگر نبود، همه‌چیز مثل قبل.
+   ------------------------------------------------------------------------- */
+$_javan_seda_admin_ui = trailingslashit( get_template_directory() ) . 'inc/ab-admin-ui.php';
+if ( is_admin() && is_readable( $_javan_seda_admin_ui ) ) {
+	require_once $_javan_seda_admin_ui;
+}
+unset( $_javan_seda_admin_ui );
+/* ---------------------------------------------------------------------------
+   لایهٔ ایمنی «سایدبار / ابزارک نوشته‌ها» (v3.0.2)
+   اگر این include حذف شود، ناحیه‌های left_side / left_side2 / left_side1
+   فقط به فایل رمزنگاری‌شدهٔ functions.php وابسته می‌مانند.
+   ------------------------------------------------------------------------- */
+$_javan_seda_sidebars = trailingslashit( get_template_directory() ) . 'inc/ab-sidebars.php';
+if ( is_readable( $_javan_seda_sidebars ) ) {
+	require_once $_javan_seda_sidebars;
+}
+unset( $_javan_seda_sidebars );
+/* v3.1.2 — لایهٔ «اخبار روز»: فقط تابع/شورت‌کد [ab_news] را تعریف می‌کند (بدون هوکِ رندر) */
+$_javan_seda_news = trailingslashit( get_template_directory() ) . 'inc/ab-news-ticker.php';
+if ( is_readable( $_javan_seda_news ) ) {
+	require_once $_javan_seda_news;
+}
+unset( $_javan_seda_news );
+/* v3.1.4 — لایۀ «دیده‌شدن» (meta description + og:/twitter: + BreadcrumbList + wp_robots)
+   برای خاموش‌کردن همه:  define( 'JAVANSEDA_SEO', false );  در wp-config.php */
+$_javan_seda_seo = trailingslashit( get_template_directory() ) . 'inc/ab-seo.php';
+if ( is_readable( $_javan_seda_seo ) ) {
+	require_once $_javan_seda_seo;
+}
+unset( $_javan_seda_seo );
+/* v3.1.3 — لایۀ «بایتِ سرعت»: defer / preload فونت / حذف بارِ <head> / lazy تصاویر + گزارش perf.
+   برای خاموش‌کردن همه:  define( 'JAVANSEDA_PERF', false );  در wp-config.php */
+$_javan_seda_perf = trailingslashit( get_template_directory() ) . 'inc/ab-perf.php';
+if ( is_readable( $_javan_seda_perf ) ) {
+	require_once $_javan_seda_perf;
+}
+unset( $_javan_seda_perf );
+/* v3.2.0 — لایۀ «باکس اجتماعیِ صفحهٔ پست + نوارِ چسبانِ پخش» (inc/ab-post-extras.php).
+   خاموشی کامل:  define( 'JAVANSEDA_POST_EXTRAS', false );  ·  فقط نوارِ پخش:  define( 'JAVANSEDA_STICKY_PLAYER', false ); */
+$_javan_seda_extras = trailingslashit( get_template_directory() ) . 'inc/ab-post-extras.php';
+if ( is_readable( $_javan_seda_extras ) ) {
+	require_once $_javan_seda_extras;
+}
+unset( $_javan_seda_extras );
+/* v3.2.1 — لایۀ «شناسنامۀ آهنگ» (inc/ab-credits.php) — ردیف‌های آهنگساز/ترانه‌سرا/تنظیم/میکس/تولید.
+   خاموشی:  define( 'JAVANSEDA_CREDITS', false );  ·  فقط کادر ویرایش:  define( 'JAVANSEDA_CREDITS_METABOX', false ); */
+$_javan_seda_credits = trailingslashit( get_template_directory() ) . 'inc/ab-credits.php';
+if ( is_readable( $_javan_seda_credits ) ) {
+	require_once $_javan_seda_credits;
+}
+unset( $_javan_seda_credits );
+
+
+/* v3.1.0 — لایهٔ سازگاری ACF: فقط وقتی ACF فعال نباشد توابع را تعریف می‌کند
+   و از خطای کشندهٔ «Call to undefined function get_field()» در single.php جلوگیری می‌کند. */
+/* v3.3.0 — لایۀ شیشه‌ای (css/ab-glass.css) : فقط پوسته؛ خاموشی:  define( 'JAVANSEDA_GLASS_UI', false ); */
+$_javan_seda_glass = trailingslashit( get_template_directory() ) . 'inc/ab-glass.php';
+if ( is_readable( $_javan_seda_glass ) ) {
+	require_once $_javan_seda_glass;
+}
+unset( $_javan_seda_glass );
+$_javan_seda_acf = trailingslashit( get_template_directory() ) . 'inc/acf-compat.php';
+if ( is_readable( $_javan_seda_acf ) ) {
+	require_once $_javan_seda_acf;
+}
+unset( $_javan_seda_acf );
+/* v3.3.8 — گاردِ لایۀ UI (css/ab-ui.css را فقط اگر مارکر از style.css رفت enqueue می‌کند) */
+$_javan_seda_uiguard = function_exists( 'locate_template' ) ? locate_template( 'inc/ab-ui-guard.php' ) : trailingslashit( get_template_directory() ) . 'inc/ab-ui-guard.php';
+if ( $_javan_seda_uiguard && is_readable( $_javan_seda_uiguard ) ) {
+	require_once $_javan_seda_uiguard;
+}
+unset( $_javan_seda_uiguard );
 add_theme_support( 'post-thumbnails' );
+if ( function_exists( 'add_theme_support' ) ) { /* v3.3.8 — مارک‌اپ مدرن برای فرم/گالری/کپشن و حذف type از enqueueها */
+	add_theme_support( 'html5', array( 'search-form', 'gallery', 'caption', 'style', 'script' ) );
+	/* v3.5.3 — عنوانِ استاندارد: تا ۳.۵.۲ در header.php دستی چاپ می‌شد و برای صفحهٔ اصلی
+	   همیشه فقط نام سایت بود (نه فیلدِ قابل ویرایش، نه سازگاری با افزونهٔ سئو). حالا
+	   `document_title_parts` مرجع است و inc/ab-home-meta.php فقط صفحهٔ اصلی را بازنویسی
+	   می‌کند؛ بقیهٔ صفحه‌ها همان عنوانِ وردپرس را می‌گیرند. */
+	add_theme_support( 'title-tag' );
+}
 if (function_exists('add_image_size')){
 add_image_size( 'thumb4', 150, 150, true);
 add_image_size( 'thumb3', 60, 60, true);
 add_image_size( 'thumb2', 190, 190, true);
+add_image_size( 'thumb2x', 380, 380, true); /* v3.3.8 — برای srcset/دستگاه‌های DPR2 (کارت‌ها روی موبایل شارپ می‌شوند) */
 add_image_size( 'thumb1', 640, 360, true);
+add_image_size( 'ab_cover', 500, 500, true); /* v3.4.5 — کادر کاور پست؛ برای آپلودهای تازه فایل ۵۰۰² می‌سازد (برای بقیه fallback خودِ وردپرس) */
 } ?>
 <?php
 function shapeSpace_script_loader_tag($tag, $handle, $src) {
@@ -31,9 +263,9 @@ function leftsides(){
 $args = array(
 'id'            => 'left_side',
 'class'         => 'leftside',
-'name'          => 'ابزارک بالا ستون چپ سینگل',
-'description'   => 'ابزارک بالا نوشته های مرتبط خواننده در ستون چپ سینگل را در این بخش قرار دهید.',
-'before_widget' => '<aside class="related_posts %2$s">',
+'name'          => 'سایدبار نوشته‌ها — بالا (single.php)',
+'description'   => 'ابزارک‌های بالای ستون چپ صفحهٔ نوشته/آهنگ را اینجا بگذارید. شناسه: left_side',
+'before_widget' => '<aside id="%1$s" class="related_posts %2$s">',
 'before_title'  => '<h3 class="tarlanweb_side_titles">',
 'after_title'   => '</h3><div class="liner clear"></div><div class="tarlanweb_side_box">',
 'after_widget'  => '<div class="clear"></div></div></aside>',
@@ -45,9 +277,9 @@ function leftsides2(){
 $args = array(
 'id'            => 'left_side2',
 'class'         => 'leftside2',
-'name'          => 'ابزارک پایین ستون چپ سینگل',
-'description'   => 'ابزارک پایین نوشته های مرتبط خواننده در ستون چپ سینگل را در این بخش قرار دهید.',
-'before_widget' => '<aside class="related_posts %2$s">',
+'name'          => 'سایدبار نوشته‌ها — پایین (single.php)',
+'description'   => 'ابزارک‌های پایین ستون چپ صفحهٔ نوشته (بعد از نوشته‌های مرتبط). شناسه: left_side2',
+'before_widget' => '<aside id="%1$s" class="related_posts %2$s">',
 'before_title'  => '<h3 class="tarlanweb_side_titles">',
 'after_title'   => '</h3><div class="liner clear"></div><div class="tarlanweb_side_box">',
 'after_widget'  => '<div class="clear"></div></div></aside>',
@@ -59,9 +291,9 @@ function leftsides1(){
 $args = array(
 'id'            => 'left_side1',
 'class'         => 'leftside1',
-'name'          => 'ابزارک ستون چپ برگه',
-'description'   => 'ابزارک ستون چپ  برگه ها را در این بخش قرار دهید.',
-'before_widget' => '<aside class="related_posts %2$s">',
+'name'          => 'سایدبار برگه‌ها (page.php)',
+'description'   => 'ستون چپ «برگه‌ها» — روی صفحهٔ نوشته/آهنگ نمایش داده نمی‌شود! شناسه: left_side1',
+'before_widget' => '<aside id="%1$s" class="related_posts %2$s">',
 'before_title'  => '<h3 class="tarlanweb_side_titles">',
 'after_title'   => '</h3><div class="liner clear"></div><div class="tarlanweb_side_box">',
 'after_widget'  => '<div class="clear"></div></div></aside>',
@@ -223,8 +455,9 @@ if ( JAVANSEDA_COVER_IN_CONTENT ) {
 		if ( is_singular( 'post' ) && is_main_query() && in_the_loop() && has_post_thumbnail() ) {
 			$cover = '<div class="single_featured_cover"><figure class="single_featured_image">' . get_the_post_thumbnail(
 				get_the_ID(),
-				'large',
-				array( 'alt' => get_the_title(), 'title' => get_the_title() )
+				function_exists( 'javan_seda_post_cover_size' ) ? javan_seda_post_cover_size() : 'large',
+				function_exists( 'javan_seda_post_cover_args' ) ? javan_seda_post_cover_args()
+					: array( 'alt' => get_the_title(), 'title' => get_the_title() )
 			) . '</figure></div>';
 			return $cover . $content;
 		}
@@ -255,26 +488,31 @@ if ( JAVANSEDA_COVER_IN_CONTENT ) {
 if ( ! defined( 'JAVANSEDA_SINGER_FIX' ) ) {
 	define( 'JAVANSEDA_SINGER_FIX', false ); // برای فعال‌کردن: true
 }
+/* 3.4.8 — نامکِ تازه؛ JAVANSEDA_SINGER_FIX هم همچنان کار می‌کند */
+if ( ! defined( 'JAVANSEDA_ARTIST_FIX' ) ) {
+	define( 'JAVANSEDA_ARTIST_FIX', JAVANSEDA_SINGER_FIX );
+}
 
-if ( JAVANSEDA_SINGER_FIX ) {
+if ( JAVANSEDA_SINGER_FIX || JAVANSEDA_ARTIST_FIX ) {
 
 	/* ثبت جایگزین — فقط اگر تاکسونومی و پست‌تایپ هم‌نام وجود نداشته باشند */
 	add_action(
 		'init',
 		function () {
-			if ( taxonomy_exists( 'singer' ) ) {
+			$jv_tax = function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer';
+			if ( taxonomy_exists( $jv_tax ) ) {
 				return; // قبلاً ثبت شده است؛ دست نزن
 			}
-			if ( post_type_exists( 'singer' ) ) {
+			if ( post_type_exists( $jv_tax ) ) {
 				return; // پست‌تایپ هم‌نام وجود دارد؛ ثبت تاکسونومی هم‌نام باعث تداخل rewrite و ۴۰۴ می‌شود
 			}
 			register_taxonomy(
-				'singer',
+				$jv_tax,
 				array( 'post' ),
 				array(
 					'labels'             => array(
-						'name'          => 'خواننده‌ها',
-						'singular_name' => 'خواننده',
+						'name'          => 'هنرمندان',
+						'singular_name' => 'هنرمند',
 					),
 					'public'             => true,
 					'publicly_queryable' => true,
@@ -283,7 +521,7 @@ if ( JAVANSEDA_SINGER_FIX ) {
 					'show_admin_column'  => true,
 					'show_in_rest'       => true,
 					'rewrite'            => array(
-						'slug'       => 'singer',
+						'slug'       => ( function_exists( 'javan_seda_artist_slug' ) ? javan_seda_artist_slug() : 'singer' ),
 						'with_front' => false,
 					),
 				)
@@ -296,15 +534,18 @@ if ( JAVANSEDA_SINGER_FIX ) {
 	add_action(
 		'admin_init',
 		function () {
-			if ( ! taxonomy_exists( 'singer' ) ) {
+			if ( ! taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ) {
 				return;
 			}
-			$version = '2.0.0';
-			if ( get_option( 'javanseda_singer_rewrite_version' ) === $version ) {
-				return;
+			$version   = '2.2.0';
+			$jv_old    = get_option( 'javanseda_singer_rewrite_version' );
+			$jv_new    = get_option( 'javanseda_artist_rewrite_version' );
+			if ( $jv_new === $version || ( false === $jv_new && $jv_old === $version ) ) {
+				return; // همین نسخه اعمال شده
 			}
 			flush_rewrite_rules( false );
 			update_option( 'javanseda_singer_rewrite_version', $version );
+			update_option( 'javanseda_artist_rewrite_version', $version );
 		}
 	);
 }
@@ -315,7 +556,10 @@ if ( JAVANSEDA_SINGER_FIX ) {
 add_filter(
 	'template_include',
 	function ( $template ) {
-		if ( empty( $_GET['ab_singer_diag'] ) || ! current_user_can( 'manage_options' ) ) {
+		if ( empty( $_GET['ab_singer_diag'] ) && empty( $_GET['ab_artist_diag'] ) ) {
+			return $template;
+		}
+		if ( ! current_user_can( 'manage_options' ) ) {
 			return $template;
 		}
 
@@ -328,15 +572,18 @@ add_filter(
 		$lines[] = '=== گزارش تشخیص «صفحهٔ خواننده» — ترانه‌یار / جوان‌صدا ===';
 		$lines[] = 'WordPress: ' . get_bloginfo( 'version' ) . ' | PHP: ' . PHP_VERSION;
 		$lines[] = 'permalink_structure: ' . (string) get_option( 'permalink_structure' );
-		$lines[] = 'JAVANSEDA_SINGER_FIX: ' . ( JAVANSEDA_SINGER_FIX ? 'ON' : 'OFF (پیش‌فرض)' );
+		$lines[] = 'JAVANSEDA_SINGER_FIX / JAVANSEDA_ARTIST_FIX: ' . ( ( JAVANSEDA_SINGER_FIX || JAVANSEDA_ARTIST_FIX ) ? 'ON' : 'OFF (پیش‌فرض)' );
+		$lines[] = 'نامکِ فعالِ هنرمند: ' . ( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
+		$lines[] = 'آدرسِ فهرستِ هنرمندان: ' . ( function_exists( 'javan_seda_artists_index_url' ) ? javan_seda_artists_index_url() : '-' );
 
 		$lines[] = '';
-		$lines[] = '--- نوع ثبت «singer» ---';
-		$lines[] = 'taxonomy_exists(singer): ' . ( taxonomy_exists( 'singer' ) ? 'YES' : 'NO' );
-		$lines[] = 'post_type_exists(singer): ' . ( post_type_exists( 'singer' ) ? 'YES  <-- صفحهٔ خواننده در این سایت «پست‌تایپ» است، نه آرشیو تاکسونومی' : 'NO' );
+		$jv_tax_name = function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer';
+		$lines[]    = '--- نوع ثبت «' . $jv_tax_name . '» ---';
+		$lines[] = 'taxonomy_exists(' . $jv_tax_name . '): ' . ( taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES' : 'NO' );
+		$lines[] = 'post_type_exists(' . $jv_tax_name . '): ' . ( post_type_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES  <-- صفحهٔ خواننده در این سایت «پست‌تایپ» است، نه آرشیو تاکسونومی' : 'NO' );
 		$lines[] = 'taxonomy_exists(post_tag): ' . ( taxonomy_exists( 'post_tag' ) ? 'YES' : 'NO' );
-		if ( taxonomy_exists( 'singer' ) ) {
-			$object  = get_taxonomy( 'singer' );
+		if ( taxonomy_exists( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ) {
+			$object  = get_taxonomy( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
 			$lines[] = 'public: ' . ( $object->public ? 'yes' : 'NO' ) . ' | publicly_queryable: ' . ( $object->publicly_queryable ? 'yes' : 'NO' );
 			$lines[] = 'hierarchical: ' . ( $object->hierarchical ? 'yes' : 'no' ) . ' | show_in_rest: ' . ( $object->show_in_rest ? 'yes' : 'no' );
 			$lines[] = 'object_type: ' . wp_json_encode( $object->object_type );
@@ -349,9 +596,9 @@ add_filter(
 		$lines[] = 'matched_rule: ' . ( isset( $wp->matched_rule ) && '' !== $wp->matched_rule ? $wp->matched_rule : '(هیچ قانونی مطابقت نکرد)' );
 		$lines[] = 'matched_query: ' . ( isset( $wp->matched_query ) && '' !== $wp->matched_query ? $wp->matched_query : '(خالی)' );
 		$lines[] = 'is_404: ' . ( is_404() ? 'YES  <-- همین باعث «بالا نیامدن» صفحه است' : 'no' );
-		$lines[] = 'is_tax(singer): ' . ( is_tax( 'singer' ) ? 'YES (آرشیو تاکسونومی — حالت درست)' : 'no' );
+		$lines[] = 'is_tax(singer): ' . ( is_tax( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES (آرشیو تاکسونومی — حالت درست)' : 'no' );
 		$lines[] = 'is_singular: ' . ( is_singular() ? 'YES (' . get_post_type() . ')' : 'no' );
-		$lines[] = 'is_post_type_archive(singer): ' . ( is_post_type_archive( 'singer' ) ? 'YES' : 'no' );
+		$lines[] = 'is_post_type_archive(singer): ' . ( is_post_type_archive( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' ) ? 'YES' : 'no' );
 		$lines[] = 'is_archive: ' . ( is_archive() ? 'yes' : 'no' ) . ' | is_home: ' . ( is_home() ? 'yes' : 'no' );
 
 		$queried = get_queried_object();
@@ -377,19 +624,20 @@ add_filter(
 		} else {
 			$found = array();
 			foreach ( array_keys( $rules ) as $pattern ) {
-				if ( false !== strpos( $pattern, 'singer' ) ) {
+				$jv_base = function_exists( 'javan_seda_artist_slug' ) ? javan_seda_artist_slug() : 'singer';
+				if ( false !== strpos( $pattern, 'singer' ) || false !== strpos( $pattern, $jv_base ) ) {
 					$found[] = $pattern . '  →  ' . $rules[ $pattern ];
 				}
 			}
 			$lines[] = $found ? implode( "\n", array_slice( $found, 0, 8 ) ) : '(هیچ قانونی برای singer ثبت نشده است)';
 		}
 
-		$total  = wp_count_terms( array( 'taxonomy' => 'singer', 'hide_empty' => false ) );
+		$total  = wp_count_terms( array( 'taxonomy' => function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer', 'hide_empty' => false ) );
 		$lines[] = '';
 		$lines[] = '--- ترم‌های singer ---';
 		$lines[] = 'تعداد کل: ' . ( is_wp_error( $total ) ? 'WP_Error: ' . $total->get_error_message() : $total );
 
-		$sample = get_terms( array( 'taxonomy' => 'singer', 'hide_empty' => false, 'number' => 5 ) );
+		$sample = get_terms( array( 'taxonomy' => function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer', 'hide_empty' => false, 'number' => 5 ) );
 		if ( is_wp_error( $sample ) ) {
 			$lines[] = 'get_terms خطا: ' . $sample->get_error_message();
 		} elseif ( is_array( $sample ) ) {
@@ -403,9 +651,9 @@ add_filter(
 		if ( '' !== $needle ) {
 			$lines[] = '';
 			$lines[] = '--- بررسی ترم: ' . $needle . ' ---';
-			$term    = get_term_by( 'slug', sanitize_title( $needle ), 'singer' );
+			$term    = get_term_by( 'slug', sanitize_title( $needle ), function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
 			if ( ! $term ) {
-				$term = get_term_by( 'name', $needle, 'singer' );
+				$term = get_term_by( 'name', $needle, function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
 			}
 			if ( ! $term || is_wp_error( $term ) ) {
 				$lines[] = 'در تاکسونومی singer ترمی با این نام/اسلاگ پیدا نشد.';
@@ -415,7 +663,7 @@ add_filter(
 						$lines[] = 'اما در «' . $fallback_tax . '» هست: ' . $alt->name . ' (' . $alt->count . ' نوشته) → ' . get_term_link( $alt );
 					}
 				}
-				$cpt = get_page_by_path( sanitize_title( $needle ), OBJECT, 'singer' );
+				$cpt = get_page_by_path( sanitize_title( $needle ), OBJECT, function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer' );
 				if ( $cpt ) {
 					$lines[] = 'و یک نوشته از پست‌تایپ singer با همین اسلاگ وجود دارد: ' . get_permalink( $cpt );
 				}
@@ -434,7 +682,7 @@ add_filter(
 						'no_found_rows'  => true,
 						'tax_query'      => array(
 							array(
-								'taxonomy' => 'singer',
+								'taxonomy' => function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'singer',
 								'field'    => 'term_id',
 								'terms'    => $term->term_id,
 							),
@@ -461,3 +709,15 @@ add_filter(
 	},
 	PHP_INT_MAX
 );
+/* ------------------------------------------------------------------------- v3.3.8 */
+/* شمارندۀ پلیرها. JS قالب (js/scripts.js:88,135) با getElementById('audio') فقط اولین پلیر را
+   bind می‌کند؛ اگر در یک نوشته هم «تک‌آهنگ» و هم «آلبوم» باشد، id تکراری و کنترل بی‌حرکت
+   می‌ساخت. اولی همان `audio` می‌ماند (پس JS دست‌نخورده کار می‌کند) و بعدی‌ها `audio-2`،
+   `audio-3` … می‌شوند + خصیصۀ data-ab-player که در CSS کنترل‌های مردهٔ پلیر دوم را پنهان می‌کند. */
+if ( ! function_exists( 'javan_seda_player_uid' ) ) {
+	function javan_seda_player_uid() {
+		static $n = 0;
+		$n++;
+		return $n;
+	}
+}

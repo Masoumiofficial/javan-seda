@@ -39,7 +39,7 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 </a></li>
 <?php endwhile; ?>
 </ul>
-<?php endif; wp_reset_query(); ?>
+<?php endif; wp_reset_postdata(); ?>
 <?php
 echo $args['after_widget'];
 }
@@ -125,7 +125,7 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 </a></li>
 <?php endwhile; wp_reset_postdata(); else : ?>
 <li><?php _e( 'چیزی برای نمایش وجود ندارد' ); ?></li>
-<?php endif; wp_reset_query(); ?>
+<?php endif; wp_reset_postdata(); ?>
 </ul>
 <?php
 echo $args['after_widget'];
@@ -207,7 +207,7 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 </a></li>
 <?php endwhile; ?>
 </ul>
-<?php endif; wp_reset_query(); ?>
+<?php endif; wp_reset_postdata(); ?>
 <?php
 echo $args['after_widget'];
 }

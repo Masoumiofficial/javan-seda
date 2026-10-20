@@ -246,6 +246,17 @@ foreach ( $watch as $rel ) {
 		is_file( $f ) ? filesize( $f ) . 'B' : '-'
 	);
 }
+if ( ! is_file( $theme . '/functions.php' ) ) {
+	$lines[] = '';
+	$lines[] = '✗✗ functions.php نیست ⇒ وردپرس هیچ کدِ پوسته را لود نمی‌کند و هر صفحه با';
+	$lines[] = '     Fatal error: Call to undefined function ot_get_option()  سفید می‌افتد.';
+	$lines[] = '     رفع: functions.php و RTL_License_41d6c5f704e3a746.php را از دانلودِ اصلیِ';
+	$lines[] = '     rtl-theme.com برگردانید؛ یا موقتاً emergency/functions.rescue.php را';
+	$lines[] = '     به functions.php تغییر نام دهید.';
+}
+if ( ! is_file( $theme . '/RTL_License_41d6c5f704e3a746.php' ) ) {
+	$lines[] = '⚠ RTL_License_41d6c5f704e3a746.php نیست (فایلِ لایسنسِ قالب).';
+}
 $lines[] = 'wp-content/uploads: ' . ( is_dir( $root . '/wp-content/uploads' ) ? 'نوشته‌پذیر? ' . ( is_writable( $root . '/wp-content/uploads' ) ? 'بله' : 'نه' ) : 'نیست' );
 $lines[] = 'wp-content نوشتنی: ' . ( is_writable( $root . '/wp-content' ) ? 'بله' : 'نه' );
 javan_seda_check_out( 'فایل‌های پوسته (نسخهٔ واقعیِ روی سرور)', implode( "\n", $lines ) );

@@ -1,0 +1,213 @@
+/* ============================================================================================
+   جوان‌صدا ۳.۵.۲ — استایلِ بخش‌های تازه (مستقل از style.css تا هیچ قاعدهٔ موجودی عوض نشود)
+   --------------------------------------------------------------------------------------------
+   • .ab-cat-intro      توضیح کوتاه بالای آرشیو دسته
+   • .ab-cat-desc       توضیح کامل پایین آرشیو + «نمایش بیشتر/کمتر»
+   • .ab-resume__views  نشانِ «مجموع بازدید آثار» در سرتیتر هنرمند
+   • .ab-artist-bio     بیوگرافی کوتاه + دکمهٔ «بیوگرافی کامل»
+   همهٔ رنگ‌ها از متغیرهای خودِ قالب (style.css، بلوک پالت) می‌آیند؛ اگر نبودند،
+   مقدار پشتیبان همان پالت است. حالت شب با .night پوشش داده شده است.
+   ============================================================================================ */
+
+/* ---------- توضیح کوتاه دسته ---------- */
+.ab-cat-intro {
+	background: var(--ab-blue-soft, #EAF1FE);
+	border: 1px solid var(--ab-line, rgba(24, 90, 219, 0.16));
+	border-radius: 10px;
+	padding: 14px 16px;
+	margin: 0 0 18px;
+	color: var(--ab-text, #222);
+	line-height: 2.1;
+	font-size: 15px;
+}
+
+.ab-cat-intro > *:first-child {
+	margin-top: 0;
+}
+
+.ab-cat-intro > *:last-child {
+	margin-bottom: 0;
+}
+
+.night .ab-cat-intro {
+	background: #161A22;
+	border-color: rgba(255, 255, 255, 0.10);
+	color: #E8EAEF;
+}
+
+/* ---------- توضیح کامل دسته ---------- */
+.ab-cat-desc {
+	margin: 26px 0 0;
+	padding: 18px 20px;
+	background: var(--ab-surface, #fff);
+	border: 1px solid var(--ab-line, rgba(24, 90, 219, 0.16));
+	border-radius: 12px;
+}
+
+.ab-cat-desc__title {
+	margin: 0 0 10px;
+	font-size: 18px;
+	line-height: 1.9;
+	color: var(--ab-text, #222);
+}
+
+.ab-cat-desc__body {
+	position: relative;
+	max-height: 2000px;
+	overflow: hidden;
+	line-height: 2.1;
+	color: var(--ab-text, #222);
+	transition: max-height 0.28s ease;
+}
+
+.ab-cat-desc__body.is-clamped {
+	max-height: 190px;
+}
+
+.ab-cat-desc__body.is-clamped::after {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	bottom: 0;
+	height: 76px;
+	pointer-events: none;
+	background: linear-gradient(to bottom, rgba(255, 255, 255, 0), var(--ab-surface, #fff) 78%);
+}
+
+.night .ab-cat-desc {
+	background: #15181F;
+	border-color: rgba(255, 255, 255, 0.10);
+}
+
+.night .ab-cat-desc__title,
+.night .ab-cat-desc__body {
+	color: #E8EAEF;
+}
+
+.night .ab-cat-desc__body.is-clamped::after {
+	background: linear-gradient(to bottom, rgba(21, 24, 31, 0), #15181F 78%);
+}
+
+.ab-cat-desc__actions {
+	margin: 12px 0 0;
+	text-align: center;
+}
+
+.ab-cat-desc__toggle {
+	display: inline-block;
+	padding: 9px 22px;
+	border: 1px solid var(--ab-blue, #185ADB);
+	border-radius: 8px;
+	background: transparent;
+	color: var(--ab-blue, #185ADB);
+	font: inherit;
+	font-size: 14px;
+	cursor: pointer;
+	transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.ab-cat-desc__toggle:hover,
+.ab-cat-desc__toggle:focus-visible {
+	background: var(--ab-blue, #185ADB);
+	color: #fff;
+	outline: 2px solid transparent;
+}
+
+.ab-cat-desc__toggle:focus-visible {
+	box-shadow: 0 0 0 3px rgba(24, 90, 219, 0.35);
+}
+
+.ab-cat-desc__toggle[hidden] {
+	display: none;
+}
+
+.night .ab-cat-desc__toggle {
+	border-color: #7AA2F7;
+	color: #7AA2F7;
+}
+
+.night .ab-cat-desc__toggle:hover,
+.night .ab-cat-desc__toggle:focus-visible {
+	background: #7AA2F7;
+	color: #10131A;
+}
+
+/* ---------- سرتیتر هنرمند ---------- */
+.ab-resume__views .ab-resume__num {
+	font-weight: 700;
+}
+
+.ab-artist-latin {
+	display: inline-block;
+	margin: 0 0 6px;
+	color: var(--ab-muted, #555);
+	font-size: 13px;
+	direction: ltr;
+	unicode-bidi: isolate;
+}
+
+.night .ab-artist-latin {
+	color: #A9B4C6;
+}
+
+.ab-artist-bio {
+	margin: 12px 0 0;
+	line-height: 2.1;
+	color: var(--ab-text, #222);
+}
+
+.night .ab-artist-bio {
+	color: #E8EAEF;
+}
+
+.ab-artist-bio__more {
+	display: inline-block;
+	margin-top: 10px;
+	padding: 8px 18px;
+	border: 1px solid var(--ab-blue, #185ADB);
+	border-radius: 8px;
+	color: var(--ab-blue, #185ADB);
+	text-decoration: none;
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.ab-artist-bio__more:hover,
+.ab-artist-bio__more:focus-visible {
+	background: var(--ab-blue, #185ADB);
+	color: #fff;
+	text-decoration: none;
+}
+
+.night .ab-artist-bio__more {
+	border-color: #7AA2F7;
+	color: #7AA2F7;
+}
+
+.night .ab-artist-bio__more:hover,
+.night .ab-artist-bio__more:focus-visible {
+	background: #7AA2F7;
+	color: #10131A;
+}
+
+@media (max-width: 600px) {
+	.ab-cat-desc {
+		padding: 14px 15px;
+	}
+
+	.ab-cat-desc__body.is-clamped {
+		max-height: 150px;
+	}
+
+	.ab-cat-intro {
+		padding: 12px 13px;
+		font-size: 14px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ab-cat-desc__body,
+	.ab-cat-desc__toggle {
+		transition: none;
+	}
+}

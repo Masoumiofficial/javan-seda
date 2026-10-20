@@ -1,112 +1,5 @@
 <?php
 /* ---------------------------------------------------------------------------
-   v3.4.10 — حائلِ امنِ لایه‌ها
-   هر بلوکِ اختیاریِ این پوسته از این تابع رد می‌شود: اگر روزی چیزی خطا بدهد
-   (افزونۀ ناآشنا، هاستِ بی‌mbstring، فایلِ ناقص) خطا در لاگ نوشته می‌شود و
-   صفحۀ سایت **نمی‌افتد**؛ فقط همان بلوک جا‌افتاده حذف می‌شود. try/catch هر دو نسخۀ PHP را می‌پوشاند.
-   ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_safe_log' ) ) {
-	function javan_seda_safe_log( $e ) {
-		/* عمداً بی‌شرط است: اگر روزی لایه‌ای خطا بدهد، همین یک سطر در error_log
-		   (یا wp-content/debug.log) علت را لو می‌دهد و لازم نیست کاربر WP_DEBUG
-		   را روشن کند. برای سیل‌نشدنِ لاگ، هر ساعت فقط یک بار نوشته می‌شود. */
-		if ( function_exists( 'get_option' ) && get_option( 'javan_seda_safe_log_ts' ) > ( time() - HOUR_IN_SECONDS ) ) {
-			return;
-		}
-		if ( function_exists( 'update_option' ) ) {
-			update_option( 'javan_seda_safe_log_ts', time(), false );
-		}
-		if ( ! is_object( $e ) ) {
-			return;
-		}
-		$msg = '[javan-seda] ' . get_class( $e ) . ': ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
-		if ( function_exists( 'error_log' ) ) {
-			error_log( $msg );
-		}
-		javan_seda_error_log_file( $msg );
-	}
-}
-
-/* ---------------------------------------------------------------------------
-   v3.4.11 — لاگِ مرکزیِ خطا و ناظرِ fatal
-   اگر خطا آن‌جا باشد که try/catch به آن نمی‌رسد (سینتکس، حافظه، فایلِ ناقص)،
-   این ناظر در لحظۀ آخرِ اجرا پیام، فایل، شمارهٔ سطر، مصرف حافظه، آدرس صفحه و
-   نسخۀ PHP را می‌نویسد. مقصد: error_log هاست + wp-content/javan-seda-error.log
-   (بدون نیاز به روشن‌کردن WP_DEBUG). اگر لاگ از ۶۴ کیلوبایت گذشت، خودش را
-   از نو می‌سازد تا هاست را پر نکند.
-   ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_error_log_file' ) ) {
-	function javan_seda_error_log_file( $msg ) {
-		if ( ! function_exists( 'is_admin' ) ) {
-			return;
-		}
-		$dir = defined( 'WP_CONTENT_DIR' ) ? WP_CONTENT_DIR : ( defined( 'ABSPATH' ) ? ABSPATH . 'wp-content' : '' );
-		if ( '' === $dir || ! is_dir( $dir ) || ! is_writable( $dir ) ) {
-			return;
-		}
-		$log = trailingslashit( $dir ) . 'javan-seda-error.log';
-		if ( is_file( $log ) && (int) filesize( $log ) > 65536 ) {
-			@file_put_contents( $log, '' ); // فقط ۶۴KBِ آخر نگه داشته می‌شود
-		}
-		@file_put_contents( $log, gmdate( 'Y-m-d H:i:s' ) . 'Z  ' . $msg . "\n", FILE_APPEND | LOCK_EX );
-	}
-}
-
-if ( ! function_exists( 'javan_seda_fatal_watch' ) ) {
-	/**
-	 * آخرین خطای مرگبارِ PHP را می‌گیرد — حتی خطاهایی که هیچ try/catch ای
-	 * به آن‌ها نمی‌رسد. فقط برای fatal‌های داخل همین پوسته در فایلِ لاگ می‌نویسد
-	 * تا خطای افزونه‌های دیگر را ما به گردن نگیریم.
-	 */
-	function javan_seda_fatal_watch() {
-		$e = error_get_last();
-		if ( ! is_array( $e ) || empty( $e['message'] ) ) {
-			return;
-		}
-		$types = array( E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR );
-		if ( ! in_array( (int) $e['type'], $types, true ) ) {
-			return;
-		}
-		$file = isset( $e['file'] ) ? (string) $e['file'] : '';
-		$mine = ( false !== strpos( $file, 'javanseda' ) );
-		$mem  = function_exists( 'memory_get_usage' ) ? round( memory_get_usage( true ) / 1048576, 1 ) : 0;
-		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? substr( (string) sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), 0, 180 ) : '-';
-		$msg  = '[javan-seda ' . ( $mine ? 'FATAL' : 'PHP' ) . '] ' . $e['message'] . ' @ ' . $file . ':' . (int) $e['line']
-			. ' | php=' . PHP_VERSION
-			. ' | mem=' . $mem . 'MB/' . ini_get( 'memory_limit' )
-			. ' | wp=' . ( function_exists( 'get_bloginfo' ) ? get_bloginfo( 'version' ) : '?' )
-			. ' | admin=' . ( function_exists( 'is_admin' ) && is_admin() ? '1' : '0' )
-			. ' | uri=' . $uri;
-		if ( function_exists( 'error_log' ) ) {
-			error_log( $msg );
-		}
-		if ( $mine ) {
-			javan_seda_error_log_file( $msg );
-		}
-	}
-	register_shutdown_function( 'javan_seda_fatal_watch' );
-}
-if ( ! function_exists( 'javan_seda_safe' ) ) {
-	/**
-	 * javan_seda_safe( 'نام_تابع', array( آرگومان‌ها ), مقدارِ_جایگزین )
-	 * خروجیِ تابع اگر false/null هم بشود قابل قبول است؛ مهم این است که fatal ندهیم.
-	 */
-	function javan_seda_safe( $fn, $args = array(), $fallback = '' ) {
-		if ( ! is_callable( $fn ) ) {
-			return $fallback;
-		}
-		try {
-			return call_user_func_array( $fn, (array) $args );
-		} catch ( \Throwable $jv_e ) {
-			javan_seda_safe_log( $jv_e );
-			return $fallback;
-		} catch ( \Exception $jv_e ) { // PHP 5.6
-			javan_seda_safe_log( $jv_e );
-			return $fallback;
-		}
-	}
-}
-/* ---------------------------------------------------------------------------
    v3.4.1 — «کنترل رابط» (inc/ab-controls.php)
    گزینه‌های تنظیمات قالب (بخش «کنترل رابط») + اولویت define() در wp-config.php.
    این include باید پیش از بقیۀ لایه‌ها بیاید، چون آن‌ها توابع همین فایل را صدا می‌زنند.
@@ -129,6 +22,44 @@ if ( is_readable( $_javan_seda_artist_tax ) ) {
 	require_once $_javan_seda_artist_tax;
 }
 unset( $_javan_seda_artist_tax );
+
+/* ---------------------------------------------------------------------------
+   v3.5.2 — «دادهٔ هنرمند» (inc/ab-artist-fields.php)
+   خواندنِ یکدستِ کلیدهای موجودِ هنرمند (aimg2, afacebook, …, ab_bio_short,
+   ab_bio_post) با ترتیب «ACF → term meta»، به‌همراه مجموع بازدید آثار.
+   باید پیش از فرم‌های پیشخوان و پیش از قالب‌ها بیاید.
+   ------------------------------------------------------------------------- */
+$_javan_seda_artist_fields = trailingslashit( get_template_directory() ) . 'inc/ab-artist-fields.php';
+if ( is_readable( $_javan_seda_artist_fields ) ) {
+	require_once $_javan_seda_artist_fields;
+}
+unset( $_javan_seda_artist_fields );
+
+/* ---------------------------------------------------------------------------
+   v3.5.2 — «فرم‌های پیشخوان» (inc/ab-terms-admin.php + inc/ab-post-artist.php)
+   فیلدهای هنرمند و توضیح کوتاه/کامل دسته، جست‌وجوی AJAX و جعبهٔ «هنرمندِ اثر».
+   این فایل‌ها فقط هوک ثبت می‌کنند؛ اگر نبودند قالب مثل قبل کار می‌کند.
+   ------------------------------------------------------------------------- */
+$_javan_seda_terms_admin = trailingslashit( get_template_directory() ) . 'inc/ab-terms-admin.php';
+if ( is_readable( $_javan_seda_terms_admin ) ) {
+	require_once $_javan_seda_terms_admin;
+}
+unset( $_javan_seda_terms_admin );
+
+$_javan_seda_post_artist = trailingslashit( get_template_directory() ) . 'inc/ab-post-artist.php';
+if ( is_readable( $_javan_seda_post_artist ) ) {
+	require_once $_javan_seda_post_artist;
+}
+unset( $_javan_seda_post_artist );
+
+/* ---------------------------------------------------------------------------
+   v3.5.2 — «توضیح دسته در فرانت» (inc/ab-cat-desc.php)
+   ------------------------------------------------------------------------- */
+$_javan_seda_cat_desc = trailingslashit( get_template_directory() ) . 'inc/ab-cat-desc.php';
+if ( is_readable( $_javan_seda_cat_desc ) ) {
+	require_once $_javan_seda_cat_desc;
+}
+unset( $_javan_seda_cat_desc );
 
 /* اگر لایۀ بالا روی سرور نبود، همه‌چیز دقیقاً مثل قبل کار می‌کند: نامک singer
    و آدرسِ همان صفحۀ «همهٔ خواننده‌ها». (هیچ فایلی به تنهایی نمی‌تواند بشکند.) */
@@ -187,21 +118,6 @@ if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
    v3.4.3 — پوستۀ صفحۀ «تنظیمات قالب» (فقط پیشخوان؛ inc/ab-admin-ui.php)
    این فایل روی صفحۀ سایت هیچ چیزی چاپ نمی‌کند؛ اگر نبود، همه‌چیز مثل قبل.
    ------------------------------------------------------------------------- */
-/* ---------------------------------------------------------------------------
-   v3.4.9 — «فیلدهای ترم» (inc/ab-terms-ui.php)
-   صفحۀ ویرایشِ هنرمند را در پیشخوان کامل می‌کند (تصویر، نام لاتین، صفحات مجازی،
-   بیوگرافیِ کوتاه و نشانیِ بیوگرافیِ کامل) و به دسته‌ها/برچسب‌ها «توضیح کوتاه» و
-   «توضیح کاملِ با دکمۀ بیشتر/کمتر» اضافه می‌کند. اگر فایل نبود، همه‌چیز مثل قبل
-   (فقط فیلدهای ACF و توضیحِ تک‌خطیِ خودش). خاموشی: JAVANSEDA_TERM_FIELDS = false
-   ------------------------------------------------------------------------- */
-$_javan_seda_terms_ui = trailingslashit( get_template_directory() ) . 'inc/ab-terms-ui.php';
-if ( defined( 'JAVANSEDA_TERM_FIELDS' ) && ! JAVANSEDA_TERM_FIELDS ) {
-	$_javan_seda_terms_ui = ''; // کل لایه خاموش: نه پیشخوان، نه بلوک‌های نمایشی
-}
-if ( '' !== $_javan_seda_terms_ui && is_readable( $_javan_seda_terms_ui ) ) {
-	require_once $_javan_seda_terms_ui;
-}
-unset( $_javan_seda_terms_ui );
 $_javan_seda_admin_ui = trailingslashit( get_template_directory() ) . 'inc/ab-admin-ui.php';
 if ( is_admin() && is_readable( $_javan_seda_admin_ui ) ) {
 	require_once $_javan_seda_admin_ui;

@@ -368,6 +368,12 @@ function taranehyar_panel_sections() {
 			'desc'  => 'نشانک، لوگو، تم تاریک و عنوانِ جایگزینِ سربرگ.',
 		),
 		array(
+			'id'    => 'brand',
+			'title' => 'رنگ‌ها و هویت',
+			'icon'  => 'dashicons-art',
+			'desc'  => 'رنگ اصلی و فرعی سایت و رنگ منو/جست‌وجوی گوشی.',
+		),
+		array(
 			'id'    => 'homes',
 			'title' => 'صفحهٔ اصلی',
 			'icon'  => 'dashicons-admin-home',
@@ -381,9 +387,9 @@ function taranehyar_panel_sections() {
 		),
 		array(
 			'id'    => 'ab_ui',
-			'title' => 'کنترل رابط',
+			'title' => 'ظاهر و رفتار ترانه یار',
 			'icon'  => 'dashicons-layout',
-			'desc'  => 'حالت شب، چیدمان کارت‌ها، صفحه‌بندی دیدگاه‌ها و جزئیات ظاهری.',
+			'desc'  => 'پلیر، کارت‌ها، حالت شب و جزئیات ظاهریِ همین قالب.',
 		),
 		array(
 			'id'    => 'footer',
@@ -408,6 +414,12 @@ function taranehyar_panel_sections() {
 			'title' => 'دربارهٔ سایت',
 			'icon'  => 'dashicons-info',
 			'desc'  => 'متن «درباره ما» برای پانوشت و صفحهٔ هنرمند — یک‌جا ویرایش می‌شود.',
+		),
+		array(
+			'id'    => 'dev',
+			'title' => 'توسعه دهنده',
+			'icon'  => 'dashicons-editor-code',
+			'desc'  => 'تنظیمات فنی و ریز؛ بیشترشان پیش‌فرض خوبی دارند.',
 		),
 	);
 

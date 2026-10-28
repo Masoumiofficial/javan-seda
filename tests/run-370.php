@@ -325,7 +325,7 @@ tara_settings_shell_assets( 'taranehyar_page_ot-theme-options' );
 t( 'تنظیمات: دوباره روی صفحهٔ درست بار می‌شود', isset( $GLOBALS['__styles']['taranehyar-settings'] ) );
 t( 'تنظیمات: پیکربندی JS به صفحه تزریق شد', isset( $GLOBALS['__localized']['taranehyar-settings']['taraSettings'] ) );
 
-t( 'تنظیمات: نقشهٔ هشت بخش', 8 === count( tara_settings_shell_sections() ) );
+t( 'تنظیمات: نقشهٔ ده بخش', 10 === count( tara_settings_shell_sections() ) );
 t( 'تنظیمات: هر بخش عنوان/آیکون/راهنما دارد', ( function () {
 	foreach ( tara_settings_shell_sections() as $id => $item ) {
 		if ( empty( $item['title'] ) || empty( $item['icon'] ) || ! isset( $item['hint'] ) ) {
@@ -335,6 +335,8 @@ t( 'تنظیمات: هر بخش عنوان/آیکون/راهنما دارد', ( 
 	return true;
 } )() );
 t( 'تنظیمات: بخش «درباره سایت» در نقشه هست', isset( tara_settings_shell_sections()['about'] ) );
+t( 'تنظیمات: بخش «رنگ‌ها و هویت» در نقشه هست', isset( tara_settings_shell_sections()['brand'] ) );
+t( 'تنظیمات: بخش «توسعه دهنده» در نقشه هست', isset( tara_settings_shell_sections()['dev'] ) );
 
 /* سربرگ فقط روی همان صفحه چاپ می‌شود */
 $GLOBALS['__screen_id'] = 'taranehyar_page_ot-theme-options';
@@ -437,6 +439,24 @@ t( 'تنظیمات: جابه‌جایی بخش‌ها درون‌خطی است',
 t( 'تنظیمات: هر گزینه جمع‌شونده است', false !== strpos( $settings_php, 'has-label' ) && false !== strpos( $settings_php, 'is-open' ) );
 t( 'تنظیمات: دکمهٔ باز/بستن همه', false !== strpos( $settings_php, 'باز کردن همه' ) && false !== strpos( $settings_php, 'بستن همه' ) );
 
+/* ---------- v3.7.7: رنگ‌های سایت، نوار چسبان تک‌ردیفه/دوردیفه، ویدیو ---------- */
+t( 'رنگ‌ها: فایل tara-brand.php وجود دارد', is_readable( TARANEHYAR_DIR . '/inc/tara-brand.php' ) );
+require_once TARANEHYAR_DIR . '/inc/tara-brand.php';
+t( 'رنگ‌ها: رنگ اصلی از تنظیمات خوانده می‌شود', ( function () {
+	$GLOBALS['__options']['option_tree'] = array( 'brand_primary' => '#aa33cc' );
+	return '#aa33cc' === tara_brand_option( 'brand_primary', '#185ADB' );
+} )() );
+t( 'رنگ‌ها: مقدار نامعتبر رد می‌شود', ( function () {
+	$GLOBALS['__options']['option_tree'] = array( 'brand_primary' => 'red; } body{display:none' );
+	return '#185ADB' === tara_brand_option( 'brand_primary', '#185ADB' );
+} )() );
+t( 'رنگ‌ها: پالت پیش‌فرض درست است', ( function () {
+	$GLOBALS['__options']['option_tree'] = array();
+	$p = tara_brand_palette();
+	return '#185ADB' === $p['primary'] && '#6d28d9' === $p['secondary'];
+} )() );
+t( 'رنگ‌ها: نسخهٔ روشن/تیره ساخته می‌شود', '#ffffff' === tara_tone( '#ffffff', 40 ) && 'rgba(24,90,219,0.100)' === tara_rgba( '#185ADB', 0.1 ) );
+
 /* ---------- v3.7.6: پروتکل فایل صوتی، لایهٔ تضمینی، جست‌وجوی زنده ---------- */
 $GLOBALS['__is_ssl'] = true;
 t( 'پلیر: آدرس http روی سایت https به https ارتقا می‌یابد', 'https://ex/a.mp3' === tara_media_fix_scheme( 'http://ex/a.mp3' ) );
@@ -471,6 +491,55 @@ t( 'اسلایدر: تک‌اسلاید شده', false !== strpos( $scripts, "0:
 
 t( 'تاکسونومی: قالب آرشیو برای ژانر موجود', is_readable( '/tmp/theme/taxonomy-tara_genre.php' ) );
 t( 'تاکسونومی: قالب مشترک آرشیو موجود', is_readable( '/tmp/theme/inc/tax-listing.php' ) );
+
+/* ======================================================================
+   v3.7.7 — بازبینی خرابی‌های گزارش‌شده و تنظیمات تازه
+   ====================================================================== */
+t( 'نسخه: style.css روی ۳.۷.۷ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.7.7' ) );
+
+$opts = (string) @file_get_contents( '/tmp/theme/inc/theme-options.php' );
+t( 'تنظیمات: بخش رنگ‌ها اضافه شده', false !== strpos( $opts, "'id'=>'brand'" ) );
+t( 'تنظیمات: بخش توسعه دهنده اضافه شده', false !== strpos( $opts, "'id'=>'dev'" ) );
+t( 'تنظیمات: رنگ اصلی و فرعی قابل تنظیم‌اند', false !== strpos( $opts, "'id'=>'brand_primary'" ) && false !== strpos( $opts, "'id'=>'brand_secondary'" ) );
+t( 'تنظیمات: رنگ منو و جست‌وجوی گوشی قابل تنظیم است', false !== strpos( $opts, "'id'=>'tara_mob_menu_bg'" ) && false !== strpos( $opts, "'id'=>'tara_mob_search_bg'" ) );
+t( 'تنظیمات: گزینه‌های ریز به بخش توسعه دهنده رفته‌اند', false !== strpos( $opts, "'id'=>'ab_post_img_size'" ) && preg_match( "/'id'=>'ab_post_img_size'.{0,400}'section'=>'dev'/s", $opts ) );
+t( 'تنظیمات: نوار چسبان قدیمی پیش‌فرض خاموش است', (bool) preg_match( "/'id'=>'ab_sticky_player'.{0,700}'std'=>'off'/s", $opts ) );
+
+$ui_css2 = (string) @file_get_contents( '/tmp/theme/css/tara-ui.css' );
+t( 'کارت‌پخش: در قاعدهٔ اصلی فقط یک translate(-50%,-50%) دارد', 1 === preg_match( '/\\.ty-cardplay\\s*\\{[^}]*transform:\\s*translate\\(-50%,\\s*-50%\\)\\s*scale\\(0\\.92\\)/', $ui_css2 ) );
+t( 'کارت‌پخش: translateY سرگردان حذف شده', false === strpos( $ui_css2, "opacity: 0;
+	transform: translateY(6px);" ) );
+t( 'نوار چسبان: شبکهٔ نه‌ستونه با نام ناحیه‌ها', false !== strpos( $ui_css2, 'grid-template-areas: "bars art meta prev toggle next vol list close"' ) );
+t( 'نوار چسبان: کنترل صدا استایل دارد', false !== strpos( $ui_css2, '.ty-dock__volrange' ) && false !== strpos( $ui_css2, '.ty-dock__btn--vol' ) );
+t( 'نوار چسبان: در گوشی دو ردیفی می‌شود', false !== strpos( $ui_css2, '"prev toggle next list"' ) );
+t( 'دکمهٔ بالا: با نوار چسبان جابه‌جا می‌شود', false !== strpos( $ui_css2, 'body.has-tara-dock .top_page' ) );
+t( 'ویدیو: حالت شبه‌تمام‌صفحه و چرخش دارد', false !== strpos( $ui_css2, '.ty-video.is-pseudofs' ) && false !== strpos( $ui_css2, 'is-rotated' ) );
+t( 'شناسنامه: بدون پس‌زمینهٔ سفید', false !== strpos( $ui_css2, '.ab-credits.ab-credits .ab-credit {' ) );
+t( 'جست‌وجو: حالت شبِ کادر تعریف شده', false !== strpos( $ui_css2, 'body.night #searches' ) );
+
+$critical2 = (string) @file_get_contents( '/tmp/theme/inc/tara-critical.php' );
+t( 'تضمینی: جست‌وجو در مود شب رنگ عوض می‌کند', false !== strpos( $critical2, 'body.night #searches' ) );
+t( 'تضمینی: نتایج جست‌وجو در مود شب تیره است', false !== strpos( $critical2, 'body.night #tara-search-results' ) );
+
+$artist_css = (string) @file_get_contents( '/tmp/theme/css/tara-artist.css' );
+t( 'هنرمند: فهرست آهنگ‌ها چندستونه شده', false !== strpos( $artist_css, 'repeat(3, minmax(0, 1fr))' ) && false !== strpos( $artist_css, 'repeat(4, minmax(0, 1fr))' ) );
+
+$home_css = (string) @file_get_contents( '/tmp/theme/css/tara-home.css' );
+t( 'بنر: زوم نرم‌تر شده', false !== strpos( $home_css, 'scale(1.025)' ) && false === strpos( $home_css, 'scale(1.05)' ) );
+t( 'بنر: در گوشی فلش‌ها پنهان می‌شوند', false !== strpos( $home_css, '.ty-hero-slider .owl-nav { display: none !important; }' ) );
+
+$shell = (string) @file_get_contents( '/tmp/theme/inc/admin-settings-shell.php' );
+t( 'تنظیمات: ردیف‌ها پیش‌فرض باز هستند', false !== strpos( $shell, "classList.add('has-label', 'is-open')" ) );
+$admin_js = (string) @file_get_contents( '/tmp/theme/js/admin-settings.js' );
+t( 'تنظیمات: زیربخش‌ها به details تبدیل می‌شوند', false !== strpos( $admin_js, "box.className = 'tara-fold'" ) && false !== strpos( $admin_js, 'groupAll' ) );
+$settings_css2 = (string) @file_get_contents( '/tmp/theme/css/admin-settings.css' );
+t( 'تنظیمات: استایل زیربخش باز/بسته', false !== strpos( $settings_css2, '.tara-fold[open]' ) );
+
+$dock_php = (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' );
+t( 'نوار چسبان: مارکاپ صدا دارد', false !== strpos( $dock_php, 'data-tara-dock-vol' ) && false !== strpos( $dock_php, 'data-tara-dock-mute' ) );
+$player_js2 = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
+t( 'ویدیو: خروج با Esc و تغییر جهت', false !== strpos( $player_js2, "'orientationchange'" ) && false !== strpos( $player_js2, "e.key !== 'Escape'" ) );
+t( 'پلیر: نشانهٔ نسخه ۳.۷.۷', false !== strpos( $player_js2, "'data-tara-ready', '3.7.7'" ) );
 
 /* ======================================================================
    خلاصه

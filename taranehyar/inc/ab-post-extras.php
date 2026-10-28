@@ -29,8 +29,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! defined( 'TARA_POST_EXTRAS' ) ) {
 	define( 'TARA_POST_EXTRAS', true );
 }
+/*
+ * v3.7.7 — «نوار چسبانِ قدیمی» پیش‌فرض خاموش شد.
+ * کاربر دو پلیر هم‌زمان می‌دید: همین نوارِ قدیمی (`#ab-sticky-player` با
+ * `<audio id="ab-sp-audio">` مستقل) و پلیر تازهٔ قالب (`ty-player` + dock).
+ * پلیر تازه کامل‌تر است (فهرست پاپ‌آپ، نوار چسبان با صدا، همگام با کارت)،
+ * پس این یکی دیگر چاپ نمی‌شود. برای برگرداندن:
+ *   define( 'TARA_STICKY_PLAYER', true );  در wp-config.php
+ */
 if ( ! defined( 'TARA_STICKY_PLAYER' ) ) {
-	define( 'TARA_STICKY_PLAYER', true );
+	define( 'TARA_STICKY_PLAYER', false );
 }
 
 if ( ! function_exists( 'tara_x_on' ) ) {

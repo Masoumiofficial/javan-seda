@@ -504,8 +504,55 @@
 			artist: dock.querySelector('[data-tara-dock-artist]'),
 			art: dock.querySelector('[data-tara-dock-art]'),
 			link: dock.querySelector('[data-tara-dock-link]'),
-			fill: dock.querySelector('[data-tara-dock-fill]')
+			fill: dock.querySelector('[data-tara-dock-fill]'),
+			vol: dock.querySelector('[data-tara-dock-vol]'),
+			mute: dock.querySelector('[data-tara-dock-mute]')
 		};
+
+		/* v3.7.7 — کنترل صدا روی همان نوار چسبان پایین صفحه */
+		var lastVol = 1;
+
+		function paintVolume(volume, muted) {
+			var v = muted ? 0 : volume;
+			if (typeof v !== 'number' || isNaN(v)) {
+				v = 1;
+			}
+			if (refs.vol) {
+				refs.vol.value = Math.round(v * 100);
+				refs.vol.style.setProperty('--vol', Math.round(v * 100) + '%');
+			}
+			if (refs.mute) {
+				refs.mute.classList.toggle('is-muted', v === 0);
+				refs.mute.setAttribute('aria-pressed', v === 0 ? 'true' : 'false');
+			}
+		}
+
+		if (refs.vol) {
+			refs.vol.addEventListener('input', function () {
+				var value = Number(refs.vol.value) / 100;
+				if (value > 0) {
+					lastVol = value;
+				}
+				Engine.volume(value);
+			});
+			refs.vol.style.setProperty('--vol', '100%');
+		}
+
+		if (refs.mute) {
+			refs.mute.addEventListener('click', function (event) {
+				event.stopPropagation();
+				var state = Engine.state();
+				if (state.audio && (state.audio.muted || state.audio.volume === 0)) {
+					Engine.volume(lastVol || 0.8);
+				} else {
+					var current = state.audio ? state.audio.volume : lastVol;
+					if (current > 0) {
+						lastVol = current;
+					}
+					Engine.volume(0);
+				}
+			});
+		}
 
 		function show() {
 			if (dock.hidden) {
@@ -564,6 +611,10 @@
 				refs.fill.style.width = (data.position / data.duration) * 100 + '%';
 			}
 
+			if (type === 'volume') {
+				paintVolume(data.volume, data.muted);
+			}
+
 			if (type === 'stop') {
 				dock.classList.remove('is-playing');
 				hide();
@@ -571,6 +622,9 @@
 		});
 
 		dock.addEventListener('click', function (event) {
+			if (event.target.closest && event.target.closest('[data-tara-dock-mute]')) {
+				return; /* هندلر اختصاصی بالا */
+			}
 			var target = event.target.closest ? event.target.closest('[data-tara-dock-toggle], [data-tara-dock-prev], [data-tara-dock-next], [data-tara-dock-close], [data-tara-dock-list]') : null;
 			if (!target) {
 				return;
@@ -1015,10 +1069,92 @@
 				video.muted = !video.muted;
 				target.classList.toggle('is-muted', video.muted);
 			} else if (target.hasAttribute('data-tara-video-fs')) {
-				if (root.requestFullscreen) {
-					root.requestFullscreen();
-				} else if (video.webkitEnterFullscreen) {
-					video.webkitEnterFullscreen();
+				/* v3.7.7 — تمام‌صفحهٔ واقعی + چرخش خودکار روی موبایل.
+				   * اگر مرورگر Fullscreen API دارد: خودِ کارت پلیر تمام‌صفحه
+				     می‌شود و صفحه افقی قفل می‌شود (اندروید/دسکتاپ).
+				   * iOS روی <video> فقط حالت بومی خودش را دارد؛ همان صدا
+				     زده می‌شود که خودبه‌خود می‌چرخد.
+				   * اگر هیچ‌کدام نبود (مرورگرهای قدیمی/وب‌ویو): حالت
+				     «شبه‌تمام‌صفحه» با CSS؛ در حالت عمودی، تصویر ۹۰ درجه
+				     می‌چرخد تا مثل پلیر افقی پرِ صفحه دیده شود. */
+				var fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+
+				function lockLandscape() {
+					try {
+						if (screen.orientation && screen.orientation.lock) {
+							var p = screen.orientation.lock('landscape');
+							if (p && p.catch) { p.catch(function () {}); }
+						}
+					} catch (e) {}
+				}
+
+				function unlockOrientation() {
+					try {
+						if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
+					} catch (e) {}
+				}
+
+				function nativeVideo() {
+					if (video.webkitEnterFullscreen) {
+						video.webkitEnterFullscreen();
+						root.classList.add('is-fullscreen');
+					} else {
+						pseudoFullscreen(!root.classList.contains('is-pseudofs'));
+					}
+				}
+
+				/* شبه‌تمام‌صفحه: بدون Fullscreen API، با CSS کل صفحه را می‌گیریم. */
+				function pseudoFullscreen(on) {
+					root.classList.toggle('is-pseudofs', on);
+					document.body.classList.toggle('tara-fs-open', on);
+					var portrait = window.innerHeight > window.innerWidth;
+					root.classList.toggle('is-rotated', on && portrait);
+					if (on) { lockLandscape(); } else { unlockOrientation(); }
+					try { video.play(); } catch (e) {}
+				}
+
+				if (root.classList.contains('is-pseudofs')) {
+					pseudoFullscreen(false);
+					return;
+				}
+
+				if (fsEl) {
+					if (document.exitFullscreen) {
+						document.exitFullscreen();
+					} else if (document.webkitExitFullscreen) {
+						document.webkitExitFullscreen();
+					} else if (document.msExitFullscreen) {
+						document.msExitFullscreen();
+					}
+					unlockOrientation();
+					return;
+				}
+
+				/* iOS: تمام‌صفحهٔ عنصری روی همهٔ عناصر کار نمی‌کند؛ اگر فقط
+				   ویدیو پشتیبانی می‌کند، مستقیم همان را می‌بریم. */
+				if (!root.requestFullscreen && !root.webkitRequestFullscreen && !root.mozRequestFullScreen && !root.msRequestFullscreen) {
+					nativeVideo();
+					return;
+				}
+
+				var req = root.requestFullscreen || root.webkitRequestFullscreen || root.mozRequestFullScreen || root.msRequestFullscreen;
+				var out;
+				try {
+					out = req.call(root, { navigationUI: 'hide' });
+				} catch (err) {
+					out = req.call(root);
+				}
+
+				if (out && out.then) {
+					out.then(function () {
+						root.classList.add('is-fullscreen');
+						lockLandscape();
+					}).catch(function () {
+						nativeVideo();
+					});
+				} else {
+					root.classList.add('is-fullscreen');
+					lockLandscape();
 				}
 			} else if (target.hasAttribute('data-tara-video-settings')) {
 				if (refs.pop) {
@@ -1224,7 +1360,44 @@
 
 		/* نشانهٔ سلامت برای عیب‌یابی: اگر این صفت روی <html> نبود، یعنی همین فایل
 		   اجرا نشده است (کش/CDN/خطای اسکریپت). */
-		document.documentElement.setAttribute('data-tara-ready', '3.7.6');
+		document.documentElement.setAttribute('data-tara-ready', '3.7.7');
+
+		/* v3.7.7 — وقتی کاربر با دکمهٔ Esc یا ژست بومی از تمام‌صفحه بیرون
+		   می‌آید، کلاس‌ها و قفل چرخش باید پاک شوند؛ وگرنه صفحه سیاه/
+		   افقیِ گیرکرده می‌ماند. */
+		var fsNodes = document.querySelectorAll('[data-tara-video]');
+		function clearFs() {
+			var on = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+			for (var i = 0; i < fsNodes.length; i++) {
+				if (!on) {
+					fsNodes[i].classList.remove('is-fullscreen', 'is-pseudofs', 'is-rotated');
+				}
+			}
+			if (!on) {
+				document.body.classList.remove('tara-fs-open');
+				try {
+					if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
+				} catch (e) {}
+			}
+		}
+		document.addEventListener('fullscreenchange', clearFs);
+		document.addEventListener('webkitfullscreenchange', clearFs);
+		document.addEventListener('keydown', function (e) {
+			if (e.key !== 'Escape' && e.keyCode !== 27) { return; }
+			for (var i = 0; i < fsNodes.length; i++) {
+				if (fsNodes[i].classList.contains('is-pseudofs')) {
+					fsNodes[i].classList.remove('is-pseudofs', 'is-rotated');
+					document.body.classList.remove('tara-fs-open');
+				}
+			}
+		});
+		window.addEventListener('orientationchange', function () {
+			for (var i = 0; i < fsNodes.length; i++) {
+				if (fsNodes[i].classList.contains('is-pseudofs')) {
+					fsNodes[i].classList.toggle('is-rotated', window.innerHeight > window.innerWidth);
+				}
+			}
+		});
 	}
 
 	if (document.readyState === 'loading') {

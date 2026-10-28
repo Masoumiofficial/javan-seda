@@ -23,15 +23,113 @@ function custom_theme_options() {
 ),
 'sections'=> array( 
 array('id'=>'general','title'=>'همگانی'),
+array('id'=>'brand','title'=>'رنگ‌ها و هویت'),
 array('id'=>'homes','title'=>'صفحه اصلی'),
 array('id'=>'dl_pages','title'=>'صفحه دانلود آهنگ'),
-array('id'=>'ab_ui','title'=>'کنترل رابط'),
+array('id'=>'ab_ui','title'=>'ترانه یار — ظاهر و رفتار'),
 array('id'=>'footer','title'=>'پانوشت'),
 array('id'=>'socials','title'=>'شبکه های اجتماعی'),
 array('id'=>'ads1','title'=>'تبلیغات'),
 array('id'=>'about','title'=>'درباره سایت'),
+array('id'=>'dev','title'=>'توسعه دهنده'),
 ),
 'settings'=>array( 
+
+/* ---------------------------------------------------------------------------
+   v3.7.7 — «رنگ‌ها و هویت»: رنگ اصلی/فرعی سایت + رنگ منو و جست‌وجوی موبایل
+   همه به‌صورت متغیر CSS چاپ می‌شوند (inc/tara-brand.php) و هیچ فایلی ویرایش
+   نمی‌شود. خالی‌گذاشتن هر مورد = همان رنگ پیش‌فرض قبلی قالب.
+   ------------------------------------------------------------------------- */
+array(
+'id'=>'brand_guide',
+'label'=>'',
+'desc'=>'<strong>رنگ‌ها را همین‌جا عوض کنید.</strong> «رنگ اصلی» روی دکمه‌ها، لینک‌ها، پلیر، نشانگرها و منو اثر می‌گذارد؛ «رنگ فرعی» برای برجسته‌سازی و گرادیان‌ها استفاده می‌شود. رنگ‌های موبایل فقط نوار بالای گوشی، کشوی منو و کادر جست‌وجوی موبایل را عوض می‌کنند. برای برگشت به پیش‌فرض، خانه را خالی و «ذخیره» را بزنید.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'brand',
+'class'=>'ab-guide'
+),
+array(
+'id'=>'brand_primary',
+'label'=>'رنگ اصلی سایت',
+'desc'=>'پیش‌فرض: #185ADB. این رنگ در همه‌جای قالب (دکمه، لینک، پلیر، نشانگر فعال) به کار می‌رود.',
+'std'=>'#185ADB',
+'type'=>'colorpicker',
+'section'=>'brand'
+),
+array(
+'id'=>'brand_secondary',
+'label'=>'رنگ فرعی سایت',
+'desc'=>'پیش‌فرض: #6d28d9. برای گرادیان دکمه‌ها، برچسب‌ها و جزئیات تزئینی.',
+'std'=>'#6d28d9',
+'type'=>'colorpicker',
+'section'=>'brand'
+),
+array(
+'id'=>'brand_h_mobile',
+'label'=>'',
+'desc'=>'رنگ موبایل<span>فقط در گوشی/تبلت دیده می‌شود. هر مورد را خالی بگذارید تا رنگ قبلی همان جا بماند.</span>',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'brand',
+'class'=>'ab-h'
+),
+array(
+'id'=>'tara_mob_bar_bg',
+'label'=>'رنگ نوار بالای گوشی',
+'desc'=>'نوارِ بالای صفحه در حالت موبایل (همان‌جا که لوگو و دکمهٔ منو هست). پیش‌فرض: سفید.',
+'std'=>'#ffffff',
+'type'=>'colorpicker',
+'section'=>'brand'
+),
+array(
+'id'=>'tara_mob_btn_bg',
+'label'=>'رنگ دکمهٔ منو و ذره‌بین',
+'desc'=>'پس‌زمینهٔ مربعِ منو و جست‌وجو در نوار گوشی. پیش‌فرض: #111111.',
+'std'=>'#111111',
+'type'=>'colorpicker',
+'section'=>'brand'
+),
+array(
+'id'=>'tara_mob_bar_text',
+'label'=>'رنگ آیکون‌های نوار گوشی',
+'desc'=>'رنگ خطوطِ آیکون منو و ذره‌بین. باید با رنگ دکمهٔ بالا کنتراست داشته باشد. پیش‌فرض: سفید.',
+'std'=>'#ffffff',
+'type'=>'colorpicker',
+'section'=>'brand'
+),
+array(
+'id'=>'tara_mob_menu_bg',
+'label'=>'رنگ کشوی منو (گوشی)',
+'desc'=>'پس‌زمینهٔ منویی که از کنار باز می‌شود. پیش‌فرض: #222222.',
+'std'=>'#222222',
+'type'=>'colorpicker',
+'section'=>'brand'
+),
+array(
+'id'=>'tara_mob_menu_text',
+'label'=>'رنگ متن کشوی منو',
+'desc'=>'رنگ لینک‌های منوی موبایل. پیش‌فرض: سفید.',
+'std'=>'#ffffff',
+'type'=>'colorpicker',
+'section'=>'brand'
+),
+array(
+'id'=>'tara_mob_search_bg',
+'label'=>'رنگ کادر جست‌وجوی گوشی',
+'desc'=>'پس‌زمینهٔ کادری که با زدن ذره‌بین باز می‌شود. پیش‌فرض: سفید.',
+'std'=>'#ffffff',
+'type'=>'colorpicker',
+'section'=>'brand'
+),
+array(
+'id'=>'tara_mob_search_text',
+'label'=>'رنگ متن جست‌وجوی گوشی',
+'desc'=>'رنگ متن و راهنمای داخل کادر جست‌وجو. پیش‌فرض: #333333.',
+'std'=>'#333333',
+'type'=>'colorpicker',
+'section'=>'brand'
+),
 // General
 array(
 'id'=>'general_guide',
@@ -622,7 +720,7 @@ array(
 'desc'=>'چیدمانِ صفحۀ تنظیمات: تب‌های بالا، ردیف‌های کارتی، اسلایدرهای عددی و همین متن‌های راهنما (css/ab-admin.css). با خاموش‌کردنش صفحه به ظاهر پیش‌فرض Option Tree برمی‌گردد و هیچ گزینه‌ای عوض نمی‌شود.',
 'std'=>'on',
 'type'=>'on-off',
-'section'=>'ab_ui'
+'section'=>'dev'
 ),
 array(
 'id'=>'ab_ui_h_layers',
@@ -639,7 +737,7 @@ array(
 'desc'=>'کارت/سایه/بلور روی باکس‌ها (css/ab-glass.css). خاموش = فقط استایل خودِ قالب.',
 'std'=>'on',
 'type'=>'on-off',
-'section'=>'ab_ui'
+'section'=>'dev'
 ),
 array(
 'id'=>'ab_ui_guard',
@@ -647,7 +745,7 @@ array(
 'desc'=>'اگر روزی style.css بازنویسی شود و بلوک انتهایی‌اش برود، کپیِ همان استایل از css/ab-ui.css لود می‌شود. پیشنهاد: روشن.',
 'std'=>'on',
 'type'=>'on-off',
-'section'=>'ab_ui'
+'section'=>'dev'
 ),
 array(
 'id'=>'ab_card_stats',
@@ -694,11 +792,11 @@ array(
 ),
 array(
 'id'=>'ab_sticky_player',
-'label'=>'نوار چسبان پخش',
-'desc'=>'نوار پایینِ صفحه در صفحۀ تکیِ آهنگ.',
-'std'=>'on',
+'label'=>'نوار چسبان پخش (نسخهٔ قدیمی)',
+'desc'=>'پخش‌کنندهٔ قدیمیِ قالب که به پایین صفحه می‌چسبید. از ۳.۷.۷ به بعد پلیر تازهٔ ترانه یار همه‌جا هست و این نوار فقط یک پلیر دوم می‌سازد؛ پس پیش‌فرض «خاموش» است. اگر لازم شد، روشنش کنید.',
+'std'=>'off',
 'type'=>'on-off',
-'section'=>'ab_ui'
+'section'=>'dev'
 ),
 array(
 'id'=>'ab_skip_link',
@@ -736,7 +834,7 @@ array('value'=>'card','label'=>'کارت'),
 array('value'=>'compact','label'=>'فشرده'),
 array('value'=>'legacy','label'=>'ساده (قالب مادر)'),
 ),
-'section'=>'ab_ui'
+'section'=>'dev'
 ),
 array(
 'id'=>'ab_player_list',
@@ -772,7 +870,7 @@ array(
 'std'=>'30',
 'type'=>'numeric-slider',
 'min_max_step'=>'0,96,1',
-'section'=>'ab_ui',
+'section'=>'dev',
 'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
 'operator'=>'or',
 'class'=>'ab-sub'
@@ -784,7 +882,7 @@ array(
 'std'=>'20',
 'type'=>'numeric-slider',
 'min_max_step'=>'0,40,1',
-'section'=>'ab_ui',
+'section'=>'dev',
 'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
 'operator'=>'or',
 'class'=>'ab-sub'
@@ -795,7 +893,7 @@ array(
 'desc'=>'خط دور کارت پلیر.',
 'std'=>'on',
 'type'=>'on-off',
-'section'=>'ab_ui',
+'section'=>'dev',
 'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
 'operator'=>'or',
 'class'=>'ab-sub'
@@ -806,7 +904,7 @@ array(
 'desc'=>'سایۀ نرم زیر کارت پلیر.',
 'std'=>'on',
 'type'=>'on-off',
-'section'=>'ab_ui',
+'section'=>'dev',
 'condition'=>'ab_player_mode:is(card),ab_player_mode:is(compact)',
 'operator'=>'or',
 'class'=>'ab-sub'
@@ -827,7 +925,7 @@ array(
 'std'=>'500',
 'type'=>'numeric-slider',
 'min_max_step'=>'240,900,20',
-'section'=>'ab_ui'
+'section'=>'dev'
 ),
 array(
 'id'=>'ab_post_img_crop',
@@ -835,7 +933,7 @@ array(
 'desc'=>'روشن = عکس در همان کادر مربع از وسط کات می‌شود. خاموش = عرض همان عدد می‌ماند و ارتفاع نسبت اصلیِ عکس را می‌گیرد.',
 'std'=>'on',
 'type'=>'on-off',
-'section'=>'ab_ui',
+'section'=>'dev',
 'class'=>'ab-sub'
 ),
 /* ---- هنرمند: نامکِ تاکسونومی و آدرسِ آرشیو (v3.4.7) ---- */
@@ -845,7 +943,7 @@ array(
 'desc'=>'نامکِ «هنرمند»<span>در قالب مادر این تاکسونومی singer است، ولی بقیۀ پروژه artist را به کار می‌برد (فیلد ACFِ artist، کلاس‌ها، فایلِ فهرست هنرمندان). این دو ردیف همان دوگانگی را یکی می‌کند: نامک فعال + آدرسِ آرشیو. مهاجرت فقط یک ستونِ دیتابیس است و با خاموش‌کردن همین کلید برمی‌گردد.</span>',
 'type'=>'textblock',
 'std'=>'',
-'section'=>'ab_ui',
+'section'=>'dev',
 'class'=>'ab-h'
 ),
 array(
@@ -854,7 +952,7 @@ array(
 'desc'=>'روشن = فهرست‌ها، لینک‌ها و اصطلاحات زیر نامک artist (مهاجرت خودکارِ یک‌بار). خاموش = همان singer همیشگی؛ هیچ داده‌ای از دست نمی‌رود.',
 'std'=>'on',
 'type'=>'on-off',
-'section'=>'ab_ui'
+'section'=>'dev'
 ),
 array(
 'id'=>'ab_artist_slug',
@@ -862,7 +960,7 @@ array(
 'desc'=>'بخشِ اولِ آدرس، بدون اسلش. پیش‌فرض artist ⇒ /artist/mohsen-yeganeh. اگر singer بگذارید آدرس‌های قبلی برمی‌گردند. آدرس‌های قدیمی همیشه با ۳۰۱ به آدرسِ تازه می‌روند. صفحۀ فهرست هم با همین ردیف‌ها آدرسش را از arti_url یا اسلاگِ برگه (artists) می‌گیرد',
 'std'=>'artist',
 'type'=>'text',
-'section'=>'ab_ui',
+'section'=>'dev',
 'class'=>'ab-sub small-text'
 ),
 array(
@@ -989,6 +1087,22 @@ array('value'=>'card','label'=>'کارت کنار محتوا'),
 array('value'=>'wide','label'=>'تمام‌عرض، بالای هنرمندان مشابه'),
 ),
 'section'=>'about'
+),
+
+
+/* ---------------------------------------------------------------------------
+   v3.7.7 — «توسعه دهنده»: تنظیمات فنی/ظاهریِ ریز که کاربر عادی لازم ندارد.
+   همه همان کلیدهای قبلی هستند (هیچ داده‌ای جابه‌جا نمی‌شود)؛ فقط از شلوغی
+   بخش «ظاهر و رفتار» کم شده‌اند.
+   ------------------------------------------------------------------------- */
+array(
+'id'=>'dev_guide',
+'label'=>'',
+'desc'=>'<strong>این بخش برای کاربر فنی است.</strong> هر گزینه همان گزینهٔ قبلی است، فقط این‌جا جمع شده تا بخش‌های روزمره ساده بمانند. اگر نمی‌دانید یک مورد چه می‌کند، همان پیش‌فرض را نگه دارید. وضعیت فعلی: PHP نسخهٔ ' . PHP_VERSION . ' · وردپرس نسخهٔ ' . ( function_exists( 'get_bloginfo' ) ? get_bloginfo( 'version' ) : '—' ) . ' · قالب نسخهٔ ' . ( defined( 'TARANEHYAR_VERSION' ) ? TARANEHYAR_VERSION : '—' ) . '.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'dev',
+'class'=>'ab-guide'
 ),
 
 ));

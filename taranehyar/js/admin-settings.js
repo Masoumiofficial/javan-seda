@@ -94,6 +94,105 @@
 	}
 
 	/* ---------------------------------------------------------------
+	 * ۱-۲) زیربخش‌های باز/بستنی (v3.7.7)
+	 * ------------------------------------------------------------
+	 * هر «تیتر میانی» (ردیفی با کلاس ab-h) به یک <details> تبدیل می‌شود و
+	 * ردیف‌های بعدی تا تیتر بعدی داخل آن می‌نشینند. پیش‌فرض همه باز است —
+	 * کاربر چیزی را «گم» نمی‌کند؛ فقط اگر خواست می‌تواند یک بلوک را جمع
+	 * کند. بلوک‌های تک‌گزینه‌ای اصلاً قابل بستن نمی‌شوند تا کلیکِ بی‌فایده
+	 * نداشته باشیم.
+	 * ------------------------------------------------------------ */
+	/* OptionTree کلاس هر ردیف را با پسوند «-wrap» چاپ می‌کند
+	   (`class` در تنظیمات → `ab-h-wrap`)، پس همان شکل را می‌سنجیم. */
+	function roleOf(row) {
+		var cls = ' ' + String(row.className || '') + ' ';
+		if (cls.indexOf(' ab-h-wrap ') !== -1) { return 'head'; }
+		if (cls.indexOf(' ab-sub-wrap ') !== -1) { return 'sub'; }
+		if (cls.indexOf(' ab-guide-wrap ') !== -1) { return 'guide'; }
+		return '';
+	}
+
+	function groupPanel(panel) {
+		if (!panel || panel.getAttribute('data-tara-grouped')) {
+			return;
+		}
+		panel.setAttribute('data-tara-grouped', '1');
+
+		var inside = panel.querySelector('.inside');
+		if (!inside) {
+			return;
+		}
+
+		var rows = [];
+		for (var i = 0; i < inside.children.length; i++) {
+			if (inside.children[i].classList.contains('format-settings')) {
+				rows.push(inside.children[i]);
+			}
+		}
+
+		var current = null;
+		var buffer = [];
+
+		function flush() {
+			if (!current) {
+				buffer = [];
+				return;
+			}
+
+			/* بلوک تک‌گزینه‌ای قابل بستن نیست (کلیکِ بی‌فایده) */
+			if (buffer.length > 1) {
+				var box = document.createElement('details');
+				box.className = 'tara-fold';
+				box.open = true;
+
+				var sum = document.createElement('summary');
+				sum.className = 'tara-fold__sum';
+				sum.setAttribute('aria-label', 'باز یا بستن این بخش');
+
+				var head = current.node;
+				head.parentNode.insertBefore(box, head);
+				sum.appendChild(head);
+				box.appendChild(sum);
+
+				for (var b = 0; b < buffer.length; b++) {
+					box.appendChild(buffer[b]);
+				}
+			}
+
+			buffer = [];
+		}
+
+		for (var r = 0; r < rows.length; r++) {
+			var row = rows[r];
+			var role = roleOf(row);
+
+			if (role === 'head') {
+				flush();
+				row.classList.add('tara-head');
+				current = { node: row };
+			} else if (current) {
+				buffer.push(row);
+			}
+		}
+
+		flush();
+	}
+
+	function groupAll() {
+		if (!root || typeof document.createElement('details').open === 'undefined') {
+			return;
+		}
+		var panels = root.querySelectorAll('.ui-tabs-panel');
+		for (var i = 0; i < panels.length; i++) {
+			try {
+				groupPanel(panels[i]);
+			} catch (e) {
+				/* هیچ‌وقت صفحهٔ تنظیمات را به‌خاطر یک بلوک خراب نکن */
+			}
+		}
+	}
+
+	/* ---------------------------------------------------------------
 	 * ۲) جست‌وجو
 	 * ------------------------------------------------------------ */
 	function rowsOf(panel) {
@@ -345,6 +444,7 @@
 		if (root) {
 			decorateNav();
 			decoratePanels();
+			groupAll();
 			rememberSection();
 			buildSearch();
 			openSection(wantedSection());

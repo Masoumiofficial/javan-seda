@@ -52,26 +52,64 @@ if ( ! function_exists( 'tara_critical_css' ) ) {
 		}
 
 		/* ---------- کادر جست‌وجوی سربرگ + نتایج زنده ---------- */
-		#searches { position: relative !important; display: flex !important; align-items: stretch;
-			width: 230px; height: 34px; margin: 4px 10px 0 0; border-radius: 999px;
-			border: 1px solid #dcd8ea; background: #fff; overflow: visible !important;
-			box-shadow: 0 2px 10px -6px rgba(22, 18, 31, .35); }
-		#searches:focus-within { border-color: #6d28d9; box-shadow: 0 0 0 3px rgba(109, 40, 217, .18); }
+		/* v3.7.7 — کادر جست‌وجو: ساده‌تر و «خاص‌تر»، و هم‌رنگ با مود روشن/تاریک.
+		   قبلاً کادرِ سفیدِ ثابت با دکمهٔ بنفشِ تمام‌قد بود؛ در مود شب سفید
+		   می‌ماند و با سربرگ تیره تضاد داشت. حالا یک کپسول نرم است با دکمهٔ
+		   دایره‌ایِ کوچک و حالت‌های رنگ جدا برای روز و شب. */
+		#searches { position: relative !important; display: flex !important; align-items: center;
+			gap: 2px; width: 224px; height: 36px; margin: 3px 12px 0 0; padding: 0 3px 0 0;
+			border-radius: 999px; border: 1px solid rgba(17, 24, 39, .10);
+			background: #f2f1f7; overflow: visible !important;
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7);
+			transition: border-color .16s ease, background .16s ease, box-shadow .16s ease; }
+		#searches:focus-within { background: #fff; border-color: rgba(109, 40, 217, .55);
+			box-shadow: 0 0 0 3px rgba(109, 40, 217, .13); }
 		#searches #lsds, #searches .searchfield { position: static !important; flex: 1 1 auto;
-			width: auto !important; min-width: 0; height: 32px; padding: 0 12px !important;
-			border: 0 !important; border-radius: 999px 0 0 999px; background: #fff !important;
-			color: #16121f !important; font-size: 12.5px; text-indent: 0 !important; text-align: right; direction: rtl; }
-		#searches #lsds::placeholder { color: #8b8899 !important; opacity: 1; }
-		#searches button { flex: 0 0 38px; width: 38px; height: 32px; line-height: 32px;
-			float: none; border: 0; border-radius: 0; background: #6d28d9 !important; color: #fff !important;
-			font-size: 15px; cursor: pointer; }
+			width: auto !important; min-width: 0; height: 34px; padding: 0 14px !important;
+			border: 0 !important; border-radius: 0; background: transparent !important;
+			color: #16121f !important; font-size: 12.5px; text-indent: 0 !important;
+			text-align: right; direction: rtl; box-shadow: none !important; }
+		#searches #lsds::placeholder, #searches .searchfield::placeholder {
+			color: #8b8899 !important; opacity: 1; font-weight: 500; }
+		#searches button { flex: 0 0 30px; width: 30px; height: 30px; line-height: 30px;
+			float: none; border: 0; border-radius: 50%;
+			background: linear-gradient(135deg, #4c1d95, #6d28d9) !important; color: #fff !important;
+			font-size: 13px; cursor: pointer; box-shadow: 0 4px 10px -6px rgba(76, 29, 149, .9); }
 		#searches button:hover { background: #4c1d95 !important; }
-		@media (max-width: 600px) { #searches { width: 168px; } }
+		/* مود شب: شیشهٔ نیمه‌شفاف روی سربرگ تیره */
+		body.night #searches, html[data-tara-night="1"] #searches {
+			border-color: rgba(255, 255, 255, .14) !important;
+			background: rgba(255, 255, 255, .07) !important;
+			box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05); }
+		body.night #searches:focus-within, html[data-tara-night="1"] #searches:focus-within {
+			background: rgba(255, 255, 255, .12) !important;
+			border-color: rgba(196, 181, 253, .6) !important;
+			box-shadow: 0 0 0 3px rgba(167, 139, 250, .16); }
+		body.night #searches #lsds, body.night #searches .searchfield,
+		html[data-tara-night="1"] #searches #lsds, html[data-tara-night="1"] #searches .searchfield {
+			background: transparent !important; color: #f4f2ff !important; }
+		body.night #searches #lsds::placeholder, body.night #searches .searchfield::placeholder,
+		html[data-tara-night="1"] #searches #lsds::placeholder,
+		html[data-tara-night="1"] #searches .searchfield::placeholder {
+			color: rgba(255, 255, 255, .55) !important; }
+		@media (max-width: 600px) { #searches { width: 176px; } }
 
-		#tara-search-results { position: absolute; z-index: 100000; top: calc(100% + 8px);
-			inset-inline: 0; display: none; overflow: hidden; border: 1px solid #e6e4ef;
-			border-radius: 14px; background: #fff; box-shadow: 0 24px 44px -22px rgba(17, 16, 28, .55);
+		#tara-search-results { position: absolute; z-index: 100000; top: calc(100% + 10px);
+			inset-inline-start: 0; inset-inline-end: auto; width: 330px; max-width: 88vw;
+			display: none; overflow: hidden; border: 1px solid #e6e4ef;
+			border-radius: 16px; background: #fff; box-shadow: 0 24px 44px -22px rgba(17, 16, 28, .55);
 			direction: rtl; text-align: right; }
+		body.night #tara-search-results, html[data-tara-night="1"] #tara-search-results {
+			border-color: rgba(255, 255, 255, .12); background: #1c1b24;
+			box-shadow: 0 24px 44px -22px rgba(0, 0, 0, .8); }
+		body.night #tara-search-results .tara-sr__head,
+		html[data-tara-night="1"] #tara-search-results .tara-sr__head {
+			border-color: rgba(255, 255, 255, .08); color: rgba(255, 255, 255, .6); }
+		body.night #tara-search-results a.tara-sr__row,
+		html[data-tara-night="1"] #tara-search-results a.tara-sr__row { color: #eee9ff; }
+		body.night #tara-search-results a.tara-sr__row:hover,
+		html[data-tara-night="1"] #tara-search-results a.tara-sr__row:hover {
+			background: rgba(255, 255, 255, .06); }
 		#tara-search-results.is-open { display: block; }
 		#tara-search-results .tara-sr__head { padding: 8px 12px; border-bottom: 1px solid #f1eff8;
 			font-size: 11px; font-weight: 700; color: #6b6a7b; }

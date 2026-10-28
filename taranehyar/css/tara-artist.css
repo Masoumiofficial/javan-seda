@@ -564,3 +564,114 @@
 @media (max-width: 640px) {
 	.ty-artist__section-head .ty-artist__sort { margin-inline-start: 0; width: 100%; }
 }
+
+/* =========================================================================
+   ۳.۷.۷ — فهرست آهنگ‌های هنرمند: چندردیفه، به‌جای یک ستون بلند
+   -------------------------------------------------------------------------
+   هر بخش (آهنگ/آلبوم/ویدیو) به یک شبکهٔ کارت‌مانند تبدیل می‌شود: ۴ ستون در
+   نمایشگرهای بزرگ، ۳ ستون در لپ‌تاپ، ۲ ستون در تبلت و یک ستون در گوشی.
+   در حالت چندستونه، برچسب نوع و تاریخ حذف می‌شوند (چون همهٔ ردیف‌های یک بخش
+   هم‌نوع‌اند) تا هر کارت در عرض کم هم تمیز بماند.
+   ====================================================================== */
+.ty-artist .ty-tracklist {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 6px;
+}
+
+/* حالت کارتی: قاب نرم و پس‌زمینهٔ سطح */
+@media (min-width: 641px) {
+	.ty-artist .ty-tracklist {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px 10px;
+	}
+
+	.ty-artist .ty-track {
+		grid-template-columns: 32px 42px minmax(0, 1fr);
+		gap: 9px;
+		padding: 7px 9px;
+		border: 1px solid var(--ty-line, #e6e8ee);
+		border-radius: 14px;
+		background: var(--ty-surface, #fff);
+	}
+
+	.ty-artist .ty-track:hover {
+		background: var(--ty-surface, #fff);
+		border-color: color-mix(in srgb, var(--ty-accent, #185adb) 45%, var(--ty-line, #e6e8ee));
+		box-shadow: 0 10px 22px -20px rgba(17, 24, 39, .8);
+	}
+
+	.ty-artist .ty-track.is-current {
+		border-color: var(--ty-accent, #185adb);
+		background: var(--ty-accent-soft, #eaf1fe);
+	}
+
+	.ty-artist .ty-track__play {
+		width: 30px;
+		height: 30px;
+	}
+
+	.ty-artist .ty-track__cover img {
+		width: 42px;
+		height: 42px;
+		border-radius: 10px;
+	}
+
+	.ty-artist .ty-track__badge,
+	.ty-artist .ty-track__date { display: none; }
+
+	.ty-artist .ty-track__title { font-size: 13px; }
+}
+
+@media (min-width: 1024px) {
+	.ty-artist .ty-tracklist {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+}
+
+@media (min-width: 1400px) {
+	.ty-artist .ty-tracklist {
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+	}
+}
+
+/* گوشی: ردیف‌های لمسی و بزرگ، بدون قاب (تمام عرض) */
+@media (max-width: 640px) {
+	.ty-artist .ty-tracklist { gap: 2px; }
+
+	.ty-artist .ty-track {
+		grid-template-columns: 34px 44px minmax(0, 1fr);
+		gap: 10px;
+		padding: 8px 6px;
+		border-radius: 12px;
+		border-bottom: 1px solid rgba(17, 24, 39, .06);
+	}
+
+	.ty-artist .ty-track__badge { display: none; }
+	.ty-artist .ty-track__date { font-size: 10.5px; }
+	.ty-artist .ty-track__title { font-size: 13.5px; }
+}
+
+/* مود شب: قاب‌ها با خط روشن‌تر */
+body.night .ty-artist .ty-track,
+html[data-tara-night="1"] .ty-artist .ty-track {
+	border-color: rgba(255, 255, 255, .12);
+	background: rgba(255, 255, 255, .04);
+}
+
+body.night .ty-artist .ty-track:hover,
+html[data-tara-night="1"] .ty-artist .ty-track:hover {
+	background: rgba(255, 255, 255, .08);
+	border-color: rgba(196, 181, 253, .5);
+	box-shadow: none;
+}
+
+@media (max-width: 640px) {
+	body.night .ty-artist .ty-track,
+	html[data-tara-night="1"] .ty-artist .ty-track {
+		border-bottom-color: rgba(255, 255, 255, .08);
+		background: transparent;
+		border-inline: 0;
+		border-top: 0;
+	}
+}

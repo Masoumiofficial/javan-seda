@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.6' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.7' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -234,10 +234,40 @@ if ( ! function_exists( 'the_views' ) ) {
 	}
 }
 
+if ( ! function_exists( 'taranehyar_other_view_counter' ) ) {
+	/**
+	 * آیا افزونهٔ دیگری هم بازدید می‌شمارد؟ (v3.7.7)
+	 *
+	 * چرا مهم است: WP-PostViews و Post Views Counter هم دقیقاً روی همین متای
+	 * `views` می‌نویسند. اگر هر دو فعال باشند، هر بازدید **دو** واحد اضافه
+	 * می‌شد — همان چیزی که کاربر دید («هر بازدید ۲ بازدید»).
+	 *
+	 * @return string نام افزونه یا رشتهٔ خالی.
+	 */
+	function taranehyar_other_view_counter() {
+		if ( defined( 'WP_POSTVIEWS_VER' ) || class_exists( 'WP_PostViews' ) || function_exists( 'process_postviews' ) ) {
+			return 'WP-PostViews';
+		}
+		if ( defined( 'POSTVIEWS_VERSION' ) || class_exists( 'Post_Views_Counter' ) || function_exists( 'pvc_get_post_views' ) ) {
+			return 'Post Views Counter';
+		}
+		if ( defined( 'WPP_VERSION' ) || class_exists( 'WPP' ) ) {
+			return 'WP Statistics';
+		}
+		if ( function_exists( 'wp_statistics_visitor' ) ) {
+			return 'WP Statistics';
+		}
+
+		return '';
+	}
+}
+
 if ( ! function_exists( 'taranehyar_count_views' ) ) {
 	/**
 	 * یک بازدید به نوشتهٔ در حال نمایش اضافه می‌کند.
-	 * شرایط: فقط نوشتهٔ تکیِ منتشرشده، فقط در فرانت، بدون خزنده، یک‌بار در هر درخواست.
+	 * شرایط: فقط نوشتهٔ تکیِ منتشرشده، فقط در فرانت، بدون خزنده، یک‌بار در هر درخواست
+	 * و **یک‌بار برای هر بازدیدکننده در هر ۶ ساعت** (v3.7.7)، تا رفرش/بازگشت
+	 * شمارنده را دو برابر نکند. اگر افزونهٔ دیگری هم بشمارد، اصلاً نمی‌شماریم.
 	 * این تابع هیچ عددی «برای آمار» نمی‌سازد؛ فقط متای `views` موجود را یک واحد
 	 * بالا می‌برد — همان چیزی که مرتب‌سازیِ «پربازدیدترین‌ها» بر آن استوار است.
 	 */
@@ -298,8 +328,32 @@ if ( ! function_exists( 'taranehyar_count_views' ) ) {
 			return;
 		}
 
+		/*
+		 * v3.7.7 — اگر افزونهٔ دیگری هم می‌شمارد، ما نمی‌شماریم (جلوگیری از ۲ شدن).
+		 * با فیلتر می‌شود این تصمیم را عوض کرد:
+		 *   add_filter( 'taranehyar_skip_view_count', '__return_false' );
+		 */
+		$other = taranehyar_other_view_counter();
+		if ( '' !== $other && apply_filters( 'taranehyar_skip_view_count', true, $post_id, $other ) ) {
+			return;
+		}
+
+		/* یک‌بار در هر ۶ ساعت برای هر بازدیدکننده — رفرش/بازگشت شمارنده را دو برابر نمی‌کند */
+		$cookie = 'tara_seen_' . $post_id;
+		if ( ! empty( $_COOKIE[ $cookie ] ) ) {
+			return;
+		}
+
 		$current = (int) get_post_meta( $post_id, 'views', true );
 		update_post_meta( $post_id, 'views', max( 0, $current ) + 1 );
+
+		/* کوکی مهمان‌پسند: بدون داده‌های شخصی، فقط «این نوشته را دیده‌ام» */
+		if ( ! headers_sent() ) {
+			$path   = defined( 'COOKIEPATH' ) && COOKIEPATH ? COOKIEPATH : '/';
+			$domain = defined( 'COOKIE_DOMAIN' ) && COOKIE_DOMAIN ? COOKIE_DOMAIN : '';
+			setcookie( $cookie, '1', time() + 6 * HOUR_IN_SECONDS, $path, $domain, is_ssl(), true );
+			$_COOKIE[ $cookie ] = '1'; // در همین درخواست دوباره شمرده نشود
+		}
 	}
 	add_action( 'wp', 'taranehyar_count_views', 20 );
 }
@@ -388,6 +442,13 @@ if ( is_readable( $taranehyar_ui ) ) {
 	require_once $taranehyar_ui;
 }
 unset( $taranehyar_ui );
+
+/* ۶-الف-۳-۲) رنگ‌ها و هویت (۳.۷.۷) — متغیرهای CSS از تنظیمات قالب */
+$taranehyar_brand = TARANEHYAR_DIR . '/inc/tara-brand.php';
+if ( is_readable( $taranehyar_brand ) ) {
+	require_once $taranehyar_brand;
+}
+unset( $taranehyar_brand );
 
 /* ۶-الف-۴) لایهٔ تضمینیِ ظاهر + جست‌وجوی زنده (۳.۷.۶)
    CSS ضروری را درون‌خطی چاپ می‌کند و اگر فایل‌های قالب به صفحه نرسند،

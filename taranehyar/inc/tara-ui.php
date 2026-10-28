@@ -613,6 +613,13 @@ if ( ! function_exists( 'tara_dock_markup' ) ) {
 				<span class="ty-icon-play" aria-hidden="true"></span><span class="ty-icon-pause" aria-hidden="true"></span>
 			</button>
 			<button type="button" class="ty-dock__btn" data-tara-dock-next aria-label="قطعهٔ بعد"><span class="ty-icon-next" aria-hidden="true"></span></button>
+			<div class="ty-dock__vol" data-tara-dock-volbox>
+				<button type="button" class="ty-dock__btn ty-dock__btn--vol" data-tara-dock-mute aria-label="بی‌صدا / با صدا">
+					<span class="ty-icon-vol" aria-hidden="true"></span>
+					<span class="ty-icon-muted" aria-hidden="true"></span>
+				</button>
+				<input type="range" class="ty-dock__volrange" data-tara-dock-vol min="0" max="100" value="100" step="1" aria-label="بلندی صدا" dir="ltr">
+			</div>
 			<button type="button" class="ty-dock__btn ty-dock__btn--list" data-tara-dock-list aria-label="فهرست پخش" aria-haspopup="dialog"<?php echo ( (int) ( isset( $first['total'] ) ? $first['total'] : 0 ) < 2 ) ? ' hidden' : ''; ?>>
 				<span class="ty-icon-list" aria-hidden="true"></span>
 			</button>

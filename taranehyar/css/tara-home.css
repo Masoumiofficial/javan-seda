@@ -45,7 +45,7 @@
 	transition: transform .7s ease;
 }
 
-.ty-hero-slide:hover .ty-hero-slide__media img { transform: scale(1.05); }
+.ty-hero-slide:hover .ty-hero-slide__media img { transform: scale(1.025); }
 
 @media (max-width: 782px) {
 	.ty-hero-slide__media { aspect-ratio: 16 / 9; }
@@ -96,4 +96,62 @@
 	.ty-hero-slide__media img { height: 56vw; min-height: 220px; }
 
 	.ty-hero-slider .owl-dots { bottom: 8px; }
+}
+
+/* =========================================================================
+   ۳.۷.۷ — بنر خانه: ریسپانسیوِ مطمئن + زومِ نرم‌تر
+   -------------------------------------------------------------------------
+   بنر در هر اندازهٔ صفحه کاملِ عرض را می‌گیرد، هیچ‌وقت سرریز نمی‌کند و زوم
+   هاور آرام‌تر شده است (به‌جای ۱٫۰۵ برابر، ۱٫۰۲۵ برابر و طولانی‌تر).
+   ====================================================================== */
+.ty-hero-slider {
+	width: 100%;
+	max-width: 100%;
+	overflow: hidden;
+}
+
+.ty-hero-slider .vip_top_slider,
+.ty-hero-slider .owl-stage-outer,
+.ty-hero-slider .owl-stage,
+.ty-hero-slider .owl-item {
+	max-width: 100%;
+}
+
+.ty-hero-slider .ty-hero-slide__media img {
+	max-width: 100%;
+	transform: scale(1.005);
+	transition: transform 1.1s cubic-bezier(.22, .61, .36, 1);
+}
+
+.ty-hero-slide:hover .ty-hero-slide__media img,
+.ty-hero-slider:hover .ty-hero-slide__media img {
+	transform: scale(1.025);
+}
+
+@media (max-width: 782px) {
+	.ty-hero-slider {
+		--ty-hs-radius: 16px;
+		margin: 12px 0 18px;
+		border-radius: var(--ty-hs-radius);
+	}
+
+	.ty-hero-slide__media { aspect-ratio: 16 / 9; }
+
+	/* فلش‌های اسلایدر در گوشی روی تصویر می‌افتند و لمس را سخت می‌کنند؛
+	   همان نشانگرهای پایین کافی است. */
+	.ty-hero-slider .owl-nav { display: none !important; }
+
+	.ty-hero-slider .owl-dots { bottom: 8px; gap: 5px; }
+}
+
+@media (max-width: 480px) {
+	.ty-hero-slide__media { aspect-ratio: 4 / 3; }
+	.ty-hero-slide__media img { object-position: center 32%; }
+}
+
+/* دستگاه‌های لمسی: زوم هاور بی‌معناست و فقط «جهش» می‌سازد */
+@media (hover: none) {
+	.ty-hero-slide:hover .ty-hero-slide__media img,
+	.ty-hero-slider .ty-hero-slide:hover .ty-hero-slide__media img,
+	.ty-hero-slider:hover .ty-hero-slide__media img { transform: scale(1.005); }
 }

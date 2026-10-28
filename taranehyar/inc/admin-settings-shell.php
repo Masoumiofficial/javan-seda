@@ -94,14 +94,16 @@ if ( ! function_exists( 'tara_settings_shell_sections' ) ) {
 	 */
 	function tara_settings_shell_sections() {
 		$sections = array(
-			'general' => array( 'title' => 'همگانی', 'icon' => 'dashicons-admin-generic', 'hint' => 'لوگو، نشانک، عنوان و رفتار پایهٔ سایت' ),
+			'general' => array( 'title' => 'همگانی', 'icon' => 'dashicons-admin-generic', 'hint' => 'نشانک (فاویکون)، لوگو، عنوان و رفتار پایهٔ سایت' ),
+			'brand'   => array( 'title' => 'رنگ‌ها و هویت', 'icon' => 'dashicons-art', 'hint' => 'رنگ اصلی و فرعی سایت، رنگ منو و جست‌وجوی گوشی' ),
 			'homes'   => array( 'title' => 'صفحه اصلی', 'icon' => 'dashicons-admin-home', 'hint' => 'اسلایدر، بخش‌ها و ترتیب مطالب صفحهٔ اصلی' ),
 			'dl_pages' => array( 'title' => 'صفحه دانلود آهنگ', 'icon' => 'dashicons-download', 'hint' => 'چیدمان صفحهٔ آهنگ و دکمه‌های دانلود' ),
-			'ab_ui'   => array( 'title' => 'کنترل رابط', 'icon' => 'dashicons-admin-appearance', 'hint' => 'کلیدهای روشن/خاموش ظاهر و لایه‌های سایت' ),
+			'ab_ui'   => array( 'title' => 'ظاهر و رفتار ترانه یار', 'icon' => 'dashicons-admin-appearance', 'hint' => 'پلیر، کارت‌ها، مود شب و جزئیات ظاهری همین قالب' ),
 			'footer'  => array( 'title' => 'پانوشت', 'icon' => 'dashicons-editor-insertmore', 'hint' => 'متن، دسته‌ها و کپی‌رایت پایین سایت' ),
 			'socials' => array( 'title' => 'شبکه‌های اجتماعی', 'icon' => 'dashicons-share', 'hint' => 'آدرس اینستاگرام، تلگرام و بقیه' ),
 			'ads1'    => array( 'title' => 'تبلیغات', 'icon' => 'dashicons-megaphone', 'hint' => 'کدهای تبلیغاتی بالای سایت و کنار مطالب' ),
 			'about'   => array( 'title' => 'درباره سایت', 'icon' => 'dashicons-info-outline', 'hint' => 'متنی که در پانوشت و صفحهٔ هنرمند دیده می‌شود' ),
+			'dev'     => array( 'title' => 'توسعه دهنده', 'icon' => 'dashicons-editor-code', 'hint' => 'تنظیمات فنی و ریز — برای کاربر عادی لازم نیست' ),
 		);
 
 		return apply_filters( 'tara_settings_shell_sections', $sections );
@@ -405,7 +407,7 @@ if ( ! function_exists( 'tara_settings_shell_core_ui' ) ) {
 	 * این تکه **درون خودِ صفحه** چاپ می‌شود (نه فایل بیرونی)، پس هیچ کش،
 	 * فیلتر یا خطای اسکریپتی نمی‌تواند از کار بیندازدش:
 	 *   • با کلیک هر تب، فقط پنل همان بخش دیده می‌شود
-	 *   • هر گزینه یک ردیف جمع‌شونده است (پیش‌فرض بسته) + «باز/بستن همه»
+	 *   • هر گزینه یک ردیف جمع‌شونده است (پیش‌فرض باز) + «باز/بستن همه»
 	 *   • آدرس صفحه با #section_x هم‌گام است، پس رفرش روی همان بخش می‌ماند
 	 */
 	function tara_settings_shell_core_ui() {
@@ -612,10 +614,14 @@ if ( ! function_exists( 'tara_settings_shell_core_ui' ) ) {
 					if (!label) {
 						continue;
 					}
-					rows[k].classList.add('has-label');
+					/* v3.7.7 — همهٔ گزینه‌ها «باز» شروع می‌شوند.
+					   پیش‌تر هر ردیف بسته بود و کاربر باید یکی‌یکی بازش می‌کرد
+					   (همان «باز بسته»ای که لوگو و فاویکون را پنهان می‌کرد).
+					   حالا مقدار همه دیده می‌شود؛ فقط اگر خواست می‌تواند جمعش کند. */
+					rows[k].classList.add('has-label', 'is-open');
 					label.setAttribute('role', 'button');
 					label.setAttribute('tabindex', '0');
-					label.setAttribute('aria-expanded', 'false');
+					label.setAttribute('aria-expanded', 'true');
 				}
 
 				function toggle(row, open) {

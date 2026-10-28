@@ -240,7 +240,8 @@
 .ty-icon-search,
 .ty-icon-caret,
 .ty-icon-expand,
-.ty-icon-pip {
+.ty-icon-pip,
+.ty-icon-muted {
 	display: inline-block;
 	position: relative;
 	width: 18px;
@@ -319,6 +320,40 @@
 	border-width: 6px 7px 6px 0;
 	border-color: transparent currentColor transparent transparent;
 }
+
+/* v3.7.7 — آیکون «بی‌صدا» (بلندگو + ضربدر). فقط وقتی صدا بسته است دیده می‌شود. */
+.ty-icon-muted {
+	display: none;
+}
+
+.ty-icon-muted::before {
+	content: "";
+	position: absolute;
+	inset-inline-start: 1px;
+	top: 6px;
+	width: 5px;
+	height: 6px;
+	background: currentColor;
+	border-start-start-radius: 1px;
+	border-end-start-radius: 1px;
+}
+
+.ty-icon-muted::after {
+	content: "×";
+	position: absolute;
+	inset-inline-end: -1px;
+	top: -3px;
+	font-size: 17px;
+	line-height: 1;
+	font-weight: 700;
+	color: currentColor;
+}
+
+.ty-dock__btn--vol.is-muted .ty-icon-vol,
+.ty-player [data-tara-vol-mute].is-muted .ty-icon-vol { display: none; }
+
+.ty-dock__btn--vol.is-muted .ty-icon-muted,
+.ty-player [data-tara-vol-mute].is-muted .ty-icon-muted { display: inline-block; }
 
 .ty-icon-note::before {
 	content: "♪";
@@ -641,7 +676,11 @@
 	bottom: 0;
 	z-index: 9990;
 	display: grid;
-	grid-template-columns: 34px 44px minmax(0, 1fr) auto auto auto auto auto;
+	/* v3.7.7 — یک ستون برای هر فرزند (نوار اکولایزر، کاور، متن، قبلی،
+	   پخش، بعدی، صدا، فهرست، بستن). قبلاً هشت ستون بود و با اضافه‌شدن
+	   کنترل صدا، اسلایدر به بیرونِ شبکه می‌افتاد. */
+	grid-template-columns: auto 44px minmax(0, 1fr) auto auto auto auto auto auto;
+	grid-template-areas: "bars art meta prev toggle next vol list close";
 	align-items: center;
 	gap: 10px;
 	padding: 8px 14px calc(8px + env(safe-area-inset-bottom));
@@ -657,7 +696,92 @@
 
 .ty-dock.is-visible { transform: translateY(0); }
 
-body.has-tara-dock { padding-bottom: 72px; }
+.ty-dock__bars { grid-area: bars; }
+.ty-dock__art { grid-area: art; display: block; line-height: 0; }
+.ty-dock__meta { grid-area: meta; }
+.ty-dock [data-tara-dock-prev] { grid-area: prev; }
+.ty-dock [data-tara-dock-toggle] { grid-area: toggle; }
+.ty-dock [data-tara-dock-next] { grid-area: next; }
+.ty-dock__vol { grid-area: vol; }
+.ty-dock [data-tara-dock-list] { grid-area: list; }
+.ty-dock [data-tara-dock-close] { grid-area: close; }
+
+body.has-tara-dock { padding-bottom: 76px; }
+
+/* کنترل صدا داخل نوار چسبان ----------------------------------------- */
+.ty-dock__vol {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-width: 0;
+}
+
+.ty-dock__btn--vol {
+	width: 34px;
+	height: 34px;
+	flex: 0 0 auto;
+	color: var(--ty-muted);
+}
+
+.ty-dock__btn--vol:hover { color: var(--ty-accent); }
+
+.ty-dock__btn--vol.is-muted { color: #d1435b; }
+
+.ty-dock__volrange {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 84px;
+	min-width: 56px;
+	height: 22px;
+	background: transparent;
+	cursor: pointer;
+	accent-color: var(--ty-accent);
+	margin: 0;
+}
+
+.ty-dock__volrange::-webkit-slider-runnable-track {
+	height: 4px;
+	border-radius: 999px;
+	background: linear-gradient(
+		to right,
+		var(--ty-accent) 0,
+		var(--ty-accent) var(--vol, 100%),
+		var(--ty-line) var(--vol, 100%),
+		var(--ty-line) 100%
+	);
+}
+
+.ty-dock__volrange::-moz-range-track {
+	height: 4px;
+	border-radius: 999px;
+	background: var(--ty-line);
+}
+
+.ty-dock__volrange::-moz-range-progress {
+	height: 4px;
+	border-radius: 999px;
+	background: var(--ty-accent);
+}
+
+.ty-dock__volrange::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	appearance: none;
+	width: 13px;
+	height: 13px;
+	margin-top: -4.5px;
+	border-radius: 50%;
+	background: #fff;
+	border: 2px solid var(--ty-accent);
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.ty-dock__volrange::-moz-range-thumb {
+	width: 13px;
+	height: 13px;
+	border: 2px solid var(--ty-accent);
+	border-radius: 50%;
+	background: #fff;
+}
 
 .ty-dock__img {
 	width: 44px;
@@ -1548,22 +1672,25 @@ body.has-tara-modal { overflow: hidden; }
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	transform: translate(-50%, -50%) scale(0.9);
-	z-index: 3;
+	/* v3.7.7 — transform فقط یک‌بار نوشته می‌شود. قبلاً یک قاعدهٔ بعدی
+	   `transform: translateY(6px)` را می‌نشاند و مرکزگیری را باطل می‌کرد؛
+	   نتیجه: مثلث پخش از وسط دایره بیرون می‌زد. */
+	transform: translate(-50%, -50%) scale(0.92);
+	z-index: 4;
 	appearance: none;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 38px;
-	height: 38px;
+	width: 40px;
+	height: 40px;
+	padding: 0;
 	border: 0;
 	border-radius: 50%;
-	background: rgba(255, 255, 255, .94);
+	background: rgba(255, 255, 255, .96);
 	color: #4c1d95;
 	box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .65);
 	cursor: pointer;
 	opacity: 0;
-	transform: translateY(6px);
 	transition: opacity .18s ease, transform .18s ease, background .18s ease;
 }
 
@@ -1592,9 +1719,17 @@ body.has-tara-modal { overflow: hidden; }
 	display: none;
 	width: 16px;
 	height: 16px;
+	margin: 0;
 }
 
-.ty-cardplay .ty-icon-play::before { border-width: 6px 0 6px 10px; inset-inline-start: 4px; }
+/* مثلث باید «بینایی» در وسط دایره بنشیند؛ عرض ۱۰px + آفست ۳px = ۱۳ از ۱۶،
+   پس ۱.۵px به راست هدایت می‌شود تا مرکز بصری دقیقاً وسط باشد. */
+.ty-cardplay .ty-icon-play::before {
+	border-width: 6px 0 6px 10px;
+	inset-inline-start: 3px;
+	top: 2px;
+	transform: translateX(1.5px);
+}
 
 .ty-cardplay:not(.is-playing) .ty-icon-play { display: inline-block; }
 .ty-cardplay.is-playing .ty-icon-pause { display: inline-block; }
@@ -1602,6 +1737,11 @@ body.has-tara-modal { overflow: hidden; }
 
 @media (hover: none) {
 	.ty-cardplay { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@media (max-width: 520px) {
+	.ty-cardplay { width: 34px; height: 34px; }
+	.ty-cardplay::after { inset: -5px; }
 }
 
 /* =========================================================================
@@ -1837,32 +1977,33 @@ a.ty-person__chip:hover {
 
 }
 
-/* جست‌وجوی سربرگ — v3.7.4
-   باگ قبلی: متن و placeholder سفید شده بود ولی خودِ کادر روشن بود ⇒ «سفید روی سفید».
-   حالا کادر روشن با خطِ مشخص، متن تیره و حالت فوکوسِ بنفش. */
+/* جست‌وجوی سربرگ — v3.7.7
+   ساده‌تر و خالص‌تر: کپسول نرمِ کم‌رنگ با دکمهٔ دایره‌ایِ کوچک (به‌جای نوار
+   بنفش تمام‌قد). رنگ‌ها از توکن‌های تم می‌آیند تا در مود شب هم هم‌خوان باشند. */
 #searches,
 #header #searches {
 	display: flex;
-	align-items: stretch;
-	width: 230px;
-	height: 34px;
-	margin: 4px 10px 0 0;
+	align-items: center;
+	gap: 2px;
+	width: 224px;
+	height: 36px;
+	margin: 3px 12px 0 0;
+	padding: 0 3px 0 0;
 	border-radius: 999px;
 	overflow: hidden;
-	border: 1px solid #dcd8ea;
-	background: #ffffff;
-	box-shadow: 0 2px 10px -6px rgba(22, 18, 31, .45);
-	transition: border-color .16s ease, box-shadow .16s ease;
+	border: 1px solid rgba(17, 24, 39, .10);
+	background: #f2f1f7;
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, .7);
+	transition: border-color .16s ease, background .16s ease, box-shadow .16s ease;
 }
 
 #searches:focus-within,
 #header #searches:focus-within {
-	border-color: #6d28d9;
-	box-shadow: 0 0 0 3px rgba(109, 40, 217, .18);
+	background: #fff;
+	border-color: rgba(109, 40, 217, .55);
+	box-shadow: 0 0 0 3px rgba(109, 40, 217, .13);
 }
 
-/* ورودی دیگر absolute نیست: قبلاً با width:100% روی دکمه می‌افتاد و
-   دکمهٔ ذره‌بین زیر آن پنهان می‌شد. حالا هر دو در یک ردیف فلکس‌اند. */
 #lsds,
 #searches .searchfield,
 #header #searches .searchfield {
@@ -1870,11 +2011,12 @@ a.ty-person__chip:hover {
 	flex: 1 1 auto;
 	width: auto !important;
 	min-width: 0;
-	background: #ffffff !important;
+	background: transparent !important;
 	border: 0 !important;
+	box-shadow: none !important;
 	color: #16121f !important;
-	height: 32px;
-	padding: 0 12px !important;
+	height: 34px;
+	padding: 0 14px !important;
 	text-align: right;
 	text-indent: 0 !important;
 	font-size: 12.5px;
@@ -1885,29 +2027,62 @@ a.ty-person__chip:hover {
 #lsds::placeholder {
 	color: #8b8899 !important;
 	opacity: 1;
+	font-weight: 500;
 }
 
 #searches button,
 #header #searches button {
 	float: none;
-	flex: 0 0 38px;
-	width: 38px;
-	height: 32px;
-	line-height: 32px;
+	flex: 0 0 30px;
+	width: 30px;
+	height: 30px;
+	line-height: 30px;
 	border: 0;
-	border-radius: 0;
-	background: #6d28d9 !important;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #4c1d95, #6d28d9) !important;
 	color: #ffffff !important;
-	font-size: 15px;
+	font-size: 13px;
 	cursor: pointer;
+	box-shadow: 0 4px 10px -6px rgba(76, 29, 149, .9);
+}
+
+#searches button:hover,
+#header #searches button:hover { background: #4c1d95 !important; }
+
+/* مود شب */
+body.night #searches,
+body.night #header #searches,
+html[data-tara-night="1"] #searches {
+	border-color: rgba(255, 255, 255, .14);
+	background: rgba(255, 255, 255, .07);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+body.night #searches:focus-within,
+html[data-tara-night="1"] #searches:focus-within {
+	background: rgba(255, 255, 255, .12);
+	border-color: rgba(196, 181, 253, .6);
+	box-shadow: 0 0 0 3px rgba(167, 139, 250, .16);
+}
+
+body.night #searches #lsds,
+body.night #searches .searchfield,
+html[data-tara-night="1"] #searches #lsds,
+html[data-tara-night="1"] #searches .searchfield {
+	background: transparent !important;
+	color: #f4f2ff !important;
+}
+
+body.night #searches #lsds::placeholder,
+body.night #searches .searchfield::placeholder,
+html[data-tara-night="1"] #searches #lsds::placeholder {
+	color: rgba(255, 255, 255, .55) !important;
 }
 
 @media (max-width: 600px) {
 	#searches,
-	#header #searches { width: 168px; }
+	#header #searches { width: 176px; }
 }
-
-#searches button:hover { background: #4c1d95 !important; }
 
 /* کلید شب/روز: ناحیهٔ کلیک بزرگ‌تر، بالای لایه‌ها و با نشانگر دست */
 .dark_light_mode {
@@ -2040,4 +2215,388 @@ body.tara-dock-open .top_page { bottom: 92px; }
 	background: #f1ecff;
 	color: #6d28d9;
 	font-size: 15px;
+}
+
+/* =========================================================================
+   ۳.۷.۷ — لایهٔ تکمیلی: موبایلِ نوار چسبان، تمام‌صفحهٔ ویدیو، کاور پلیر
+   ====================================================================== */
+
+/* ---- نوار چسبان در گوشی: دو ردیف ----
+   در یک ردیف، ۹ ستون در عرض ۳۶۰px جا نمی‌شود و عنوان آهنگ کاملاً حذف
+   می‌شد. حالا کاور+عنوان در ردیف اول و کنترل‌ها (قبلی/پخش/بعدی + صدا +
+   فهرست) در ردیف دوم می‌نشینند؛ همه‌چیز بزرگ و قابل لمس می‌ماند. */
+@media (max-width: 640px) {
+	.ty-dock {
+		grid-template-columns: 40px 40px minmax(0, 1fr) 40px;
+		grid-template-areas:
+			"art meta meta close"
+			"prev toggle next list"
+			"prev vol vol list";
+		grid-template-rows: auto auto auto;
+		row-gap: 2px;
+		column-gap: 6px;
+		padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+	}
+
+	.ty-dock__bars { display: none; }
+	.ty-dock__img { width: 40px; height: 40px; border-radius: 9px; }
+	.ty-dock__title { font-size: 12.5px; }
+	.ty-dock__artist { font-size: 10.5px; }
+	.ty-dock__rail { margin-top: 3px; }
+
+	.ty-dock [data-tara-dock-prev],
+	.ty-dock [data-tara-dock-next],
+	.ty-dock [data-tara-dock-list],
+	.ty-dock [data-tara-dock-close],
+	.ty-dock__btn--main { width: 40px; height: 40px; }
+
+	.ty-dock__vol {
+		grid-area: vol;
+		justify-self: stretch;
+		gap: 6px;
+	}
+
+	.ty-dock__btn--vol { width: 30px; height: 30px; }
+
+	.ty-dock__volrange {
+		width: 100%;
+		flex: 1 1 auto;
+		height: 26px;
+	}
+
+	.ty-dock [data-tara-dock-close] { align-self: start; }
+
+	body.has-tara-dock { padding-bottom: 118px; }
+}
+
+@media (max-width: 380px) {
+	.ty-dock {
+		grid-template-columns: 36px 38px minmax(0, 1fr) 36px;
+		column-gap: 4px;
+		padding-inline: 8px;
+	}
+
+	body.has-tara-dock { padding-bottom: 112px; }
+}
+
+/* ---- دکمهٔ «بالا» نباید روی نوار چسبان بیفتد ----
+   ارتفاع نوار در گوشی دو ردیفه است؛ ۹۸px در دسکتاپ و ۱۳۶px در موبایل
+   فاصلهٔ امن می‌دهد. */
+body.has-tara-dock .top_page {
+	bottom: calc(84px + env(safe-area-inset-bottom)) !important;
+}
+
+@media (max-width: 640px) {
+	body.has-tara-dock .top_page {
+		bottom: calc(128px + env(safe-area-inset-bottom)) !important;
+		width: 40px;
+		height: 40px;
+		left: 8px;
+	}
+}
+
+/* ---- پلیر ویدیو: تمام‌صفحهٔ واقعی + شبه‌تمام‌صفحه ---- */
+.ty-video {
+	position: relative;
+}
+
+.ty-video.is-fullscreen,
+.ty-video.is-pseudofs {
+	position: fixed;
+	inset: 0;
+	z-index: 999999;
+	width: 100vw;
+	height: 100vh;
+	height: 100dvh;
+	margin: 0;
+	border: 0;
+	border-radius: 0;
+	display: flex;
+	flex-direction: column;
+	background: #000;
+}
+
+.ty-video.is-fullscreen .ty-video__stage,
+.ty-video.is-pseudofs .ty-video__stage {
+	flex: 1 1 auto;
+	aspect-ratio: auto;
+	height: auto;
+	min-height: 0;
+}
+
+.ty-video.is-fullscreen .ty-video__bar,
+.ty-video.is-pseudofs .ty-video__bar {
+	flex: 0 0 auto;
+	padding-bottom: calc(8px + env(safe-area-inset-bottom));
+	background: rgba(10, 8, 18, .96);
+}
+
+/* شبه‌تمام‌صفحهٔ چرخیده: تصویر ۹۰ درجه می‌چرخد تا در گوشیِ عمودی مثل
+   پلیر افقی تمام‌صفحه دیده شود. */
+.ty-video.is-pseudofs.is-rotated {
+	width: 100vh;
+	width: 100dvh;
+	height: 100vw;
+	top: 50%;
+	left: 50%;
+	inset-inline: auto;
+	bottom: auto;
+	transform: translate(-50%, -50%) rotate(90deg);
+	transform-origin: center center;
+}
+
+.ty-video.is-pseudofs.is-rotated .ty-video__bar {
+	padding-bottom: 8px;
+}
+
+body.tara-fs-open {
+	overflow: hidden;
+	overscroll-behavior: none;
+}
+
+/* در تمام‌صفحه، دکمهٔ «بستن/خروج» همیشه دیده شود */
+.ty-video.is-fullscreen [data-tara-video-fs],
+.ty-video.is-pseudofs [data-tara-video-fs] {
+	background: rgba(255, 255, 255, .18);
+}
+
+/* ---- پلیر موبایل: کاور بزرگ و مربعی (قبلاً نواری ۱۹۰px بود) ---- */
+@media (max-width: 782px) {
+	.ty-player__art {
+		width: 100%;
+		max-width: 300px;
+		height: auto;
+		aspect-ratio: 1 / 1;
+		margin-inline: auto;
+	}
+
+	.ty-player__img { height: 100%; }
+
+	.ty-player {
+		margin: 16px 0;
+		border-radius: 18px;
+	}
+
+	.ty-player__song { font-size: 19px; line-height: 1.6; }
+
+	.ty-player__transport {
+		flex-wrap: wrap;
+		row-gap: 10px;
+	}
+
+	.ty-player__btn--main { width: 56px; height: 56px; }
+
+	.ty-player__vol { flex: 1 1 auto; }
+	.ty-player__vol input[type="range"] { width: 88px; }
+}
+
+/* ---- ویدیو در گوشی: نوار کنترل جمع‌وجور ولی قابل لمس ---- */
+@media (max-width: 640px) {
+	.ty-video { margin: 16px 0; border-radius: 16px; }
+	.ty-video__bar { flex-wrap: wrap; row-gap: 6px; padding: 8px 10px; }
+	.ty-video__rail { min-width: 90px; }
+	.ty-video__btn { width: 40px; height: 40px; }
+	.ty-video__btn--text { padding: 0 10px; }
+	.ty-video__bigplay { width: 62px; height: 62px; }
+	.ty-video__bigplay .ty-icon-play { width: 22px; height: 22px; }
+	.ty-video__bigplay .ty-icon-play::before { border-width: 9px 0 9px 14px; }
+	.ty-video__caption { inset-inline: 12px; bottom: 10px; font-size: 12px; }
+}
+
+/* =========================================================================
+   ۳.۷.۷ — شناسنامهٔ اثر: خواناتر و مرتب‌تر (بدون هیچ پس‌زمینهٔ سفید)
+   -------------------------------------------------------------------------
+   هر قلم یک «ستون کوچک» با خط راهنمای نازک در کنار است؛ برچسب کم‌رنگ و
+   مقدار پررنگ. چیدمان دو-سه ستونه در دسکتاپ و دو ستونه در گوشی.
+   ====================================================================== */
+.ab-credits.ab-credits .ab-credits__row {
+	grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+	gap: 2px 18px;
+	align-items: start;
+}
+
+.ab-credits.ab-credits .ab-credit {
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 1px;
+	padding: 5px 0 5px 10px;
+	border-inline-start: 2px solid rgba(109, 40, 217, .16);
+	border-radius: 0 8px 8px 0;
+	background: transparent;
+	transition: border-color .16s ease, background .16s ease;
+}
+
+.ab-credits.ab-credits .ab-credit:hover {
+	border-inline-start-color: var(--ty-accent, #185adb);
+	background: color-mix(in srgb, var(--ty-accent, #185adb) 5%, transparent);
+}
+
+.ab-credits.ab-credits .ab-credit__k {
+	font-size: 10.5px;
+	font-weight: 600;
+	letter-spacing: .2px;
+	color: var(--ty-muted, #8b8b9a);
+}
+
+.ab-credits.ab-credits .ab-credit__k::after { content: none; }
+
+.ab-credits.ab-credits .ab-credit__v {
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1.65;
+	color: var(--ty-ink, #111);
+}
+
+.ab-credits.ab-credits .ab-credit__v a {
+	color: inherit;
+	border-bottom: 1px solid transparent;
+	padding-bottom: 1px;
+}
+
+.ab-credits.ab-credits .ab-credit__v a:hover {
+	color: var(--ty-accent, #185adb);
+	border-bottom-color: currentColor;
+}
+
+body.night .ab-credits.ab-credits .ab-credit,
+html[data-tara-night="1"] .ab-credits.ab-credits .ab-credit {
+	border-inline-start-color: rgba(196, 181, 253, .28);
+}
+
+body.night .ab-credits.ab-credits .ab-credit:hover,
+html[data-tara-night="1"] .ab-credits.ab-credits .ab-credit:hover {
+	background: rgba(255, 255, 255, .05);
+	border-inline-start-color: #c4b5fd;
+}
+
+@media (max-width: 640px) {
+	.ab-credits.ab-credits .ab-credits__row {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 2px 12px;
+	}
+
+	.ab-credits.ab-credits .ab-credits__title {
+		font-size: 11.5px;
+		margin-bottom: 5px;
+	}
+}
+
+/* =========================================================================
+   ۳.۷.۷ — «صفحهٔ اختصاصی هنرمند» در بخش سایر آهنگ‌ها: دکمهٔ واقعی، نه یک
+   برچسب خاکستری. قرصِ گرادیانی با آیکون میکروفن در دایره و فلش، همراه با
+   بالا‌آمدن نرم در هاور. در گوشی هم به‌جای پنهان‌شدن، تمام‌عرض می‌شود.
+   ====================================================================== */
+.rel_sing_bbt .left_artists_pp {
+	float: inline-start;
+	display: inline-flex;
+	margin: 0 0 8px;
+	padding: 0;
+	background: transparent;
+	border-radius: 999px;
+}
+
+.rel_sing_bbt .left_artists_pp:hover { background: transparent; }
+
+.rel_sing_bbt .artist_songs_page {
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	height: auto !important;
+	line-height: 1.6;
+	padding: 8px 16px 8px 14px;
+	border-radius: 999px;
+	font-size: 12.5px;
+	font-weight: 700;
+	text-decoration: none;
+	color: #fff !important;
+	background: linear-gradient(135deg, #4c1d95, #6d28d9 70%, #7c3aed);
+	box-shadow: 0 14px 26px -18px rgba(76, 29, 149, .95);
+	transition: transform .16s ease, box-shadow .16s ease, filter .16s ease;
+}
+
+.rel_sing_bbt .artist_songs_page:hover,
+.rel_sing_bbt .artist_songs_page:focus-visible {
+	color: #fff !important;
+	transform: translateY(-1px);
+	filter: saturate(1.1) brightness(1.05);
+	box-shadow: 0 18px 30px -18px rgba(76, 29, 149, 1);
+}
+
+.rel_sing_bbt .artist_songs_page i {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .18);
+	font-size: 15px;
+}
+
+.rel_sing_bbt .artist_songs_page::after {
+	content: "‹";
+	font-size: 17px;
+	line-height: 1;
+	margin-inline-start: 2px;
+	opacity: .8;
+}
+
+@media (max-width: 767px) {
+	.rel_sing_bbt .left_artists_pp {
+		display: block;
+		float: none;
+		margin: 10px 0 12px;
+	}
+
+	.rel_sing_bbt .artist_songs_page {
+		display: flex;
+		width: 100%;
+		justify-content: center;
+		padding: 11px 16px;
+		font-size: 13px;
+	}
+
+	/* دکمهٔ تکراری انتهای فهرست دیگر لازم نیست */
+	.rel_sing_bbt .mobile_more_artist { display: none !important; }
+}
+
+body.night .rel_sing_bbt .artist_songs_page,
+html[data-tara-night="1"] .rel_sing_bbt .artist_songs_page {
+	box-shadow: none;
+	border: 1px solid rgba(255, 255, 255, .18);
+}
+
+/* ---- آیکون تمام‌صفحه: واضح‌تر + تغییر حالت در تمام‌صفحه ---- */
+.ty-video__btn[data-tara-video-fs] {
+	background: rgba(255, 255, 255, .10);
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+}
+
+.ty-video__btn[data-tara-video-fs]:hover {
+	background: rgba(255, 255, 255, .22);
+}
+
+.ty-video__btn[data-tara-video-fs] .ty-icon-expand {
+	width: 20px;
+	height: 20px;
+	transition: transform .18s ease;
+}
+
+.ty-video__btn[data-tara-video-fs] .ty-icon-expand::before,
+.ty-video__btn[data-tara-video-fs] .ty-icon-expand::after {
+	width: 7px;
+	height: 7px;
+}
+
+.ty-video.is-fullscreen .ty-video__btn[data-tara-video-fs] .ty-icon-expand,
+.ty-video.is-pseudofs .ty-video__btn[data-tara-video-fs] .ty-icon-expand {
+	transform: rotate(180deg);
+}
+
+/* ---- ارتفاع جایگزین برای مرورگرهای بدون dvh ---- */
+@supports not (height: 100dvh) {
+	.ty-video.is-fullscreen,
+	.ty-video.is-pseudofs { height: 100vh; }
 }

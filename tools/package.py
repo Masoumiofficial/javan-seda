@@ -30,7 +30,7 @@ import subprocess
 import sys
 import zipfile
 
-THEME = 'javanseda'
+THEME = 'taranehyar'
 EXCLUDE_NAMES = ('style.css.map',)   # نام‌هایی که همیشه بیرون می‌مانند
 ICB0_MARK = 'ICB0'                  # سرآمدِ فایل‌های رمزگذاری‌شده با ionCube
 

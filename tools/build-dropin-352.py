@@ -40,7 +40,7 @@ README = """جوان‌صدا ۳.۵.۲ — drop-in (فقط فایل‌های ت�
 ۱۴ فایل. دو فایلِ لایسنس (functions.php و RTL_License_41d6c5f704e3a746.php) عمداً در این
 بسته نیستند: لایسنسِ روی سرور شما باید دست‌نخورده بماند.
 
-نصب: محتوای بسته را در wp-content/themes/javanseda/ باز کنید (Extract/Overwrite).
+نصب: محتوای بسته را در wp-content/themes/taranehyar/ باز کنید (Extract/Overwrite).
 سپس Purge All در افزونهٔ کش. style.css باید Version: 3.5.2 بدهد.
 
 برای نصبِ کامل، javanseda-3.5.2.zip را با File Manager در wp-content/themes/ باز کنید.
@@ -49,7 +49,7 @@ README = """جوان‌صدا ۳.۵.۲ — drop-in (فقط فایل‌های ت�
 
 def main():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    theme = os.path.join(root, 'javanseda')
+    theme = os.path.join(root, 'taranehyar')
     out = os.path.join(root, 'artifacts', 'drop-in-v3.5.2.zip')
     os.makedirs(os.path.dirname(out), exist_ok=True)
     if os.path.exists(out):

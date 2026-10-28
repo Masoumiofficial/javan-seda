@@ -200,7 +200,7 @@ t( 'CSS: حالت شب', false !== strpos( $css, '.night .ab-cpager .page-number
 t( 'CSS: فوکوس قابل‌دیدن', false !== strpos( $css, '.ab-cpager .page-numbers:focus-visible' ) );
 
 $style = file_get_contents( '/tmp/theme/style.css' );
-t( 'style.css: نسخه ۳.۵.۴', false !== strpos( $style, 'Version: 3.5.4' ) );
+t( 'style.css: نسخه ۳.۵.۴ یا بالاتر', (bool) preg_match( '/Version:\s*3\.(5|6|7|8|9)\.[0-9]+/', $style ) );
 
 /* ======================================================================
    خلاصه

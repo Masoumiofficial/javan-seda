@@ -1,11 +1,16 @@
 @charset "utf-8";
 /*
-Theme Name: javanseda
-Theme URI: https://www.rtl-theme.com/author/tarlanweb/
-Author: Reza Kianoosh
-Author URI: https://www.rtl-theme.com/author/tarlanweb/
-Description: قالب وردپرس جوان صدا 
-Version: 3.5.4
+Theme Name: ترانه یار
+Theme URI: https://ahangban.ir/
+Author: Taranehyar
+Author URI: https://ahangban.ir/
+Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
+Version: 3.6.0
+Requires at least: 5.5
+Tested up to: 6.7
+Requires PHP: 7.4
+Text Domain: javanseda
+Tags: rtl-language-support, music, dark-mode, custom-menu, featured-images, threaded-comments
 */
 /*
 ==================================================================================

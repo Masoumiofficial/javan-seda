@@ -8,8 +8,8 @@
 import io, os, re, sys
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-style = os.path.join(root, 'javanseda', 'style.css')
-out = os.path.join(root, 'javanseda', 'css', 'ab-ui.css')
+style = os.path.join(root, 'taranehyar', 'style.css')
+out = os.path.join(root, 'taranehyar', 'css', 'ab-ui.css')
 
 s = io.open(style, encoding='utf-8', newline='').read()
 i = s.find('/* ── ab-ui-layer ─')

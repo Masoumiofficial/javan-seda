@@ -25,7 +25,7 @@ import sys
 import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-THEME = 'javanseda'
+THEME = 'taranehyar'
 THEME_ABS = os.path.join(ROOT, THEME)
 LICENSE_FILES = ('functions.php', 'RTL_License_41d6c5f704e3a746.php')
 

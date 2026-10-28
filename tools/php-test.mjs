@@ -8,7 +8,7 @@ import path from 'node:path';
 
 const file = process.argv[2] || 'tests/run-352.php';
 const root = process.cwd();
-const theme = path.join(root, 'javanseda');
+const theme = path.join(root, 'taranehyar');
 
 const incFiles = [
   'ab-artist-fields.php',
@@ -26,12 +26,17 @@ const files = incFiles.map((name) => ({
   url: 'file://' + path.join(theme, 'inc', name),
 }));
 /* فایل‌های ریشهٔ قالب (آزمونِ سرچشمه: اینکه <title> دستی برنگشته باشد) */
-for (const name of ['header.php', 'myfunctions.php', 'style.css', 'comments.php']) {
+for (const name of ['functions.php', 'header.php', 'myfunctions.php', 'style.css', 'comments.php']) {
   files.push({ parent: '/tmp/theme', name, url: 'file://' + path.join(theme, name) });
 }
 files.push({ parent: '/tmp/theme/inc', name: 'theme-options.php', url: 'file://' + path.join(theme, 'inc', 'theme-options.php') });
 files.push({ parent: '/tmp/theme/inc', name: 'ab-controls.php', url: 'file://' + path.join(theme, 'inc', 'ab-controls.php') });
 files.push({ parent: '/tmp/theme/css', name: 'ab-352.css', url: 'file://' + path.join(theme, 'css', 'ab-352.css') });
+files.push({ parent: '/tmp/theme/css', name: 'icofont.min.css', url: 'file://' + path.join(theme, 'css', 'icofont.min.css') });
+for (const js of ['owl.carousel.js', 'scripts.js']) {
+  files.push({ parent: '/tmp/theme/js', name: js, url: 'file://' + path.join(theme, 'js', js) });
+}
+files.push({ parent: '/tmp/theme/inc', name: 'widgets.php', url: 'file://' + path.join(theme, 'inc', 'widgets.php') });
 files.push({ parent: '/preload/tests', name: 'stubs-wp.php', url: 'file://' + path.join(root, 'tests', 'stubs-wp.php') });
 files.push({ parent: '/preload/tests', name: path.basename(file), url: 'file://' + path.resolve(file) });
 

@@ -11,8 +11,8 @@
 import hashlib, io, os, re, sys
 
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-php = os.path.join(root, 'javanseda', 'inc', 'ab-sidebars.php')
-theme = os.path.join(root, 'javanseda')
+php = os.path.join(root, 'taranehyar', 'inc', 'ab-sidebars.php')
+theme = os.path.join(root, 'taranehyar')
 
 def disk_hash(rel):
     p = os.path.join(theme, rel.replace('/', os.sep))

@@ -24,7 +24,7 @@ import os
 import sys
 import zipfile
 
-THEME = 'javanseda'
+THEME = 'taranehyar'
 THEME_ABS = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), THEME)
 
 # هشِ فایل‌های لایسنس در نسخهٔ مبنای تأییدشده (javanseda (1).zip در main)

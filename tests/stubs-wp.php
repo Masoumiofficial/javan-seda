@@ -59,6 +59,30 @@ class WP_Error {
 	}
 }
 
+class WP_Widget {
+	public $id_base = '';
+	public $name      = '';
+	public $widget_options = array();
+	public $control_options = array();
+	public function __construct( $id_base = '', $name = '', $widget_options = array(), $control_options = array() ) {
+		$this->id_base         = $id_base;
+		$this->name            = $name;
+		$this->widget_options  = (array) $widget_options;
+		$this->control_options = (array) $control_options;
+	}
+	public function get_field_id( $field ) {
+		return 'widget-' . $this->id_base . '-' . $field;
+	}
+	public function get_field_name( $field ) {
+		return 'widget-' . $this->id_base . '[' . $field . ']';
+	}
+	public function widget( $args, $instance ) {}
+	public function form( $instance ) {}
+	public function update( $new, $old ) {
+		return $new;
+	}
+}
+
 class WP_Post {
 	public $ID;
 	public $post_title;
@@ -75,6 +99,91 @@ class WP_Post {
 		$this->post_type   = $type;
 		$this->post_date   = $date;
 	}
+}
+
+/* ---------- قالب/دارایی ---------- */
+$GLOBALS['__nav_menus']   = array();
+$GLOBALS['__supports']    = array();
+$GLOBALS['__img_sizes']   = array();
+$GLOBALS['__styles']      = array();
+$GLOBALS['__scripts']     = array();
+$GLOBALS['__queried_id']  = 0;
+
+function register_nav_menus( $locations ) {
+	$GLOBALS['__nav_menus'] = array_merge( $GLOBALS['__nav_menus'], (array) $locations );
+	return true;
+}
+function add_theme_support( $feature, $args = null ) {
+	$GLOBALS['__supports'][ $feature ] = $args;
+	return true;
+}
+function current_theme_supports( $feature ) {
+	return array_key_exists( $feature, $GLOBALS['__supports'] );
+}
+function add_image_size( $name, $w = 0, $h = 0, $crop = false ) {
+	$GLOBALS['__img_sizes'][ $name ] = array( $w, $h, $crop );
+	return true;
+}
+function load_theme_textdomain( $domain, $path = '' ) {
+	return true;
+}
+function get_stylesheet_uri() {
+	return 'https://ex/wp-content/themes/taranehyar/style.css';
+}
+function wp_enqueue_style( $handle, $src = '', $deps = array(), $ver = false, $media = 'all' ) {
+	$GLOBALS['__styles'][ $handle ] = array( $src, $deps, $ver );
+	return true;
+}
+function wp_enqueue_script( $handle, $src = '', $deps = array(), $ver = false, $footer = false ) {
+	$GLOBALS['__scripts'][ $handle ] = array( $src, $deps, $ver, $footer );
+	return true;
+}
+function wp_register_style( $handle, $src = '', $deps = array(), $ver = false ) {
+	$GLOBALS['__styles'][ $handle ] = array( $src, $deps, $ver );
+	return true;
+}
+function wp_register_script( $handle, $src = '', $deps = array(), $ver = false, $footer = false ) {
+	$GLOBALS['__scripts'][ $handle ] = array( $src, $deps, $ver, $footer );
+	return true;
+}
+function wp_script_is( $handle, $list = 'enqueued' ) {
+	return isset( $GLOBALS['__scripts'][ $handle ] );
+}
+function wp_style_is( $handle, $list = 'enqueued' ) {
+	return isset( $GLOBALS['__styles'][ $handle ] );
+}
+function get_pagenum_link( $pagenum = 1 ) {
+	return 'https://ex/page/' . (int) $pagenum . '/';
+}
+function get_queried_object_id() {
+	return (int) $GLOBALS['__queried_id'];
+}
+function is_preview() {
+	return ! empty( $GLOBALS['__is_preview'] );
+}
+function is_robots() {
+	return false;
+}
+function set_query_var( $k, $v ) {
+	$GLOBALS['__query_vars'][ $k ] = $v;
+}
+function get_search_query() {
+	return 'تست';
+}
+function comments_open() {
+	return true;
+}
+function post_type_supports( $type, $feature ) {
+	return true;
+}
+function get_post_type() {
+	return 'post';
+}
+function is_page() {
+	return false;
+}
+function have_comments() {
+	return ! empty( $GLOBALS['__have_comments'] );
 }
 
 /* ---------- هوک‌ها ---------- */
@@ -121,7 +230,7 @@ function trailingslashit( $s ) {
 function wp_get_theme() {
 	return new class() {
 		public function get( $k ) {
-			return '3.5.2';
+			return '3.6.0';
 		}
 	};
 }
@@ -353,11 +462,18 @@ function get_bloginfo( $what = '' ) {
 	$b = isset( $GLOBALS['__blog'] ) ? (array) $GLOBALS['__blog'] : array();
 	return isset( $b[ $what ] ) ? $b[ $what ] : '';
 }
-function ot_get_option( $key, $default = '' ) {
-	if ( array_key_exists( $key, $GLOBALS['__ot'] ) ) {
-		return $GLOBALS['__ot'][ $key ];
+/* اگر آزمون بخواهد تابعِ واقعیِ قالب را بسنجد، TY_TEST_REAL_OT را تعریف می‌کند */
+if ( ! defined( 'TY_TEST_REAL_OT' ) ) {
+	function ot_get_option( $key, $default = '' ) {
+		if ( array_key_exists( $key, $GLOBALS['__ot'] ) ) {
+			return $GLOBALS['__ot'][ $key ];
+		}
+		$opts = isset( $GLOBALS['__options']['option_tree'] ) ? $GLOBALS['__options']['option_tree'] : array();
+		if ( is_array( $opts ) && array_key_exists( $key, $opts ) ) {
+			return $opts[ $key ];
+		}
+		return array_key_exists( $key, $GLOBALS['__options'] ) ? $GLOBALS['__options'][ $key ] : $default;
 	}
-	return array_key_exists( $key, $GLOBALS['__options'] ) ? $GLOBALS['__options'][ $key ] : $default;
 }
 function get_queried_object() {
 	return $GLOBALS['__query_obj'];
@@ -422,10 +538,21 @@ function wp_parse_args( $args, $defaults = array() ) {
 	return array_merge( (array) $defaults, $args );
 }
 function is_singular( $types = '' ) {
-	return true;
+	if ( ! empty( $GLOBALS['__not_singular'] ) ) {
+		return false;
+	}
+	if ( '' === $types ) {
+		return true;
+	}
+	$p = get_post( isset( $GLOBALS['__queried_id'] ) ? (int) $GLOBALS['__queried_id'] : 0 );
+	$type = $p ? $p->post_type : 'post';
+	return in_array( $type, (array) $types, true );
 }
 function get_the_ID() {
-	return 10;
+	if ( ! empty( $GLOBALS['__the_id'] ) ) {
+		return (int) $GLOBALS['__the_id'];
+	}
+	return ! empty( $GLOBALS['__queried_id'] ) ? (int) $GLOBALS['__queried_id'] : 10;
 }
 function wp_doing_ajax() {
 	return ! empty( $GLOBALS['__doing_ajax'] );

@@ -80,7 +80,7 @@ def files_of(arg):
 
 hits = 0
 mine = re.compile(r'(^|/)(inc/ab-|ab-mobile-probe|myfunctions|functions|single|404|search|home|header|footer|page)\.php$|patches/')
-for arg in (sys.argv[1:] or ['javanseda']):
+for arg in (sys.argv[1:] or ['taranehyar']):
     for path in files_of(arg):
         src = io.open(path, encoding='utf-8', errors='ignore').read()
         scan = code_only(src)
@@ -96,14 +96,14 @@ for arg in (sys.argv[1:] or ['javanseda']):
 # تابعش در همان فایل تعریف شده باشد (یا با function_exists پوشیده شده باشد).
 CB = re.compile(r"add_(?:action|filter|shortcode)\(\s*'[^']+'\s*,\s*'(javan_seda_[A-Za-z0-9_]+)'")
 declared_all = set()
-for dp, dn, fn in os.walk(sys.argv[1] if len(sys.argv) > 1 else 'javanseda'):
+for dp, dn, fn in os.walk(sys.argv[1] if len(sys.argv) > 1 else 'taranehyar'):
     if 'option-tree' in dp:
         continue
     for f in fn:
         if f.endswith('.php'):
             src = io.open(os.path.join(dp, f), encoding='utf-8', errors='ignore').read()
             declared_all |= set(re.findall(r'function\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(', src))
-for arg in (sys.argv[1:] or ['javanseda']):
+for arg in (sys.argv[1:] or ['taranehyar']):
     for path in files_of(arg):
         src = io.open(path, encoding='utf-8', errors='ignore').read()
         scan = code_only(src)

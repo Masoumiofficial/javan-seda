@@ -13,7 +13,7 @@
 import io, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PATH = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'javanseda', 'inc', 'theme-options.php')
+PATH = sys.argv[1] if len(sys.argv) > 1 else os.path.join(ROOT, 'taranehyar', 'inc', 'theme-options.php')
 src = io.open(PATH, encoding='utf-8', newline='').read()
 
 ids = [(m.group(1), m.start()) for m in re.finditer(r"'id'\s*=>\s*'([a-zA-Z0-9_]+)'", src)]

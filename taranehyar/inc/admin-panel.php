@@ -180,6 +180,32 @@ add_filter(
 	}
 );
 
+/**
+ * دکمهٔ پنجرهٔ رسانه در صفحهٔ تنظیمات.
+ *
+ * OptionTree متنِ «Insert into post» را فقط وقتی عوض می‌کرد که صفحه زیر
+ * «نمایش» باشد (`$pagenow == themes.php`). حالا صفحه زیر منوی «ترانه یار» است،
+ * پس خودمان و فقط در همان صفحه ترجمه‌اش می‌کنیم.
+ *
+ * @param string $translation ترجمهٔ فعلی.
+ * @param string $text        متن اصلی.
+ * @param string $domain      دامنهٔ ترجمه.
+ * @return string
+ */
+function taranehyar_panel_media_button( $translation, $text, $domain ) {
+	if ( 'default' !== $domain || 'Insert into post' !== $text ) {
+		return $translation;
+	}
+
+	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+	if ( 'ot-theme-options' !== $page ) {
+		return $translation;
+	}
+
+	return 'درج در تنظیمات';
+}
+add_filter( 'gettext', 'taranehyar_panel_media_button', 20, 3 );
+
 /* -------------------------------------------------------------------------
  * ۳) دارایی‌های پیشخوان (فقط در صفحه‌های همین پنل)
  * ---------------------------------------------------------------------- */

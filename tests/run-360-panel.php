@@ -213,6 +213,15 @@ $widget = ob_get_clean();
 t( 'ابزارک: خروجی کوتاه و RTL', false !== strpos( $widget, 'dir="rtl"' ) && false !== strpos( $widget, 'تنظیمات قالب' ) );
 
 /* ======================================================================
+   ۶.۵) دکمهٔ پنجرهٔ رسانه در صفحهٔ تنظیمات
+   ====================================================================== */
+$_GET['page'] = 'ot-theme-options';
+t( 'رسانه: در صفحهٔ تنظیمات ترجمه می‌شود', 'درج در تنظیمات' === apply_filters( 'gettext', 'Insert into post', 'Insert into post', 'default' ) );
+$_GET['page'] = 'edit.php';
+t( 'رسانه: در بقیهٔ صفحه‌ها دست نمی‌خورد', 'Insert into post' === apply_filters( 'gettext', 'Insert into post', 'Insert into post', 'default' ) );
+unset( $_GET['page'] );
+
+/* ======================================================================
    ۷) دارایی‌ها
    ====================================================================== */
 $GLOBALS['taranehyar_panel_hooks'] = array( 'toplevel_page_taranehyar' );

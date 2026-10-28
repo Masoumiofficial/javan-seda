@@ -46,6 +46,19 @@ for (const css of ['admin-panel.css']) {
 for (const js of ['admin-panel.js']) {
   files.push({ parent: '/tmp/theme/js', name: js, url: 'file://' + path.join(theme, 'js', js) });
 }
+/* فایل‌های تازهٔ ۳.۷.۰ — آزمون run-370 */
+for (const name of ['tara-taxonomies.php', 'tara-ui.php', 'admin-settings-shell.php', 'tax-listing.php']) {
+  files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
+}
+for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-settings.css']) {
+  files.push({ parent: '/tmp/theme/css', name, url: 'file://' + path.join(theme, 'css', name) });
+}
+for (const name of ['tara-player.js', 'admin-settings.js']) {
+  files.push({ parent: '/tmp/theme/js', name, url: 'file://' + path.join(theme, 'js', name) });
+}
+for (const name of ['single.php', 'footer.php', 'taxonomy-artist.php', 'taxonomy-tara_genre.php', 'home.php']) {
+  files.push({ parent: '/tmp/theme', name, url: 'file://' + path.join(theme, name) });
+}
 files.push({ parent: '/preload/tests', name: 'stubs-wp.php', url: 'file://' + path.join(root, 'tests', 'stubs-wp.php') });
 files.push({ parent: '/preload/tests', name: path.basename(file), url: 'file://' + path.resolve(file) });
 

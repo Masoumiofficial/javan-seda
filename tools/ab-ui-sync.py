@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""css/ab-ui.css را از مارکر «ab-ui-layer» در javanseda/style.css بازسازی می‌کند.
+"""css/ab-ui.css را از مارکر «ab-ui-layer» در taranehyar/style.css بازسازی می‌کند.
 
 هر بار که بلوک تازه‌ای به انتهای style.css اضافه می‌کنید این را اجرا کنید تا
-کپیِ گارد (javanseda/css/ab-ui.css) هم‌زمان بماند:
+کپیِ گارد (taranehyar/css/ab-ui.css) هم‌زمان بماند:
     python3 tools/ab-ui-sync.py
 """
 import io, os, re, sys

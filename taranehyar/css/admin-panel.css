@@ -485,3 +485,45 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+/* تاکسونومی‌ها ------------------------------------------------------- */
+.ty-taxgrid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+	gap: 12px;
+	margin-bottom: 26px;
+}
+
+.ty-tax {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 14px 16px;
+	border: 1px solid var(--ty-line);
+	border-radius: var(--ty-radius);
+	background: var(--ty-surface);
+	text-decoration: none;
+	color: var(--ty-ink);
+	transition: border-color .15s ease, transform .15s ease;
+}
+
+.ty-tax:hover,
+.ty-tax:focus {
+	border-color: #cdbff5;
+	transform: translateY(-1px);
+	color: var(--ty-ink);
+}
+
+.ty-tax .dashicons {
+	width: 34px;
+	height: 34px;
+	padding: 7px;
+	border-radius: 10px;
+	background: #f4f1fb;
+	color: var(--ty-accent);
+	font-size: 20px;
+}
+
+.ty-tax__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ty-tax__body strong { font-size: 13px; font-weight: 700; }
+.ty-tax__body em { font-style: normal; font-size: 11px; color: var(--ty-muted); }

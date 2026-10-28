@@ -12,7 +12,7 @@
  *           یا define( 'TARA_ADMIN_UI', false );  در wp-config.php
  * نبودن این فایل = دقیقاً همان رفتار قبلی (بدون پوسته).
  *
- * @package JavanSeda
+ * @package Taranehyar
  * @since   3.4.3
  */
 
@@ -51,8 +51,9 @@ if ( ! function_exists( 'tara_admin_ui_screens' ) ) {
    */
   function tara_admin_ui_screens() {
     return array(
-      'taranehyar_page_ot-theme-options', /* ۳.۶.۰: تنظیمات زیر منوی «ترانه یار» */
-      'appearance_page_ot-theme-options', /* سازگاری: اگر کسی پدر را به «نمایش» برگرداند */
+      'appearance_page_ot-theme-options', /* اگر کسی پدر را به «نمایش» برگرداند */
+      /* صفحهٔ تنظیماتِ زیر منوی «ترانه یار» از ۳.۷.۰ پوستۀ اختصاصی خودش را دارد
+         (css/admin-settings.css) و پوستۀ عمومی این‌جا رویش نمی‌نشیند. */
       'toplevel_page_ot-settings',        /* ویرایشگر تنظیمات + چیدمان‌ها */
       'optiontree_page_ot-documentation',  /* مستندات */
     );
@@ -86,7 +87,7 @@ if ( ! function_exists( 'tara_admin_ui_enqueue' ) ) {
     $ver = (string) filemtime( $dir . '/css/ab-admin.css' );
 
     wp_enqueue_style(
-      'javan-seda-admin-css',
+      'tara-admin-css',
       trailingslashit( get_template_directory_uri() ) . 'css/ab-admin.css',
       array(),
       $ver

@@ -91,8 +91,8 @@ if ( ! function_exists( 'tara_ui_layer_enqueue' ) ) {
 			return; /* فایل کپی وجود ندارد — کاری از دستمان برنمی‌آید */
 		}
 		$dep = array();
-		if ( function_exists( 'wp_style_is' ) && ( wp_style_is( 'javanSedaMainStyle', 'registered' ) || wp_style_is( 'javanSedaMainStyle', 'enqueued' ) ) ) {
-			$dep = array( 'javanSedaMainStyle' );
+		if ( function_exists( 'wp_style_is' ) && ( wp_style_is( 'taraMainStyle', 'registered' ) || wp_style_is( 'taraMainStyle', 'enqueued' ) ) ) {
+			$dep = array( 'taraMainStyle' );
 		}
 		$theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
 		$ver   = ( $theme && $theme->get( 'Version' ) ) ? $theme->get( 'Version' ) : false;

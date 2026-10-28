@@ -1,6 +1,6 @@
 <?php
 /**
- * جاوه‌سدا — چراغ‌قوهٔ عیب‌یابی (javan-seda-check.php)
+ * ترانه یار — چراغ‌قوهٔ عیب‌یابی (taranehyar-check.php)
  * ---------------------------------------------------------------------------
  * این فایل بخشی از پوسته نیست و هیچ چیزی را عوض نمی‌کند. کاری که می‌کند:
  *   ۱) اطلاعاتِ محیط (نسخۀ PHP، حافظه، wp-content، فایل‌های پوسته) را چاپ می‌کند
@@ -11,20 +11,20 @@
  *
  * روش:
  *   این فایل را در wp-content/ بگذارید، بعد در مرورگر باز کنید:
- *     https://سایت شما/wp-content/javan-seda-check.php            ← حالت عادی
- *     https://سایت شما/wp-content/javan-seda-check.php?admin=1    ← حالت پیشخوان
- *     https://سایت شما/wp-content/javan-seda-check.php?admin=1&full=1     ← اجرای واقعیِ داشبورد
- *     https://سایت شما/wp-content/javan-seda-check.php?admin=1&route=/artists/   ← اجرای یک صفحۀ مشخص و چاپِ خطای همان صفحه
+ *     https://سایت شما/wp-content/taranehyar-check.php            ← حالت عادی
+ *     https://سایت شما/wp-content/taranehyar-check.php?admin=1    ← حالت پیشخوان
+ *     https://سایت شما/wp-content/taranehyar-check.php?admin=1&full=1     ← اجرای واقعیِ داشبورد
+ *     https://سایت شما/wp-content/taranehyar-check.php?admin=1&route=/artists/   ← اجرای یک صفحۀ مشخص و چاپِ خطای همان صفحه
  *   خروجی را برای ما بفرستید و سپس همین فایل را پاک کنید.
  *
  * بعد از اتمام کار پاکش کنید (این فایل عمداً هیچ دادهٔ حساسی چاپ نمی‌کند:
  * نه رمز، نه نام کاربری دیتابیس — فقط نسخه‌ها، مسیرها و متنِ خطاها).
  */
 
-if ( ! function_exists( 'javan_seda_check_out' ) ) {
+if ( ! function_exists( 'tara_check_out' ) ) {
 	/** یک بلوکِ خروجی، بلافاصله flush می‌شود تا اگر بعدش fatal داد، متن نپرد */
-	function javan_seda_check_out( $title, $body = '' ) {
-		if ( ! empty( $GLOBALS['javan_seda_check_raw'] ) ) {
+	function tara_check_out( $title, $body = '' ) {
+		if ( ! empty( $GLOBALS['tara_check_raw'] ) ) {
 			echo '== ' . $title . ' ==' . "\n" . ( '' !== $body ? $body . "\n" : '' );
 			return;
 		}
@@ -39,9 +39,9 @@ if ( ! function_exists( 'javan_seda_check_out' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_check_tail' ) ) {
+if ( ! function_exists( 'tara_check_tail' ) ) {
 	/** چند سطرِ آخرِ یک فایل (برای لاگ‌های بزرگ) */
-	function javan_seda_check_tail( $file, $lines = 40 ) {
+	function tara_check_tail( $file, $lines = 40 ) {
 		if ( ! is_file( $file ) || ! is_readable( $file ) ) {
 			return null;
 		}
@@ -88,14 +88,14 @@ if ( ! function_exists( 'mb_cut' ) ) {
 	}
 }
 
-$GLOBALS['javan_seda_check_raw'] = ( isset( $_GET['raw'] ) && '1' === (string) $_GET['raw'] );
+$GLOBALS['tara_check_raw'] = ( isset( $_GET['raw'] ) && '1' === (string) $_GET['raw'] );
 
 @ini_set( 'display_errors', '1' );
 @error_reporting( E_ALL );
 header( 'Content-Type: text/html; charset=utf-8' );
 header( 'Cache-Control: no-store' );
-if ( empty( $GLOBALS['javan_seda_check_raw'] ) ) {
-echo '<!doctype html><html dir="ltr"><head><meta charset="utf-8"><title>javan-seda check</title>'
+if ( empty( $GLOBALS['tara_check_raw'] ) ) {
+echo '<!doctype html><html dir="ltr"><head><meta charset="utf-8"><title>ترانه یار — بررسی</title>'
 	. '<style>body{font:14px/1.7 tahoma,sans-serif;max-width:900px;margin:24px auto;padding:0 14px}'
 	. 'h1{font-size:19px}h2{font-size:15px;margin:22px 0 6px}pre{background:#f4f4f4;padding:10px;'
 	. 'white-space:pre-wrap;word-break:break-word;border-left:3px solid #185ADB;font:12px/1.6 monospace;direction:ltr}'
@@ -106,13 +106,13 @@ echo '<h1>جوان‌سدا — چراغ‌قوهٔ عیب‌یابی</h1>';
 $admin_mode = ( isset( $_GET['admin'] ) && '1' === (string) $_GET['admin'] );
 
 /* ---------- ۱) ناظرِ fatal: هر خطای مرگباری که از این به بعد رخ بدهد چاپ می‌شود ---------- */
-$GLOBALS['javan_seda_check_dead'] = false;
-if ( ! function_exists( 'javan_seda_check_goodbye' ) ) {
-	function javan_seda_check_goodbye() {
-		if ( ! empty( $GLOBALS['javan_seda_check_dead'] ) ) {
+$GLOBALS['tara_check_dead'] = false;
+if ( ! function_exists( 'tara_check_goodbye' ) ) {
+	function tara_check_goodbye() {
+		if ( ! empty( $GLOBALS['tara_check_dead'] ) ) {
 			return;
 		}
-		$GLOBALS['javan_seda_check_dead'] = true;
+		$GLOBALS['tara_check_dead'] = true;
 		$e = error_get_last();
 		if ( is_array( $e ) && ! empty( $e['message'] ) ) {
 			echo '<h2 class="bad">خطای مرگبار گرفته شد</h2><pre>'
@@ -124,9 +124,9 @@ if ( ! function_exists( 'javan_seda_check_goodbye' ) ) {
 			echo '<h2>اسکریپت نصفه تمام شد (خطای مرگباری ثبت نشده بود)</h2>'
 				. '<pre>احتمالاً خروجی کامل چاپ شده و فقط PHP موقع بستنِ صفحه قطع کرده است.</pre>';
 		}
-		echo '<p><strong>این صفحه را برای ما بفرستید، سپس فایلِ javan-seda-check.php را پاک کنید.</strong></p></body></html>';
+		echo '<p><strong>این صفحه را برای ما بفرستید، سپس فایلِ taranehyar-check.php را پاک کنید.</strong></p></body></html>';
 	}
-	register_shutdown_function( 'javan_seda_check_goodbye' );
+	register_shutdown_function( 'tara_check_goodbye' );
 }
 
 /* ---------- ۲) محیط ---------- */
@@ -134,9 +134,9 @@ $root = dirname( dirname( __FILE__ ) ); // اگر فایل در wp-content/ با
 if ( ! is_file( $root . '/wp-load.php' ) ) {
 	$root = dirname( __FILE__ );
 }
-$theme = $root . '/wp-content/themes/javanseda';
+$theme = $root . '/wp-content/themes/taranehyar';
 
-javan_seda_check_out(
+tara_check_out(
 	'محیط',
 	'PHP: ' . PHP_VERSION . "\n"
 	. 'memory_limit: ' . ini_get( 'memory_limit' ) . '  · _used: ' . round( memory_get_usage( true ) / 1048576, 1 ) . " MB\n"
@@ -212,7 +212,7 @@ if ( PHP_VERSION_ID >= 80300 ) {
 } else {
 	$lic[] = 'نتیجه: PHP 5/7 — بازۀ امنِ فایل‌های لایسنسِ این قالب.';
 }
-javan_seda_check_out( 'PHP، لودرِ لایسنس و فایل‌های رمزگذاری‌شده', implode( "
+tara_check_out( 'PHP، لودرِ لایسنس و فایل‌های رمزگذاری‌شده', implode( "
 ", $lic ) );
 
 /* ---------- ۳) فایل‌های پوسته ---------- */
@@ -259,30 +259,30 @@ if ( ! is_file( $theme . '/RTL_License_41d6c5f704e3a746.php' ) ) {
 }
 $lines[] = 'wp-content/uploads: ' . ( is_dir( $root . '/wp-content/uploads' ) ? 'نوشته‌پذیر? ' . ( is_writable( $root . '/wp-content/uploads' ) ? 'بله' : 'نه' ) : 'نیست' );
 $lines[] = 'wp-content نوشتنی: ' . ( is_writable( $root . '/wp-content' ) ? 'بله' : 'نه' );
-javan_seda_check_out( 'فایل‌های پوسته (نسخهٔ واقعیِ روی سرور)', implode( "\n", $lines ) );
+tara_check_out( 'فایل‌های پوسته (نسخهٔ واقعیِ روی سرور)', implode( "\n", $lines ) );
 
 /* ---------- ۴) لاگ‌های موجود ---------- */
 $logs = array(
 	$wp_log = $root . '/wp-content/debug.log',
-	$root . '/wp-content/javan-seda-error.log',
+	$root . '/wp-content/taranehyar-error.log',
 );
 if ( ( $ini = ini_get( 'error_log' ) ) && '' !== $ini && is_file( $ini ) ) {
 	$logs[] = $ini;
 }
 foreach ( $logs as $log ) {
-	$body = javan_seda_check_tail( $log, 45 );
+	$body = tara_check_tail( $log, 45 );
 	if ( null === $body ) {
 		echo '<h3>' . htmlspecialchars( basename( $log ) ) . '</h3>';
 		echo '<p>— ' . htmlspecialchars( $log ) . ' : وجود ندارد یا خوانده نمی‌شود.</p>';
 		continue;
 	}
-	javan_seda_check_out( 'آخرِ ' . basename( $log ), $body );
+	tara_check_out( 'آخرِ ' . basename( $log ), $body );
 }
 
 /* ---------- ۵) بالا آوردنِ وردپرس (این‌جا fatalِ واقعی لو می‌رود) ---------- */
 if ( ! is_file( $root . '/wp-load.php' ) ) {
-	javan_seda_check_out( 'wp-load.php پیدا نشد', 'مسیرِ آزمایش‌شده: ' . $root . '/wp-load.php — فایل را داخل wp-content/ بگذارید.' );
-	$GLOBALS['javan_seda_check_dead'] = true;
+	tara_check_out( 'wp-load.php پیدا نشد', 'مسیرِ آزمایش‌شده: ' . $root . '/wp-load.php — فایل را داخل wp-content/ بگذارید.' );
+	$GLOBALS['tara_check_dead'] = true;
 	echo '</body></html>';
 	return;
 }
@@ -308,15 +308,15 @@ if ( $admin_mode && function_exists( 'wp_set_current_user' ) ) {
 		echo '<pre>کاربرِ مدیرِ نمونه برای شبیه‌سازی بارگذاری شد (ID ' . (int) $ids[0] . ') — هیچ نوشته/گزینه‌ای تغییر نمی‌کند.</pre>';
 	}
 }
-javan_seda_check_out(
+tara_check_out(
 	'وضعیت پوسته از دیدِ وردپرس',
 	'stylesheet: ' . ( function_exists( 'get_stylesheet' ) ? get_stylesheet() : '?' ) . "\n"
 	. 'template: ' . ( function_exists( 'get_template' ) ? get_template() : '?' ) . "\n"
 	. 'Version: ' . ( function_exists( 'wp_get_theme' ) ? wp_get_theme()->get( 'Version' ) : '?' ) . "\n"
 	. 'is_admin(): ' . ( function_exists( 'is_admin' ) && is_admin() ? 'true' : 'false' ) . "\n"
-	. 'javan_seda_safe(): ' . ( function_exists( 'javan_seda_safe' ) ? 'هست' : 'نیست (پوستهٔ نو نصب نشده)' ) . "\n"
-	. 'javan_seda_term_bio(): ' . ( function_exists( 'javan_seda_term_bio' ) ? 'هست' : 'نیست' ) . "\n"
-	. 'javan_seda_artist_home_rows(): ' . ( function_exists( 'javan_seda_artist_home_rows' ) ? 'هست' : 'نیست' ) . "\n"
+	. 'taranehyar_safe(): ' . ( function_exists( 'taranehyar_safe' ) ? 'هست' : 'نیست (پوستهٔ نو نصب نشده)' ) . "\n"
+	. 'taranehyar_term_bio(): ' . ( function_exists( 'taranehyar_term_bio' ) ? 'هست' : 'نیست' ) . "\n"
+	. 'taranehyar_artist_home_rows(): ' . ( function_exists( 'taranehyar_artist_home_rows' ) ? 'هست' : 'نیست' ) . "\n"
 	. 'taxonomy artist: ' . ( taxonomy_exists( 'artist' ) ? 'ثبت شده' : 'نیست' ) . "\n"
 	. 'taxonomy singer: ' . ( taxonomy_exists( 'singer' ) ? 'ثبت شده' : 'نیست' ) . "\n"
 	. 'ACF (get_field): ' . ( function_exists( 'get_field' ) ? 'فعال' : 'غیرفعال' ) . "\n"
@@ -326,12 +326,12 @@ javan_seda_check_out(
 
 /* ---------- ۶) آزمایشِ خودِ لایه‌ها (اگر اینجا ترکاند، معلوم است) ---------- */
 $tests = array();
-foreach ( array( 'javan_seda_term_tax_list', 'javan_seda_term_field_defs', 'javan_seda_artist_acf_rules', 'javan_seda_artist_home_settings' ) as $fn ) {
+foreach ( array( 'taranehyar_term_tax_list', 'taranehyar_term_field_defs', 'taranehyar_artist_acf_rules', 'taranehyar_artist_home_settings' ) as $fn ) {
 	if ( ! function_exists( $fn ) ) {
 		$tests[] = $fn . ': تابع وجود ندارد';
 		continue;
 	}
-	$args = ( 'javan_seda_artist_acf_rules' === $fn ) ? array( array() ) : array();
+	$args = ( 'taranehyar_artist_acf_rules' === $fn ) ? array( array() ) : array();
 	ob_start();
 	$ret    = call_user_func_array( $fn, $args );
 	$err    = ob_get_clean();
@@ -341,23 +341,23 @@ if ( function_exists( 'get_terms' ) ) {
 	$t = get_terms( array( 'taxonomy' => ( taxonomy_exists( 'artist' ) ? 'artist' : 'singer' ), 'hide_empty' => false, 'number' => 1 ) );
 	$tests[] = 'get_terms → ' . ( is_wp_error( $t ) ? 'WP_Error: ' . $t->get_error_message() : (int) count( $t ) . ' ترم' );
 }
-javan_seda_check_out( 'آزمایشِ تابع‌های حساس', implode( "\n", $tests ) );
+tara_check_out( 'آزمایشِ تابع‌های حساس', implode( "\n", $tests ) );
 
 /* ---------- ۶-پ) اجرای یک مسیرِ واقعی (?admin=1&route=/artists/) ----------
  * تا وقتی خطا با `die()` تمام شود، هیچ لاگی روی سرور نمی‌ماند. این حالت همان
  * مسیری که شما در مرورگر می‌زنید را روی همین سرور اجرا می‌کند (با همان PHP،
  * همان افزونه‌ها، همان پوسته) و فقط «چرا نمرندر شد» را چاپ می‌کند: متنِ خطای
  * مرگبار با فایل و شمارهٔ سطر، وضعیتِ شرطی‌ها، و نتیجهٔ کوئری.
- * نمونه:  javan-seda-check.php?admin=1&route=/artists/
- *          javan-seda-check.php?admin=1&route=/artist/mohsen-yeganeh/&raw=1
+ * نمونه:  taranehyar-check.php?admin=1&route=/artists/
+ *          taranehyar-check.php?admin=1&route=/artist/mohsen-yeganeh/&raw=1
  * -------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_route_report' ) ) {
+if ( ! function_exists( 'tara_check_route_report' ) ) {
 	/** گزارشِ حالتِ «مسیر» — هم از پایانِ اسکریپت و هم از shutdown صدا زده می‌شود */
-	function javan_seda_route_report() {
-		if ( ! empty( $GLOBALS['javan_seda_route_done'] ) ) {
+	function tara_check_route_report() {
+		if ( ! empty( $GLOBALS['tara_check_route_done'] ) ) {
 			return;
 		}
-		$GLOBALS['javan_seda_route_done'] = true;
+		$GLOBALS['tara_check_route_done'] = true;
 
 		$lines = array();
 		$e     = function_exists( 'error_get_last' ) ? error_get_last() : null;
@@ -384,14 +384,14 @@ if ( ! function_exists( 'javan_seda_route_report' ) ) {
 		} else {
 			$lines[] = 'هیچ خطای مرگباری برای این مسیر ثبت نشد.';
 		}
-		if ( ! empty( $GLOBALS['javan_seda_route_lines'] ) ) {
-			$lines = array_merge( $lines, (array) $GLOBALS['javan_seda_route_lines'] );
+		if ( ! empty( $GLOBALS['tara_check_route_lines'] ) ) {
+			$lines = array_merge( $lines, (array) $GLOBALS['tara_check_route_lines'] );
 		}
 		$lines[] = '—— اگر «خطا» در فایل‌های خودِ پوسته (inc/ab-*.php یا myfunctions.php) است، مسیر و شمارهٔ سطر را برای ما بفرستید. ——';
 
-		javan_seda_check_out( 'نتیجهٔ اجرای مسیر: ' . ( isset( $GLOBALS['javan_seda_route'] ) ? $GLOBALS['javan_seda_route'] : '?' ), implode( "\n", $lines ) );
+		tara_check_out( 'نتیجهٔ اجرای مسیر: ' . ( isset( $GLOBALS['tara_check_route'] ) ? $GLOBALS['tara_check_route'] : '?' ), implode( "\n", $lines ) );
 
-		if ( empty( $GLOBALS['javan_seda_check_raw'] ) ) {
+		if ( empty( $GLOBALS['tara_check_raw'] ) ) {
 			echo '</body></html>';
 		}
 	}
@@ -404,12 +404,12 @@ if ( $admin_mode && isset( $_GET['route'] ) && '' !== trim( (string) $_GET['rout
 		$route = '/' . $route;
 	}
 
-	$GLOBALS['javan_seda_route']       = $route;
-	$GLOBALS['javan_seda_route_lines'] = array();
-	$GLOBALS['javan_seda_check_dead']  = true; // گزارشِ این بخش خودش چاپ می‌شود
-	register_shutdown_function( 'javan_seda_route_report' );
+	$GLOBALS['tara_check_route']       = $route;
+	$GLOBALS['tara_check_route_lines'] = array();
+	$GLOBALS['tara_check_dead']  = true; // گزارشِ این بخش خودش چاپ می‌شود
+	register_shutdown_function( 'tara_check_route_report' );
 
-	javan_seda_check_out( 'اجرای مسیر: ' . $route, 'در حال بالا آوردنِ همان درخواست… (بدنۀ HTML چاپ نمی‌شود)' );
+	tara_check_out( 'اجرای مسیر: ' . $route, 'در حال بالا آوردنِ همان درخواست… (بدنۀ HTML چاپ نمی‌شود)' );
 
 	$qpos                    = strpos( $route, '?' );
 	$_SERVER['REQUEST_URI']  = $route;
@@ -432,7 +432,7 @@ if ( $admin_mode && isset( $_GET['route'] ) && '' !== trim( (string) $_GET['rout
 	ob_end_clean();
 
 	$len           = strlen( (string) $buf );
-	$rl            = &$GLOBALS['javan_seda_route_lines'];
+	$rl            = &$GLOBALS['tara_check_route_lines'];
 	$rl[]          = 'طول بدنهٔ پاسخ: ' . $len . ' بایت' . ( $len < 700 ? '  ← صفحه عملاً رندر نشده' : '' );
 	if ( false !== stripos( (string) $buf, 'is corrupted' ) ) {
 		$rl[] = 'در بدنه: «is corrupted» ⇒ functions.php هنوز decode نمی‌شود؛ نسخۀ PHP هاست را پایین بیاورید (راجع به این فایل، بخشِ «PHP و لودرِ لایسنس» را ببینید).';
@@ -466,17 +466,17 @@ if ( $admin_mode && isset( $_GET['route'] ) && '' !== trim( (string) $_GET['rout
 	}
 	$rl[] = 'حافظۀ مصرفی: ' . round( memory_get_usage( true ) / 1048576, 1 ) . ' MB از ' . ini_get( 'memory_limit' );
 
-	javan_seda_route_report();
+	tara_check_route_report();
 	return;
 }
 
 /* ---------- ۷) اجرای تمام‌قدِ داشبورد (?admin=1&full=1) ---------- */
 if ( $admin_mode && isset( $_GET['full'] ) && '1' === (string) $_GET['full'] && is_file( $root . '/wp-admin/admin.php' ) ) {
-	javan_seda_check_out( 'اجرای واقعیِ wp-admin/admin.php (داشبورد)…', 'اگر خطا همین‌جا رخ بدهد، دقیقاً همان خطای پیشخوان است.' );
+	tara_check_out( 'اجرای واقعیِ wp-admin/admin.php (داشبورد)…', 'اگر خطا همین‌جا رخ بدهد، دقیقاً همان خطای پیشخوان است.' );
 	require $root . '/wp-admin/admin.php';
 	echo '<pre class="ok">داشبورد هم بدون خطا اجرا شد ✔ — پس خطا یا به صفحۀ دیگری از پیشخوان است یا به یک افزونه.</pre>';
 }
 
-$GLOBALS['javan_seda_check_dead'] = true;
+$GLOBALS['tara_check_dead'] = true;
 echo '<p><strong>هیچ خطای مرگباری رخ نداد.</strong> اگر در حالت <code>?admin=1</code> هم همین پیام را دیدید، یعنی خطا در کدِ پوسته نیست (احتمالاً یک افزونه یا صفحۀ خاصِ پیشخوان) — در این صورت بگویید کدام صفحۀ پیشخوان خطا می‌دهد.</p>';
 echo '<p>خروجی را برای ما بفرستید و این فایل را پاک کنید.</p></body></html>';

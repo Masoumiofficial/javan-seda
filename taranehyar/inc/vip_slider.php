@@ -1,101 +1,115 @@
-<?php $fixbvip = ot_get_option('fixbvip'); if('off' != $fixbvip){
+<?php
+/**
+ * اسلایدر ویژهٔ صفحهٔ اصلی — نسخهٔ ۳.۷.۰
+ * ==========================================================================
+ * از «دو اسلاید کنار هم» به **یک اسلاید بزرگ** تبدیل شد: تصویر تمام‌عرض با
+ * لایهٔ تیره، نام هنرمند/آهنگ درشت، ژانر و دکمهٔ «شنیدن».
+ *
+ * چرا؟ در عرض دسکتاپ دو کارت کوچک هم‌زمان دیده می‌شد و هر دو ریز بودند؛ یک
+ * اسلاید بزرگ‌تر هم جذاب‌تر است و هم روی موبایل همان چیزی را می‌دهد.
+ *
+ * تنظیمات: تنظیمات قالب → صفحهٔ اصلی
+ *   • «اسلایدر ویژه» (fixbvip)  روشن/خاموش
+ *   • «تعداد اسلایدها» (vip_num) ۱ تا ۵ (برای سبکی، سقف ۵)
+ *
+ * @package Taranehyar
+ */
 
-$vip_np_raw = ot_get_option('vip_num');
-$vip_np = !empty($vip_np_raw) ? intval($vip_np_raw) : 5;
-if ($vip_np <= 0 || $vip_np > 5) {
-	$vip_np = 5; // حداکثر ۵ اسلاید در DOM جهت سبکی و عدم افت کارایی
-}
+$tara_fixbvip = ot_get_option( 'fixbvip' );
 
-$my_custom_query = new WP_Query(array(
-	'post_type'      => 'post',
-	'post_status'    => 'publish',
-	'posts_per_page' => $vip_np,
-	'meta_query'     => array(
+if ( 'off' !== $tara_fixbvip ) {
+
+	$tara_vip_num = ot_get_option( 'vip_num' );
+	$tara_vip_num = ! empty( $tara_vip_num ) ? (int) $tara_vip_num : 5;
+	if ( $tara_vip_num <= 0 || $tara_vip_num > 5 ) {
+		$tara_vip_num = 5; // سقف ۵ اسلاید در DOM: سبک‌تر برای موبایل
+	}
+
+	$tara_vip_query = new WP_Query(
 		array(
-			'key'     => 'vip_song',
-			'value'   => '1',
-			'compare' => 'LIKE',
-		),
-	),
-));
+			'post_type'      => 'post',
+			'post_status'    => 'publish',
+			'posts_per_page' => $tara_vip_num,
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				array(
+					'key'     => 'vip_song',
+					'value'   => '1',
+					'compare' => 'LIKE',
+				),
+			),
+		)
+	);
 
-if($my_custom_query->have_posts()) : ?>
+	if ( $tara_vip_query->have_posts() ) {
+		?>
+		<div class="ty-hero-slider ab-vip-slider-box">
+			<div class="vip_top_slider owl-carousel owl-theme" data-ab-vip-slider>
+				<?php
+				$tara_slide = 0;
+				while ( $tara_vip_query->have_posts() ) :
+					$tara_vip_query->the_post();
+					$tara_slide++;
 
-<!-- vip_img_box -->
+					$tara_custom = function_exists( 'get_field' ) ? get_field( 'vip_img' ) : '';
+					$tara_image  = '';
+					if ( is_string( $tara_custom ) && '' !== trim( $tara_custom ) ) {
+						$tara_image = $tara_custom;
+					} elseif ( has_post_thumbnail() ) {
+						$tara_image = get_the_post_thumbnail_url( get_the_ID(), 'thumb1' );
+					}
+					if ( ! $tara_image ) {
+						$tara_image = get_template_directory_uri() . '/images/vip_img.jpg';
+					}
 
-<div class="vip_img_box ab-vip-slider-box">
+					$tara_vip_artist = function_exists( 'get_field' ) ? (string) get_field( 'artist' ) : '';
+					$tara_vip_song   = function_exists( 'get_field' ) ? (string) get_field( 'song' ) : '';
+					$tara_vip_genre  = function_exists( 'tara_term_chips' ) ? tara_term_chips( 'tara_genre', get_the_ID(), '' ) : '';
+					$tara_priority   = ( 1 === $tara_slide ) ? 'high' : 'auto';
+					$tara_loading    = ( 1 === $tara_slide ) ? 'eager' : 'lazy';
+					?>
+					<article class="ty-hero-slide">
+						<a class="ty-hero-slide__media" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true">
+							<img src="<?php echo esc_url( $tara_image ); ?>"
+								width="1280" height="620"
+								alt="<?php echo esc_attr( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?>"
+								loading="<?php echo esc_attr( $tara_loading ); ?>"
+								fetchpriority="<?php echo esc_attr( $tara_priority ); ?>">
+						</a>
 
-<div class="vip_top_slider owl-carousel owl-theme" data-ab-vip-slider>
+						<div class="ty-hero-slide__body">
+							<span class="ty-hero-slide__badge">
+								<i class="icofont-star" aria-hidden="true"></i>
+								پیشنهاد ویژه
+							</span>
 
-<?php $rkian = 1; while($my_custom_query->have_posts()) : $my_custom_query->the_post();?>
+							<h2 class="ty-hero-slide__title">
+								<a href="<?php the_permalink(); ?>">
+									<?php if ( '' !== $tara_vip_artist ) : ?>
+										<span class="ty-hero-slide__artist"><?php echo esc_html( $tara_vip_artist ); ?></span>
+									<?php endif; ?>
+									<span class="ty-hero-slide__song"><?php echo esc_html( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?></span>
+								</a>
+							</h2>
 
-<article class="vip_post ab-vip-post">
+							<?php if ( '' !== trim( wp_strip_all_tags( $tara_vip_genre ) ) ) : ?>
+								<div class="ty-hero-slide__tags"><?php echo $tara_vip_genre; // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده ?></div>
+							<?php endif; ?>
 
-<header>
+							<div class="ty-hero-slide__actions">
+								<a class="ty-hero-slide__play" href="<?php the_permalink(); ?>">
+									<span class="ty-icon-play" aria-hidden="true"></span>
+									شنیدن و دانلود
+								</a>
+							</div>
+						</div>
+					</article>
+					<?php
+				endwhile;
+				?>
+			</div>
+		</div>
+		<?php
+	}
 
-<figure><a href="<?php the_permalink(); ?>">
-
-<?php
-$ab_vip_custom_img = get_field('vip_img');
-$ab_img_loading    = ($rkian === 1) ? 'eager' : 'lazy';
-$ab_fetchpriority  = ($rkian === 1) ? 'high' : 'auto';
-
-if (!empty($ab_vip_custom_img)){ ?>
-
-<img src="<?php echo esc_url($ab_vip_custom_img); ?>" width="640" height="360" alt="<?php the_title_attribute(); ?>" title="<?php the_title_attribute(); ?>" loading="<?php echo esc_attr($ab_img_loading); ?>" fetchpriority="<?php echo esc_attr($ab_fetchpriority); ?>" class="ab-vip-img">
-
-<?php } else {
-	if(has_post_thumbnail()){
-		the_post_thumbnail('thumb1', array(
-			'alt'           => get_the_title(),
-			'title'         => get_the_title(),
-			'loading'       => $ab_img_loading,
-			'fetchpriority' => $ab_fetchpriority,
-			'class'         => 'ab-vip-img',
-			'width'         => 640,
-			'height'        => 360,
-		));
-	} else { ?>
-
-<img src="<?php echo esc_url(get_template_directory_uri()); ?>/images/vip_img.jpg" width="640" height="360" alt="تصویر پیدا نشد" title="تصویر پیدا نشد" loading="<?php echo esc_attr($ab_img_loading); ?>" class="ab-vip-img">
-
-<?php } } ?></a></figure>
-
-<h2><a href="<?php the_permalink(); ?>"><?php
-$ab_artist_field = get_field('artist');
-$ab_song_field   = get_field('song');
-if(!empty($ab_artist_field) || !empty($ab_song_field)){
-	echo esc_html($ab_artist_field); ?> - <span><?php echo esc_html($ab_song_field); ?></span><?php
-} else {
-	the_title('');
-} ?></a></h2>
-
-</header>	
-
-<footer>
-
-<?php
-$field = function_exists('get_field_object') ? get_field_object('musics_type') : null;
-if($field && !empty($field['value'])){
-	$value = $field['value'];
-	$label = isset($field['choices'][$value]) ? $field['choices'][$value] : $value;
-?>
-<span class="ft_box_format ab-format-badge"><?php echo esc_html($label); ?></span><?php } ?>
-
-</footer>
-
-<div class="clear"></div>
-
-</article>
-
-<?php $rkian++; endwhile; ?>
-
-</div>
-
-<div class="clear"></div>
-
-</div>
-
-<!-- vip_img_box -->
-
-<?php endif; wp_reset_postdata(); } ?>
+	wp_reset_postdata();
+}

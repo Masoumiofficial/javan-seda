@@ -508,10 +508,10 @@ if ( ! function_exists( 'tara_admin_assets' ) ) {
 			wp_enqueue_media();
 		}
 		if ( $dir && is_readable( trailingslashit( $dir ) . 'js/ab-admin-picker.js' ) ) {
-			wp_enqueue_script( 'javan-seda-admin-picker', trailingslashit( $uri ) . 'js/ab-admin-picker.js', array(), $ver, true );
+			wp_enqueue_script( 'tara-admin-picker', trailingslashit( $uri ) . 'js/ab-admin-picker.js', array(), $ver, true );
 			wp_localize_script(
-				'javan-seda-admin-picker',
-				'JavanSedaPicker',
+				'tara-admin-picker',
+				'TaraPicker',
 				array(
 					'ajax'  => admin_url( 'admin-ajax.php' ),
 					'nonce' => wp_create_nonce( 'tara_picker' ),
@@ -522,7 +522,7 @@ if ( ! function_exists( 'tara_admin_assets' ) ) {
 			);
 		}
 		if ( $dir && is_readable( trailingslashit( $dir ) . 'css/ab-admin-352.css' ) ) {
-			wp_enqueue_style( 'javan-seda-admin-352', trailingslashit( $uri ) . 'css/ab-admin-352.css', array(), $ver );
+			wp_enqueue_style( 'tara-admin-352', trailingslashit( $uri ) . 'css/ab-admin-352.css', array(), $ver );
 		}
 	}
 	add_action( 'admin_enqueue_scripts', 'tara_admin_assets' );

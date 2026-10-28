@@ -127,6 +127,25 @@ function taranehyar_render_dashboard() {
 			<?php endforeach; ?>
 		</div>
 
+		<?php $tara_taxonomies = function_exists( 'taranehyar_panel_taxonomies' ) ? taranehyar_panel_taxonomies() : array(); ?>
+		<?php if ( ! empty( $tara_taxonomies ) ) : ?>
+			<h2 class="ty-heading">
+				تاکسونومی‌های موسیقی
+				<span class="ty-heading__hint">ژانر، حال‌وهوا، ترانه‌سرا، آهنگساز، تنظیم</span>
+			</h2>
+			<div class="ty-taxgrid">
+				<?php foreach ( $tara_taxonomies as $tara_tax ) : ?>
+					<a class="ty-tax" href="<?php echo esc_url( $tara_tax['url'] ); ?>">
+						<span class="dashicons <?php echo esc_attr( $tara_tax['icon'] ); ?>"></span>
+						<span class="ty-tax__body">
+							<strong><?php echo esc_html( $tara_tax['title'] ); ?></strong>
+							<em><?php echo esc_html( taranehyar_panel_number( $tara_tax['count'] ) ); ?> مورد ثبت‌شده</em>
+						</span>
+					</a>
+				<?php endforeach; ?>
+			</div>
+		<?php endif; ?>
+
 		<div class="ty-columns">
 			<section class="ty-card ty-card--wide">
 				<h3>
@@ -217,6 +236,8 @@ function taranehyar_render_tools() {
 				<p class="ty-note">
 					تنظیمات قالب در این صفحه نیست؛
 					<a href="<?php echo esc_url( taranehyar_panel_settings_url() ); ?>">به تنظیمات بروید</a>.
+					متن «دربارهٔ سایت» هم در تب
+					<a href="<?php echo esc_url( taranehyar_panel_settings_url( 'about' ) ); ?>">دربارهٔ سایت</a> است.
 				</p>
 			</section>
 		</div>
@@ -254,6 +275,12 @@ function taranehyar_render_about() {
 					<li>فایل لایسنس رمزگذاری‌شده و هستهٔ رمزگذاری‌شده حذف شدند؛ هیچ ارتباطی با سرور بیرونی نیست.</li>
 					<li>هسته از نو و خوانا نوشته شد: راه‌اندازی، دارایی‌ها، شمارش بازدید، نمایش بازدید و صفحه‌بندی.</li>
 					<li>پنل تنظیمات به منوی اصلی پیشخوان آمد؛ ذخیره‌سازی همان <code>option_tree</code> ماند.</li>
+					<li>صفحهٔ تنظیمات ظاهر تازه گرفت: تب‌های قرصی، کارت هر بخش و جست‌وجوی فیلد.</li>
+					<li>پلیر «رادیو» تازه: یک کارت بزرگ با فهرست پخش و نوار چسبانِ پایین صفحه.</li>
+					<li>صفحهٔ هنرمند مثل یک ایستگاه رادیو از نو ساخته شد (سربرگ، رادیو، آلبوم/ویدیو، مشابه‌ها).</li>
+					<li>اسلایدر صفحهٔ اصلی تک‌اسلاید و تمام‌عرض شد.</li>
+					<li>پنج تاکسونومی تازه: ژانر، حال‌وهوا، ترانه‌سرا، آهنگساز، تنظیم.</li>
+					<li>متن «دربارهٔ سایت» از تنظیمات قابل ویرایش شد (پانوشت + صفحهٔ هنرمند).</li>
 				</ul>
 			</section>
 

@@ -8,7 +8,7 @@
 <?php if(have_posts()) : ?>
 <div class="songs_title_box">
 <h1>نتیجۀ جست‌وجو: «<?php echo esc_html( get_search_query() ); ?>»</h1>
-<p class="ab-search-count"><?php global $wp_query; $ab_n = (int) $wp_query->found_posts; printf( _n( '%d اثر پیدا شد.', '%d اثر پیدا شد.', $ab_n, 'javan-seda' ), $ab_n ); ?>&nbsp;<a href="<?php echo esc_url( home_url('/music/') ); ?>">همۀ آهنگ‌ها</a></p>
+<p class="ab-search-count"><?php global $wp_query; $ab_n = (int) $wp_query->found_posts; printf( _n( '%d اثر پیدا شد.', '%d اثر پیدا شد.', $ab_n, 'taranehyar' ), $ab_n ); ?>&nbsp;<a href="<?php echo esc_url( home_url('/music/') ); ?>">همۀ آهنگ‌ها</a></p>
 <div class="clear"></div>
 </div>
 <div class="song_boxs_posts">

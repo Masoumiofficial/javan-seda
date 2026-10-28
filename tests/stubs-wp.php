@@ -138,6 +138,13 @@ function wp_enqueue_script( $handle, $src = '', $deps = array(), $ver = false, $
 	$GLOBALS['__scripts'][ $handle ] = array( $src, $deps, $ver, $footer );
 	return true;
 }
+function wp_localize_script( $handle, $object_name, $l10n ) {
+	$GLOBALS['__localized'][ $handle ][ $object_name ] = $l10n;
+	return true;
+}
+function current_action() {
+	return isset( $GLOBALS['__current_action'] ) ? (string) $GLOBALS['__current_action'] : '';
+}
 function wp_register_style( $handle, $src = '', $deps = array(), $ver = false ) {
 	$GLOBALS['__styles'][ $handle ] = array( $src, $deps, $ver );
 	return true;
@@ -365,12 +372,60 @@ function delete_term_meta( $id, $key ) {
 function term_description( $id, $tax = '' ) {
 	return isset( $GLOBALS['__termdesc'][ (int) $id ] ) ? $GLOBALS['__termdesc'][ (int) $id ] : '';
 }
+function register_taxonomy( $tax, $objects, $args = array() ) {
+	$object                = (object) array(
+		'name'        => $tax,
+		'object_type' => (array) $objects,
+		'args'        => (array) $args,
+	);
+	$GLOBALS['__taxonomies'][ $tax ] = $object;
+	return $object;
+}
 function taxonomy_exists( $tax ) {
-	return in_array( $tax, array( 'artist', 'singer', 'category', 'post_tag' ), true );
+	return in_array( $tax, array( 'artist', 'singer', 'category', 'post_tag' ), true ) || isset( $GLOBALS['__taxonomies'][ $tax ] );
+}
+function get_the_terms( $post_id, $tax ) {
+	return isset( $GLOBALS['__postterms'][ (int) $post_id ][ $tax ] ) ? $GLOBALS['__postterms'][ (int) $post_id ][ $tax ] : false;
+}
+function get_term_link( $term, $tax = '' ) {
+	$t = is_object( $term ) ? $term : null;
+	if ( ! $t ) {
+		return new WP_Error( 'invalid_term' );
+	}
+	return 'https://ex/' . rawurlencode( $t->taxonomy ) . '/' . $t->slug . '/';
+}
+function get_edit_term_link( $id, $tax = '', $object = '' ) {
+	return 'https://ex/wp-admin/term.php?taxonomy=' . $tax . '&tag_ID=' . (int) $id;
+}
+function wp_count_terms( $args = array() ) {
+	$tax = is_array( $args ) && isset( $args['taxonomy'] ) ? $args['taxonomy'] : '';
+	return isset( $GLOBALS['__termcount'][ $tax ] ) ? (int) $GLOBALS['__termcount'][ $tax ] : 0;
+}
+function wp_json_encode( $data, $flags = 0 ) {
+	return json_encode( $data, $flags );
+}
+function wp_unique_id( $prefix = '' ) {
+	$GLOBALS['__uid'] = isset( $GLOBALS['__uid'] ) ? $GLOBALS['__uid'] + 1 : 1;
+	return $prefix . $GLOBALS['__uid'];
+}
+function wpautop( $text ) {
+	return '<p>' . str_replace( "\n\n", '</p>\n<p>', trim( (string) $text ) ) . '</p>';
+}
+function has_post_thumbnail( $post_id = 0 ) {
+	return ! empty( $GLOBALS['__thumb'][ (int) $post_id ] );
+}
+function get_the_post_thumbnail_url( $post_id = 0, $size = '' ) {
+	return has_post_thumbnail( $post_id ) ? $GLOBALS['__thumb'][ (int) $post_id ] : false;
+}
+function get_the_post_thumbnail( $post_id = 0, $size = '', $attr = array() ) {
+	return has_post_thumbnail( $post_id ) ? '<img src="' . esc_url( $GLOBALS['__thumb'][ (int) $post_id ] ) . '" alt="">' : '';
 }
 function get_taxonomy( $tax ) {
 	if ( ! taxonomy_exists( $tax ) ) {
 		return false;
+	}
+	if ( isset( $GLOBALS['__taxonomies'][ $tax ] ) ) {
+		return $GLOBALS['__taxonomies'][ $tax ];
 	}
 	$o               = new stdClass();
 	$o->name         = $tax;

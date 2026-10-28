@@ -6,7 +6,7 @@
  * می‌دهد و ParseError را پرتاب می‌کند ⇒ همان کاری که `php -l` می‌کند، بدون اجرا.
  *
  * استفاده:
- *   node tools/php-lint.mjs javanseda [javanseda/inc ...]
+ *   node tools/php-lint.mjs taranehyar [taranehyar/inc ...]
  *
  * خروجی: یک خط خلاصه + فهرست فایل‌های خطادار. کد خروج ۱ اگر خطایی باشد.
  */

@@ -52,7 +52,7 @@ if ( ! function_exists( 'tara_add_artist_metabox' ) ) {
 			return;
 		}
 		add_meta_box(
-			'javan-seda-artist',
+			'tara-post-artist',
 			'هنرمندِ اثر',
 			'tara_render_artist_metabox',
 			$post_type,

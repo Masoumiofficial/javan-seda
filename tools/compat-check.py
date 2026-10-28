@@ -8,7 +8,7 @@ compat-check.py — نگهبان سازگاری نسخهٔ PHP (معرفی‌ش�
 «نسخه» نمی‌دهند. این اسکریپت قبل از build اجرا می‌شود و هر ساختاری که تازه‌تر از کف پروژه
 (PHP 5.6) باشد را در فایل‌های قالب گزارش می‌کند.
 
-استفاده:  python3 tools/compat-check.py javanseda
+استفاده:  python3 tools/compat-check.py taranehyar
 خروجی:   فایل:خط [برچسب] · کد خروج ۱ اگر چیزی پیدا شد.
 """
 import io, os, re, sys
@@ -92,9 +92,9 @@ for arg in (sys.argv[1:] or ['taranehyar']):
                 print('[%s] %s:%d  %s  …%s…' % (tag, path, ln, label, frag))
                 hits += 1
 # --- بررسی دوم (v3.1.7): «dangling callback» — همان چیزی که سایت را خواباند ---
-# هر add_action/add_filter/add_shortcode که callback رشته‌ایِ javan_seda_* دارد باید
+# هر add_action/add_filter/add_shortcode که callback رشته‌ایِ taranehyar_*/tara_* دارد باید
 # تابعش در همان فایل تعریف شده باشد (یا با function_exists پوشیده شده باشد).
-CB = re.compile(r"add_(?:action|filter|shortcode)\(\s*'[^']+'\s*,\s*'(javan_seda_[A-Za-z0-9_]+)'")
+CB = re.compile(r"add_(?:action|filter|shortcode)\(\s*'[^']+'\s*,\s*'((?:taranehyar|tara)_[A-Za-z0-9_]+)'")
 declared_all = set()
 for dp, dn, fn in os.walk(sys.argv[1] if len(sys.argv) > 1 else 'taranehyar'):
     if 'option-tree' in dp:
@@ -116,7 +116,7 @@ for arg in (sys.argv[1:] or ['taranehyar']):
             ln = src[:m.start()].count('\n') + 1
             print('[OURS] %s:%d  dangling callback (WP will fatal in PHP 8)  →  %s' % (path, ln, cb))
             hits += 1
-        for m in re.finditer(r"add_(?:action|filter|shortcode)\(\s*'[^']+'\s*,\s*'(javan_seda_[A-Za-z0-9_]+)'", scan):
+        for m in re.finditer(r"add_(?:action|filter|shortcode)\(\s*'[^']+'\s*,\s*'((?:taranehyar|tara)_[A-Za-z0-9_]+)'", scan):
             cb = m.group(1)
             if cb not in declared_all and ("function_exists( '%s' )" % cb) not in scan:
                 ln = src[:m.start()].count('\n') + 1

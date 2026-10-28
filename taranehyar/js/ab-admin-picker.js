@@ -4,12 +4,12 @@
  * ۱) انتخاب تصویر از کتابخانهٔ رسانهٔ خودِ وردپرس (هیچ آپلودرِ موازی‌ای ساخته نشده).
  * ۲) جست‌وجوی زندهٔ هنرمند/نوشته با AJAX (بدون بارگذاریِ کاملِ فهرست).
  *
- * وابستگی: window.JavanSedaPicker {ajax, nonce, empty, error, min}
+ * وابستگی: window.TaraPicker {ajax, nonce, empty, error, min}
  */
 (function () {
 	'use strict';
 
-	var CFG = window.JavanSedaPicker || {};
+	var CFG = window.TaraPicker || {};
 	var NONCE = CFG.nonce || '';
 	var AJAX = CFG.ajax || '';
 	var TEXT = {

@@ -1,0 +1,855 @@
+/**
+ * ترانه یار — عناصر مشترک رابط: پلیر «رادیو»، ردیف آهنگ، چیپ‌ها
+ * ---------------------------------------------------------------------------
+ * همه چیز زیر پیشوند `.ty-` است تا هیچ قاعده‌ای از استایل‌های قدیمی قالب
+ * (کلاس‌های ab-* و .music_box_player) را عوض نکند. رنگ‌ها از متغیرهای خود قالب
+ * می‌آیند و اگر نبودند، مقدار پشتیبان دارند.
+ *
+ * @package Taranehyar
+ */
+
+/* =========================================================================
+   ۱) توکن‌ها
+   ====================================================================== */
+.ty-player,
+.ty-dock,
+.ty-track,
+.ty-chips,
+.ty-tracklist {
+	--ty-accent: var(--ab-blue, #185adb);
+	--ty-accent-dark: var(--ab-blue-dark, #1246ad);
+	--ty-accent-soft: var(--ab-blue-soft, #eaf1fe);
+	--ty-ink: var(--ab-ink, #111111);
+	--ty-text: var(--ab-text, #2a2a2a);
+	--ty-muted: var(--ab-muted, #6b7280);
+	--ty-line: var(--ab-line, #e6e8ee);
+	--ty-surface: var(--ab-surface, #ffffff);
+	--ty-radius: 18px;
+	direction: rtl;
+}
+
+/* =========================================================================
+   ۲) پلیر
+   ====================================================================== */
+.ty-player {
+	position: relative;
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	gap: 20px;
+	padding: 20px;
+	margin: 22px 0;
+	border: 1px solid var(--ty-line);
+	border-radius: var(--ty-radius);
+	background:
+		radial-gradient(120% 140% at 100% 0%, rgba(24, 90, 219, 0.10) 0%, rgba(24, 90, 219, 0) 55%),
+		var(--ty-surface);
+	box-shadow: 0 16px 40px -32px rgba(17, 24, 39, 0.65);
+}
+
+.ty-player:focus-within {
+	border-color: color-mix(in srgb, var(--ty-accent) 35%, var(--ty-line));
+}
+
+/* کاور ---------------------------------------------------------------- */
+.ty-player__art {
+	position: relative;
+	flex: 0 0 auto;
+	width: 132px;
+	height: 132px;
+}
+
+.ty-player__img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	border-radius: 16px;
+	display: block;
+	box-shadow: 0 10px 24px -18px rgba(0, 0, 0, 0.8);
+}
+
+.ty-player__pulse {
+	position: absolute;
+	inset-inline-start: 8px;
+	bottom: 8px;
+	display: flex;
+	align-items: flex-end;
+	gap: 3px;
+	height: 18px;
+	padding: 0 6px;
+	border-radius: 999px;
+	background: rgba(17, 17, 17, 0.55);
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.ty-player__pulse i {
+	display: block;
+	width: 3px;
+	height: 40%;
+	background: #fff;
+	border-radius: 2px;
+}
+
+.ty-player.is-playing .ty-player__pulse {
+	opacity: 1;
+}
+
+.ty-player.is-playing .ty-player__pulse i {
+	animation: ty-bounce 0.9s ease-in-out infinite;
+}
+
+.ty-player.is-playing .ty-player__pulse i:nth-child(2) { animation-delay: 0.15s; }
+.ty-player.is-playing .ty-player__pulse i:nth-child(3) { animation-delay: 0.3s; }
+.ty-player.is-playing .ty-player__pulse i:nth-child(4) { animation-delay: 0.45s; }
+
+@keyframes ty-bounce {
+	0%, 100% { height: 30%; }
+	50% { height: 100%; }
+}
+
+/* ستون اصلی ----------------------------------------------------------- */
+.ty-player__main {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.ty-player__head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.ty-player__labels {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.ty-player__eyebrow {
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.2px;
+	color: var(--ty-accent);
+}
+
+.ty-player__song {
+	font-size: clamp(17px, 2.2vw, 22px);
+	font-weight: 800;
+	line-height: 1.5;
+	color: var(--ty-ink);
+	text-decoration: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ty-player__song:hover,
+.ty-player__song:focus {
+	color: var(--ty-accent);
+}
+
+.ty-player__artist {
+	font-size: 13px;
+	color: var(--ty-muted);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ty-player__count {
+	flex: 0 0 auto;
+	font-size: 11px;
+	color: var(--ty-muted);
+	background: var(--ty-accent-soft);
+	border-radius: 999px;
+	padding: 3px 10px;
+	white-space: nowrap;
+}
+
+/* ترابری (کنترل‌ها) --------------------------------------------------- */
+.ty-player__transport {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.ty-player__btn {
+	appearance: none;
+	border: 0;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	color: var(--ty-text);
+	border-radius: 50%;
+	transition: background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.ty-player__btn--skip {
+	width: 38px;
+	height: 38px;
+}
+
+.ty-player__btn--skip:hover,
+.ty-player__btn--skip:focus-visible {
+	background: var(--ty-accent-soft);
+	color: var(--ty-accent);
+}
+
+.ty-player__btn--main {
+	width: 54px;
+	height: 54px;
+	flex: 0 0 auto;
+	background: var(--ty-accent);
+	color: #fff;
+	box-shadow: 0 10px 20px -12px var(--ty-accent);
+}
+
+.ty-player__btn--main:hover,
+.ty-player__btn--main:focus-visible {
+	background: var(--ty-accent-dark);
+	transform: translateY(-1px);
+}
+
+.ty-player__btn--main:focus-visible,
+.ty-player__btn--skip:focus-visible,
+.ty-player__seek:focus-visible,
+.ty-player__vol input:focus-visible,
+.ty-player__item-btn:focus-visible,
+.ty-dock__btn:focus-visible {
+	outline: 2px solid var(--ty-accent);
+	outline-offset: 2px;
+}
+
+/* آیکون‌ها با CSS کشیده می‌شوند تا به فونت آیکون وابسته نباشیم ------------- */
+.ty-icon-play,
+.ty-icon-pause,
+.ty-icon-prev,
+.ty-icon-next,
+.ty-icon-vol,
+.ty-icon-note,
+.ty-icon-external {
+	display: inline-block;
+	position: relative;
+	width: 18px;
+	height: 18px;
+	color: currentColor;
+}
+
+.ty-icon-play::before {
+	content: "";
+	position: absolute;
+	inset-inline-start: 3px;
+	top: 2px;
+	border-style: solid;
+	border-width: 7px 0 7px 11px;
+	border-color: transparent transparent transparent currentColor;
+}
+
+.ty-icon-pause::before,
+.ty-icon-pause::after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	width: 4px;
+	height: 14px;
+	border-radius: 1px;
+	background: currentColor;
+}
+
+.ty-icon-pause::before { inset-inline-start: 3px; }
+.ty-icon-pause::after { inset-inline-start: 10px; }
+
+.ty-icon-prev::before,
+.ty-icon-next::before {
+	content: "";
+	position: absolute;
+	top: 3px;
+	border-style: solid;
+	border-width: 6px 0 6px 9px;
+	border-color: transparent transparent transparent currentColor;
+}
+
+.ty-icon-prev::before { inset-inline-end: 2px; }
+.ty-icon-next::before { inset-inline-start: 2px; transform: scaleX(-1); }
+
+.ty-icon-prev::after,
+.ty-icon-next::after {
+	content: "";
+	position: absolute;
+	top: 2px;
+	width: 2px;
+	height: 14px;
+	background: currentColor;
+}
+
+.ty-icon-prev::after { inset-inline-start: 2px; }
+.ty-icon-next::after { inset-inline-end: 2px; }
+
+.ty-icon-vol::before {
+	content: "";
+	position: absolute;
+	inset-inline-start: 1px;
+	top: 6px;
+	width: 5px;
+	height: 6px;
+	background: currentColor;
+	border-start-start-radius: 1px;
+	border-end-start-radius: 1px;
+}
+
+.ty-icon-vol::after {
+	content: "";
+	position: absolute;
+	inset-inline-start: 4px;
+	top: 3px;
+	border-style: solid;
+	border-width: 6px 7px 6px 0;
+	border-color: transparent currentColor transparent transparent;
+}
+
+.ty-icon-note::before {
+	content: "♪";
+	font-size: 18px;
+	line-height: 18px;
+}
+
+.ty-icon-external::before {
+	content: "";
+	position: absolute;
+	inset: 4px;
+	border: 2px solid currentColor;
+	border-radius: 2px;
+}
+
+.ty-icon-external::after {
+	content: "";
+	position: absolute;
+	inset-inline-end: 1px;
+	top: 2px;
+	width: 7px;
+	height: 7px;
+	border-top: 2px solid currentColor;
+	border-inline-end: 2px solid currentColor;
+}
+
+/* حالت پخش/توقف: فقط یکی از دو آیکون دیده شود -------------------------- */
+.ty-player .ty-icon-pause,
+.ty-player .ty-icon-play,
+.ty-dock .ty-icon-pause,
+.ty-dock .ty-icon-play,
+.ty-track .ty-icon-pause,
+.ty-track .ty-icon-play {
+	display: none;
+}
+
+.ty-player:not(.is-playing) .ty-player__btn--main .ty-icon-play { display: inline-block; }
+.ty-player.is-playing .ty-player__btn--main .ty-icon-pause { display: inline-block; }
+.ty-dock:not(.is-playing) .ty-icon-play { display: inline-block; }
+.ty-dock.is-playing .ty-icon-pause { display: inline-block; }
+.ty-track:not(.is-playing) .ty-icon-play { display: inline-block; }
+.ty-track.is-playing .ty-icon-pause { display: inline-block; }
+
+/* اسپینر بارگذاری ----------------------------------------------------- */
+.ty-player__spinner {
+	display: none;
+	width: 20px;
+	height: 20px;
+	border: 2px solid rgba(255, 255, 255, 0.45);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: ty-spin 0.8s linear infinite;
+}
+
+.ty-player.is-loading .ty-player__spinner { display: block; }
+.ty-player.is-loading .ty-player__btn--main .ty-icon-play,
+.ty-player.is-loading .ty-player__btn--main .ty-icon-pause { display: none !important; }
+
+@keyframes ty-spin { to { transform: rotate(360deg); } }
+
+/* تایم‌لاین ----------------------------------------------------------- */
+.ty-player__timeline {
+	position: relative;
+	flex: 1 1 160px;
+	min-width: 120px;
+	height: 8px;
+	border-radius: 999px;
+	background: var(--ty-line);
+	overflow: visible;
+}
+
+.ty-player__buffer,
+.ty-player__fill {
+	position: absolute;
+	inset-inline-start: 0;
+	top: 0;
+	height: 100%;
+	border-radius: 999px;
+	pointer-events: none;
+}
+
+.ty-player__buffer { background: rgba(17, 24, 39, 0.12); width: 0; }
+.ty-player__fill { background: var(--ty-accent); width: 0; }
+
+.ty-player__seek {
+	position: absolute;
+	inset-inline: 0;
+	top: -6px;
+	width: 100%;
+	height: 20px;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.ty-player__time {
+	font-variant-numeric: tabular-nums;
+	font-size: 11px;
+	color: var(--ty-muted);
+	white-space: nowrap;
+	min-width: 82px;
+	text-align: center;
+}
+
+.ty-player__vol {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.ty-player__vol-btn {
+	appearance: none;
+	background: transparent;
+	border: 0;
+	color: var(--ty-muted);
+	cursor: pointer;
+	padding: 4px;
+	border-radius: 8px;
+}
+
+.ty-player__vol-btn:hover { color: var(--ty-accent); background: var(--ty-accent-soft); }
+
+.ty-player__vol input[type="range"] {
+	width: 74px;
+	accent-color: var(--ty-accent);
+}
+
+/* فهرست پخش ---------------------------------------------------------- */
+.ty-player__playlist {
+	grid-column: 1 / -1;
+	margin: 4px 0 0;
+	padding: 0;
+	list-style: none;
+	max-height: 262px;
+	overflow: auto;
+	border-top: 1px solid var(--ty-line);
+	padding-top: 8px;
+	scrollbar-width: thin;
+}
+
+.ty-player__item-btn {
+	appearance: none;
+	width: 100%;
+	border: 0;
+	background: transparent;
+	display: grid;
+	grid-template-columns: 30px minmax(0, 1fr) auto 22px;
+	align-items: center;
+	gap: 10px;
+	padding: 9px 10px;
+	border-radius: 10px;
+	cursor: pointer;
+	text-align: right;
+	color: var(--ty-text);
+	font: inherit;
+}
+
+.ty-player__item-btn:hover,
+.ty-player__item-btn:focus-visible {
+	background: var(--ty-accent-soft);
+}
+
+.ty-player__item.is-active .ty-player__item-btn {
+	background: color-mix(in srgb, var(--ty-accent) 10%, transparent);
+}
+
+.ty-player__item-num {
+	font-size: 12px;
+	color: var(--ty-muted);
+	text-align: center;
+}
+
+.ty-player__item-title {
+	font-size: 13px;
+	font-weight: 600;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ty-player__item-artist {
+	font-size: 11px;
+	color: var(--ty-muted);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 40vw;
+}
+
+.ty-icon-eq {
+	display: none;
+	gap: 2px;
+	align-items: flex-end;
+	height: 14px;
+}
+
+.ty-icon-eq i {
+	display: block;
+	width: 3px;
+	height: 30%;
+	background: var(--ty-accent);
+	border-radius: 2px;
+	animation: ty-bounce 0.9s ease-in-out infinite;
+}
+
+.ty-icon-eq i:nth-child(2) { animation-delay: 0.15s; }
+.ty-icon-eq i:nth-child(3) { animation-delay: 0.3s; }
+
+.ty-player__item.is-active .ty-icon-eq { display: flex; }
+
+/* =========================================================================
+   ۳) نوار چسبان پایین (Dock)
+   ====================================================================== */
+.ty-dock {
+	position: fixed;
+	inset-inline: 0;
+	bottom: 0;
+	z-index: 9990;
+	display: grid;
+	grid-template-columns: 44px minmax(0, 1fr) auto auto auto auto;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 14px calc(8px + env(safe-area-inset-bottom));
+	background: color-mix(in srgb, var(--ty-surface) 92%, transparent);
+	backdrop-filter: blur(14px);
+	border-top: 1px solid var(--ty-line);
+	box-shadow: 0 -10px 30px -22px rgba(0, 0, 0, 0.6);
+	transform: translateY(110%);
+	transition: transform 0.25s ease;
+}
+
+.ty-dock[hidden] { display: none; }
+
+.ty-dock.is-visible { transform: translateY(0); }
+
+body.has-tara-dock { padding-bottom: 72px; }
+
+.ty-dock__img {
+	width: 44px;
+	height: 44px;
+	border-radius: 10px;
+	object-fit: cover;
+}
+
+.ty-dock__meta { min-width: 0; }
+
+.ty-dock__title {
+	display: block;
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--ty-ink);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ty-dock__artist {
+	display: block;
+	font-size: 11px;
+	color: var(--ty-muted);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ty-dock__rail {
+	margin-top: 5px;
+	height: 3px;
+	border-radius: 999px;
+	background: var(--ty-line);
+	overflow: hidden;
+}
+
+.ty-dock__fill {
+	display: block;
+	height: 100%;
+	width: 0;
+	background: var(--ty-accent);
+	transition: width 0.2s linear;
+}
+
+.ty-dock__btn {
+	appearance: none;
+	border: 0;
+	background: transparent;
+	color: var(--ty-text);
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+.ty-dock__btn:hover { background: var(--ty-accent-soft); color: var(--ty-accent); }
+
+.ty-dock__btn--main {
+	background: var(--ty-accent);
+	color: #fff;
+	width: 44px;
+	height: 44px;
+}
+
+.ty-dock__btn--main:hover { background: var(--ty-accent-dark); color: #fff; }
+
+.ty-dock__link {
+	color: var(--ty-muted);
+	display: inline-flex;
+	width: 34px;
+	height: 34px;
+	align-items: center;
+	justify-content: center;
+	border-radius: 8px;
+}
+
+.ty-dock__link:hover { color: var(--ty-accent); }
+
+/* =========================================================================
+   ۴) ردیف آهنگ (فهرست‌های عمومی)
+   ====================================================================== */
+.ty-tracklist {
+	display: grid;
+	gap: 4px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ty-track {
+	display: grid;
+	grid-template-columns: 38px 48px minmax(0, 1fr) auto auto;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 10px;
+	border-radius: 12px;
+	transition: background 0.15s ease;
+}
+
+.ty-track:hover { background: var(--ty-accent-soft); }
+
+.ty-track.is-current { background: color-mix(in srgb, var(--ty-accent) 8%, transparent); }
+
+.ty-track__play {
+	appearance: none;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	border: 1px solid var(--ty-line);
+	background: var(--ty-surface);
+	color: var(--ty-accent);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+.ty-track__play:hover { background: var(--ty-accent); color: #fff; border-color: var(--ty-accent); }
+.ty-track__play--none { color: var(--ty-muted); cursor: default; }
+
+.ty-track__cover img {
+	width: 48px;
+	height: 48px;
+	border-radius: 10px;
+	object-fit: cover;
+	display: block;
+}
+
+.ty-track__body { min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.ty-track__title {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--ty-ink);
+	text-decoration: none;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ty-track__title:hover { color: var(--ty-accent); }
+
+.ty-track__artist,
+.ty-track__date {
+	font-size: 11px;
+	color: var(--ty-muted);
+	white-space: nowrap;
+}
+
+.ty-track__badge {
+	font-size: 10px;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: var(--ty-accent-soft);
+	color: var(--ty-accent);
+	white-space: nowrap;
+}
+
+/* =========================================================================
+   ۵) چیپ‌ها
+   ====================================================================== */
+.ty-chips {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 6px;
+}
+
+.ty-chips__label {
+	font-size: 11px;
+	color: var(--ty-muted);
+}
+
+.ty-chip {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 999px;
+	border: 1px solid var(--ty-line);
+	background: var(--ty-surface);
+	color: var(--ty-text);
+	font-size: 11px;
+	text-decoration: none;
+	transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.ty-chip:hover,
+.ty-chip:focus-visible {
+	border-color: var(--ty-accent);
+	color: var(--ty-accent);
+	background: var(--ty-accent-soft);
+}
+
+/* =========================================================================
+   ۶) حالت شب
+   ====================================================================== */
+.night .ty-player,
+.night .ty-dock,
+.night .ty-chip {
+	--ty-surface: var(--ab-charcoal, #222222);
+	--ty-ink: #f4f4f5;
+	--ty-text: #d9d9de;
+	--ty-muted: #9aa0aa;
+	--ty-line: #33333a;
+	--ty-accent-soft: rgba(24, 90, 219, 0.18);
+}
+
+.night .ty-player {
+	background:
+		radial-gradient(120% 140% at 100% 0%, rgba(24, 90, 219, 0.22) 0%, rgba(24, 90, 219, 0) 55%),
+		var(--ty-surface);
+}
+
+.night .ty-track:hover { background: rgba(255, 255, 255, 0.06); }
+
+/* =========================================================================
+   ۷) موبایل
+   ====================================================================== */
+@media (max-width: 782px) {
+	.ty-player {
+		grid-template-columns: 1fr;
+		padding: 16px;
+		gap: 14px;
+	}
+
+	.ty-player__art {
+		width: 100%;
+		height: 190px;
+	}
+
+	.ty-player__img { border-radius: 14px; }
+
+	.ty-player__transport { gap: 8px; }
+
+	.ty-player__timeline { flex-basis: 100%; order: 5; }
+
+	.ty-player__time { order: 6; }
+
+	.ty-player__vol { order: 4; margin-inline-start: auto; }
+
+	.ty-player__vol input[type="range"] { width: 56px; }
+
+	.ty-player__item-btn {
+		grid-template-columns: 24px minmax(0, 1fr) 18px;
+	}
+
+	.ty-player__item-artist { display: none; }
+
+	.ty-track {
+		grid-template-columns: 34px 42px minmax(0, 1fr);
+		gap: 10px;
+	}
+
+	.ty-track__cover img { width: 42px; height: 42px; }
+
+	.ty-track__date,
+	.ty-track__badge { display: none; }
+
+	.ty-dock {
+		grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
+		padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+	}
+
+	.ty-dock__link { display: none; }
+}
+
+/* =========================================================================
+   ۸) دسترس‌پذیری و چاپ
+   ====================================================================== */
+@media (prefers-reduced-motion: reduce) {
+	.ty-player.is-playing .ty-player__pulse i,
+	.ty-icon-eq i,
+	.ty-player__spinner {
+		animation: none;
+	}
+}
+
+@media print {
+	.ty-dock { display: none !important; }
+}
+
+/* =========================================================================
+   ۹) نوار شناسهٔ آهنگ در صفحهٔ نوشته
+   ====================================================================== */
+.ty-single-meta {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 18px;
+	margin: 12px 0 4px;
+	padding: 10px 12px;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	border-radius: 14px;
+	background: var(--ty-surface, #fff);
+}
+
+.ty-single-meta .ty-chips { gap: 6px; }
+
+.night .ty-single-meta {
+	--ty-surface: var(--ab-charcoal, #222222);
+	--ty-line: #33333a;
+}

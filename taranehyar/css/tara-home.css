@@ -1,0 +1,174 @@
+/**
+ * ترانه یار — اسلایدر ویژهٔ صفحهٔ اصلی (تک‌اسلاید)
+ * ---------------------------------------------------------------------------
+ * پیش از ۳.۷.۰ دو اسلاید کنار هم بود (هر کدام ~نصف عرض) و روی دسکتاپ ریز
+ * دیده می‌شد. حالا یک اسلاید تمام‌عرض با لایهٔ تیره و تیتر درشت است.
+ *
+ * @package Taranehyar
+ */
+
+.ty-hero-slider {
+	--ty-hs-radius: 24px;
+	position: relative;
+	margin: 18px 0 24px;
+}
+
+.ty-hero-slider .vip_top_slider { border-radius: var(--ty-hs-radius); }
+
+.ty-hero-slide {
+	position: relative;
+	display: block;
+	border-radius: var(--ty-hs-radius);
+	overflow: hidden;
+	background: #10172a;
+	isolation: isolate;
+}
+
+.ty-hero-slide__media {
+	display: block;
+	line-height: 0;
+}
+
+.ty-hero-slide__media img {
+	width: 100%;
+	height: clamp(240px, 36vw, 460px);
+	object-fit: cover;
+	display: block;
+	transform: scale(1.02);
+	transition: transform 0.6s ease;
+}
+
+.ty-hero-slide:hover .ty-hero-slide__media img { transform: scale(1.06); }
+
+.ty-hero-slide::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+	background:
+		linear-gradient(to top, rgba(9, 12, 24, 0.94) 0%, rgba(9, 12, 24, 0.55) 38%, rgba(9, 12, 24, 0) 72%),
+		linear-gradient(to left, rgba(9, 12, 24, 0.5) 0%, rgba(9, 12, 24, 0) 55%);
+}
+
+.ty-hero-slide__body {
+	position: absolute;
+	inset-inline: 0;
+	bottom: 0;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 10px;
+	padding: clamp(16px, 3vw, 34px);
+	color: #fff;
+}
+
+.ty-hero-slide__badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 12px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.16);
+	border: 1px solid rgba(255, 255, 255, 0.28);
+	font-size: 11px;
+	font-weight: 600;
+	backdrop-filter: blur(6px);
+}
+
+.ty-hero-slide__title {
+	margin: 0;
+	font-size: clamp(20px, 3.4vw, 34px);
+	line-height: 1.4;
+	font-weight: 800;
+	color: #fff;
+}
+
+.ty-hero-slide__title a {
+	color: #fff;
+	text-decoration: none;
+}
+
+.ty-hero-slide__artist {
+	display: block;
+	font-size: 0.52em;
+	font-weight: 600;
+	color: rgba(255, 255, 255, 0.72);
+	letter-spacing: 0.2px;
+}
+
+.ty-hero-slide__song { display: block; }
+
+.ty-hero-slide__tags .ty-chips { gap: 6px; }
+
+.ty-hero-slide__tags .ty-chip {
+	background: rgba(255, 255, 255, 0.14);
+	border-color: rgba(255, 255, 255, 0.26);
+	color: #fff;
+}
+
+.ty-hero-slide__actions { margin-top: 4px; }
+
+.ty-hero-slide__play {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 20px;
+	border-radius: 999px;
+	background: #fff;
+	color: #0f172a;
+	font-size: 13px;
+	font-weight: 800;
+	text-decoration: none;
+	box-shadow: 0 12px 24px -16px rgba(0, 0, 0, 0.9);
+	transition: transform 0.15s ease;
+}
+
+.ty-hero-slide__play:hover,
+.ty-hero-slide__play:focus {
+	transform: translateY(-1px);
+	color: #0f172a;
+}
+
+.ty-hero-slide__play:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
+/* نشانگرهای اسلایدر (owl dots) --------------------------------------- */
+.ty-hero-slider .owl-dots {
+	position: absolute;
+	inset-inline-start: 50%;
+	bottom: 12px;
+	transform: translateX(50%);
+	display: flex;
+	gap: 6px;
+	z-index: 3;
+}
+
+.ty-hero-slider .owl-dot {
+	appearance: none;
+	border: 0;
+	padding: 0;
+	width: 8px;
+	height: 8px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.45);
+	cursor: pointer;
+	transition: width 0.2s ease, background 0.2s ease;
+}
+
+.ty-hero-slider .owl-dot.active {
+	width: 22px;
+	background: #fff;
+}
+
+/* پلیر صفحهٔ اصلی ------------------------------------------------------ */
+.ty-home-player { margin: 6px 0 22px; }
+
+@media (max-width: 782px) {
+	.ty-hero-slide__media img { height: 56vw; min-height: 220px; }
+
+	.ty-hero-slider .owl-dots { bottom: 8px; }
+}

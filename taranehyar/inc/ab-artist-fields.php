@@ -603,11 +603,11 @@ if ( ! function_exists( 'tara_352_assets' ) ) {
 		$ver = function_exists( 'wp_get_theme' ) ? wp_get_theme()->get( 'Version' ) : '3.5.2';
 
 		if ( $dir && is_readable( trailingslashit( $dir ) . 'css/ab-352.css' ) ) {
-			wp_enqueue_style( 'javan-seda-352', trailingslashit( $uri ) . 'css/ab-352.css', array(), $ver );
+			wp_enqueue_style( 'tara-352', trailingslashit( $uri ) . 'css/ab-352.css', array(), $ver );
 		}
 
 		if ( function_exists( 'is_category' ) && is_category() && $dir && is_readable( trailingslashit( $dir ) . 'js/ab-cat-desc.js' ) ) {
-			wp_enqueue_script( 'javan-seda-cat-desc', trailingslashit( $uri ) . 'js/ab-cat-desc.js', array(), $ver, true );
+			wp_enqueue_script( 'tara-cat-desc', trailingslashit( $uri ) . 'js/ab-cat-desc.js', array(), $ver, true );
 		}
 	}
 	add_action( 'wp_enqueue_scripts', 'tara_352_assets', 30 );

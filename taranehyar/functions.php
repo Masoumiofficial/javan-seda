@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.6.0' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.0' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -138,6 +138,21 @@ if ( ! function_exists( 'taranehyar_assets' ) ) {
 				$deps[] = 'owl-carousel';
 			}
 			wp_enqueue_script( 'taranehyar-scripts', TARANEHYAR_URI . '/js/scripts.js', $deps, TARANEHYAR_VERSION, true );
+		}
+
+		/* لایهٔ تازهٔ ۳.۷.۰ — پلیر «رادیو»، ردیف آهنگ‌ها و چیپ‌ها.
+		   بدون jQuery و بدون وابستگی؛ اگر فایل نبود، هیچ‌چیز نمی‌شکند. */
+		if ( file_exists( TARANEHYAR_DIR . '/css/tara-ui.css' ) ) {
+			wp_enqueue_style( 'taranehyar-ui', TARANEHYAR_URI . '/css/tara-ui.css', array( 'taranehyar-style' ), TARANEHYAR_VERSION );
+		}
+		if ( file_exists( TARANEHYAR_DIR . '/css/tara-artist.css' ) ) {
+			wp_enqueue_style( 'taranehyar-artist', TARANEHYAR_URI . '/css/tara-artist.css', array( 'taranehyar-ui' ), TARANEHYAR_VERSION );
+		}
+		if ( file_exists( TARANEHYAR_DIR . '/css/tara-home.css' ) ) {
+			wp_enqueue_style( 'taranehyar-home', TARANEHYAR_URI . '/css/tara-home.css', array( 'taranehyar-ui' ), TARANEHYAR_VERSION );
+		}
+		if ( file_exists( TARANEHYAR_DIR . '/js/tara-player.js' ) ) {
+			wp_enqueue_script( 'taranehyar-player', TARANEHYAR_URI . '/js/tara-player.js', array(), TARANEHYAR_VERSION, true );
 		}
 	}
 	add_action( 'wp_enqueue_scripts', 'taranehyar_assets', 5 );
@@ -338,6 +353,20 @@ if ( is_readable( $taranehyar_ot ) && ! class_exists( 'OT_Loader' ) ) {
 }
 unset( $taranehyar_ot );
 
+/* ۶-الف-۲) تاکسونومی‌های موسیقی (ژانر، حال‌وهوا، ترانه‌سرا، آهنگساز، تنظیم) */
+$taranehyar_taxonomies = TARANEHYAR_DIR . '/inc/tara-taxonomies.php';
+if ( is_readable( $taranehyar_taxonomies ) ) {
+	require_once $taranehyar_taxonomies;
+}
+unset( $taranehyar_taxonomies );
+
+/* ۶-الف-۳) عناصر مشترک رابط: چیپ، ردیف آهنگ، پلیر */
+$taranehyar_ui = TARANEHYAR_DIR . '/inc/tara-ui.php';
+if ( is_readable( $taranehyar_ui ) ) {
+	require_once $taranehyar_ui;
+}
+unset( $taranehyar_ui );
+
 /* ۶-ب) ابزارک‌های اختصاصی (خودشان روی widgets_init هوک می‌زنند) */
 $taranehyar_widgets = TARANEHYAR_DIR . '/inc/widgets.php';
 if ( is_readable( $taranehyar_widgets ) ) {
@@ -358,6 +387,13 @@ if ( is_admin() ) {
 		require_once $taranehyar_panel;
 	}
 	unset( $taranehyar_panel );
+
+	/* پوستهٔ تازهٔ صفحهٔ تنظیمات (۳.۷.۰) — فقط ظاهر و جست‌وجو؛ نه ذخیره‌سازی */
+	$taranehyar_shell = TARANEHYAR_DIR . '/inc/admin-settings-shell.php';
+	if ( is_readable( $taranehyar_shell ) ) {
+		require_once $taranehyar_shell;
+	}
+	unset( $taranehyar_shell );
 }
 
 /* ۶-د) لایهٔ اصلیِ قالب (سی‌اس‌اس/ابزارک/سئو/دیدگاه‌ها…). آخر از همه می‌آید

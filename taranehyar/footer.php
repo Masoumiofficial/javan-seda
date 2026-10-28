@@ -37,7 +37,16 @@ if ( function_exists( 'tara_ui_footer_cols_count' ) ) {
 			<h4 class="ab-footer__title">درباره ما</h4>
 			<div class="ab-footer__content">
 				<?php
-				$ab_about = ot_get_option('footer_about');
+				/* ۳.۷.۰ — ترتیب تازه: «دربارهٔ سایت» (تب تازه) → settings → توضیح سایت.
+				   اگر گزینهٔ نمایش در پانوشت خاموش باشد، همان رفتار قبلی برمی‌گردد. */
+				$ab_about = '';
+				$ab_about_show = ot_get_option('about_show_footer');
+				if ('off' !== $ab_about_show) {
+					$ab_about = trim((string) ot_get_option('about_site_text'));
+				}
+				if (empty($ab_about)) {
+					$ab_about = ot_get_option('footer_about');
+				}
 				if (empty($ab_about)) {
 					$ab_about = ot_get_option('navar_txt');
 				}
@@ -48,7 +57,7 @@ if ( function_exists( 'tara_ui_footer_cols_count' ) ) {
 					$ab_about = ot_get_option('copyright');
 				}
 				if (!empty($ab_about)) {
-					echo '<p class="ab-footer__text">' . esc_html($ab_about) . '</p>';
+					echo '<p class="ab-footer__text">' . nl2br( esc_html( $ab_about ) ) . '</p>';
 				}
 				?>
 			</div>

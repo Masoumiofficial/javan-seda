@@ -401,6 +401,12 @@ function taranehyar_panel_sections() {
 			'icon'  => 'dashicons-megaphone',
 			'desc'  => 'کدهای بنر و جایگاه‌های تبلیغاتیِ قالب.',
 		),
+		array(
+			'id'    => 'about',
+			'title' => 'دربارهٔ سایت',
+			'icon'  => 'dashicons-info',
+			'desc'  => 'متن «درباره ما» برای پانوشت و صفحهٔ هنرمند — یک‌جا ویرایش می‌شود.',
+		),
 	);
 
 	foreach ( $sections as $index => $section ) {
@@ -408,6 +414,40 @@ function taranehyar_panel_sections() {
 	}
 
 	return $sections;
+}
+
+
+/**
+ * تاکسونومی‌های موسیقی + شمارش ترم‌ها (فقط خواندن).
+ *
+ * @return array
+ */
+function taranehyar_panel_taxonomies() {
+	$list = array();
+
+	if ( ! function_exists( 'tara_music_taxonomies' ) ) {
+		return $list;
+	}
+
+	foreach ( tara_music_taxonomies() as $config ) {
+		$taxonomy = (string) $config['taxonomy'];
+		if ( ! taxonomy_exists( $taxonomy ) ) {
+			continue;
+		}
+
+		$count = wp_count_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false ) );
+
+		$list[] = array(
+			'taxonomy' => $taxonomy,
+			'title'    => $config['plural'],
+			'singular' => $config['singular'],
+			'icon'     => $config['icon'],
+			'count'    => is_wp_error( $count ) ? 0 : (int) $count,
+			'url'      => admin_url( 'edit-tags.php?taxonomy=' . $taxonomy . '&post_type=post' ),
+		);
+	}
+
+	return $list;
 }
 
 /**

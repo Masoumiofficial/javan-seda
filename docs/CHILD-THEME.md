@@ -1,40 +1,43 @@
-# ساخت Child Theme برای «جاوان‌سدا» (جواب همیشگیِ مشکل آپدیت قالب مادر)
+# ساخت Child Theme برای «ترانه یار»
 
-**این سند اختیاری است.** تا وقتی که «بروزرسانی قالب مادر» را از پیشخوان نمی‌زنید،
-همان گارد `inc/ab-ui-guard.php` (افزودۀ 3.3.8) کار را راه می‌اندازد: اگر مارکر
-`ab-ui-layer` از `style.css` پاک شود، کپیِ لایه از `css/ab-ui.css` به‌طور خودکار
-enqueue می‌شود.
+**این سند اختیاری است.** تا وقتی «به‌روزرسانی قالب مادر» را از پیشخوان نمی‌زنید،
+گارد `inc/ab-ui-guard.php` کار را راه می‌اندازد: اگر مارکر لایۀ اختصاصی از
+`style.css` پاک شود، کپی لایه از `css/ab-ui.css` خودکار enqueue می‌شود. خاموش‌کردنش:
+
+```php
+define( 'TARA_UI_GUARD', false );
+```
 
 Child theme تنها راهی است که بعداً `style.css` مادر **هرگز** لمس نمی‌شود — ولی یک
 هزینهٔ مهم دارد که باید قبل از شروع بدانید.
 
 ---
 
-## ⚠️ هزینهٔ اصلی: تنظیمات Option Tree به نام پوشۀ قالب ذخیره می‌شود
+## ⚠️ هزینهٔ اصلی: تنظیمات به نام پوشهٔ قالب ذخیره می‌شوند
 
-این قالب تنظیماتش را با Option Tree در `theme_mods_<stylesheet>` نگه می‌دارد
-(`logo` ، `favicon` ، `vip_num` ، `arti_title` ، `ads_*` ، `index_pv` ، …). اگر child
-theme را فعال کنید، `stylesheet` عوض می‌شود ⇒ **همۀ این گزینه‌ها برای وردپرس خالی
-به‌نظر می‌رسند** (لوگو، تبلیغات، تعداد VIP، متن فوتر و …). راه‌حل‌ها:
+قالب تنظیمات OptionTree را در گزینۀ `option_tree` نگه می‌دارد و بخشی از چیزها
+(`theme_mods_…`) به نام stylesheet بسته است. اگر child را فعال کنید، `stylesheet`
+عوض می‌شود و ممکن است لوگو/تبلیغات/شمارنده‌ها خالی به‌نظر برسند. راه‌حل‌ها:
 
-1. **ساده‌ترین و توصیه‌شدۀ ما:** child نسازید؛ همان گارد + zip بکاپ کافی است.
-2. اگر اصرار به child دارید، بعد از فعال‌کردن child این را یک‌بار با WP-CLI اجرا کنید
-   (نسخۀ `theme_mods` را از parent به نام child کپی می‌کند):
+1. **ساده‌ترین و توصیه‌شدهٔ ما:** child نسازید؛ همان گارد + zip بکاپ کافی است.
+   گزینه‌های `option_tree` مستقل از نام پوشه‌اند و با child هم خوانده می‌شوند؛
+   خطر اصلی فقط `theme_mods` است.
+2. اگر child می‌سازید، بعد از فعال‌کردنش یک‌بار این را با WP-CLI بزنید:
    ```
-   wp option get theme_mods_javanseda --format=json > /tmp/tm.json
-   wp option update theme_mods_javanseda_child --format=json < /tmp/tm.json
-   wp option delete theme_mods_javanseda   # فقط بعد از اینکه همه‌چیز درست به‌نظر رسید
+   wp option get theme_mods_taranehyar --format=json > /tmp/tm.json
+   wp option update theme_mods_taranehyar-child --format=json < /tmp/tm.json
    ```
-   و حتماً در `functions.php` چایل بگذارید تا اگر نام پوشه فرق داشت، دستی برگردانید.
-3. موازی‌کاری نکنید: یا کل قالب را child می‌کنید، یا همان روش «فایل‌های قالب + drop-in» را ادامه می‌دهید.
+   و `wp option delete theme_mods_taranehyar` را تا وقتی همه‌چیز درست است، نزنید.
+3. موازی‌کاری نکنید: یا کل قالب را child می‌کنید، یا همان روش «Overwrite فایل‌های
+   قالب» را ادامه می‌دهید.
 
 ---
 
 ## ساختار پیشنهادی (کمینه‌ترین حالت)
 
 ```
-wp-content/themes/javanseda/            ← قالب مادر، دست‌نخورده (آپدیت‌شدنی)
-wp-content/themes/javanseda-child/
+wp-content/themes/taranehyar/            ← قالب مادر، دست‌نخورده (آپدیت‌شدنی)
+wp-content/themes/taranehyar-child/
 ├── style.css                           ← فقط هدر + بچه‌بودن
 ├── functions.php                       ← enqueue استایل مادر + لایۀ اختصاصی
 └── css/
@@ -45,72 +48,80 @@ wp-content/themes/javanseda-child/
 
 ```css
 /*
-Theme Name:   آهنگ‌بان (فرزندِ جاوان‌سدا)
-Template:     javanseda
-Version:      3.3.8
-Text Domain:  javanseda-child
+Theme Name:   ترانه یار (فرزند)
+Template:     taranehyar
+Version:      3.7.0
+Text Domain:  taranehyar-child
 */
 ```
 
-> قید `Template: javanseda` باید **دقیقاً** نام پوشۀ مادر باشد. `Version` را هم بنویسید؛
+> `Template: taranehyar` باید **دقیقاً** نام پوشهٔ مادر باشد. `Version` را هم بنویسید؛
 > کش‌شکنی وردپرس از همین عدد استفاده می‌کند.
 
 ### ۲) `functions.php`
 
 ```php
 <?php
-add_action( 'wp_enqueue_scripts', 'javanseda_child_assets', 20 );
-function javanseda_child_assets() {
-	// استایل مادر (همان handle که myfunctions.php ثبت کرده، تا وابستگی‌ها نشکنند)
-	$main = wp_style_is( 'javanSedaMainStyle', 'registered' ) ? 'javanSedaMainStyle' : '';
+add_action( 'wp_enqueue_scripts', 'taranehyar_child_assets', 20 );
+
+function taranehyar_child_assets() {
+	// هندل استایل مادر: taranehyar-style (functions.php ثبت می‌کند)
+	$deps   = wp_style_is( 'taranehyar-style', 'registered' ) ? array( 'taranehyar-style' ) : array();
+	$deps[] = 'taranehyar-ui'; // اختیاری: توکن‌های --ty-*
+
 	wp_enqueue_style(
-		'javanseda-child',
+		'taranehyar-child',
 		get_stylesheet_directory_uri() . '/css/ab-ui.css',
-		$main ? array( $main ) : array(),
+		array_values( array_filter( $deps, 'wp_style_is' ) ),
 		wp_get_theme()->get( 'Version' )
 	);
 }
 ```
 
+> اگر روی `taranehyar-ui` وابسته می‌شوید، مطمئن شوید `wp_style_is( 'taranehyar-ui',
+> 'registered' )` هم true است، چون آن فایل فقط در صفحه‌هایی بار می‌شود که قالب
+> detect می‌کند. امن‌ترین حالت: فقط `taranehyar-style`.
+
 ### ۳) `css/ab-ui.css`
 
-همان فایلی که از 3.3.8 در مخزن است (`javanseda/css/ab-ui.css`) — کپیِ کامل ناحیۀ
-`ab-ui-layer` تا انتهای `style.css`. یک خط هم به ابتدایش اضافه کنید تا اگر روزی
-گارد را حذف کردید، مشخص باشد نسخهٔ کدام است.
+همان فایلی که از 3.3.8 در مخزن است (`taranehyar/css/ab-ui.css`) — کپی کامل ناحیهٔ
+`ab-ui-layer` تا انتهای `style.css`. یک خط هم به ابتدایش اضافه کنید تا اگر روزی گارد
+را حذف کردید، مشخص باشد نسخهٔ کدام است.
 
 ---
 
-## چه چیزی را «در چایل» بگذاریم و چه چیزی را نه
+## چه چیزی را «در child» بگذاریم و چه چیزی را نه
 
-| مورد | در چایل؟ | چرا |
-|------|----------|-----|
-| CSS لایۀ اختصاصی (بلوک ۲۴ → ۳۲) | ✅ بله، در `css/ab-ui.css` | دقیقاً همان چیزی که آپدیت مادر پاکش می‌کند |
-| `css/ab-glass.css` | ⚪ می‌تواند در مادر بماند | فایل جدا است و آپدیت مادر آن را حذف نمی‌کند؛ اگر خواستید کپی کنید |
-| `inc/ab-*.php` (perf, credits, seo, glass, sidebars…) | ⛔ نه، در مادر بماند | با `get_template_directory()` include می‌شوند؛ بردنشان به چایل فقط duplicate می‌سازد |
-| `header.php` / `single.php` / `home.php` و بقیۀ تمپلیت‌ها | ⛔ نه (مگر ناگزیر) | کپی‌کردن تمپلیت یعنی از این به بعد **شما** باید هر تغییر مادر را دستی merge کنید |
-| `style.css` مادر | ⛔ دست نزنید | دیگر مال شما نیست؛ بگذارید آپدیت‌شدنی بماند |
-| تنظیمات Option Tree | ⚠️ باید منتقل شوند | بخش ⚠️ بالا |
+| مورد | در child؟ | چرا |
+|------|-----------|-----|
+| CSS لایۀ اختصاصی | ✅ بله، در `css/ab-ui.css` | دقیقاً همان چیزی که آپدیت مادر پاکش می‌کند |
+| `css/ab-glass.css` | ⚪ می‌تواند در مادر بماند | فایل جداست؛ آپدیت مادر حذفش نمی‌کند |
+| `css/tara-ui.css` / `tara-artist.css` / `tara-home.css` | ⛔ نه | ۳.۷.۰ از همین‌ها می‌خواند؛ کپی‌کردنشان دو نسخه می‌سازد |
+| `inc/tara-*.php` (UI، تاکسونومی‌ها، آرشیو) | ⛔ نه، در مادر بماند | با `require_once` از مادر include می‌شوند |
+| `inc/ab-*.php` (perf, credits, seo, glass, sidebars…) | ⛔ نه | همین دلیل |
+| `header.php` / `single.php` / `home.php` / `taxonomy-*.php` | ⛔ نه (مگر ناگزیر) | از این به بعد **شما** باید هر تغییر مادر را دستی merge کنید |
+| `css/admin-settings.css` | ⛔ نه | پوستهٔ صفحهٔ تنظیمات، فقط با همان فایل مادر کار می‌کند |
+| `style.css` مادر | ⛔ دست نزنید | بگذارید آپدیت‌شدنی بماند |
+| تنظیمات OptionTree | ⚠️ باید منتقل شوند | بخش ⚠️ بالا |
 
-قاعدهٔ کلی: **CSS و فایل‌های «abi» که خودمان ساخته‌ایم → چایل؛ تمپلیت‌های مادر → هرگز.**
-هر تمپلیتی که در چایل کپی کنید، از آن لحظه به بعد روی آپدیت‌های مادر به‌روز نمی‌شود و
-باگ‌های جدید مادر را هم به‌ارث نمی‌برید — و رفعیهایی که بعداً روی همان تمپلیت در مادر
-انجام می‌دهم، باید دوباره در چایل تکرار شوند.
+قاعده کلی: **CSS و فایل‌های اختصاصی خودمان → child؛ تمپلیت‌های مادر → هرگز.**
+هر تمپلیتی که در child کپی کنید، از آن لحظه روی آپدیت‌های مادر به‌روز نمی‌شود و
+باگ‌های جدید مادر را هم به ارث نمی‌برید.
 
 ---
 
-## بعد از ساخت چایل، این دو چیز را فراموش نکنید
+## پس از ساخت child، این دو کار را فراموش نکنید
 
-1. `JAVANSEDA_UI_GUARD` را خاموش کنید تا گارد مادر دو بار لایه را enqueue نکند:
+1. گارد را خاموش کنید تا لایه دو بار enqueue نشود:
    ```php
-   define( 'JAVANSEDA_UI_GUARD', false );
+   define( 'TARA_UI_GUARD', false );
    ```
-2. تست‌های سریع: `/` (ریل‌ها و تیکر)، صفحۀ یک آهنگ (پلیر + شناسنامه + JSON-LD)،
-   `/singers/`، `/404` (دستی)، حالت شب، و منوی موبایل. در همۀ این‌ها باید فقط
-   `ab-ui.css` دیده شود، نه `style.css` دوباره‌سازی‌شده.
+2. تست‌های سریع: `/` (اسلایدر تک‌اسلاید)، یک صفحۀ آهنگ (پلیر + چیپ تاکسونومی‌ها)،
+   `/genre/…` و `/artist/…`، یک آهنگ بدون فایل صوتی، `/404`، حالت شب، منوی موبایل،
+   و نوار چسبان پلیر بعد از تغییر صفحه.
 
 ## بازگشت
 
-فعال‌سازی مجدد «جاوان‌سدا» (مادر) در پیشخوان → نمایش → پوسته‌ها کافی است؛ چون هیچ فایل
-مادر و هیچ داده‌ای تغییر نکرده، سایت دقیقاً برمی‌گردد. اگر `theme_mods_javanseda` را
-پاک نکرده باشید، تنظیمات Option Tree هم سرِ جایشان هستند (به همین دلیل در مرحلهٔ ۲
-بالا، `wp option delete` را آخر انجام دهید).
+فعال‌سازی مجدد «ترانه یار» (مادر) در پیشخوان → نمایش → پوسته‌ها کافی است؛ چون هیچ
+فایل مادر و هیچ داده‌ای تغییر نکرده، سایت دقیقاً برمی‌گردد. `theme_mods_taranehyar`
+را تا آخرین لحظه پاک نکنید تا گزینه‌ها سر جایشان باشند.

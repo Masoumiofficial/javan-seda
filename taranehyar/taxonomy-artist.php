@@ -481,204 +481,255 @@ $taranehyar_sort_labels = array(
 	'old'   => 'قدیمی‌ترین',
 	'title' => 'الفبایی (نام آهنگ)',
 );
+?><?php
+/* ==================================================================================
+   از این‌جا فقط «نمایش» است — نسخهٔ ۳.۷.۰
+   ----------------------------------------------------------------------------------
+   صفحهٔ هنرمند مثل یک ایستگاه رادیو چیده شده:
+     ۱) سربرگ بزرگ با تصویر، نام، آمار و دکمهٔ «پخش همه»
+     ۲) پلیرِ رادیو با فهرست پخش (همهٔ آهنگ‌های صوتی همین هنرمند)
+     ۳) آلبوم‌ها و موزیک‌ویدیوها به‌شکل ردیف
+     ۴) بیوگرافی، دربارهٔ سایت، هنرمندان مشابه
+   هیچ داده‌ای تغییر نمی‌کند؛ فقط چیدمان و مارکاپ عوض شده است.
+   ================================================================================== */
+
+/* ژانر و حال‌وهوای غالبِ این هنرمند — از خودِ آهنگ‌ها جمع می‌شود (فقط خواندن) */
+$taranehyar_genre_terms = array();
+$taranehyar_mood_terms  = array();
+foreach ( array( 'audio', 'album', 'video', 'other' ) as $taranehyar_bucket_key ) {
+	foreach ( $taranehyar_buckets[ $taranehyar_bucket_key ] as $taranehyar_bucket_post ) {
+		foreach ( array( 'tara_genre' => 'genre', 'tara_mood' => 'mood' ) as $taranehyar_tax => $taranehyar_agg ) {
+			if ( ! taxonomy_exists( $taranehyar_tax ) ) {
+				continue;
+			}
+			$taranehyar_post_terms = get_the_terms( $taranehyar_bucket_post->ID, $taranehyar_tax );
+			if ( ! is_array( $taranehyar_post_terms ) ) {
+				continue;
+			}
+			foreach ( $taranehyar_post_terms as $taranehyar_post_term ) {
+				if ( 'genre' === $taranehyar_agg ) {
+					$taranehyar_genre_terms[ $taranehyar_post_term->term_id ] = $taranehyar_post_term;
+				} else {
+					$taranehyar_mood_terms[ $taranehyar_post_term->term_id ] = $taranehyar_post_term;
+				}
+			}
+		}
+	}
+}
+
+/* فقط آهنگ‌های صوتی قابل پخش‌اند */
+$taranehyar_radio_tracks = function_exists( 'tara_track_playlist' ) ? tara_track_playlist( $taranehyar_buckets['audio'] ) : array();
+
+$taranehyar_cover = '' !== $taranehyar_image_url
+	? $taranehyar_image_url
+	: ( function_exists( 'tara_artist_default_image' ) ? tara_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp' );
+
+$taranehyar_bio_short = function_exists( 'tara_artist_bio_short' ) ? tara_artist_bio_short( $taranehyar_term, false ) : '';
+$taranehyar_bio_link  = function_exists( 'tara_artist_bio_link' ) ? tara_artist_bio_link( $taranehyar_term ) : '';
+$taranehyar_about      = function_exists( 'ot_get_option' ) ? trim( (string) ot_get_option( 'about_site_text' ) ) : '';
+$taranehyar_about_ttl  = function_exists( 'ot_get_option' ) ? trim( (string) ot_get_option( 'about_site_title' ) ) : '';
+$taranehyar_about_on   = function_exists( 'ot_get_option' ) ? ( 'off' !== ot_get_option( 'about_show_artist' ) ) : true;
+$taranehyar_about_wide = function_exists( 'ot_get_option' ) ? ( 'wide' === ot_get_option( 'about_style' ) ) : false;
+if ( ! $taranehyar_about_on ) {
+	$taranehyar_about = '';
+}
+
+$taranehyar_social_icons = array(
+	'afacebook'  => 'icofont-facebook',
+	'atelegram'  => 'icofont-paper-plane',
+	'ainstagram' => 'icofont-instagram',
+	'atwitter'   => 'icofont-twitter',
+	'ayoutube'   => 'icofont-youtube-play',
+);
 ?>
 
-<div class="tarlanweb_center">
-	<div class="artist_box_tarlanweb">
-		<div class="artists_imsf">
-			<?php if ( '' !== $taranehyar_image_url ) : ?>
-				<img src="<?php echo esc_url( $taranehyar_image_url ); ?>" width="200" height="200" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" title="<?php echo esc_attr( $taranehyar_term->name ); ?>">
-			<?php else : ?>
-				<img src="<?php echo esc_url( function_exists( 'tara_artist_default_image' ) ? tara_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp' ); ?>" width="200" height="200" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" title="<?php echo esc_attr( $taranehyar_term->name ); ?>">
-			<?php endif; ?>
-			<div class="socials_box">
-				<span>صفحات مجازی هنرمند</span>
-				<?php foreach ( $taranehyar_socials as $taranehyar_field_key => $taranehyar_network ) : ?>
-					<?php $taranehyar_social_url = $taranehyar_term_field( $taranehyar_field_key ); ?>
-					<?php if ( ! empty( $taranehyar_social_url ) ) : ?>
-						<a href="<?php echo esc_url( $taranehyar_social_url ); ?>" class="icofont-<?php echo esc_attr( 'telegram' === $taranehyar_network ? 'paper-plane' : ( 'youtube' === $taranehyar_network ? 'youtube-play' : $taranehyar_network ) ); ?>" aria-label="<?php echo esc_attr( $taranehyar_network ); ?>"></a>
-					<?php endif; ?>
-				<?php endforeach; ?>
-				<div class="clear"></div>
-			</div>
-			<div class="clear"></div>
+<div class="ty-artist tarlanweb_center" dir="rtl">
+
+	<!-- ۱) سربرگ ------------------------------------------------------- -->
+	<header class="ty-artist__hero">
+		<div class="ty-artist__bg" aria-hidden="true">
+			<img src="<?php echo esc_url( $taranehyar_cover ); ?>" alt="" loading="eager" fetchpriority="high">
 		</div>
 
-		<div class="artist_box_detss">
-			<h1 class="artist_name_head">دانلود آهنگ‌های <?php echo esc_html( $taranehyar_term->name ); ?></h1>
+		<div class="ty-artist__identity">
+			<span class="ty-artist__eyebrow"><i class="icofont-radio-mic" aria-hidden="true"></i> صفحهٔ هنرمند</span>
+			<h1 class="ty-artist__name"><?php echo esc_html( $taranehyar_term->name ); ?></h1>
 
 			<?php $taranehyar_latin = $taranehyar_term_field( 'artist_en' ); ?>
 			<?php if ( '' !== $taranehyar_latin ) : ?>
-				<p class="ab-artist-latin" lang="en" dir="ltr"><?php echo esc_html( $taranehyar_latin ); ?></p>
+				<p class="ty-artist__latin" lang="en" dir="ltr"><?php echo esc_html( $taranehyar_latin ); ?></p>
 			<?php endif; ?>
 
-			<ul class="artist_resume_box">
-				<?php foreach ( array( 'album', 'audio', 'video', 'other' ) as $taranehyar_key ) : ?>
+			<ul class="ty-artist__stats">
+				<?php foreach ( array( 'audio', 'album', 'video' ) as $taranehyar_key ) : ?>
 					<?php $taranehyar_count = count( $taranehyar_buckets[ $taranehyar_key ] ); ?>
 					<?php if ( $taranehyar_count > 0 ) : ?>
-						<li><span class="ab-resume__num"><?php echo esc_html( tara_artist_digits( absint( $taranehyar_count ) ) ); ?></span> <?php echo esc_html( isset( $taranehyar_resume_labels[ $taranehyar_key ] ) ? $taranehyar_resume_labels[ $taranehyar_key ] : $taranehyar_key ); ?></li>
+						<li>
+							<strong><?php echo esc_html( tara_number_fa( $taranehyar_count ) ); ?></strong>
+							<span><?php echo esc_html( isset( $taranehyar_resume_labels[ $taranehyar_key ] ) ? $taranehyar_resume_labels[ $taranehyar_key ] : $taranehyar_key ); ?></span>
+						</li>
 					<?php endif; ?>
 				<?php endforeach; ?>
-				<?php
-				/* v3.5.2 — مجموع بازدید آثار. اگر هنوز آماری نباشد، li چاپ نمی‌شود. */
-				if ( function_exists( 'tara_artist_views_html' ) ) {
-					echo tara_artist_views_html( $taranehyar_term ); // خروجی escape شده است
-				}
-				?>
-			</ul>
-
-			<?php if ( ! empty( $taranehyar_cfg['show_meta'] ) && ( $taranehyar_found > 0 || '' !== $taranehyar_latest_date ) ) : ?>
-				<p class="ab-artist-page__meta">
-					<?php if ( $taranehyar_found > 0 ) : ?>
-						<?php echo esc_html( sprintf( '%s اثر در این صفحه', tara_artist_digits( number_format_i18n( $taranehyar_found ) ) ) ); ?>
-					<?php endif; ?>
-					<?php if ( '' !== $taranehyar_latest_date ) : ?>
-						<span class="ab-artist-page__dot">•</span>
-						<?php echo esc_html( 'آخرین به‌روزرسانی: ' . tara_artist_fa_date( $taranehyar_latest_date ) ); ?>
-					<?php endif; ?>
-				</p>
-			<?php endif; ?>
-
-			<div class="clear2"></div>
-			<?php
-			$taranehyar_description = get_the_archive_description();
-			if ( ! empty( $taranehyar_description ) ) :
-				?>
-				<div class="artist_txt_box">
-					<?php echo wp_kses_post( $taranehyar_description ); ?>
-					<div class="clear"></div>
-				</div>
-			<?php endif; ?>
-
-			<?php
-			/* v3.5.2 — بیوگرافی کوتاه + دکمهٔ «بیوگرافی کامل».
-			   دکمه فقط وقتی چاپ می‌شود که مقصد معتبر باشد (منتشرشده، یا خصوصی/پیش‌نویس
-			   برای کاربری که اجازهٔ خواندنش را دارد) ⇒ هیچ لینک شکسته‌ای ساخته نمی‌شود. */
-			$taranehyar_bio_short = function_exists( 'tara_artist_bio_short' )
-				? tara_artist_bio_short( $taranehyar_term, false )
-				: '';
-			$taranehyar_bio_link = function_exists( 'tara_artist_bio_link' )
-				? tara_artist_bio_link( $taranehyar_term )
-				: '';
-			if ( '' !== $taranehyar_bio_short || '' !== $taranehyar_bio_link ) :
-				?>
-				<div class="ab-artist-bio">
-					<?php if ( '' !== $taranehyar_bio_short ) : ?>
-						<p><?php echo esc_html( $taranehyar_bio_short ); ?></p>
-					<?php endif; ?>
-					<?php if ( '' !== $taranehyar_bio_link ) : ?>
-						<a class="ab-artist-bio__more" href="<?php echo esc_url( $taranehyar_bio_link ); ?>">بیوگرافی کامل</a>
-					<?php endif; ?>
-				</div>
-			<?php endif; ?>
-
-			<?php if ( ! empty( $taranehyar_cfg['show_dir_links'] ) ) : ?>
-				<p class="ab-artist-page__links">
-					<a href="<?php echo esc_url( $taranehyar_directory_url ); ?>">همهٔ هنرمندان (فهرست الفبایی)</a>
-					<?php if ( '' !== $taranehyar_letter ) : ?>
-						<span class="ab-artist-page__dot">•</span>
-						<a href="<?php echo esc_url( $taranehyar_letter_url ); ?>">هنرمندانِ حرف «<?php echo esc_html( $taranehyar_letter ); ?>»</a>
-					<?php endif; ?>
-				</p>
-			<?php endif; ?>
-		</div>
-		<div class="clear"></div>
-	</div>
-</div>
-
-<div id="artist_box">
-
-<!-- centers_box -->
-<div class="tarlanweb_center">
-<div id="centers_box">
-
-<?php if ( ! empty( $taranehyar_cfg['show_sort'] ) && $taranehyar_found > 1 ) : ?>
-	<nav class="ab-artist-page__sortbox" aria-label="ترتیب نمایش آثار">
-		<span class="ab-artist-page__sortlabel">ترتیب:</span>
-		<?php foreach ( $taranehyar_sort_labels as $taranehyar_sort_key => $taranehyar_sort_label ) : ?>
-			<?php if ( $taranehyar_sort_key === $taranehyar_sort ) : ?>
-				<span class="ab-artist-page__sortitem is-active" aria-current="true"><?php echo esc_html( $taranehyar_sort_label ); ?></span>
-			<?php else : ?>
-				<a class="ab-artist-page__sortitem" href="<?php echo esc_url( $taranehyar_sort_urls[ $taranehyar_sort_key ] ); ?>"><?php echo esc_html( $taranehyar_sort_label ); ?></a>
-			<?php endif; ?>
-		<?php endforeach; ?>
-	</nav>
-<?php endif; ?>
-
-<?php if ( ! empty( $taranehyar_cfg['show_related'] ) && ! empty( $taranehyar_related ) ) : ?>
-	<div class="song_boxs ab-related">
-		<div class="songs_title_box">
-			<h3>هنرمندانِ مشابه</h3>
-			<div class="clear"></div><div class="liner"></div>
-		</div>
-		<div class="ab-related__list">
-			<?php foreach ( $taranehyar_related as $taranehyar_related_term ) : ?>
-				<?php $taranehyar_related_link = get_term_link( $taranehyar_related_term ); ?>
-				<?php if ( is_wp_error( $taranehyar_related_link ) ) : ?>
-					<?php continue; ?>
+				<?php if ( ! empty( $taranehyar_genre_terms ) ) : ?>
+					<li class="ty-artist__stats-wide">
+						<strong><?php echo esc_html( tara_number_fa( count( $taranehyar_genre_terms ) ) ); ?></strong>
+						<span>ژانر</span>
+					</li>
 				<?php endif; ?>
-				<a class="ab-related__item" href="<?php echo esc_url( $taranehyar_related_link ); ?>">
-					<?php echo esc_html( $taranehyar_related_term->name ); ?>
-					<span class="ab-related__count"><?php echo esc_html( number_format_i18n( (int) $taranehyar_related_term->count ) ); ?></span>
-				</a>
-			<?php endforeach; ?>
-			<div class="clear"></div>
-		</div>
-	</div>
-<?php endif; ?>
-
-<?php foreach ( array( 'album', 'audio', 'video', 'other' ) as $taranehyar_key ) : ?>
-	<?php if ( empty( $taranehyar_buckets[ $taranehyar_key ] ) ) : ?>
-		<?php continue; ?>
-	<?php endif; ?>
-	<!-- song_boxs -->
-	<div class="song_boxs">
-		<div class="songs_title_box">
-			<h3><?php echo esc_html( isset( $taranehyar_labels[ $taranehyar_key ] ) ? $taranehyar_labels[ $taranehyar_key ] : $taranehyar_key ); ?></h3>
-			<span class="ab-bucket-count"><?php echo esc_html( number_format_i18n( count( $taranehyar_buckets[ $taranehyar_key ] ) ) ); ?></span>
-			<div class="clear"></div><div class="liner"></div>
-		</div>
-		<div class="song_boxs_posts">
-			<ul>
-				<?php
-				foreach ( $taranehyar_buckets[ $taranehyar_key ] as $taranehyar_post ) :
-					$GLOBALS['post'] = $taranehyar_post; // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- لازم برای جزئی که به حلقهٔ اصلی تکیه دارد
-					setup_postdata( $taranehyar_post );
-					?>
-					<li><?php get_template_part( 'inc/songs_post' ); ?></li>
-					<?php
-				endforeach;
-				wp_reset_postdata();
-				?>
 			</ul>
-			<div class="clear"></div>
-		</div>
-		<div class="clear"></div>
-	</div>
-	<!-- song_boxs -->
-<?php endforeach; ?>
 
-<?php if ( 0 === $taranehyar_found ) : ?>
-	<div class="song_boxs">
-		<div class="songs_title_box">
-			<h3>آهنگی برای این هنرمند ثبت نشده است</h3>
-			<div class="clear"></div><div class="liner"></div>
-		</div>
-		<div class="artist_txt_box">
-			<p>هنوز نوشته‌ای به این هنرمند متصل نشده است. اگر آهنگ‌های این هنرمند در سایت موجودند، در نوشته‌ها فیلد «هنرمند» را به همین نام انتخاب کنید.</p>
-			<p><a href="<?php echo esc_url( $taranehyar_directory_url ); ?>">دیدن همهٔ هنرمندان</a> — <a href="<?php echo esc_url( home_url( '/' ) ); ?>">بازگشت به صفحهٔ اصلی</a></p>
-			<div class="clear"></div>
-		</div>
-	</div>
-<?php elseif ( ! empty( $taranehyar_unknown ) ) : ?>
-	<?php /* مقادیر ناشناخته در «سایر موارد» نمایش داده شده‌اند؛ برای تشخیص سریع، نام‌شان در کد می‌ماند. */ ?>
-	<!-- musics_type values seen: <?php echo esc_html( implode( ', ', array_keys( $taranehyar_unknown ) ) ); ?> -->
-<?php endif; ?>
+			<?php if ( ! empty( $taranehyar_genre_terms ) || ! empty( $taranehyar_mood_terms ) ) : ?>
+				<div class="ty-artist__chips">
+					<?php foreach ( $taranehyar_genre_terms as $taranehyar_genre_term ) : ?>
+						<?php $taranehyar_genre_link = get_term_link( $taranehyar_genre_term ); ?>
+						<?php if ( ! is_wp_error( $taranehyar_genre_link ) ) : ?>
+							<a class="ty-chip" href="<?php echo esc_url( $taranehyar_genre_link ); ?>"><?php echo esc_html( $taranehyar_genre_term->name ); ?></a>
+						<?php endif; ?>
+					<?php endforeach; ?>
+					<?php foreach ( $taranehyar_mood_terms as $taranehyar_mood_term ) : ?>
+						<?php $taranehyar_mood_link = get_term_link( $taranehyar_mood_term ); ?>
+						<?php if ( ! is_wp_error( $taranehyar_mood_link ) ) : ?>
+							<a class="ty-chip ty-chip--soft" href="<?php echo esc_url( $taranehyar_mood_link ); ?>"><?php echo esc_html( $taranehyar_mood_term->name ); ?></a>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</div>
+			<?php endif; ?>
 
-<div class="clear"></div>
-</div>
-</div>
-<!-- centers_box -->
+			<?php if ( '' !== $taranehyar_bio_short ) : ?>
+				<p class="ty-artist__bio"><?php echo esc_html( $taranehyar_bio_short ); ?></p>
+			<?php endif; ?>
+
+			<div class="ty-artist__actions">
+				<?php if ( ! empty( $taranehyar_radio_tracks ) ) : ?>
+					<button type="button" class="ty-artist__cta" data-tara-play="0">
+						<span class="ty-icon-play" aria-hidden="true"></span>
+						پخش همه (رادیو)
+					</button>
+				<?php endif; ?>
+
+				<?php if ( '' !== $taranehyar_bio_link ) : ?>
+					<a class="ty-artist__ghost" href="<?php echo esc_url( $taranehyar_bio_link ); ?>">بیوگرافی کامل</a>
+				<?php endif; ?>
+
+				<?php if ( '' !== $taranehyar_directory_url ) : ?>
+					<a class="ty-artist__ghost" href="<?php echo esc_url( $taranehyar_directory_url ); ?>">همهٔ هنرمندان</a>
+				<?php endif; ?>
+
+				<span class="ty-artist__socials">
+					<?php foreach ( $taranehyar_social_icons as $taranehyar_field_key => $taranehyar_icon ) : ?>
+						<?php $taranehyar_social_url = $taranehyar_term_field( $taranehyar_field_key ); ?>
+						<?php if ( ! empty( $taranehyar_social_url ) ) : ?>
+							<a href="<?php echo esc_url( $taranehyar_social_url ); ?>" class="<?php echo esc_attr( $taranehyar_icon ); ?>" target="_blank" rel="noopener nofollow" aria-label="<?php echo esc_attr( $taranehyar_network = str_replace( array( 'afacebook', 'atelegram', 'ainstagram', 'atwitter', 'ayoutube' ), array( 'فیسبوک', 'تلگرام', 'اینستاگرام', 'توییتر', 'یوتیوب' ), $taranehyar_field_key ) ); ?>"></a>
+						<?php endif; ?>
+					<?php endforeach; ?>
+				</span>
+			</div>
+		</div>
+
+		<figure class="ty-artist__portrait">
+			<img src="<?php echo esc_url( $taranehyar_cover ); ?>" width="240" height="240" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" loading="eager" fetchpriority="high">
+			<?php if ( $taranehyar_found > 0 ) : ?>
+				<figcaption><?php echo esc_html( sprintf( '%s اثر در سایت', tara_number_fa( $taranehyar_found ) ) ); ?></figcaption>
+			<?php endif; ?>
+		</figure>
+	</header>
+
+	<!-- ۲) رادیو ------------------------------------------------------- -->
+	<?php if ( ! empty( $taranehyar_radio_tracks ) ) : ?>
+		<?php
+		echo tara_player( // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین قالب، escape شده در تابع
+			array(
+				'tracks'   => $taranehyar_radio_tracks,
+				'title'    => 'رادیو ' . $taranehyar_term->name,
+				'cover'    => $taranehyar_cover,
+				'context'  => 'artist',
+			)
+		);
+		?>
+	<?php endif; ?>
+
+	<!-- ۳) آلبوم/ویدیو (غیرقابل پخش در پلیر) -------------------------- -->
+	<?php
+	$taranehyar_visual_buckets = array(
+		'album' => isset( $taranehyar_labels['album'] ) ? $taranehyar_labels['album'] : 'آلبوم‌ها',
+		'video' => isset( $taranehyar_labels['video'] ) ? $taranehyar_labels['video'] : 'موزیک‌ویدیوها',
+		'other' => isset( $taranehyar_labels['other'] ) ? $taranehyar_labels['other'] : 'سایر',
+	);
+	foreach ( $taranehyar_visual_buckets as $taranehyar_key => $taranehyar_title ) :
+		if ( empty( $taranehyar_buckets[ $taranehyar_key ] ) ) :
+			continue;
+		endif;
+		?>
+		<section class="ty-artist__section">
+			<header class="ty-artist__section-head">
+				<h2><?php echo esc_html( $taranehyar_title ); ?></h2>
+				<span class="ty-artist__section-count"><?php echo esc_html( tara_number_fa( count( $taranehyar_buckets[ $taranehyar_key ] ) ) ); ?></span>
+			</header>
+			<ul class="ty-tracklist">
+				<?php foreach ( $taranehyar_buckets[ $taranehyar_key ] as $taranehyar_post ) : ?>
+					<li><?php echo tara_track_row( $taranehyar_post->ID, array( 'badge' => isset( $taranehyar_resume_labels[ $taranehyar_key ] ) ? $taranehyar_resume_labels[ $taranehyar_key ] : '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></li>
+				<?php endforeach; ?>
+			</ul>
+		</section>
+	<?php endforeach; ?>
+
+	<?php if ( 0 === $taranehyar_found ) : ?>
+		<section class="ty-artist__section ty-artist__empty">
+			<h2>هنوز آهنگی برای این هنرمند ثبت نشده است</h2>
+			<p>اگر آثار این هنرمند در سایت هست، در ویرایش هر نوشته فیلد «هنرمند» را به همین نام انتخاب کنید.</p>
+		</section>
+	<?php endif; ?>
+
+	<!-- ۴) درباره + هنرمندان مشابه ------------------------------------ -->
+	<div class="ty-artist__grid">
+		<?php $taranehyar_description = get_the_archive_description(); ?>
+		<?php if ( ! empty( $taranehyar_description ) ) : ?>
+			<section class="ty-artist__card">
+				<h2>دربارهٔ <?php echo esc_html( $taranehyar_term->name ); ?></h2>
+				<div class="ty-artist__card-text"><?php echo wp_kses_post( $taranehyar_description ); ?></div>
+			</section>
+		<?php endif; ?>
+
+		<?php if ( '' !== $taranehyar_about ) : ?>
+			<section class="ty-artist__card<?php echo $taranehyar_about_wide ? ' ty-artist__card--wide' : ''; ?>">
+				<h2><?php echo esc_html( '' !== $taranehyar_about_ttl ? $taranehyar_about_ttl : 'دربارهٔ سایت' ); ?></h2>
+				<div class="ty-artist__card-text"><?php echo wp_kses_post( wpautop( $taranehyar_about ) ); ?></div>
+			</section>
+		<?php endif; ?>
+
+		<?php if ( ! empty( $taranehyar_related ) ) : ?>
+			<section class="ty-artist__card ty-artist__card--wide">
+				<h2>هنرمندان مشابه</h2>
+				<ul class="ty-artist__related">
+					<?php foreach ( $taranehyar_related as $taranehyar_related_term ) : ?>
+						<?php $taranehyar_related_link = get_term_link( $taranehyar_related_term ); ?>
+						<?php if ( is_wp_error( $taranehyar_related_link ) ) : ?>
+							<?php continue; ?>
+						<?php endif; ?>
+						<li>
+							<a href="<?php echo esc_url( $taranehyar_related_link ); ?>">
+								<span class="ty-artist__related-name"><?php echo esc_html( $taranehyar_related_term->name ); ?></span>
+								<span class="ty-artist__related-count"><?php echo esc_html( tara_number_fa( (int) $taranehyar_related_term->count ) ); ?> اثر</span>
+							</a>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+			</section>
+		<?php endif; ?>
+	</div>
+
+	<?php if ( ! empty( $taranehyar_cfg['show_sort'] ) && $taranehyar_found > 1 ) : ?>
+		<nav class="ty-artist__sort" aria-label="ترتیب نمایش آثار">
+			<span>ترتیب:</span>
+			<?php foreach ( $taranehyar_sort_labels as $taranehyar_sort_key => $taranehyar_sort_label ) : ?>
+				<?php if ( $taranehyar_sort_key === $taranehyar_sort ) : ?>
+					<span class="is-active" aria-current="true"><?php echo esc_html( $taranehyar_sort_label ); ?></span>
+				<?php else : ?>
+					<a href="<?php echo esc_url( $taranehyar_sort_urls[ $taranehyar_sort_key ] ); ?>"><?php echo esc_html( $taranehyar_sort_label ); ?></a>
+				<?php endif; ?>
+			<?php endforeach; ?>
+		</nav>
+	<?php endif; ?>
 
 </div>
 
@@ -690,8 +741,8 @@ if ( $taranehyar_found > 0 ) {
 	$taranehyar_term_link = get_term_link( $taranehyar_term );
 	$taranehyar_term_link = is_wp_error( $taranehyar_term_link ) ? '' : $taranehyar_term_link;
 
-	$taranehyar_graph    = array();
-	$taranehyar_artist   = array(
+	$taranehyar_graph  = array();
+	$taranehyar_artist = array(
 		'@type' => 'MusicGroup',
 		'@id'   => $taranehyar_term_link . '#artist',
 		'name'  => $taranehyar_term->name,

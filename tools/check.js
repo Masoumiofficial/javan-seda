@@ -3,7 +3,7 @@
  * check.js — احراز سینتکس PHP بدون نصب PHP (با php-parser)
  * استفاده: node tools/check.js <file.php> [more.php ...]
  * مثال (وقتی php-parser در /home/user/lint نصب است):
- *   PHP_PARSER_PATH=/home/user/lint/node_modules/php-parser node tools/check.js javanseda/single.php
+ *   PHP_PARSER_PATH=/home/user/lint/node_modules/php-parser node tools/check.js taranehyar/single.php
  *  • خطای سینتکس  → NON-ZERO exit + شمارهٔ خط
  *  • ساختارهای جدیدتر از PHP 5.6  → هشدار (و exit غیرصفر، چون کفِ این قالب 5.6 است)
  */

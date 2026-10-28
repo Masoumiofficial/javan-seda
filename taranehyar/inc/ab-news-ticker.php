@@ -156,7 +156,7 @@ if ( ! function_exists( 'tara_news_ticker' ) ) {
 		$items = ! empty( $data['items'] ) ? $data['items'] : array();
 
 		if ( ! $items ) {
-			$out = '<!-- javan_seda: news ticker — مطلبی در دستهٔ اخبار نیست -->';
+			$out = '<!-- taranehyar: news ticker — مطلبی در دستهٔ اخبار نیست -->';
 			if ( $echo ) {
 				echo $out;
 				return '';
@@ -204,7 +204,7 @@ if ( ! function_exists( 'tara_news_ticker' ) ) {
 			. '</div>'
 			. ( $more ? '<a class="ab-news-more" href="' . esc_url( $more ) . '">همهٔ اخبار <i class="icofont-arrow-left" aria-hidden="true"></i></a>' : '' )
 			. '</div>'
-			. '<!-- javan_seda: news ticker | cat=' . ( $cat_id ? $cat_id : 'NONE' ) . ' | ' . count( $items ) . ' خبر | strict=' . ( defined( 'TARA_NEWS_STRICT' ) && false === TARA_NEWS_STRICT ? 'off' : 'on' ) . ' -->'
+			. '<!-- taranehyar: news ticker | cat=' . ( $cat_id ? $cat_id : 'NONE' ) . ' | ' . count( $items ) . ' خبر | strict=' . ( defined( 'TARA_NEWS_STRICT' ) && false === TARA_NEWS_STRICT ? 'off' : 'on' ) . ' -->'
 			. '</nav>';
 
 		if ( $echo ) {

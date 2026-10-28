@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""javanseda/inc/ab-sidebars.php → tara_expected_hashes() را با disk هم‌سازی می‌کند.
+"""taranehyar/inc/ab-sidebars.php → tara_expected_hashes() را با disk هم‌سازی می‌کند.
 
 چرا این اسکریپت هست: مقدار هر کلید = sha256 محتوای فایل **بعد از** نرمال‌سازی
-\r\n و \r به \n — دقیقاً همان کاری که javan_seda_file_hash() در PHP می‌کند.
+\r\n و \r به \n — دقیقاً همان کاری که tara_file_hash() در PHP می‌کند.
 اگر دستی و روی بایت خام حساب شود، هر فایل CRLF همیشه «ناسازگار» گزارش می‌شود.
 
     python3 tools/expected-hashes.py --check     # گزارش

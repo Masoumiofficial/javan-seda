@@ -33,6 +33,29 @@ if ( function_exists( 'is_plugin_active' ) && is_plugin_active( 'kk-star-ratings
 <div class="tarlanweb_post_ft"><i class="icofont-eye-alt"></i> <?php the_views(); ?></div><?php } ?>
 <div class="tarlanweb_post_ft"><i class="icofont-comment"></i> <?php comments_number('0','1','%'); ?></div><?php edit_post_link('ویرایش مطلب'); ?>
 <div class="clear"></div>
+
+<?php
+/* نسخهٔ ۳.۷.۰ — نوار شناسهٔ آهنگ زیر تیتر:
+   ژانر · حال‌وهوا · ترانه‌سرا · آهنگساز · تنظیم. همه از تاکسونومی‌های تازه
+   می‌آیند و هر چیپ به آرشیو همان ترم لینک است. اگر ترمی ثبت نشده باشد،
+   چیزی چاپ نمی‌شود (بدون ردیف خالی). */
+$tara_meta_rows = array(
+	'tara_songwriter' => array( 'label' => 'ترانه‌سرا' ),
+	'tara_composer'   => array( 'label' => 'آهنگساز' ),
+	'tara_arranger'   => array( 'label' => 'تنظیم' ),
+	'tara_genre'      => array( 'label' => 'ژانر' ),
+	'tara_mood'       => array( 'label' => 'حال‌وهوا' ),
+);
+$tara_meta_html = '';
+foreach ( $tara_meta_rows as $tara_tax => $tara_conf ) {
+	if ( function_exists( 'tara_term_chips' ) ) {
+		$tara_meta_html .= tara_term_chips( $tara_tax, get_the_ID(), $tara_conf['label'] );
+	}
+}
+if ( '' !== trim( wp_strip_all_tags( $tara_meta_html ) ) ) {
+	echo '<div class="ty-single-meta">' . $tara_meta_html . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده است
+}
+?>
 </header>
 
 <div class="single_content_box">
@@ -317,123 +340,73 @@ if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID(), '
 <?php } ?>
 
 
-<?php if(get_field('music128')){ ?> 
-<!-- music player -->
-<div class="music_box_player taktarcks" data-ab-player="<?php $ab_pu = tara_player_uid(); echo (int) $ab_pu; ?>">
-<audio id="audio<?php echo ( ! empty( $ab_pu ) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" preload="none" tabindex="0">
-<source src="<?php echo esc_url( get_field('music128') ); ?>" data-track-number="1" />    
-پلیر شما قدیمی است و از پخش آنلاین پشتیبانی نمیکند.
-</audio>
+<?php
+/* ==================================================================================
+   پلیر «رادیو» — نسخهٔ ۳.۷.۰
+   ----------------------------------------------------------------------------------
+   جای دو بلوک قدیمی (پلیر تک‌آهنگ و پلیر آلبوم) یک کارت واحد نشسته است:
+     • آلبوم: هر قطعهٔ تکرارشونده یک ردیف در فهرست پخش می‌شود.
+     • تک‌آهنگ: همان یک قطعه با کاور بزرگ.
+   مارکاپ و کنترل‌ها در inc/tara-ui.php ساخته می‌شوند و js/tara-player.js آن را
+   می‌گرداند؛ هیچ وابستگی به jQuery ندارد. اگر تابع در دسترس نبود (مثلاً فایل
+   حذف شده باشد) هیچ خروجی و هیچ خطایی نداریم.
+   ================================================================================== */
+$tara_tracks     = array();
+$tara_cover_big  = has_post_thumbnail() ? get_the_post_thumbnail_url( get_the_ID(), 'thumb2x' ) : '';
+$tara_artist_big = $taranehyar_artist;
+$tara_song_big   = $taranehyar_song;
+$tara_link_big   = get_permalink();
 
- <div class="player">
+if ( function_exists( 'have_rows' ) && have_rows( 'album' ) ) {
+	$tara_album_index = 0;
+	while ( have_rows( 'album' ) ) {
+		the_row();
+		$tara_album_index++;
+		$tara_album_src = get_sub_field( 'albumlink320' );
+		if ( ! $tara_album_src ) {
+			$tara_album_src = get_sub_field( 'albumlink128' );
+		}
+		$tara_album_name = get_sub_field( 'song_names' );
+		if ( ! $tara_album_src ) {
+			continue;
+		}
+		$tara_tracks[] = array(
+			'id'     => get_the_ID() . '-' . $tara_album_index,
+			'title'  => $tara_album_name ? $tara_album_name : ( $tara_song_big . ' — قطعهٔ ' . $tara_album_index ),
+			'artist' => $tara_artist_big,
+			'src'    => $tara_album_src,
+			'cover'  => $tara_cover_big ? $tara_cover_big : tara_track_cover( get_the_ID(), 'thumb2' ),
+			'link'   => $tara_link_big,
+		);
+	}
+}
 
-<div class="player_controls">
-<i class="previous-track-btn disabled"><span class="screen-reader-text">Previous track button</span></i>
-<div class="large-toggle-btn"><i class="icofont-play-alt-1"><span class="screen-reader-text">Large toggle button</span></i></div>
-<i class="next-track-btn"><span class="screen-reader-text">Next track button</span></i>
+if ( empty( $tara_tracks ) && function_exists( 'tara_track_src' ) ) {
+	$tara_single_src = tara_track_src( get_the_ID() );
+	if ( '' !== $tara_single_src ) {
+		$tara_tracks[] = array(
+			'id'     => get_the_ID(),
+			'title'  => $tara_song_big,
+			'artist' => $tara_artist_big,
+			'src'    => $tara_single_src,
+			'cover'  => $tara_cover_big ? $tara_cover_big : tara_track_cover( get_the_ID(), 'thumb2' ),
+			'link'   => $tara_link_big,
+		);
+	}
+}
 
-</div>
-    <div class="info-box">
-      <div class="track-info-box">
-        <div class="track-title-text"> <?php the_field('artist');?> - <?php the_field('song') ?> </div>
-        <div class="audio-time">
-        	<span class="duration">00:00</span> /
-          <span class="current-time">00:00</span> 
-        </div>
-      </div>
-      <!-- /.info-box -->
-      <div class="progress-box">
-        <div class="progress-cell">
-          <div class="progress">
-            <div class="progress-buffer"></div>
-            <div class="progress-indicator"></div>
-          </div>
-        </div>
-<div class="volume_box">
-<i class="icofont-volume-bar"></i>
-<input type="range" id="volume-bar<?php echo ( isset($ab_pu) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" min="0" max="100" step="5" value="100">
-</div>
-      </div>
-    </div>
-    <!-- /.progress-box -->
-  </div>
-  <!-- /.player -->
-<div class="play-list">
-<div class="play-list-row" data-track-row="1">
-<div class="small-toggle-btn">
-<i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i>
-</div>
-<div class="track-number">1.</div>
-<div class="track-title"><?php if(get_field('song')){ ?><a class="playlist-track" href="#" data-play-track="<?php echo $tara_row; ?>"><?php the_field('artist');?> - <?php the_field('song') ?></a><?php } ?></div>
-</div>
-</div>
-</div>
-<!-- music player -->
-<?php } ?>
+if ( ! empty( $tara_tracks ) && function_exists( 'tara_player' ) ) {
+	echo tara_player( // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین قالب
+		array(
+			'tracks'  => $tara_tracks,
+			'title'   => ( count( $tara_tracks ) > 1 ) ? 'آلبوم · ' . $tara_song_big : $taranehyar_type,
+			'cover'   => $tara_cover_big,
+			'context' => 'single',
+		)
+	);
+}
+?>
 
-
-
-<?php if( have_rows('album') ): ?>
-<!-- album player -->
-<div class="music_box_player" data-ab-player="<?php $ab_pu = tara_player_uid(); echo (int) $ab_pu; ?>">
-
-<audio id="audio<?php echo ( ! empty( $ab_pu ) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" preload="none" tabindex="0">
-<?php $tara_row=1; while( have_rows('album') ): the_row(); ?>
-<source src="<?php if(get_sub_field('albumlink128')){the_sub_field('albumlink128');}else{the_sub_field('albumlink320');} ?>" data-track-number="<?php echo $tara_row; ?>" />
-<?php $tara_row++; endwhile; ?>    
-Your browser does not support HTML5 audio.
-</audio>
-<div class="player">
-<div class="player_controls">
-<i class="previous-track-btn disabled"><span class="screen-reader-text">Previous track button</span></i>
-<div class="large-toggle-btn"><i class="icofont-play-alt-1"><span class="screen-reader-text">Large toggle button</span></i></div>
-<i class="next-track-btn"><span class="screen-reader-text">Next track button</span></i>
-</div>
-<div class="info-box">
-      <div class="track-info-box">
-        <div class="track-title-text"> انتخاب قطعه </div>
-        <div class="audio-time">
-        	<span class="duration">00:00</span> /
-          <span class="current-time">00:00</span> 
-        </div>
-      </div>
-      <!-- /.info-box -->
-      <div class="progress-box">
-        <div class="progress-cell">
-          <div class="progress">
-            <div class="progress-buffer"></div>
-            <div class="progress-indicator"></div>
-          </div>
-        </div>
-<div class="volume_box">
-<i class="icofont-volume-bar"></i>
-<input type="range" id="volume-bar<?php echo ( isset($ab_pu) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" min="0" max="100" step="5" value="100">
-</div>
-</div>
-</div>
-<!-- /.progress-box -->
-</div>
-<!-- /.player -->
-<div class="play-list">
-<?php $tara_row=1; while( have_rows('album') ): the_row(); ?>
-<div class="play-list-row <?php if($tara_row % 2 == 0){echo 'plylodd';}?>" data-track-row="<?php echo $tara_row; ?>">
-<div class="small-toggle-btn">
-<i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i>
-</div>
-<div class="track-number"><?php echo $tara_row; ?>.</div>
-<div class="track-title"><?php if(get_sub_field('song_names')){ ?><a class="playlist-track" href="#" data-play-track="<?php echo $tara_row; ?>"><?php the_sub_field('song_names'); ?></a><?php } ?></div>
-<div class="download_box">
-<?php if(get_sub_field('albumlink128')){ ?>
-<a target="_blank" href="<?php the_sub_field('albumlink128'); ?>">دانلود  128</a>
-<?php } if(get_sub_field('albumlink320')){ ?>
-<a target="_blank" href="<?php the_sub_field('albumlink320'); ?>">دانلود  320</a><?php } ?>
-</div>
-</div>
-<?php $tara_row++; endwhile; ?> 
-</div>
-</div>
-<!-- album player -->
-<?php endif; ?>
 
 
 <?php

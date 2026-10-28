@@ -46,6 +46,33 @@ if ( ! function_exists( 'tara_music_field' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_media_fix_scheme' ) ) {
+	/**
+	 * اصلاح پروتکل آدرس فایل (v3.7.6)
+	 *
+	 * اگر سایت روی HTTPS باشد و آدرس فایل صوتی با `http://` ذخیره شده باشد،
+	 * مرورگر آن را «محتوای ناامن» می‌داند و **پخش نمی‌کند**؛ همان چیزی که
+	 * کاربر «کار نکردن پلیر» می‌دید. آدرس‌های `//host/...` هم به پروتکل فعلی
+	 * تبدیل می‌شوند.
+	 *
+	 * @param string $url آدرس.
+	 * @return string
+	 */
+	function tara_media_fix_scheme( $url ) {
+		$url = trim( (string) $url );
+		if ( '' === $url ) {
+			return '';
+		}
+		if ( 0 === strpos( $url, '//' ) ) {
+			return ( is_ssl() ? 'https:' : 'http:' ) . $url;
+		}
+		if ( is_ssl() && 0 === stripos( $url, 'http://' ) ) {
+			return 'https://' . substr( $url, 7 );
+		}
+		return $url;
+	}
+}
+
 if ( ! function_exists( 'tara_media_url' ) ) {
 	/**
 	 * هر چیزی که ACF/متا برای یک فایل برمی‌گرداند → آدرس واقعی فایل.
@@ -80,28 +107,28 @@ if ( ! function_exists( 'tara_media_url' ) ) {
 			/* عدد خالص = شناسهٔ پیوست */
 			if ( ctype_digit( $value ) && function_exists( 'wp_get_attachment_url' ) ) {
 				$url = wp_get_attachment_url( (int) $value );
-				return $url ? (string) $url : '';
+				return $url ? tara_media_fix_scheme( $url ) : '';
 			}
 
-			return $value;
+			return tara_media_fix_scheme( $value );
 		}
 
 		if ( is_numeric( $value ) && function_exists( 'wp_get_attachment_url' ) ) {
 			$url = wp_get_attachment_url( (int) $value );
-			return $url ? (string) $url : '';
+			return $url ? tara_media_fix_scheme( $url ) : '';
 		}
 
 		if ( is_array( $value ) ) {
 			foreach ( array( 'url', 'src', 'link' ) as $key ) {
 				if ( isset( $value[ $key ] ) && is_string( $value[ $key ] ) && '' !== trim( $value[ $key ] ) ) {
-					return trim( $value[ $key ] );
+					return tara_media_fix_scheme( $value[ $key ] );
 				}
 			}
 			foreach ( array( 'ID', 'id', 'attachment_id' ) as $key ) {
 				if ( isset( $value[ $key ] ) && function_exists( 'wp_get_attachment_url' ) ) {
 					$url = wp_get_attachment_url( (int) $value[ $key ] );
 					if ( $url ) {
-						return (string) $url;
+						return tara_media_fix_scheme( $url );
 					}
 				}
 			}

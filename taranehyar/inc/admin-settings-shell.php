@@ -411,6 +411,71 @@ if ( ! function_exists( 'tara_settings_shell_core_ui' ) ) {
 	function tara_settings_shell_core_ui() {
 		?>
 		<style id="tara-settings-core-css">
+		/* ---------- چیدمان دوستونی: فهرست بخش‌ها کنار، محتوا روبه‌رویش ----------
+		   v3.7.6 — پیش از این، فهرست بخش‌ها یک <ul> عمودیِ بی‌استایل بود و
+		   محتوای هر بخش «زیر» تمام فهرست می‌افتاد. حالا در RTL فهرست سمت
+		   راست ستون می‌شود و محتوای بخش دقیقاً روبه‌روی آن (ستون چپ) می‌آید. */
+		#option-tree-settings-api .ui-tabs {
+			display: grid !important;
+			grid-template-columns: minmax(170px, 232px) minmax(0, 1fr);
+			gap: 16px;
+			align-items: start;
+		}
+		#option-tree-settings-api .ui-tabs-nav {
+			grid-column: 1;
+			display: flex !important;
+			flex-direction: column;
+			gap: 4px;
+			margin: 0 !important;
+			padding: 8px !important;
+			list-style: none !important;
+			border: 1px solid #e6e4ef;
+			border-radius: 14px;
+			background: #fff;
+			position: sticky;
+			top: 46px;
+		}
+		#option-tree-settings-api .ui-tabs-nav li { margin: 0 !important; width: 100%; }
+		#option-tree-settings-api .ui-tabs-nav li a {
+			display: block;
+			padding: 9px 12px;
+			border-radius: 10px;
+			color: #4b4960 !important;
+			font-size: 12.5px;
+			font-weight: 700;
+			text-decoration: none;
+			box-shadow: none !important;
+		}
+		#option-tree-settings-api .ui-tabs-nav li a:hover { background: #f6f3ff; color: #4c1d95 !important; }
+		#option-tree-settings-api .tara-settings-toolbar { grid-column: 1; margin: 0 !important; }
+		#option-tree-settings-api #poststuff {
+			grid-column: 2;
+			grid-row: 1 / span 2;
+			margin: 0 !important;
+			min-width: 0;
+			padding: 0 !important;
+		}
+		#option-tree-settings-api #poststuff .postbox,
+		#option-tree-settings-api .ui-tabs-panel {
+			margin: 0 !important;
+			border: 0 !important;
+			background: transparent !important;
+			box-shadow: none !important;
+		}
+		@media (max-width: 960px) {
+			#option-tree-settings-api .ui-tabs {
+				grid-template-columns: 1fr;
+			}
+			#option-tree-settings-api .ui-tabs-nav {
+				flex-direction: row;
+				flex-wrap: wrap;
+				position: static;
+			}
+			#option-tree-settings-api .ui-tabs-nav li { width: auto; }
+			#option-tree-settings-api .tara-settings-toolbar { grid-column: 1; }
+			#option-tree-settings-api #poststuff { grid-column: 1; grid-row: auto; }
+		}
+
 		/* فقط وقتی اسکریپت بالا اجرا و آماده شد پنل‌ها پنهان می‌شوند؛
 		   اگر JS نبود، همان رفتار قبلی (همه باز) می‌ماند تا صفحه خالی نشود. */
 		#option-tree-settings-api.tara-tabs-ready .ui-tabs-panel { display: none !important; }

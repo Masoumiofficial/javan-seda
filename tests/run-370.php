@@ -49,6 +49,7 @@ if ( ! function_exists( 'ot_get_option' ) ) {
 
 require '/tmp/theme/inc/tara-taxonomies.php';
 require '/tmp/theme/inc/tara-ui.php';
+require '/tmp/theme/inc/tara-critical.php';
 
 $PASS = 0;
 $FAIL = 0;
@@ -435,6 +436,25 @@ $settings_php = (string) @file_get_contents( '/tmp/theme/inc/admin-settings-shel
 t( 'تنظیمات: جابه‌جایی بخش‌ها درون‌خطی است', false !== strpos( $settings_php, 'tara-tabs-ready' ) && false !== strpos( $settings_php, 'tara-settings-core-js' ) );
 t( 'تنظیمات: هر گزینه جمع‌شونده است', false !== strpos( $settings_php, 'has-label' ) && false !== strpos( $settings_php, 'is-open' ) );
 t( 'تنظیمات: دکمهٔ باز/بستن همه', false !== strpos( $settings_php, 'باز کردن همه' ) && false !== strpos( $settings_php, 'بستن همه' ) );
+
+/* ---------- v3.7.6: پروتکل فایل صوتی، لایهٔ تضمینی، جست‌وجوی زنده ---------- */
+$GLOBALS['__is_ssl'] = true;
+t( 'پلیر: آدرس http روی سایت https به https ارتقا می‌یابد', 'https://ex/a.mp3' === tara_media_fix_scheme( 'http://ex/a.mp3' ) );
+t( 'پلیر: آدرس // به پروتکل سایت تبدیل می‌شود', 'https://ex/b.mp3' === tara_media_fix_scheme( '//ex/b.mp3' ) );
+$GLOBALS['__is_ssl'] = false;
+t( 'پلیر: روی http دست‌نخورده می‌ماند', 'http://ex/a.mp3' === tara_media_fix_scheme( 'http://ex/a.mp3' ) );
+
+$critical = (string) @file_get_contents( '/tmp/theme/inc/tara-critical.php' );
+t( 'تضمینی: بلوک CSS درون‌خطی چاپ می‌شود', false !== strpos( $critical, 'tara_critical_css' ) && false !== strpos( $critical, 'wp_head' ) );
+t( 'تضمینی: مود شب صریح و بی‌وابسته به متغیرها', false !== strpos( $critical, 'body.night' ) && false !== strpos( $critical, 'data-tara-night' ) );
+t( 'تضمینی: اگر CSS چاپ نشد مستقیم لینک می‌شود', false !== strpos( $critical, 'tara_assets_guard_css' ) && false !== strpos( $critical, 'wp_style_is' ) );
+t( 'تضمینی: اگر JS چاپ نشد مستقیم بارگذاری می‌شود', false !== strpos( $critical, 'tara_assets_guard_js' ) && false !== strpos( $critical, 'wp_script_is' ) );
+t( 'جست‌وجو: نقطهٔ پایانی AJAX ثبت شده', function_exists( 'tara_ajax_search' ) && function_exists( 'tara_search_inline_js' ) );
+t( 'جست‌وجو: با افزونهٔ SearchWP تعارض ندارد', false !== strpos( $critical, 'window.SearchWP' ) );
+t( 'جست‌وجو: کادر نتایج درون‌خطی استایل دارد', false !== strpos( $critical, '#tara-search-results' ) && false !== strpos( $critical, 'is-open' ) );
+
+$settings_two = (string) @file_get_contents( '/tmp/theme/inc/admin-settings-shell.php' );
+t( 'تنظیمات: چیدمان دوستونی (محتوا کنار فهرست، نه زیرش)', false !== strpos( $settings_two, 'grid-template-columns: minmax(170px, 232px) minmax(0, 1fr)' ) );
 
 $player_js = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
 t( 'کلید شب: هندلر مستقل در JS', false !== strpos( $player_js, 'tara-night' ) && false !== strpos( $player_js, 'dark_light_mode' ) );

@@ -571,6 +571,9 @@ function count_users() {
 function get_current_screen() {
 	return (object) array( 'id' => isset( $GLOBALS['__screen_id'] ) ? (string) $GLOBALS['__screen_id'] : '' );
 }
+function is_ssl() {
+	return ! empty( $GLOBALS['__is_ssl'] );
+}
 function wp_safe_redirect( $url ) {
 	$GLOBALS['__redirect'] = $url;
 }

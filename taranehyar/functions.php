@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.5' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.6' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -388,6 +388,15 @@ if ( is_readable( $taranehyar_ui ) ) {
 	require_once $taranehyar_ui;
 }
 unset( $taranehyar_ui );
+
+/* ۶-الف-۴) لایهٔ تضمینیِ ظاهر + جست‌وجوی زنده (۳.۷.۶)
+   CSS ضروری را درون‌خطی چاپ می‌کند و اگر فایل‌های قالب به صفحه نرسند،
+   مستقیم تگ <link>/<script> می‌نویسد. --- */
+$taranehyar_critical = TARANEHYAR_DIR . '/inc/tara-critical.php';
+if ( is_readable( $taranehyar_critical ) ) {
+	require_once $taranehyar_critical;
+}
+unset( $taranehyar_critical );
 
 /* ۶-ب) ابزارک‌های اختصاصی (خودشان روی widgets_init هوک می‌زنند) */
 $taranehyar_widgets = TARANEHYAR_DIR . '/inc/widgets.php';

@@ -1224,7 +1224,7 @@
 
 		/* نشانهٔ سلامت برای عیب‌یابی: اگر این صفت روی <html> نبود، یعنی همین فایل
 		   اجرا نشده است (کش/CDN/خطای اسکریپت). */
-		document.documentElement.setAttribute('data-tara-ready', '3.7.5');
+		document.documentElement.setAttribute('data-tara-ready', '3.7.6');
 	}
 
 	if (document.readyState === 'loading') {

@@ -1,0 +1,330 @@
+<?php
+/**
+ * inc/tara-critical.php — «لایهٔ تضمینی» ظاهر و جست‌وجوی زنده (v3.7.6)
+ * ==========================================================================
+ * چرا این فایل؟ در سایت کاربر، فایل‌های `css/tara-ui.css` و `js/tara-player.js`
+ * به صفحه نمی‌رسیدند (کش/ترکیب/فیلتر دارایی‌ها) و در نتیجه: کادر جست‌وجو بد
+ * دیده می‌شد، شناسنامه همان کادر سفید قبلی بود، چیپ‌های ژانر/حال‌وهوا استایل
+ * نداشتند، مود شب ظاهر صفحه را عوض نمی‌کرد و پلیر کار نمی‌کرد. در همهٔ این‌ها
+ * فقط کدِ **درون‌خطی** اثر می‌گذاشت.
+ *
+ * این فایل سه کار می‌کند:
+ *   ۱) یک بلوک CSS کوچک و ضروری را در `wp_head` چاپ می‌کند (همیشه اثر دارد).
+ *   ۲) اگر فایل‌های CSS/JS قالب چاپ نشده باشند، خودش تگ <link>/<script> را
+ *      مستقیم می‌نویسد (بدون تکرار اگر قبلاً چاپ شده باشند).
+ *   ۳) جست‌وجوی زندهٔ AJAX را (بدون نیاز به افزونه) راه می‌اندازد؛ اگر افزونهٔ
+ *      SearchWP فعال باشد، دست به کارش نمی‌شود.
+ *
+ * همهٔ این‌ها فقط در بخش عمومی سایت اجرا می‌شوند.
+ *
+ * @package Taranehyar
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/* -------------------------------------------------------------------------
+ * ۱) CSS ضروری — درون‌خطی
+ * ---------------------------------------------------------------------- */
+if ( ! function_exists( 'tara_critical_css' ) ) {
+	function tara_critical_css() {
+		$ui = defined( 'TARANEHYAR_URI' ) ? TARANEHYAR_URI : get_template_directory_uri();
+		?>
+		<style id="tara-critical-css">
+		/* ---------- مود شب (مستقل از متغیرهای پوسته) ---------- */
+		body.night, html[data-tara-night="1"] body { background: #101014 !important; color: #ecebf3 !important; }
+		body.night #header, html[data-tara-night="1"] #header { background: #17171d !important; }
+		body.night #footer, html[data-tara-night="1"] #footer { background: #0b0b0e !important; }
+		body.night a, html[data-tara-night="1"] a { color: #d9d6ee; }
+		body.night .single_posts, body.night .songs_post, body.night .artist_box_tarlanweb,
+		body.night .related_posts, body.night .single_content_box, body.night .music_box_player,
+		body.night .tarlanweb_side_box, body.night .song_boxs,
+		html[data-tara-night="1"] .single_posts, html[data-tara-night="1"] .songs_post,
+		html[data-tara-night="1"] .artist_box_tarlanweb, html[data-tara-night="1"] .single_content_box,
+		html[data-tara-night="1"] .tarlanweb_side_box, html[data-tara-night="1"] .song_boxs {
+			background: #191920 !important; color: #ecebf3 !important; box-shadow: none !important;
+		}
+		body.night .liner, html[data-tara-night="1"] .liner { border-color: rgba(255, 255, 255, .12) !important; }
+		body.night h1, body.night h2, body.night h3, body.night .songs_title_box a,
+		html[data-tara-night="1"] h1, html[data-tara-night="1"] h2, html[data-tara-night="1"] h3 {
+			color: #f4f2ff !important;
+		}
+
+		/* ---------- کادر جست‌وجوی سربرگ + نتایج زنده ---------- */
+		#searches { position: relative !important; display: flex !important; align-items: stretch;
+			width: 230px; height: 34px; margin: 4px 10px 0 0; border-radius: 999px;
+			border: 1px solid #dcd8ea; background: #fff; overflow: visible !important;
+			box-shadow: 0 2px 10px -6px rgba(22, 18, 31, .35); }
+		#searches:focus-within { border-color: #6d28d9; box-shadow: 0 0 0 3px rgba(109, 40, 217, .18); }
+		#searches #lsds, #searches .searchfield { position: static !important; flex: 1 1 auto;
+			width: auto !important; min-width: 0; height: 32px; padding: 0 12px !important;
+			border: 0 !important; border-radius: 999px 0 0 999px; background: #fff !important;
+			color: #16121f !important; font-size: 12.5px; text-indent: 0 !important; text-align: right; direction: rtl; }
+		#searches #lsds::placeholder { color: #8b8899 !important; opacity: 1; }
+		#searches button { flex: 0 0 38px; width: 38px; height: 32px; line-height: 32px;
+			float: none; border: 0; border-radius: 0; background: #6d28d9 !important; color: #fff !important;
+			font-size: 15px; cursor: pointer; }
+		#searches button:hover { background: #4c1d95 !important; }
+		@media (max-width: 600px) { #searches { width: 168px; } }
+
+		#tara-search-results { position: absolute; z-index: 100000; top: calc(100% + 8px);
+			inset-inline: 0; display: none; overflow: hidden; border: 1px solid #e6e4ef;
+			border-radius: 14px; background: #fff; box-shadow: 0 24px 44px -22px rgba(17, 16, 28, .55);
+			direction: rtl; text-align: right; }
+		#tara-search-results.is-open { display: block; }
+		#tara-search-results .tara-sr__head { padding: 8px 12px; border-bottom: 1px solid #f1eff8;
+			font-size: 11px; font-weight: 700; color: #6b6a7b; }
+		#tara-search-results a.tara-sr__row { display: flex; gap: 9px; align-items: center;
+			padding: 8px 10px; text-decoration: none; color: #1d1b29; }
+		#tara-search-results a.tara-sr__row:hover { background: #faf8ff; }
+		#tara-search-results .tara-sr__row img { width: 40px; height: 40px; border-radius: 10px;
+			object-fit: cover; flex: 0 0 40px; background: #f1ecff; }
+		#tara-search-results .tara-sr__t { display: block; font-size: 12.5px; font-weight: 700;
+			line-height: 1.6; }
+		#tara-search-results .tara-sr__a { display: block; font-size: 11px; color: #7a7790; }
+		#tara-search-results .tara-sr__empty { padding: 12px; font-size: 12px; color: #6b6a7b; }
+
+		/* ---------- شناسنامهٔ آهنگ: بدون کادر سفید ---------- */
+		.ab-credits.ab-credits { border: 0 !important; border-radius: 0 !important;
+			background: transparent !important; box-shadow: none !important; padding: 0 !important; }
+		.ab-credits.ab-credits .ab-credit { background: transparent !important; }
+		.ab-credits.ab-credits .ab-credit__k { color: #6b7280; font-size: 11px; }
+		.ab-credits.ab-credits .ab-credit__v { color: #16121f; }
+		body.night .ab-credits.ab-credits .ab-credit__v { color: #f2f0ff; }
+		body.night .ab-credits.ab-credits .ab-credit__k { color: rgba(255, 255, 255, .62); }
+
+		/* ---------- چیپ‌های ژانر/حال‌وهوا و ردیف شناسه ---------- */
+		.ty-single-meta { display: flex !important; flex-wrap: wrap; gap: 10px 18px;
+			align-items: center; margin: 10px 0 2px; padding: 0 !important;
+			border: 0 !important; background: transparent !important; }
+		.ty-chips { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+		.ty-chip { display: inline-flex; align-items: center; gap: 5px; padding: 4px 11px;
+			border-radius: 999px; border: 1px solid #e3dcf7; background: #f7f5ff;
+			color: #4c1d95 !important; font-size: 11.5px; font-weight: 700;
+			line-height: 1.7; text-decoration: none !important; }
+		.ty-chip:hover { background: #efe9ff; }
+		body.night .ty-chip { border-color: #3a3550; background: rgba(255, 255, 255, .07); color: #d9d3ff !important; }
+		.ty-single-meta .ty-chip { font-size: 12px; padding: 5px 13px; }
+		.tarlanweb_post_ft { float: none !important; display: inline-flex; align-items: center;
+			gap: 5px; height: auto; line-height: 1.9; margin: 0 0 0 16px; font-size: 12px; }
+		header .tarlanweb_post_ft i { font-size: 14px; color: #6d28d9; }
+
+		/* ---------- دکمهٔ «بالا» ---------- */
+		.top_page { display: flex !important; align-items: center; justify-content: center;
+			opacity: 0; visibility: hidden; transform: translateY(6px);
+			transition: opacity .2s ease, transform .2s ease, visibility .2s; }
+		.top_page.is-shown { opacity: 1; visibility: visible; transform: none; }
+
+		/* ---------- پلیر: پیام خطای خوانا ---------- */
+		.ty-player__error { color: #b91c1c; font-size: 12px; }
+		</style>
+		<?php
+	}
+	add_action( 'wp_head', 'tara_critical_css', 100 );
+}
+
+/* -------------------------------------------------------------------------
+ * ۲) نگهبان دارایی‌ها — اگر enqueue چاپ نشد، مستقیم می‌نویسیم
+ * ---------------------------------------------------------------------- */
+if ( ! function_exists( 'tara_assets_guard_css' ) ) {
+	function tara_assets_guard_css() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		$css = array(
+			'taranehyar-ui'     => '/css/tara-ui.css',
+			'taranehyar-home'   => '/css/tara-home.css',
+			'taranehyar-artist' => '/css/tara-artist.css',
+		);
+
+		foreach ( $css as $handle => $rel ) {
+			if ( wp_style_is( $handle, 'done' ) ) {
+				continue;
+			}
+			$file = TARANEHYAR_DIR . $rel;
+			if ( ! file_exists( $file ) ) {
+				continue;
+			}
+			$ver = TARANEHYAR_VERSION . '.' . filemtime( $file );
+			echo '<link rel="stylesheet" id="' . esc_attr( $handle . '-direct' ) . '" href="'
+				. esc_url( TARANEHYAR_URI . $rel . '?ver=' . $ver ) . '" media="all" />' . "\n";
+		}
+	}
+	add_action( 'wp_head', 'tara_assets_guard_css', 98 );
+}
+
+if ( ! function_exists( 'tara_assets_guard_js' ) ) {
+	function tara_assets_guard_js() {
+		if ( is_admin() || wp_script_is( 'taranehyar-player', 'done' ) ) {
+			return;
+		}
+		$file = TARANEHYAR_DIR . '/js/tara-player.js';
+		if ( ! file_exists( $file ) ) {
+			return;
+		}
+		$ver = TARANEHYAR_VERSION . '.' . filemtime( $file );
+		echo '<script id="taranehyar-player-direct" src="'
+			. esc_url( TARANEHYAR_URI . '/js/tara-player.js?ver=' . $ver ) . '"></script>' . "\n";
+	}
+	add_action( 'wp_footer', 'tara_assets_guard_js', 97 );
+}
+
+/* -------------------------------------------------------------------------
+ * ۳) جست‌وجوی زندهٔ AJAX (بدون افزونه)
+ * ---------------------------------------------------------------------- */
+if ( ! function_exists( 'tara_ajax_search' ) ) {
+	/**
+	 * خروجی JSON جست‌وجو برای دراپ‌داون سربرگ.
+	 */
+	function tara_ajax_search() {
+		check_ajax_referer( 'tara_search', 'nonce', false );
+
+		$term = isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
+		$term = trim( $term );
+
+		if ( mb_strlen( $term ) < 2 ) {
+			wp_send_json_success( array( 'items' => array(), 'more' => '' ) );
+		}
+
+		$query = new WP_Query(
+			array(
+				'post_type'           => 'post',
+				'post_status'         => 'publish',
+				's'                   => $term,
+				'posts_per_page'      => 8,
+				'no_found_rows'       => false,
+				'ignore_sticky_posts' => true,
+			)
+		);
+
+		$items = array();
+		foreach ( (array) $query->posts as $post ) {
+			$cover = function_exists( 'tara_track_cover' ) ? tara_track_cover( $post->ID, 'thumb3' ) : '';
+			$artist = '';
+			if ( function_exists( 'tara_music_field' ) ) {
+				$artist = (string) tara_music_field( 'artist', $post->ID );
+			}
+			$items[] = array(
+				'title'  => get_the_title( $post ),
+				'url'    => get_permalink( $post ),
+				'artist' => $artist,
+				'cover'  => $cover,
+			);
+		}
+
+		wp_send_json_success(
+			array(
+				'items' => $items,
+				'more'  => get_search_link( $term ),
+			)
+		);
+	}
+	add_action( 'wp_ajax_tara_search', 'tara_ajax_search' );
+	add_action( 'wp_ajax_nopriv_tara_search', 'tara_ajax_search' );
+}
+
+if ( ! function_exists( 'tara_search_inline_js' ) ) {
+	/**
+	 * اسکریپت درون‌خطی جست‌وجوی زنده.
+	 *
+	 * اگر افزونهٔ SearchWP Live Ajax Search فعال باشد (window.SearchWP)، این
+	 * اسکریپت هیچ کاری نمی‌کند تا دو دراپ‌داون هم‌زمان باز نشود.
+	 */
+	function tara_search_inline_js() {
+		if ( is_admin() ) {
+			return;
+		}
+
+		$endpoint = admin_url( 'admin-ajax.php' );
+		$nonce    = wp_create_nonce( 'tara_search' );
+		?>
+		<script id="tara-search-inline">
+		(function () {
+			if (window.SearchWP || window.SearchWP_Live_Search) { return; }
+			var inputs = [];
+			var main = document.getElementById('lsds');
+			var mob = document.getElementById('lsds_mobile');
+			if (main) { inputs.push(main); }
+			if (mob) { inputs.push(mob); }
+			if (!inputs.length) { return; }
+
+			var box = document.createElement('div');
+			box.id = 'tara-search-results';
+			box.setAttribute('role', 'listbox');
+			box.setAttribute('aria-live', 'polite');
+			var host = main ? main.closest('#searches') || main.parentNode : mob.parentNode;
+			host.appendChild(box);
+
+			var timer = null;
+			var seq = 0;
+
+			function close() { box.classList.remove('is-open'); box.innerHTML = ''; }
+			function esc(s) {
+				return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+					return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+				});
+			}
+
+			function render(data, q) {
+				var items = (data && data.items) || [];
+				if (!items.length) {
+					box.innerHTML = '<div class="tara-sr__empty">چیزی برای «' + esc(q) + '» پیدا نشد.</div>';
+					box.classList.add('is-open');
+					return;
+				}
+				var html = '<div class="tara-sr__head">نتایج جست‌وجو</div>';
+				for (var i = 0; i < items.length; i++) {
+					var it = items[i];
+					html += '<a class="tara-sr__row" role="option" href="' + esc(it.url) + '">'
+						+ (it.cover ? '<img src="' + esc(it.cover) + '" width="40" height="40" alt="" loading="lazy">' : '')
+						+ '<span><span class="tara-sr__t">' + esc(it.title) + '</span>'
+						+ (it.artist ? '<span class="tara-sr__a">' + esc(it.artist) + '</span>' : '')
+						+ '</span></a>';
+				}
+				if (data && data.more) {
+					html += '<a class="tara-sr__row" href="' + esc(data.more) + '"><span class="tara-sr__t">همهٔ نتایج</span></a>';
+				}
+				box.innerHTML = html;
+				box.classList.add('is-open');
+			}
+
+			function ask(value) {
+				var q = String(value || '').trim();
+				if (q.length < 2) { close(); return; }
+				var mine = ++seq;
+				var url = '<?php echo esc_url_raw( $endpoint ); ?>?action=tara_search&nonce=<?php echo esc_js( $nonce ); ?>&q=' + encodeURIComponent(q);
+				var xhr = new XMLHttpRequest();
+				xhr.open('GET', url, true);
+				xhr.onreadystatechange = function () {
+					if (xhr.readyState !== 4 || mine !== seq) { return; }
+					if (xhr.status !== 200) { close(); return; }
+					var payload = null;
+					try { payload = JSON.parse(xhr.responseText); } catch (e) { close(); return; }
+					render(payload && payload.data, q);
+				};
+				xhr.send();
+			}
+
+			inputs.forEach(function (input) {
+				input.setAttribute('autocomplete', 'off');
+				input.addEventListener('input', function () {
+					var v = input.value;
+					window.clearTimeout(timer);
+					timer = window.setTimeout(function () { ask(v); }, 260);
+				});
+				input.addEventListener('keydown', function (ev) {
+					if (ev.key === 'Escape') { close(); }
+				});
+			});
+
+			document.addEventListener('click', function (ev) {
+				if (!box.contains(ev.target) && !ev.target.closest('#searches')) { close(); }
+			});
+		})();
+		</script>
+		<?php
+	}
+	add_action( 'wp_footer', 'tara_search_inline_js', 98 );
+}

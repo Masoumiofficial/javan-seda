@@ -369,6 +369,7 @@ if ( ! function_exists( 'tara_queue_attrs' ) ) {
 		if ( ! is_string( $json ) ) {
 			return '';
 		}
+		$GLOBALS['tara_has_queue'] = true;
 		$out = ' data-tara-queue="' . esc_attr( $json ) . '"';
 		if ( '' !== $title ) {
 			$out .= ' data-tara-title="' . esc_attr( wp_strip_all_tags( $title ) ) . '"';
@@ -549,12 +550,20 @@ if ( ! function_exists( 'tara_dock_markup' ) ) {
 		$first = wp_parse_args(
 			(array) $first,
 			array(
-				'title'  => '',
+				'title'  => 'در حال پخش',
 				'artist' => '',
 				'cover'  => '',
 				'link'   => '',
 			)
 		);
+
+		/* آدرس خالی = درخواست به خودِ صفحه؛ پس یک تصویر جانشین می‌گذاریم */
+		if ( '' === (string) $first['cover'] ) {
+			$first['cover'] = get_template_directory_uri() . '/images/nomusics.jpg';
+		}
+		if ( '' === (string) $first['link'] ) {
+			$first['link'] = home_url( '/' );
+		}
 
 		ob_start();
 		?>
@@ -806,8 +815,9 @@ if ( ! function_exists( 'tara_player' ) ) {
 							<span class="ty-icon-list" aria-hidden="true"></span>
 							<span class="ty-player__tool-label">فهرست پخش</span>
 						</button>
-						<a class="ty-player__tool ty-player__tool--link" href="<?php echo esc_url( $first['link'] ); ?>" data-tara-title-link aria-label="صفحهٔ این آهنگ">
-							<span class="ty-icon-external" aria-hidden="true"></span>
+						<a class="ty-player__tool" href="<?php echo esc_url( $first['link'] ); ?>" data-tara-title-link aria-label="رفتن به صفحهٔ این آهنگ">
+							<span class="ty-icon-note" aria-hidden="true"></span>
+							<span class="ty-player__tool-label">صفحهٔ آهنگ</span>
 						</a>
 					</div>
 				</div>
@@ -852,6 +862,8 @@ if ( ! function_exists( 'tara_player' ) ) {
 
 		<?php if ( ! $tara_dock_done ) : ?>
 		<?php $tara_dock_done = true; ?>
+		<?php $GLOBALS['tara_dock_printed'] = true; ?>
+		<?php $GLOBALS['tara_modal_printed'] = true; ?>
 		<?php echo tara_dock_markup( $first ); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع ?>
 		<?php echo tara_playlist_modal(); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع ?>
 		<?php endif; ?>
@@ -875,4 +887,49 @@ if ( ! function_exists( 'tara_fa_number' ) ) {
 
 		return strtr( (string) $number, array( '0' => '۰', '1' => '۱', '2' => '۲', '3' => '۳', '4' => '۴', '5' => '۵', '6' => '۶', '7' => '۷', '8' => '۸', '9' => '۹' ) );
 	}
+}
+
+if ( ! function_exists( 'tara_runtime_footer' ) ) {
+	/**
+	 * تضمینِ وجود نوار چسبان و پاپ‌آپ فهرست در صفحه.
+	 *
+	 * چرا لازم است؟ در صفحهٔ اصلی، صف‌ها از فهرست بخش‌ها می‌آیند
+	 * (`data-tara-queue`). اگر کارتِ پلیر خاموش باشد یا آهنگی برای آن پیدا
+	 * نشود، هیچ‌جا `tara_player()` صدا زده نمی‌شود؛ در نتیجه پاپ‌آپ و نوار
+	 * چسبان هم ساخته نمی‌شدند و دکمهٔ «فهرست پخش» روی کارت‌ها بی‌اثر بود.
+	 *
+	 * این تابع در `wp_footer` و فقط وقتی صفی در صفحه هست، آن دو را (مخفی)
+	 * چاپ می‌کند. هیچ خروجی اضافه‌ای روی صفحه‌های بی‌صف ندارد.
+	 */
+	function tara_runtime_footer() {
+		if ( empty( $GLOBALS['tara_has_queue'] ) ) {
+			return;
+		}
+
+		$dock  = empty( $GLOBALS['tara_dock_printed'] );
+		$modal = empty( $GLOBALS['tara_modal_printed'] );
+
+		if ( ! $dock && ! $modal ) {
+			return;
+		}
+
+		$placeholder = array(
+			'id'     => 0,
+			'title'  => '',
+			'artist' => '',
+			'src'    => '',
+			'cover'  => '',
+			'link'   => '',
+		);
+
+		if ( $dock && function_exists( 'tara_dock_markup' ) ) {
+			echo tara_dock_markup( $placeholder ); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع
+			$GLOBALS['tara_dock_printed'] = true;
+		}
+		if ( $modal && function_exists( 'tara_playlist_modal' ) ) {
+			echo tara_playlist_modal(); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع
+			$GLOBALS['tara_modal_printed'] = true;
+		}
+	}
+	add_action( 'wp_footer', 'tara_runtime_footer', 30 );
 }

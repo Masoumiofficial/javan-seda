@@ -1,4 +1,4 @@
-<?php $index_pv = ot_get_option('index_pv'); if('off' != $index_pv){ ?>
+<?php $index_pv = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'index_pv' ) : ( 'off' != ot_get_option( 'index_pv' ) ); if ( $index_pv ) { ?>
 <!-- song_boxs -->
 <div class="song_boxs">
 <?php $today = getdate();

@@ -1,6 +1,6 @@
 <div class="clear"></div>
 </main>
-<?php $upbs = ot_get_option('upb'); if('off' != $upbs){ ?>
+<?php $upbs = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'upb' ) : ( 'off' != ot_get_option( 'upb' ) ); if ( $upbs ) { ?>
 <div class="top_page boxes_shadows"><i class="icofont-thin-up"></i></div>
 <?php } ?>
 <?php /* v3.2.0 — «باکس شناور پایین-راست» (تلگرام/اینستاگرام) از پایین صفحه حذف شد.

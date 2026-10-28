@@ -231,6 +231,50 @@ t( 'شخص: یک نقش ⇒ کارت خالی', '' === tara_person_card( $solo, 
 
 t( 'شناسنامه: ترتیب فیلدها پابرجاست', in_array( 'lyricist', array_keys( tara_credits_fields() ), true ) );
 
+/* ---------- کلیدهای روشن/خاموش: یک قاعده برای همه (v3.7.4) ---------- */
+require_once '/tmp/theme/inc/ab-controls.php';
+
+$on_cases = array(
+	array( 'on', true ),
+	array( 'off', false ),
+	array( '1', true ),
+	array( '0', false ),
+	array( 1, true ),
+	array( 0, false ),
+	array( 'true', true ),
+	array( 'false', false ),
+	array( 'خاموش', false ),
+	array( 'روشن', true ),
+);
+$on_ok = true;
+foreach ( $on_cases as $case ) {
+	$GLOBALS['__options']['option_tree'] = array( 'zz_toggle' => $case[0] );
+	if ( tara_opt_on( 'zz_toggle' ) !== $case[1] ) {
+		$on_ok = false;
+	}
+}
+t( 'کلیدها: on/off/۱/۰/true/false/فارسی همه یکسان خوانده می‌شوند', $on_ok );
+
+$GLOBALS['__options']['option_tree'] = array();
+t( 'کلیدها: نبودِ گزینه ⇒ پیش‌فرض', true === tara_opt_on( 'zz_missing', true ) && false === tara_opt_on( 'zz_missing', false ) );
+
+/* ---------- نوار/پاپ‌آپِ پشتیبان (صفحهٔ اصلی بدون کارت پلیر) ---------- */
+$GLOBALS['tara_has_queue']    = true;
+$GLOBALS['tara_dock_printed'] = false;
+$GLOBALS['tara_modal_printed'] = false;
+ob_start();
+tara_runtime_footer();
+$runtime = ob_get_clean();
+t( 'پشتیبان: نوار چسبان ساخته شد', false !== strpos( $runtime, 'data-tara-dock' ) );
+t( 'پشتیبان: پاپ‌آپ فهرست ساخته شد', false !== strpos( $runtime, 'id="tara-playlist-modal"' ) );
+t( 'پشتیبان: تصویر جانشین برای نوار', false !== strpos( $runtime, 'nomusics.jpg' ) );
+$GLOBALS['tara_dock_printed']  = true;
+$GLOBALS['tara_modal_printed'] = true;
+ob_start();
+tara_runtime_footer();
+t( 'پشتیبان: اگر قبلاً چاپ شده، چیزی اضافه نمی‌کند', '' === ob_get_clean() );
+unset( $GLOBALS['tara_has_queue'] );
+
 /* ======================================================================
    ۵) پوستهٔ صفحهٔ تنظیمات
    ====================================================================== */
@@ -239,9 +283,23 @@ require '/tmp/theme/inc/admin-settings-shell.php';
 t( 'تنظیمات: شناسهٔ صفحهٔ درست', 'taranehyar_page_ot-theme-options' === tara_settings_shell_screen() );
 t( 'تنظیمات: پوسته به‌طور پیش‌فرض روشن است', true === tara_settings_shell_on() );
 
+/* v3.7.4 — گزینهٔ قدیمی دیگر پوسته را خاموش نمی‌کند (تا کاربر فکر نکند آپدیت نشده) */
 $GLOBALS['__options']['option_tree'] = array( 'ab_admin_ui' => 'off' );
-t( 'تنظیمات: با ab_admin_ui=off خاموش می‌شود', false === tara_settings_shell_on() );
+t( 'تنظیمات: گزینهٔ قدیمی پوست را خاموش نمی‌کند', true === tara_settings_shell_on() );
 $GLOBALS['__options']['option_tree'] = array( 'ab_admin_ui' => 'on' );
+
+/* body class با رشته (رفتار واقعی وردپرس) — باگ کشندهٔ ۳.۷.۰–۳.۷.۳ */
+$GLOBALS['__screen_id'] = 'taranehyar_page_ot-theme-options';
+$body_string = tara_settings_shell_body_class( 'wp-admin wp-core-ui' );
+t( 'تنظیمات: کلاس body روی رشته هم کار می‌کند', is_string( $body_string ) && false !== strpos( $body_string, 'tara-settings-screen' ), is_string( $body_string ) ? $body_string : gettype( $body_string ) );
+$body_twice = tara_settings_shell_body_class( $body_string );
+t( 'تنظیمات: کلاس body دوبار تکرار نمی‌شود', 1 === substr_count( $body_twice, 'tara-settings-screen' ) );
+
+/* تشخیص صفحه با پارامتر آدرس، حتی اگر شناسهٔ صفحه عوض شود */
+$GLOBALS['__screen_id'] = 'something_else';
+$_GET['page']            = 'ot-theme-options';
+t( 'تنظیمات: تشخیص صفحه با ?page=ot-theme-options', tara_settings_shell_is_page() && true === tara_settings_shell_on() );
+unset( $_GET['page'] );
 
 $GLOBALS['__screen_id'] = 'taranehyar_page_ot-theme-options';
 $classes                = apply_filters( 'admin_body_class', array() );
@@ -346,6 +404,26 @@ t( 'صفحهٔ آهنگ: نوار شناسه (ژانر/حال‌وهوا) دار
 t( 'صفحهٔ آهنگ: ترانه‌سرا/آهنگساز/تنظیم از نوار بالا حذف شد', false === strpos( $single, "'tara_songwriter' => array( 'label' => 'ترانه‌سرا' )" ) );
 t( 'صفحهٔ آهنگ: ویدیو با پلیر تازه (tara_video)', false !== strpos( $single, 'tara_video(' ) );
 t( 'صفحهٔ آهنگ: بلوک ویدیوی قدیمی نماند', false === strpos( $single, '<video width="640"' ) );
+
+$home_css = (string) @file_get_contents( '/tmp/theme/css/tara-home.css' );
+t( 'اسلایدر: کادر اطلاعات زیر تصویر (نه روی کاور)', false !== strpos( $home_css, '.ty-hero-slide__body {' ) && false !== strpos( $home_css, 'position: relative;' ) );
+t( 'اسلایدر: دکمهٔ تازه وسط‌چین', false !== strpos( $home_css, '.ty-hero-slide__actions' ) && false !== strpos( $home_css, 'justify-content: center' ) );
+
+$ui_css = (string) @file_get_contents( '/tmp/theme/css/tara-ui.css' );
+t( 'کارت: دکمهٔ پخش وسط کاور', false !== strpos( $ui_css, '.ty-cardplay {' ) && false !== strpos( $ui_css, 'left: 50%;' ) );
+t( 'شناسنامه: کادر فشرده', false !== strpos( $ui_css, 'minmax(118px, 1fr)' ) );
+t( 'هدر: کادر جست‌وجو روشن با متن تیره', false !== strpos( $ui_css, '#lsds' ) && false !== strpos( $ui_css, 'color: #16121f !important' ) );
+t( 'صفحهٔ آهنگ: ستون کناری چسبان', false !== strpos( $ui_css, '#left_side' ) && false !== strpos( $ui_css, 'position: sticky' ) );
+
+$player_js = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
+t( 'کلید شب: هندلر مستقل در JS', false !== strpos( $player_js, 'tara-night' ) && false !== strpos( $player_js, 'dark_light_mode' ) );
+t( 'پلیر: نشانهٔ راه‌اندازی data-tara-ready', false !== strpos( $player_js, 'data-tara-ready' ) );
+t( 'پلیر: پشتیبان صف از data-tara-queue', false !== strpos( $player_js, "querySelector('[data-tara-queue]')" ) );
+
+$settings_css = (string) @file_get_contents( '/tmp/theme/css/admin-settings.css' );
+t( 'تنظیمات: نشان وضعیت فایل‌ها', false !== strpos( $settings_css, '.tara-settings-status' ) );
+t( 'تنظیمات: سوییچ روشن/خاموش خوانا', false !== strpos( $settings_css, '.on-off-switch' ) );
+t( 'تنظیمات: ریشهٔ Option Tree هم پوشش دارد', false !== strpos( $settings_css, '#option-tree-settings-api' ) );
 
 $scripts = (string) @file_get_contents( '/tmp/theme/js/scripts.js' );
 t( 'اسلایدر: تک‌اسلاید شده', false !== strpos( $scripts, "0:{items:1}" ) && false === strpos( $scripts, '700:{items:2}' ) );

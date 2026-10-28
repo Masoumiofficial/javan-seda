@@ -54,9 +54,11 @@ function taranehyar_panel_capability( $cap = 'edit_theme_options' ) {
  * @return string
  */
 function taranehyar_panel_icon() {
+	/* v3.7.4 — آیکون «نُت موسیقی»ی ساده و خوانا در منوی ۲۰px پیشخوان */
 	$svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">'
-		. '<circle cx="10" cy="10" r="8" fill="none" stroke="#a7aaad" stroke-width="1.6"/>'
-		. '<path d="M8 6.2l5 3.8-5 3.8z" fill="#a7aaad"/>'
+		. '<circle cx="6.4" cy="14.6" r="3.1" fill="#a7aaad"/>'
+		. '<rect x="8.6" y="3.4" width="1.9" height="11.6" rx=".9" fill="#a7aaad"/>'
+		. '<path d="M10.5 3.4c2.9.6 4.9 2.6 5.2 5.6" fill="none" stroke="#a7aaad" stroke-width="1.9" stroke-linecap="round"/>'
 		. '</svg>';
 
 	return 'data:image/svg+xml;base64,' . base64_encode( $svg );

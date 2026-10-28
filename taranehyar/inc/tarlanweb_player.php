@@ -14,9 +14,9 @@
  * @package Taranehyar
  */
 
-$tara_indpl = ot_get_option( 'indpl' );
+$tara_indpl = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'indpl' ) : ( 'off' !== ot_get_option( 'indpl' ) );
 
-if ( 'off' !== $tara_indpl && function_exists( 'tara_player' ) ) {
+if ( $tara_indpl && function_exists( 'tara_player' ) ) {
 
 	$tara_home_num   = ot_get_option( 'v_num' );
 	$tara_home_num   = ! empty( $tara_home_num ) ? (int) $tara_home_num : 8;

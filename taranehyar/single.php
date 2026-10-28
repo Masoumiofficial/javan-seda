@@ -478,7 +478,7 @@ if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID(), '
 </article>
 <?php endwhile; endif; ?>
 
-<?php $share_off = ot_get_option('share_off'); if('off' != $share_off){ ?>
+<?php $share_off = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'share_off' ) : ( 'off' != ot_get_option( 'share_off' ) ); if ( $share_off ) { ?>
 <div class="single_posts socials_shares_box">
 <p>اشتراک گذاری مطلب</p>
 <div class="socials_shares">
@@ -491,7 +491,7 @@ if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID(), '
 </div>
 <?php } ?>
 
-<?php $tag_off = ot_get_option('tag_off'); if('off' != $tag_off){ if(has_tag()){ ?>
+<?php $tag_off = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'tag_off' ) : ( 'off' != ot_get_option( 'tag_off' ) ); if ( $tag_off ) { if(has_tag()){ ?>
 <div class="single_posts tara-tags-box">
 <span> برچسب ها :</span> <?php the_tags('','',''); ?>
 <div class="clear"></div>
@@ -501,8 +501,8 @@ if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID(), '
 	
 
 	
-<?php $reltag1 = ot_get_option('reltag1'); if('off' != $reltag1){
-$reltag = ot_get_option('reltag'); if('off' != $reltag){ ?>	
+<?php $reltag1 = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag1', false ) : ( 'off' != ot_get_option( 'reltag1' ) ); if ( $reltag1 ) {
+$reltag = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag', false ) : ( 'off' != ot_get_option( 'reltag' ) ); if ( $reltag ) { ?>	
 <?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist=get_field('artist');
 $my_custom_query= new WP_Query(
 array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,
@@ -588,7 +588,8 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
    ارسال را می‌بندد (با فیلتر موقت comments_open که بی‌درنگ برداشته می‌شود).
    منطق بازدید/نظراتِ دیگر دست‌نخورده است. */
 wp_reset_postdata();
-$cm_off = function_exists( 'ot_get_option' ) ? ot_get_option( 'cm_off' ) : 'on';
+$cm_off_on = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'cm_off' ) : ( 'off' !== ot_get_option( 'cm_off' ) );
+$cm_off    = $cm_off_on ? 'on' : 'off';
 $cm_has = (int) get_comments_number() > 0;
 $cm_lock = ( 'off' === $cm_off && $cm_has );
 if ( $cm_lock ) { add_filter( 'comments_open', '__return_false', 99 ); }
@@ -614,8 +615,8 @@ if ( function_exists( 'tara_sidebar' ) ) {
 	endif;
 }
 ?>
-<?php $reltag1 = ot_get_option('reltag1'); if('off' == $reltag1){
-$reltag = ot_get_option('reltag'); if('off' != $reltag){ ?>	
+<?php $reltag1 = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag1', false ) : ( 'off' != ot_get_option( 'reltag1' ) ); if ( ! $reltag1 ) {
+$reltag = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag', false ) : ( 'off' != ot_get_option( 'reltag' ) ); if ( $reltag ) { ?>	
 <?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist=get_field('artist');
 $my_custom_query= new WP_Query(
 array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,

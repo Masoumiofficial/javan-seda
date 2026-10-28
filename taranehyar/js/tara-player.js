@@ -319,8 +319,16 @@
 			tracks = [];
 		}
 
+		/* v3.7.4 — اگر JSON کارت خالی/خراب بود، به‌جای «مردنِ» کل کارت، صفِ
+		   اولین فهرست صفحه ([data-tara-queue]) را برمی‌داریم تا دکمهٔ «فهرست
+		   پخش» و پخشِ همان بخش همیشه کار کند. */
 		if (!tracks || !tracks.length) {
-			return;
+			var holder = document.querySelector('[data-tara-queue]');
+			tracks = readJSON(holder, 'data-tara-queue') || [];
+			if (!tracks.length) {
+				return;
+			}
+			root.__taraTracks = tracks;
 		}
 
 		var refs = {
@@ -715,7 +723,21 @@
 			owner = card || Engine.state().owner || null;
 			queue = owner && owner.__taraTracks ? owner.__taraTracks : Engine.state().queue;
 
+			/* پشتیبان: صفِ اولین فهرست صفحه (اگر کارتِ اصلی خالی بود) */
 			if (!queue || !queue.length) {
+				var holder = document.querySelector('[data-tara-queue]');
+				queue = readJSON(holder, 'data-tara-queue') || [];
+				if (holder && queue.length) {
+					holder.__taraTitle = holder.getAttribute('data-tara-title') || 'فهرست پخش';
+					owner = owner || holder;
+				}
+			}
+
+			if (!queue || !queue.length) {
+				/* هیچ صفی نیست ⇒ پیام روشن، نه سکوت */
+				if (window.console && console.warn) {
+					console.warn('[tara] فهرست پخش خالی است: نه JSON کارت و نه data-tara-queue.');
+				}
 				return;
 			}
 
@@ -1073,6 +1095,64 @@
 	 * ۶.۵) پوستهٔ سایت: هدر چسبان + دکمهٔ «بالا»
 	 * ================================================================== */
 	function Chrome() {
+		/* ---------------------------------------------------------------
+		 * کلید شب/روز — v3.7.4
+		 * چرا این‌جا؟ چون در بعضی نصب‌ها هندلر jQuery (scripts.js) اجرا
+		 * نمی‌شد و دکمه «کار نمی‌کرد». این نسخه با capture صدا زده می‌شود
+		 * تا هندلرِ قبلی دوباره اجرا نشود (وگرنه دو بار toggle = بی‌اثر).
+		 * ------------------------------------------------------------ */
+		var nightKey = 'tara-night';
+		var setNight = function (on) {
+			document.body.classList.toggle('night', on);
+			var switches = document.querySelectorAll('.dark_light_mode, .toggle_modes');
+			for (var n = 0; n < switches.length; n++) {
+				if (switches[n].classList.contains('dark_light_mode')) {
+					switches[n].classList.toggle('dark_active', on);
+				} else {
+					switches[n].classList.toggle('active', on);
+				}
+			}
+			try {
+				window.localStorage.setItem(nightKey, on ? '1' : '0');
+			} catch (error) {}
+			document.documentElement.setAttribute('data-tara-night', on ? '1' : '0');
+		};
+
+		try {
+			var saved = window.localStorage.getItem(nightKey);
+			if (saved === '1' || saved === '0') {
+				setNight(saved === '1');
+			}
+		} catch (error) {}
+
+		/* دکمهٔ «بالا» — v3.7.4
+		   اگر هندلرِ jQuery (scripts.js) اجرا نشده باشد، دکمه بی‌اثر می‌ماند.
+		   این‌جا با capture می‌گیریم و از رسیدن رویداد به هندلرِ قبلی
+		   جلوگیری می‌کنیم تا اسکرول دو بار اجرا نشود. */
+		document.addEventListener('click', function (event) {
+			var top = event.target.closest ? event.target.closest('.top_page') : null;
+			if (!top) {
+				return;
+			}
+			event.preventDefault();
+			event.stopPropagation();
+			try {
+				window.scrollTo({ top: 0, behavior: 'smooth' });
+			} catch (error) {
+				window.scrollTo(0, 0);
+			}
+		}, true);
+
+		document.addEventListener('click', function (event) {
+			var target = event.target.closest ? event.target.closest('.dark_light_mode, .toggle_modes') : null;
+			if (!target) {
+				return;
+			}
+			event.preventDefault();
+			event.stopPropagation();
+			setNight(!document.body.classList.contains('night'));
+		}, true);
+
 		var header = document.getElementById('header');
 		if (header) {
 			var onChange = function () {
@@ -1126,6 +1206,10 @@
 		Modal.init();
 		bindGlobalClicks();
 		Engine.on();
+
+		/* نشانهٔ سلامت برای عیب‌یابی: اگر این صفت روی <html> نبود، یعنی همین فایل
+		   اجرا نشده است (کش/CDN/خطای اسکریپت). */
+		document.documentElement.setAttribute('data-tara-ready', '3.7.4');
 	}
 
 	if (document.readyState === 'loading') {

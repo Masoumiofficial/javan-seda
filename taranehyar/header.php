@@ -50,7 +50,8 @@ body.ab-has-mh{padding-top:90px;}
 @media (min-width: 801px){body.ab-has-mh #mobiles_header{display:none !important;}}
 </style>
 </head>
-<?php $darks = ot_get_option('dark_modes'); if ( 'off' != $darks ) { ?>
+<?php $darks_std = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'dark_modes', false ) : ( 'off' != ot_get_option( 'dark_modes' ) );
+if ( $darks_std ) { ?>
 <body <?php body_class('night'); ?>>
 <?php } else { ?>
 <body <?php body_class(''); ?>>
@@ -76,8 +77,10 @@ body.ab-has-mh{padding-top:90px;}
 <button><i class="icofont-search"></i></button>
 </form>
 
-<?php $enablepop = ot_get_option('sun_moon'); if('off' != $enablepop){ ?>
-<div class="dark_light_mode<?php $darks = ot_get_option('dark_modes'); if('off' != $darks){echo ' dark_active'; } ?>">
+<?php $enablepop = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'sun_moon' ) : ( 'off' != ot_get_option( 'sun_moon' ) );
+if ( $enablepop ) { ?>
+<?php $darks_on = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'dark_modes', false ) : ( 'off' != ot_get_option( 'dark_modes' ) ); ?>
+<div class="dark_light_mode<?php echo $darks_on ? ' dark_active' : ''; ?>">
 <i aria-label="moon" class="icofont-moon"></i>
 <div class="toggle_modes"></div>
 <i aria-label="sun" class="icofont-sun"></i>

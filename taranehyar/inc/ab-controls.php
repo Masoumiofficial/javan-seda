@@ -43,6 +43,56 @@ if ( ! function_exists( 'tara_ui_define' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_opt_on' ) ) {
+	/**
+	 * خواندنِ یک کلید روشن/خاموش — **یک قاعده برای همهٔ گزینه‌ها**.
+	 *
+	 * چرا این تابع لازم شد؟ در نسخه‌های قبلی هر فایل خودش شرط را می‌نوشت و
+	 * نتیجه این بود که مقدارهای قدیمی («۱»/«۰»، true/false، «yes»/«no» و حتی
+	 * رشتهٔ خالی) در بعضی فایل‌ها «روشن» و در بعضی «خاموش» فهمیده می‌شدند؛
+	 * کاربر هم همان را «برعکس کار کردن کلید» می‌دید.
+	 *
+	 * قاعدهٔ تازه (۳.۷.۴): فقط این‌ها «روشن» هستند: on, 1, true, yes, show, ‌فعال.
+	 * هر چیز دیگری (off, 0, false, no, خالی) «خاموش» است.
+	 *
+	 * @param string $key     کلید گزینه.
+	 * @param bool   $default پیش‌فرض وقتی گزینه اصلاً وجود ندارد.
+	 * @return bool
+	 */
+	function tara_opt_on( $key, $default = true ) {
+		$raw = null;
+
+		if ( function_exists( 'ot_get_option' ) ) {
+			$raw = ot_get_option( $key );
+		}
+
+		if ( null === $raw || '' === $raw || false === $raw ) {
+			return (bool) $default;
+		}
+
+		if ( is_bool( $raw ) ) {
+			return $raw;
+		}
+
+		if ( is_numeric( $raw ) ) {
+			return ( (int) $raw ) > 0;
+		}
+
+		$value = strtolower( trim( (string) $raw ) );
+
+		if ( in_array( $value, array( 'off', '0', 'false', 'no', 'hide', 'hidden', 'none', 'disabled', 'خاموش', 'غیرفعال', 'نه' ), true ) ) {
+			return false;
+		}
+
+		if ( in_array( $value, array( 'on', '1', 'true', 'yes', 'show', 'enabled', 'روشن', 'فعال', 'بله' ), true ) ) {
+			return true;
+		}
+
+		/* مقدار ناشناخته: همان رفتار قبلی (هر چیزی جز off = روشن) تا سایت عوض نشود */
+		return true;
+	}
+}
+
 if ( ! function_exists( 'tara_ui_raw' ) ) {
 	/** خام‌ترین خواندن از Option Tree، بدون فرض و پیش‌فرض. */
 	function tara_ui_raw( $key, $default = '' ) {

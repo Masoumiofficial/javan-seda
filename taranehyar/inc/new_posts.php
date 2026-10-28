@@ -1,4 +1,4 @@
-<?php $index_hj = ot_get_option('index_hj'); if('off' != $index_hj){ ?>
+<?php $index_hj = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'index_hj' ) : ( 'off' != ot_get_option( 'index_hj' ) ); if ( $index_hj ) { ?>
 <!-- song_boxs -->
 <div class="song_boxs">
 <?php if(have_posts()) : ?>

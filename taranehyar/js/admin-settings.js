@@ -333,6 +333,12 @@
 	 * راه‌اندازی
 	 * ------------------------------------------------------------ */
 	function boot() {
+		/* اگر کلاس body به هر دلیلی نرسیده باشد، همین‌جا اضافه می‌شود تا CSS
+		   صفحه حتماً اعمال شود. (ریشهٔ Option Tree در صفحه کافی است.) */
+		if (document.getElementById('option-tree-settings-api')) {
+			document.body.classList.add('tara-settings-screen');
+		}
+
 		root = document.querySelector('.wrap.settings-wrap .ui-tabs');
 		nav = root ? root.querySelector('.ui-tabs-nav') : null;
 

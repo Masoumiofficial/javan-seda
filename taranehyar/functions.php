@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.3' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.4' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -115,6 +115,28 @@ if ( ! function_exists( 'taranehyar_setup' ) ) {
 /* -------------------------------------------------------------------------
  * ۳) دارایی‌ها (فقط یک‌بار و با نسخهٔ قالب برای شکستن کش)
  * ---------------------------------------------------------------------- */
+if ( ! function_exists( 'taranehyar_asset_ver' ) ) {
+	/**
+	 * نسخهٔ دارایی = نسخهٔ قالب + زمانِ آخرین تغییر فایل.
+	 *
+	 * چرا؟ اگر فایل JS/CSS عوض شود ولی شمارهٔ نسخه در style.css یادمان برود،
+	 * مرورگر و افزونه‌های کش نسخهٔ قدیمی را سرو می‌کنند و کاربر فکر می‌کند
+	 * «هیچ چیز عوض نشده». با mtime، آدرس فایل به‌طور خودکار تغییر می‌کند.
+	 *
+	 * @param string $relative مسیر نسبی از ریشهٔ قالب.
+	 * @return string
+	 */
+	function taranehyar_asset_ver( $relative ) {
+		$base = defined( 'TARANEHYAR_DIR' ) ? TARANEHYAR_DIR : get_template_directory();
+		$file = $base . $relative;
+		$ver  = defined( 'TARANEHYAR_VERSION' ) ? TARANEHYAR_VERSION : '0';
+		if ( is_readable( $file ) ) {
+			$ver .= '.' . filemtime( $file );
+		}
+		return $ver;
+	}
+}
+
 if ( ! function_exists( 'taranehyar_assets' ) ) {
 	function taranehyar_assets() {
 		if ( ! function_exists( 'wp_enqueue_style' ) ) {
@@ -143,16 +165,16 @@ if ( ! function_exists( 'taranehyar_assets' ) ) {
 		/* لایهٔ تازهٔ ۳.۷.۰ — پلیر «رادیو»، ردیف آهنگ‌ها و چیپ‌ها.
 		   بدون jQuery و بدون وابستگی؛ اگر فایل نبود، هیچ‌چیز نمی‌شکند. */
 		if ( file_exists( TARANEHYAR_DIR . '/css/tara-ui.css' ) ) {
-			wp_enqueue_style( 'taranehyar-ui', TARANEHYAR_URI . '/css/tara-ui.css', array( 'taranehyar-style' ), TARANEHYAR_VERSION );
+			wp_enqueue_style( 'taranehyar-ui', TARANEHYAR_URI . '/css/tara-ui.css', array( 'taranehyar-style' ), taranehyar_asset_ver( '/css/tara-ui.css' ) );
 		}
 		if ( file_exists( TARANEHYAR_DIR . '/css/tara-artist.css' ) ) {
-			wp_enqueue_style( 'taranehyar-artist', TARANEHYAR_URI . '/css/tara-artist.css', array( 'taranehyar-ui' ), TARANEHYAR_VERSION );
+			wp_enqueue_style( 'taranehyar-artist', TARANEHYAR_URI . '/css/tara-artist.css', array( 'taranehyar-ui' ), taranehyar_asset_ver( '/css/tara-artist.css' ) );
 		}
 		if ( file_exists( TARANEHYAR_DIR . '/css/tara-home.css' ) ) {
-			wp_enqueue_style( 'taranehyar-home', TARANEHYAR_URI . '/css/tara-home.css', array( 'taranehyar-ui' ), TARANEHYAR_VERSION );
+			wp_enqueue_style( 'taranehyar-home', TARANEHYAR_URI . '/css/tara-home.css', array( 'taranehyar-ui' ), taranehyar_asset_ver( '/css/tara-home.css' ) );
 		}
 		if ( file_exists( TARANEHYAR_DIR . '/js/tara-player.js' ) ) {
-			wp_enqueue_script( 'taranehyar-player', TARANEHYAR_URI . '/js/tara-player.js', array(), TARANEHYAR_VERSION, true );
+			wp_enqueue_script( 'taranehyar-player', TARANEHYAR_URI . '/js/tara-player.js', array(), taranehyar_asset_ver( '/js/tara-player.js' ), true );
 		}
 	}
 	add_action( 'wp_enqueue_scripts', 'taranehyar_assets', 5 );

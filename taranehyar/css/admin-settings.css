@@ -843,3 +843,169 @@ body.tara-settings-screen .tara-empty.is-on {
 		display: block;
 	}
 }
+
+/* =========================================================================
+   ۱۱) نشان وضعیت (نسخهٔ ۳.۷.۴) — مطمئن می‌شویم فایل‌های تازه روی سایت‌اند
+   ====================================================================== */
+body.tara-settings-screen .tara-settings-status {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	max-width: 1220px;
+	margin: 0 auto 16px;
+	padding: 0 2px;
+}
+
+body.tara-settings-screen .tara-settings-status__item {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 7px 12px;
+	border: 1px solid var(--ts-line);
+	border-radius: 999px;
+	background: var(--ts-surface);
+	color: var(--ts-muted);
+	font-size: 11.5px;
+	font-weight: 600;
+	line-height: 1.5;
+}
+
+body.tara-settings-screen .tara-settings-status__item .dashicons {
+	width: 15px;
+	height: 15px;
+	font-size: 15px;
+}
+
+body.tara-settings-screen .tara-settings-status__item.is-ok {
+	border-color: #cdeccd;
+	background: #f2fbf2;
+	color: #14713a;
+}
+
+body.tara-settings-screen .tara-settings-status__item.is-bad {
+	border-color: #fbd5df;
+	background: #fdf1f4;
+	color: #8b1e3f;
+}
+
+body.tara-settings-screen .tara-settings-hero__ver {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 11.5px;
+	font-weight: 700;
+	color: rgba(255, 255, 255, 0.92);
+	letter-spacing: 0.3px;
+}
+
+/* دکمهٔ روشن/خاموش OptionTree — پهن‌تر و خواناتر تا «کدام انتخاب شده» معلوم باشد */
+body.tara-settings-screen .on-off-switch {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	width: auto !important;
+	min-width: 150px;
+	height: 36px;
+	padding: 3px;
+	border: 1px solid var(--ts-line);
+	border-radius: 999px;
+	background: var(--ts-line-soft);
+	gap: 0;
+}
+
+body.tara-settings-screen .on-off-switch input[type="radio"] {
+	position: absolute !important;
+	opacity: 0 !important;
+	width: 1px !important;
+	height: 1px !important;
+	margin: 0 !important;
+	pointer-events: none;
+}
+
+body.tara-settings-screen .on-off-switch label {
+	flex: 1 1 0;
+	margin: 0 !important;
+	padding: 6px 14px !important;
+	border-radius: 999px;
+	text-align: center;
+	font-size: 12px !important;
+	font-weight: 700;
+	color: var(--ts-muted);
+	cursor: pointer;
+	transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+body.tara-settings-screen .on-off-switch label:hover { color: var(--ts-ink); }
+
+body.tara-settings-screen .on-off-switch input[type="radio"]:checked + label {
+	background: var(--ts-accent);
+	color: #fff;
+	box-shadow: 0 6px 14px -8px rgba(109, 40, 217, 0.9);
+}
+
+body.tara-settings-screen .on-off-switch input[type="radio"]:focus-visible + label {
+	outline: 2px solid var(--ts-accent);
+	outline-offset: 2px;
+}
+
+body.tara-settings-screen .on-off-switch .slide-button { display: none !important; }
+
+/* =========================================================================
+   ۱۲) ریشهٔ Option Tree — قواعدِ اضطراری
+   اگر به هر دلیلی کلاس body نرسید، خودِ ساختار صفحه هم مرتب دیده شود.
+   ====================================================================== */
+#option-tree-settings-api {
+	direction: rtl;
+}
+
+#option-tree-settings-api h1 {
+	font-size: 20px;
+	font-weight: 800;
+	color: var(--ts-ink, #1f1d2b);
+}
+
+#option-tree-settings-api .ui-tabs-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 0 0 14px;
+	padding: 8px;
+	list-style: none;
+	border: 1px solid var(--ts-line, #e6e4ef);
+	border-radius: 14px;
+	background: #fff;
+}
+
+#option-tree-settings-api .ui-tabs-nav li { margin: 0; }
+
+#option-tree-settings-api .ui-tabs-nav li a {
+	display: inline-flex;
+	padding: 8px 14px;
+	border-radius: 10px;
+	text-decoration: none;
+	color: var(--ts-muted, #6b6a7b);
+	font-weight: 600;
+	font-size: 12.5px;
+}
+
+#option-tree-settings-api .ui-tabs-nav li.ui-tabs-active a {
+	background: var(--ts-accent, #6d28d9);
+	color: #fff;
+}
+
+#option-tree-settings-api .format-settings {
+	padding: 14px 18px;
+	border-bottom: 1px solid var(--ts-line-soft, #f1eff8);
+}
+
+#option-tree-settings-api .format-settings .heading,
+#option-tree-settings-api .format-settings h3 {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--ts-ink, #1f1d2b);
+}
+
+#option-tree-settings-api .format-settings .description {
+	color: var(--ts-muted, #6b6a7b);
+	font-size: 12px;
+	line-height: 1.9;
+}

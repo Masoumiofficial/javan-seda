@@ -15,9 +15,10 @@
  * @package Taranehyar
  */
 
-$tara_fixbvip = ot_get_option( 'fixbvip' );
+/* v3.7.4 — خواندنِ یکسانِ کلید روشن/خاموش (on/1/true = روشن، off/0/خالی = خاموش) */
+$tara_fixbvip = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'fixbvip' ) : ( 'off' !== ot_get_option( 'fixbvip' ) );
 
-if ( 'off' !== $tara_fixbvip ) {
+if ( $tara_fixbvip ) {
 
 	$tara_vip_num = ot_get_option( 'vip_num' );
 	$tara_vip_num = ! empty( $tara_vip_num ) ? (int) $tara_vip_num : 5;
@@ -68,7 +69,7 @@ if ( 'off' !== $tara_fixbvip ) {
 					$tara_loading    = ( 1 === $tara_slide ) ? 'eager' : 'lazy';
 					?>
 					<article class="ty-hero-slide">
-						<a class="ty-hero-slide__media" href="<?php the_permalink(); ?>" tabindex="-1" aria-hidden="true">
+						<a class="ty-hero-slide__media" href="<?php the_permalink(); ?>">
 							<img src="<?php echo esc_url( $tara_image ); ?>"
 								width="1280" height="620"
 								alt="<?php echo esc_attr( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?>"
@@ -76,24 +77,31 @@ if ( 'off' !== $tara_fixbvip ) {
 								fetchpriority="<?php echo esc_attr( $tara_priority ); ?>">
 						</a>
 
+						<?php
+						/* v3.7.4 — اطلاعات اسلاید از «روی کاور» به «کادر کوچکِ زیر کاور» منتقل شد:
+						   بنر خودش معمولاً نام خواننده و آهنگ را دارد و متن روی متن ناخوانا می‌شد.
+						   متن‌ها راست‌چین و دکمهٔ «شنیدن و دانلود» وسطِ پایینِ همان کادر است. */
+						?>
 						<div class="ty-hero-slide__body">
-							<span class="ty-hero-slide__badge">
-								<i class="icofont-star" aria-hidden="true"></i>
-								پیشنهاد ویژه
-							</span>
+							<div class="ty-hero-slide__info">
+								<span class="ty-hero-slide__badge">
+									<i class="icofont-star" aria-hidden="true"></i>
+									پیشنهاد ویژه
+								</span>
 
-							<h2 class="ty-hero-slide__title">
-								<a href="<?php the_permalink(); ?>">
-									<?php if ( '' !== $tara_vip_artist ) : ?>
-										<span class="ty-hero-slide__artist"><?php echo esc_html( $tara_vip_artist ); ?></span>
-									<?php endif; ?>
-									<span class="ty-hero-slide__song"><?php echo esc_html( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?></span>
-								</a>
-							</h2>
+								<h2 class="ty-hero-slide__title">
+									<a href="<?php the_permalink(); ?>">
+										<?php if ( '' !== $tara_vip_artist ) : ?>
+											<span class="ty-hero-slide__artist"><?php echo esc_html( $tara_vip_artist ); ?></span>
+										<?php endif; ?>
+										<span class="ty-hero-slide__song"><?php echo esc_html( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?></span>
+									</a>
+								</h2>
 
-							<?php if ( '' !== trim( wp_strip_all_tags( $tara_vip_genre ) ) ) : ?>
-								<div class="ty-hero-slide__tags"><?php echo $tara_vip_genre; // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده ?></div>
-							<?php endif; ?>
+								<?php if ( '' !== trim( wp_strip_all_tags( $tara_vip_genre ) ) ) : ?>
+									<div class="ty-hero-slide__tags"><?php echo $tara_vip_genre; // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده ?></div>
+								<?php endif; ?>
+							</div>
 
 							<div class="ty-hero-slide__actions">
 								<a class="ty-hero-slide__play" href="<?php the_permalink(); ?>">

@@ -61,27 +61,6 @@ if ( '' !== trim( wp_strip_all_tags( $tara_meta_html ) ) ) {
 <div class="single_content_box">
 
 <?php
-/* تصویر شاخص نوشته (کاور پست) به‌صورت خودکار در ابتدای بخش توضیحات درج می‌شود
-   تا نیازی به گذاشتن دستی همان تصویر داخل متن توضیحات نباشد.
-   اندازه از «تنظیمات قالب ← کنترل رابط ← تصویر کاور پست» می‌آید (پیش‌فرض ۵۰۰×۵۰۰ با
-   کاتِ مربعی). اگر فایلش موجود باشد سایز ab_cover (۵۰۰² کات‌شده) درخواست می‌شود و
-   srcset/sizes خودش نزدیک‌ترین را برمی‌دارد؛ اگر نبود به 'large' برمی‌گردد.
-   تغییر دستی: 'large' یا 'full' = اندازهٔ بزرگ/اصلی | 'thumb1' = ۶۴۰×۳۶۰ */
-$taranehyar_featured_size  = function_exists( 'tara_post_cover_size' ) ? tara_post_cover_size() : 'large';
-$taranehyar_featured_args  = function_exists( 'tara_post_cover_args' )
-	? tara_post_cover_args()
-	: array( 'alt' => get_the_title(), 'title' => get_the_title() );
-if ( has_post_thumbnail() ) {
-	?>
-	<div class="single_featured_cover">
-		<figure class="single_featured_image">
-			<?php the_post_thumbnail( $taranehyar_featured_size, $taranehyar_featured_args ); ?>
-		</figure>
-	</div>
-	<?php
-} ?>
-
-<?php
 /* ---------- نام آهنگ / هنرمند / لینک صفحهٔ هنرمند (مشترک بین باکس متن ترانه و تیتر دانلود) ----------
    لینک هنرمند روی تاکسونومی هنرمند ساخته می‌شود؛ نامک فعال را tara_artist_tax() می‌دهد
    مثال: «محسن یگانه» → https://site/artist/mohsen-yeganeh
@@ -159,7 +138,122 @@ if ( '' !== $taranehyar_artist ) {
 }
 ?>
 
+<?php
+/* ==================================================================================
+   v3.7.8 — ترتیب تازهٔ صفحهٔ آهنگ (درخواست صریح):
+     پلیر (جای کاور بزرگ) → «ما را دنبال کنید» → توضیحات پست →
+     مشخصات اثر → ویدیو → لینک دانلود → متن ترانه
+   ----------------------------------------------------------------------------------
+   کاور بزرگ بالای صفحه حذف شد؛ همان تصویر حالا داخل خود پلیر است و یک آیکون
+   کوچک دوربین روی آن، نسخهٔ اصلی و باکیفیت را در پاپ‌آپ نشان می‌دهد
+   (`data-tara-zoom`). هیچ بخشی از DOM حذف نشده، فقط جابه‌جا شده است.
+   ================================================================================== */
+?>
+
+<?php
+/* ==================================================================================
+   پلیر «رادیو» — نسخهٔ ۳.۷.۰
+   ----------------------------------------------------------------------------------
+   جای دو بلوک قدیمی (پلیر تک‌آهنگ و پلیر آلبوم) یک کارت واحد نشسته است:
+     • آلبوم: هر قطعهٔ تکرارشونده یک ردیف در فهرست پخش می‌شود.
+     • تک‌آهنگ: همان یک قطعه با کاور بزرگ.
+   مارکاپ و کنترل‌ها در inc/tara-ui.php ساخته می‌شوند و js/tara-player.js آن را
+   می‌گرداند؛ هیچ وابستگی به jQuery ندارد. اگر تابع در دسترس نبود (مثلاً فایل
+   حذف شده باشد) هیچ خروجی و هیچ خطایی نداریم.
+   ================================================================================== */
+$tara_tracks     = array();
+$tara_cover_big  = has_post_thumbnail() ? get_the_post_thumbnail_url( get_the_ID(), 'thumb2x' ) : '';
+/* v3.7.8 — نسخهٔ اصلی تصویر برای پاپ‌آپ دوربین روی کاور پلیر */
+$tara_cover_full = has_post_thumbnail() ? get_the_post_thumbnail_url( get_the_ID(), 'full' ) : '';
+$tara_artist_big = $taranehyar_artist;
+$tara_song_big   = $taranehyar_song;
+$tara_link_big   = get_permalink();
+
+if ( function_exists( 'have_rows' ) && have_rows( 'album' ) ) {
+	$tara_album_index = 0;
+	while ( have_rows( 'album' ) ) {
+		the_row();
+		$tara_album_index++;
+		$tara_album_src = get_sub_field( 'albumlink320' );
+		if ( ! $tara_album_src ) {
+			$tara_album_src = get_sub_field( 'albumlink128' );
+		}
+		$tara_album_name = get_sub_field( 'song_names' );
+		if ( ! $tara_album_src ) {
+			continue;
+		}
+		$tara_tracks[] = array(
+			'id'     => get_the_ID() . '-' . $tara_album_index,
+			'title'  => $tara_album_name ? $tara_album_name : ( $tara_song_big . ' — قطعهٔ ' . $tara_album_index ),
+			'artist' => $tara_artist_big,
+			'src'    => $tara_album_src,
+			'cover'  => $tara_cover_big ? $tara_cover_big : tara_track_cover( get_the_ID(), 'thumb2' ),
+			'link'   => $tara_link_big,
+		);
+	}
+}
+
+if ( empty( $tara_tracks ) && function_exists( 'tara_track_src' ) ) {
+	$tara_single_src = tara_track_src( get_the_ID() );
+	if ( '' !== $tara_single_src ) {
+		$tara_tracks[] = array(
+			'id'     => get_the_ID(),
+			'title'  => $tara_song_big,
+			'artist' => $tara_artist_big,
+			'src'    => $tara_single_src,
+			'cover'  => $tara_cover_big ? $tara_cover_big : tara_track_cover( get_the_ID(), 'thumb2' ),
+			'link'   => $tara_link_big,
+		);
+	}
+}
+
+if ( ! empty( $tara_tracks ) && function_exists( 'tara_player' ) ) {
+	echo tara_player( // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین قالب
+		array(
+			'tracks'  => $tara_tracks,
+			'title'   => ( count( $tara_tracks ) > 1 ) ? 'آلبوم · ' . $tara_song_big : $taranehyar_type,
+			'cover'   => $tara_cover_big,
+			'zoom'    => $tara_cover_full,
+			'context' => 'single',
+		)
+	);
+}
+?>
+
+<?php
+/* v3.7.8 — اگر این آهنگ هیچ فایل صوتی نداشته باشد، پلیر چیزی چاپ نمی‌کند؛
+   در آن حالت همان کاور (با دکمهٔ دوربین) می‌ماند تا صفحه بدون تصویر نشود. */
+if ( empty( $tara_tracks ) && has_post_thumbnail() ) {
+	$tara_fallback_full = get_the_post_thumbnail_url( get_the_ID(), 'full' );
+	?>
+	<figure class="ty-cover-fallback">
+		<?php the_post_thumbnail( 'thumb2x', array( 'alt' => get_the_title(), 'title' => get_the_title() ) ); ?>
+		<?php if ( $tara_fallback_full ) : ?>
+			<button type="button" class="ty-player__zoom ty-cover-fallback__zoom" data-tara-zoom="<?php echo esc_url( $tara_fallback_full ); ?>" aria-label="نمایش کاور در اندازهٔ بزرگ" title="نمایش کاور در اندازهٔ بزرگ">
+				<i class="icofont-camera" aria-hidden="true"></i>
+			</button>
+		<?php endif; ?>
+	</figure>
+	<?php
+}
+?>
+
+<?php /* «ما را دنبال کنید» — v3.7.8: بلافاصله بعد از پلیر و پیش از توضیحات.
+   تابع در inc/ab-post-extras.php است و با function_exists محافظت شده؛
+   نبودن فایل ⇒ صفر خروجی و صفر خطا. لینک‌ها و متن دکمه‌ها از تنظیمات قالب →
+   «شبکه‌های اجتماعی» می‌آیند و با همان گزینهٔ fixbtn روشن/خاموش می‌شوند. */
+if ( function_exists( 'tara_social_box' ) ) { tara_social_box( get_the_ID() ); }
+?>
+
+
 <?php the_content(''); ?>
+
+<?php
+/* v3.7.8 — «مشخصات اثر» دقیقاً یک‌جا و بعد از توضیحات می‌آید.
+   خودِ پلیر بالای صفحه است، پس تنظیم قدیمی «شناسنامه بالای پلیر» دیگر
+   کاربردی ندارد؛ جای دیگر با فیلتر tara_credits_position ممکن است. */
+if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID() ); }
+?>
 
 <?php
 /* ============================ باکس «متن ترانه» (متن آهنگ) ============================
@@ -318,14 +412,6 @@ if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
 ?>
 <div class="clear"></div>
 
-<?php /* v3.2.0 — باکس «ما را دنبال کنید» (تلگرام · اینستاگرام · بله · روبیکا): بالای باکس پلیر،
-   زیر متن/ترانه و پیش از ویدیو و پلیر. تابع در inc/ab-post-extras.php است و با function_exists محافظت
-   شده؛ نبودن فایل ⇒ صفر خروجی و صفر خطا. لینک‌ها و متن دکمه‌ها از تنظیمات قالب → «شبکه‌های اجتماعی»
-   می‌آیند و با همان گزینهٔ fixbtn روشن/خاموش می‌شوند. */
-if ( function_exists( 'tara_social_box' ) ) { tara_social_box( get_the_ID() ); }
-if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID(), 'before_player' ); }
-?>
-
 <?php
 /* v3.7.3 — پلیر ویدیوی تازه (inc/tara-ui.php → tara_video): کاور، دکمهٔ بزرگ،
    نوار زمان، سرعت پخش، انتخاب کیفیت، Picture-in-Picture و تمام‌صفحه.
@@ -353,75 +439,6 @@ if ( function_exists( 'tara_video' ) ) {
 <?php if((ot_get_option('ads_sg') !="") || (ot_get_option('adsjs_sg') !="")){ ?>
 <div id="ads_top_dl"><?php echo ot_get_option('ads_sg'); ?><?php echo ot_get_option('adsjs_sg'); ?><div class="clear"></div></div>
 <?php } ?>
-
-
-<?php
-/* ==================================================================================
-   پلیر «رادیو» — نسخهٔ ۳.۷.۰
-   ----------------------------------------------------------------------------------
-   جای دو بلوک قدیمی (پلیر تک‌آهنگ و پلیر آلبوم) یک کارت واحد نشسته است:
-     • آلبوم: هر قطعهٔ تکرارشونده یک ردیف در فهرست پخش می‌شود.
-     • تک‌آهنگ: همان یک قطعه با کاور بزرگ.
-   مارکاپ و کنترل‌ها در inc/tara-ui.php ساخته می‌شوند و js/tara-player.js آن را
-   می‌گرداند؛ هیچ وابستگی به jQuery ندارد. اگر تابع در دسترس نبود (مثلاً فایل
-   حذف شده باشد) هیچ خروجی و هیچ خطایی نداریم.
-   ================================================================================== */
-$tara_tracks     = array();
-$tara_cover_big  = has_post_thumbnail() ? get_the_post_thumbnail_url( get_the_ID(), 'thumb2x' ) : '';
-$tara_artist_big = $taranehyar_artist;
-$tara_song_big   = $taranehyar_song;
-$tara_link_big   = get_permalink();
-
-if ( function_exists( 'have_rows' ) && have_rows( 'album' ) ) {
-	$tara_album_index = 0;
-	while ( have_rows( 'album' ) ) {
-		the_row();
-		$tara_album_index++;
-		$tara_album_src = get_sub_field( 'albumlink320' );
-		if ( ! $tara_album_src ) {
-			$tara_album_src = get_sub_field( 'albumlink128' );
-		}
-		$tara_album_name = get_sub_field( 'song_names' );
-		if ( ! $tara_album_src ) {
-			continue;
-		}
-		$tara_tracks[] = array(
-			'id'     => get_the_ID() . '-' . $tara_album_index,
-			'title'  => $tara_album_name ? $tara_album_name : ( $tara_song_big . ' — قطعهٔ ' . $tara_album_index ),
-			'artist' => $tara_artist_big,
-			'src'    => $tara_album_src,
-			'cover'  => $tara_cover_big ? $tara_cover_big : tara_track_cover( get_the_ID(), 'thumb2' ),
-			'link'   => $tara_link_big,
-		);
-	}
-}
-
-if ( empty( $tara_tracks ) && function_exists( 'tara_track_src' ) ) {
-	$tara_single_src = tara_track_src( get_the_ID() );
-	if ( '' !== $tara_single_src ) {
-		$tara_tracks[] = array(
-			'id'     => get_the_ID(),
-			'title'  => $tara_song_big,
-			'artist' => $tara_artist_big,
-			'src'    => $tara_single_src,
-			'cover'  => $tara_cover_big ? $tara_cover_big : tara_track_cover( get_the_ID(), 'thumb2' ),
-			'link'   => $tara_link_big,
-		);
-	}
-}
-
-if ( ! empty( $tara_tracks ) && function_exists( 'tara_player' ) ) {
-	echo tara_player( // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین قالب
-		array(
-			'tracks'  => $tara_tracks,
-			'title'   => ( count( $tara_tracks ) > 1 ) ? 'آلبوم · ' . $tara_song_big : $taranehyar_type,
-			'cover'   => $tara_cover_big,
-			'context' => 'single',
-		)
-	);
-}
-?>
-
 
 
 <?php
@@ -459,10 +476,7 @@ if ( $taranehyar_download_title && (
 </div>
 <?php } ?>
 <?php if ( '' !== $taranehyar_lyrics_box && 'end' === $taranehyar_lyrics_position ) { echo $taranehyar_lyrics_box; } ?>
-<?php /* v3.2.1 — «شناسنامۀ آهنگ» (هنرمند · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید).
-   جایگاه از تنظیمات قالب → «صفحه دانلود آهنگ» → «شناسنامه بالای پلیر» عوض می‌شود؛ اگر فایل
-   inc/ab-credits.php نصب نباشد، این دو خط هیچ خروجی و هیچ خطایی ندارند. */
-if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID(), 'after_download' ); } ?>
+<?php /* v3.7.8 — «مشخصات اثر» بالاتر و بعد از توضیحات چاپ می‌شود، نه این‌جا. */ ?>
 <div class="clear"></div>
 </div>
 

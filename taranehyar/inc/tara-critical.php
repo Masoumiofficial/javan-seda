@@ -171,11 +171,16 @@ if ( ! function_exists( 'tara_assets_guard_css' ) ) {
 			return;
 		}
 
-		$css = array(
-			'taranehyar-ui'     => '/css/tara-ui.css',
-			'taranehyar-home'   => '/css/tara-home.css',
-			'taranehyar-artist' => '/css/tara-artist.css',
-		);
+		/* v3.7.8 — همان فهرستِ وابسته‌به‌صفحهٔ `tara_asset_styles()` تا نگهبان با
+		   enqueue هم‌گام بماند؛ وگرنه CSSهایی که عمداً بار نمی‌شوند، همین‌جا
+		   دوباره چاپ می‌شدند و بهینه‌سازی بی‌اثر می‌ماند. */
+		$css = function_exists( 'tara_asset_styles' )
+			? tara_asset_styles()
+			: array(
+				'taranehyar-ui'     => '/css/tara-ui.css',
+				'taranehyar-home'   => '/css/tara-home.css',
+				'taranehyar-artist' => '/css/tara-artist.css',
+			);
 
 		foreach ( $css as $handle => $rel ) {
 			if ( wp_style_is( $handle, 'done' ) ) {

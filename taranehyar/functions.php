@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.7' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.8' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -137,6 +137,61 @@ if ( ! function_exists( 'taranehyar_asset_ver' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_page_is_home' ) ) {
+	/** آیا این صفحه، صفحهٔ اصلی است؟ (یک‌جا، برای enqueue و نگهبان دارایی‌ها) */
+	function tara_page_is_home() {
+		/* home.php هم برای «صفحهٔ اصلی» و هم برای «صفحهٔ نوشته‌ها» رندر می‌شود؛
+		   پس هر دو حالت باید همین CSS/JS را بگیرند. */
+		return ( function_exists( 'is_front_page' ) && is_front_page() )
+			|| ( function_exists( 'is_home' ) && is_home() );
+	}
+}
+
+if ( ! function_exists( 'tara_page_is_artist' ) ) {
+	/** آرشیو هنرمند/خواننده؟ (کلاس‌های `.ty-artist__*` فقط این‌جا لازم‌اند) */
+	function tara_page_is_artist() {
+		if ( ! function_exists( 'is_tax' ) ) {
+			return false;
+		}
+		$taxes = array( 'artist', 'singer' );
+		if ( function_exists( 'tara_artist_tax' ) ) {
+			$taxes[] = tara_artist_tax();
+		}
+		foreach ( array_unique( array_filter( $taxes ) ) as $tax ) {
+			if ( is_tax( $tax ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
+if ( ! function_exists( 'tara_asset_styles' ) ) {
+	/**
+	 * فهرست «چه CSS‌ای در این صفحه لازم است».
+	 *
+	 * v3.7.8 — سبک‌بارسازی: `tara-home.css` فقط صفحهٔ اصلی و `tara-artist.css`
+	 * فقط آرشیو هنرمند بار می‌شود. پیش از این هر سه فایل (حدود ۱۵۰KB) در همهٔ
+	 * صفحه‌ها دانلود می‌شد. `tara-ui.css` چون پلیر/کارت‌ها همه‌جا هستند سراسری
+	 * می‌ماند. همین فهرست، هم در enqueue و هم در «نگهبان دارایی‌ها» استفاده
+	 * می‌شود تا این دو هرگز از هم جدا نشوند.
+	 *
+	 * @return array<string,string> handle => مسیر نسبی
+	 */
+	function tara_asset_styles() {
+		$styles = array( 'taranehyar-ui' => '/css/tara-ui.css' );
+
+		if ( tara_page_is_home() ) {
+			$styles['taranehyar-home'] = '/css/tara-home.css';
+		}
+		if ( tara_page_is_artist() ) {
+			$styles['taranehyar-artist'] = '/css/tara-artist.css';
+		}
+
+		return apply_filters( 'tara_asset_styles', $styles );
+	}
+}
+
 if ( ! function_exists( 'taranehyar_assets' ) ) {
 	function taranehyar_assets() {
 		if ( ! function_exists( 'wp_enqueue_style' ) ) {
@@ -150,29 +205,34 @@ if ( ! function_exists( 'taranehyar_assets' ) ) {
 			wp_enqueue_style( 'icofont', TARANEHYAR_URI . '/css/icofont.min.css', array(), '1.0.1' );
 		}
 
-		/* اسکریپت‌ها در پانوشت؛ jquery را خودِ هسته می‌دهد */
-		if ( file_exists( TARANEHYAR_DIR . '/js/owl.carousel.js' ) ) {
+		/* اسکریپت‌ها در پانوشت؛ jquery را خودِ هسته می‌دهد.
+		   v3.7.8 — owl.carousel (۹۰KB) فقط برای ریل هنرمندانِ صفحهٔ اصلی لازم است؛
+		   پیش از این در همهٔ صفحه‌ها دانلود می‌شد. `scripts.js` هم دیگر به آن
+		   وابسته نیست و خودش وجودش را بررسی می‌کند. */
+		if ( tara_page_is_home() && file_exists( TARANEHYAR_DIR . '/js/owl.carousel.js' ) ) {
 			wp_enqueue_script( 'owl-carousel', TARANEHYAR_URI . '/js/owl.carousel.js', array( 'jquery' ), '2.3.4', true );
 		}
 		if ( file_exists( TARANEHYAR_DIR . '/js/scripts.js' ) ) {
-			$deps = array( 'jquery' );
-			if ( wp_script_is( 'owl-carousel', 'registered' ) ) {
-				$deps[] = 'owl-carousel';
-			}
-			wp_enqueue_script( 'taranehyar-scripts', TARANEHYAR_URI . '/js/scripts.js', $deps, TARANEHYAR_VERSION, true );
+			wp_enqueue_script( 'taranehyar-scripts', TARANEHYAR_URI . '/js/scripts.js', array( 'jquery' ), taranehyar_asset_ver( '/js/scripts.js' ), true );
 		}
 
 		/* لایهٔ تازهٔ ۳.۷.۰ — پلیر «رادیو»، ردیف آهنگ‌ها و چیپ‌ها.
 		   بدون jQuery و بدون وابستگی؛ اگر فایل نبود، هیچ‌چیز نمی‌شکند. */
-		if ( file_exists( TARANEHYAR_DIR . '/css/tara-ui.css' ) ) {
-			wp_enqueue_style( 'taranehyar-ui', TARANEHYAR_URI . '/css/tara-ui.css', array( 'taranehyar-style' ), taranehyar_asset_ver( '/css/tara-ui.css' ) );
+		/* v3.7.8 — فقط CSS لازمِ همین صفحه (فهرست در tara_asset_styles). */
+		foreach ( tara_asset_styles() as $tara_handle => $tara_rel ) {
+			if ( ! file_exists( TARANEHYAR_DIR . $tara_rel ) ) {
+				continue;
+			}
+			$tara_deps = ( 'taranehyar-ui' === $tara_handle ) ? array( 'taranehyar-style' ) : array( 'taranehyar-ui' );
+			wp_enqueue_style( $tara_handle, TARANEHYAR_URI . $tara_rel, $tara_deps, taranehyar_asset_ver( $tara_rel ) );
 		}
-		if ( file_exists( TARANEHYAR_DIR . '/css/tara-artist.css' ) ) {
-			wp_enqueue_style( 'taranehyar-artist', TARANEHYAR_URI . '/css/tara-artist.css', array( 'taranehyar-ui' ), taranehyar_asset_ver( '/css/tara-artist.css' ) );
+		unset( $tara_handle, $tara_rel, $tara_deps );
+
+		/* v3.7.8 — اسلایدر تازهٔ خانه فقط همان‌جا بار می‌شود (بدون jQuery). */
+		if ( tara_page_is_home() && file_exists( TARANEHYAR_DIR . '/js/hero-slider.js' ) ) {
+			wp_enqueue_script( 'taranehyar-hero', TARANEHYAR_URI . '/js/hero-slider.js', array(), taranehyar_asset_ver( '/js/hero-slider.js' ), true );
 		}
-		if ( file_exists( TARANEHYAR_DIR . '/css/tara-home.css' ) ) {
-			wp_enqueue_style( 'taranehyar-home', TARANEHYAR_URI . '/css/tara-home.css', array( 'taranehyar-ui' ), taranehyar_asset_ver( '/css/tara-home.css' ) );
-		}
+
 		if ( file_exists( TARANEHYAR_DIR . '/js/tara-player.js' ) ) {
 			wp_enqueue_script( 'taranehyar-player', TARANEHYAR_URI . '/js/tara-player.js', array(), taranehyar_asset_ver( '/js/tara-player.js' ), true );
 		}

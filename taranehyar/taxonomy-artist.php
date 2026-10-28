@@ -602,6 +602,8 @@ $taranehyar_cover = '' !== $taranehyar_image_url
 	: ( function_exists( 'tara_artist_default_image' ) ? tara_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp' );
 
 $taranehyar_bio_short = function_exists( 'tara_artist_bio_short' ) ? tara_artist_bio_short( $taranehyar_term, false ) : '';
+/* v3.7.8 — بنر اختیاری سربرگ (ستون سوم). خالی ⇒ همان تصویر پروفایل. */
+$taranehyar_banner = function_exists( 'tara_artist_banner_url' ) ? tara_artist_banner_url( $taranehyar_term, 'full' ) : '';
 $taranehyar_bio_link  = function_exists( 'tara_artist_bio_link' ) ? tara_artist_bio_link( $taranehyar_term ) : '';
 $taranehyar_about      = function_exists( 'ot_get_option' ) ? trim( (string) ot_get_option( 'about_site_text' ) ) : '';
 $taranehyar_about_ttl  = function_exists( 'ot_get_option' ) ? trim( (string) ot_get_option( 'about_site_title' ) ) : '';
@@ -623,7 +625,7 @@ $taranehyar_social_icons = array(
 <div class="ty-artist tarlanweb_center" dir="rtl">
 
 	<!-- ۱) سربرگ ------------------------------------------------------- -->
-	<header class="ty-artist__hero">
+	<header class="ty-artist__hero<?php echo ( '' !== $taranehyar_banner ) ? ' has-banner' : ''; ?>">
 		<div class="ty-artist__bg" aria-hidden="true">
 			<img src="<?php echo esc_url( $taranehyar_cover ); ?>" alt="" loading="eager" fetchpriority="high">
 		</div>
@@ -672,9 +674,9 @@ $taranehyar_social_icons = array(
 				</div>
 			<?php endif; ?>
 
-			<?php if ( '' !== $taranehyar_bio_short ) : ?>
-				<p class="ty-artist__bio"><?php echo esc_html( $taranehyar_bio_short ); ?></p>
-			<?php endif; ?>
+			<?php /* v3.7.8 — بیوگرافی و دکمهٔ «بیوگرافی کامل» به ستون دوم منتقل شدند
+			   (`.ty-artist__about` پایین‌تر)، تا ستون اطلاعات فقط نام/آمار/ژانر/شبکه‌ها
+			   باشد و سربرگ سه‌ستونهٔ درخواستی شکل بگیرد. */ ?>
 
 			<div class="ty-artist__actions">
 				<?php if ( ! empty( $taranehyar_radio_tracks ) ) : ?>
@@ -682,10 +684,6 @@ $taranehyar_social_icons = array(
 						<span class="ty-icon-play" aria-hidden="true"></span>
 						پخش همه (رادیو)
 					</button>
-				<?php endif; ?>
-
-				<?php if ( '' !== $taranehyar_bio_link ) : ?>
-					<a class="ty-artist__ghost" href="<?php echo esc_url( $taranehyar_bio_link ); ?>">بیوگرافی کامل</a>
 				<?php endif; ?>
 
 				<?php if ( '' !== $taranehyar_directory_url ) : ?>
@@ -703,8 +701,34 @@ $taranehyar_social_icons = array(
 			</div>
 		</div>
 
-		<figure class="ty-artist__portrait">
-			<img src="<?php echo esc_url( $taranehyar_cover ); ?>" width="240" height="240" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" loading="eager" fetchpriority="high">
+			<?php /* ستون دوم: بیوگرافی کوتاه + دکمهٔ «بیوگرافی کامل» زیر آن */ ?>
+		<div class="ty-artist__about">
+			<?php if ( '' !== $taranehyar_bio_short ) : ?>
+				<p class="ty-artist__bio"><?php echo esc_html( $taranehyar_bio_short ); ?></p>
+			<?php endif; ?>
+
+			<?php if ( '' !== $taranehyar_bio_link ) : ?>
+				<a class="ty-artist__ghost ty-artist__bio-btn" href="<?php echo esc_url( $taranehyar_bio_link ); ?>">
+					<i class="icofont-book-alt" aria-hidden="true"></i>
+					بیوگرافی کامل
+				</a>
+			<?php endif; ?>
+
+			<?php if ( '' === $taranehyar_bio_short && '' === $taranehyar_bio_link ) : ?>
+				<p class="ty-artist__bio ty-artist__bio--empty">بیوگرافی این هنرمند هنوز ثبت نشده است.</p>
+			<?php endif; ?>
+		</div>
+
+		<?php
+		/* ستون سوم: بنر هنرمند اگر ثبت شده باشد؛ وگرنه همان تصویر پروفایل
+		   (حالت پیش‌فرض و سازگار با نسخهٔ قبل). */
+		?>
+		<figure class="ty-artist__portrait<?php echo ( '' !== $taranehyar_banner ) ? ' ty-artist__portrait--banner' : ''; ?>">
+			<?php if ( '' !== $taranehyar_banner ) : ?>
+				<img src="<?php echo esc_url( $taranehyar_banner ); ?>" width="1200" height="400" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" loading="eager" fetchpriority="high">
+			<?php else : ?>
+				<img src="<?php echo esc_url( $taranehyar_cover ); ?>" width="240" height="240" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" loading="eager" fetchpriority="high">
+			<?php endif; ?>
 			<?php if ( $taranehyar_found > 0 ) : ?>
 				<figcaption><?php echo esc_html( sprintf( '%s اثر در سایت', tara_number_fa( $taranehyar_found ) ) ); ?></figcaption>
 			<?php endif; ?>
@@ -738,9 +762,24 @@ $taranehyar_social_icons = array(
 				}
 				?>
 			</header>
-			<ul class="ty-tracklist">
+			<?php
+			/* v3.7.8 — رفع باگ «دکمهٔ پخش فهرست آهنگ‌ها کار نمی‌کند»:
+			   ردیف‌ها ایندکس عددی نداشتند و صفی هم روی <ul> نبود، پس JS نمی‌دانست
+			   کدام قطعه را پخش کند. حالا صف همین بخش ساخته می‌شود و هر ردیف
+			   ایندکس واقعیِ خودش را در همان صف می‌گیرد (شناسه‌محور، پس اگر قطعه‌ای
+			   فایل صوتی نداشته باشد بقیه جابه‌جا نمی‌شوند). */
+			$taranehyar_audio_tracks = function_exists( 'tara_track_playlist' )
+				? tara_track_playlist( $taranehyar_buckets['audio'] )
+				: array();
+			$taranehyar_audio_index  = array();
+			foreach ( $taranehyar_audio_tracks as $taranehyar_ti => $taranehyar_tr ) {
+				$taranehyar_audio_index[ (string) $taranehyar_tr['id'] ] = $taranehyar_ti;
+			}
+			?>
+			<ul class="ty-tracklist"<?php echo function_exists( 'tara_queue_attrs' ) ? tara_queue_attrs( $taranehyar_audio_tracks, $taranehyar_labels['audio'] ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 				<?php foreach ( $taranehyar_buckets['audio'] as $taranehyar_post ) : ?>
-					<li><?php echo tara_track_row( $taranehyar_post->ID, array( 'badge' => isset( $taranehyar_resume_labels['audio'] ) ? $taranehyar_resume_labels['audio'] : '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></li>
+					<?php $taranehyar_row_i = isset( $taranehyar_audio_index[ (string) $taranehyar_post->ID ] ) ? $taranehyar_audio_index[ (string) $taranehyar_post->ID ] : -1; ?>
+					<li><?php echo tara_track_row( $taranehyar_post->ID, array( 'index' => $taranehyar_row_i, 'badge' => isset( $taranehyar_resume_labels['audio'] ) ? $taranehyar_resume_labels['audio'] : '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></li>
 				<?php endforeach; ?>
 			</ul>
 		</section>

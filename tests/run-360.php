@@ -102,8 +102,22 @@ reset_state();
 taranehyar_assets();
 t( 'دارایی: style.css با نسخهٔ ۳.۶.۰', isset( $GLOBALS['__styles']['taranehyar-style'] ) && '3.6.0' === $GLOBALS['__styles']['taranehyar-style'][2], json_encode( array_keys( $GLOBALS['__styles'] ) ) );
 t( 'دارایی: icofont لود می‌شود', isset( $GLOBALS['__styles']['icofont'] ) );
-t( 'دارایی: owl-carousel در پانوشت', isset( $GLOBALS['__scripts']['owl-carousel'] ) && true === $GLOBALS['__scripts']['owl-carousel'][3] );
-t( 'دارایی: scripts.js وابسته به owl', isset( $GLOBALS['__scripts']['taranehyar-scripts'] ) && in_array( 'owl-carousel', $GLOBALS['__scripts']['taranehyar-scripts'][1], true ) );
+/* v3.7.8 — سبک‌بارسازی: owl (۹۰KB) فقط در صفحهٔ اصلی، و scripts.js دیگر
+   وابستهٔ آن نیست؛ CSS خانه/هنرمند هم فقط در صفحهٔ خودش. */
+t( 'دارایی: CSS رابط در همهٔ صفحه‌ها', isset( $GLOBALS['__styles']['taranehyar-ui'] ) );
+t( 'دارایی: CSS خانه در صفحهٔ غیرِاصلی بار نمی‌شود', ! isset( $GLOBALS['__styles']['taranehyar-home'] ) );
+t( 'دارایی: CSS هنرمند در صفحهٔ غیرِاصلی بار نمی‌شود', ! isset( $GLOBALS['__styles']['taranehyar-artist'] ) );
+t( 'دارایی: در صفحهٔ غیرِاصلی owl بار نمی‌شود', ! isset( $GLOBALS['__scripts']['owl-carousel'] ) );
+t( 'دارایی: scripts.js فقط به jquery وابسته است', isset( $GLOBALS['__scripts']['taranehyar-scripts'] ) && array( 'jquery' ) === $GLOBALS['__scripts']['taranehyar-scripts'][1], json_encode( isset( $GLOBALS['__scripts']['taranehyar-scripts'] ) ? $GLOBALS['__scripts']['taranehyar-scripts'][1] : null ) );
+
+$GLOBALS['__styles']  = array();
+$GLOBALS['__scripts'] = array();
+$GLOBALS['__is_front'] = true;
+taranehyar_assets();
+t( 'دارایی: owl-carousel در صفحهٔ اصلی و در پانوشت', isset( $GLOBALS['__scripts']['owl-carousel'] ) && true === $GLOBALS['__scripts']['owl-carousel'][3] );
+t( 'دارایی: CSS خانه در صفحهٔ اصلی بار می‌شود', isset( $GLOBALS['__styles']['taranehyar-home'] ) );
+t( 'دارایی: اسلایدر تازهٔ خانه بدون jQuery', isset( $GLOBALS['__scripts']['taranehyar-hero'] ) && ! in_array( 'jquery', $GLOBALS['__scripts']['taranehyar-hero'][1], true ) );
+$GLOBALS['__is_front'] = false;
 
 /* ======================================================================
    ۵) the_views

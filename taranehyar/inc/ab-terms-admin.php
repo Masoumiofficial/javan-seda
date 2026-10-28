@@ -143,7 +143,7 @@ if ( ! function_exists( 'tara_register_term_meta' ) ) {
 
 if ( ! function_exists( 'tara_field_image_control' ) ) {
 	/** کنترل تصویر با پیش‌نمایش + کتابخانهٔ رسانه (بدون ساخت سیستم آپلود موازی). */
-	function tara_field_image_control( $url, $id, $name_url, $name_id, $label = 'تصویر پروفایل' ) {
+	function tara_field_image_control( $url, $id, $name_url, $name_id, $label = 'تصویر پروفایل', $description = '' ) {
 		$has = ( '' !== $url );
 		?>
 		<div class="ab-imgfield" data-ab-image>
@@ -160,9 +160,15 @@ if ( ! function_exists( 'tara_field_image_control' ) ) {
 				<button type="button" class="button-link ab-imgfield__clear" data-ab-media-clear<?php echo $has ? '' : ' hidden'; ?>>حذف تصویر</button>
 			</span>
 			<p class="description">
+				<?php
+				if ( '' !== $description ) {
+					echo wp_kses_post( $description );
+				} else {
+					?>
 				همان تصویری که در صفحهٔ اصلی، آرشیو هنرمندان و صفحهٔ هنرمند دیده می‌شود.
 				اگر برای همین هنرمند قبلاً تصویر ثبت شده باشد، همین‌جا نمایش داده می‌شود و
 				نیازی به بارگذاری دوباره نیست.
+				<?php } ?>
 			</p>
 		</div>
 		<?php
@@ -219,6 +225,39 @@ if ( ! function_exists( 'tara_field_post_picker' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_artist_banner_group' ) ) {
+	/**
+	 * گروه فیلد «بنر سربرگ» — v3.7.8
+	 * ------------------------------------------------------------------
+	 * جدا شده تا حتی وقتی ACF فیلدهای هنرمند را مدیریت می‌کند (و فرمِ ما
+	 * پنهان است) هم مدیر بتواند بنر را از همین صفحهٔ ترم ثبت کند.
+	 * سایز استاندارد ۱۲۰۰×۴۰۰ (۱۶:۵) و سقف ۳۰۰KB همین‌جا نوشته شده است.
+	 */
+	function tara_artist_banner_group( $term = null ) {
+		?>
+		<div class="ab-termgroup">
+			<h3 class="ab-termgroup__title">بنر سربرگ صفحهٔ هنرمند <span class="ab-termgroup__badge">اختیاری</span></h3>
+			<?php
+			$banner_url = ( $term && function_exists( 'tara_artist_banner_url' ) ) ? tara_artist_banner_url( $term, 'full' ) : '';
+			$banner_id  = $term ? absint( tara_artist_field( $term, 'ab_artist_banner_id' ) ) : 0;
+			tara_field_image_control(
+				$banner_url,
+				$banner_id,
+				'ab_artist_banner',
+				'ab_artist_banner_id',
+				'بنر صفحهٔ هنرمند',
+				'<strong>سایز استاندارد: ۱۲۰۰×۴۰۰ پیکسل (نسبت ۱۶:۵)، حداکثر ۳۰۰ کیلوبایت</strong> — فرمت JPG یا WebP.'
+				. ' این تصویر در «ستون سوم» سربرگ صفحهٔ هنرمند نمایش داده می‌شود و کل عرض همان ستون را می‌پوشاند؛'
+				. ' نام خواننده و متن روی آن نگذارید (قالب خودش نام را می‌نویسد).'
+				. ' اگر خالی بماند، همان تصویر پروفایل (مربعی) مثل قبل نشان داده می‌شود — یعنی صفحه خراب نمی‌شود.'
+			);
+			?>
+		</div>
+
+		<?php
+	}
+}
+
 if ( ! function_exists( 'tara_artist_form_body' ) ) {
 	/** بدنهٔ مشترکِ فرم هنرمند (در «افزودن» و «ویرایش» عیناً یکی است). */
 	function tara_artist_form_body( $term = null ) {
@@ -240,6 +279,8 @@ if ( ! function_exists( 'tara_artist_form_body' ) ) {
 				<span class="description">مثل <code>Mohsen Yeganeh</code> — در سرتیتر صفحهٔ هنرمند استفاده می‌شود.</span>
 			</p>
 		</div>
+
+		<?php tara_artist_banner_group( $term ); ?>
 
 		<div class="ab-termgroup">
 			<h3 class="ab-termgroup__title">شبکه‌های اجتماعی</h3>
@@ -274,6 +315,14 @@ if ( ! function_exists( 'tara_artist_form_body' ) ) {
 if ( ! function_exists( 'tara_artist_add_fields' ) ) {
 	function tara_artist_add_fields( $taxonomy ) {
 		if ( tara_acf_manages_fields( $taxonomy ) ) {
+			/* v3.7.8 — فرمِ کامل پنهان است، ولی بنر باید از همین‌جا قابل ثبت باشد. */
+			?>
+			<div class="form-field ab-termform">
+				<?php wp_nonce_field( 'tara_save_term', 'tara_term_nonce' ); ?>
+				<input type="hidden" name="tara_artist_form" value="1">
+				<?php tara_artist_banner_group( null ); ?>
+			</div>
+			<?php
 			return;
 		}
 		?>
@@ -287,6 +336,16 @@ if ( ! function_exists( 'tara_artist_add_fields' ) ) {
 if ( ! function_exists( 'tara_artist_edit_fields' ) ) {
 	function tara_artist_edit_fields( $term, $taxonomy ) {
 		if ( tara_acf_manages_fields( $taxonomy ) ) {
+			?>
+			<tr class="form-field ab-termform">
+				<th scope="row"><label>بنر صفحهٔ هنرمند</label></th>
+				<td>
+					<?php wp_nonce_field( 'tara_save_term', 'tara_term_nonce' ); ?>
+					<input type="hidden" name="tara_artist_form" value="1">
+					<?php tara_artist_banner_group( $term ); ?>
+				</td>
+			</tr>
+			<?php
 			return;
 		}
 		?>

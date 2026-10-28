@@ -200,9 +200,11 @@
 /* .music_box_player عمداً از این گروه بیرون رفت (v3.4.0): کارتِ پلیر فقط یک جا تعریف
    می‌شود (بلوک ۳۳ style.css). قبلاً #index_music_player و .music_box_player هر دو جعبه
    داشتند ⇒ «پلیر داخل یک باکس دیگر». */
+/* v3.7.8 — `.ab-credits` از این گروه بیرون رفت: «مشخصات اثر» کارتِ مستقل
+   خودش را دارد (css/tara-ui.css بخش ۱۲) و پس‌زمینهٔ آبیِ این لایه، طرحِ تازه
+   را می‌پوشاند. */
 .dl_linksv_box,
 .single_content_box .ab-social-box,
-.single_content_box .ab-credits,
 .download_box:has(a){
 	border: 1px solid var(--ab-glass-border);
 	border-radius: var(--ab-radius-l, 20px);
@@ -211,7 +213,6 @@
 }
 /* .download_box عمداً با :has(a) است: در ردیف‌های آلبوم (single.php:419) ممکن است هیچ
    لینکی ست نشده باشد؛ آن‌جا همان div خالی یک «کادر سفیدِ بی‌دلیل» می‌ساخت. */
-.single_content_box .ab-credits{background: var(--ab-blue-soft)}
 .single_featured_image{
 	border-radius: var(--ab-radius-l, 20px);
 	box-shadow: var(--ab-depth-2);

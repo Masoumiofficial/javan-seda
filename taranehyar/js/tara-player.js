@@ -347,9 +347,20 @@
 			error: root.querySelector('[data-tara-error]')
 		};
 
+		/* v3.7.8 — رنگ کاور روی پلیر */
+		watchCoverTint(root, refs.art);
+
 		var isOwner = function () {
 			return Engine.state().owner === root;
 		};
+
+		/* v3.7.8 — «کاور/لینک آهنگ دیگر روی کارت»:
+		   پیش از این اگر قطعهٔ تازه کاور نداشت، srcِ قبلی روی <img> می‌ماند و
+		   تصویر آهنگ پیشین نمایش داده می‌شد. حالا کاورِ اصلی همین کارت
+		   نگه داشته می‌شود و در نبود کاور، همان بازگردانده می‌شود؛ لینک هم
+		   همیشه از قطعهٔ جاری گرفته می‌شود. جست‌وجو هم فقط داخل خودِ کارت
+		   انجام می‌شود تا کارت‌های دیگر دست‌نخورده بمانند. */
+		var baseCover = refs.art ? (refs.art.getAttribute('src') || '') : '';
 
 		function paintTrack(item) {
 			if (!item) {
@@ -361,8 +372,12 @@
 			if (refs.artist) {
 				refs.artist.textContent = item.artist || '';
 			}
-			if (refs.art && item.cover) {
-				refs.art.setAttribute('src', item.cover);
+			if (refs.art) {
+				var cover = item.cover || baseCover;
+				if (cover) {
+					refs.art.setAttribute('src', cover);
+					tintFromCover(root, refs.art);
+				}
 			}
 			var links = root.querySelectorAll('[data-tara-title-link]');
 			for (var i = 0; i < links.length; i++) {
@@ -392,6 +407,7 @@
 			}
 
 			if (type === 'load') {
+				root.__taraIndex = typeof data.index === 'number' ? data.index : 0;
 				paintTrack(data.track);
 				if (refs.count) {
 					var total = (Engine.state().queue || []).length;
@@ -425,6 +441,9 @@
 
 			if (type === 'volume') {
 				root.classList.toggle('is-muted', !!data.muted);
+				if (refs.mute) {
+					refs.mute.setAttribute('aria-pressed', data.muted ? 'true' : 'false');
+				}
 				if (refs.volume) {
 					refs.volume.value = String(data.muted ? 0 : data.volume);
 				}
@@ -451,17 +470,21 @@
 
 			event.preventDefault();
 
+			/* v3.7.8 — از همان قطعه‌ای ادامه بده که روی کارت دیده می‌شود،
+			   نه از قطعهٔ اول صف (باگ «کاور آهنگ دیگری بالا می‌آمد»). */
+			var at = typeof root.__taraIndex === 'number' ? root.__taraIndex : 0;
+
 			if (button.hasAttribute('data-tara-toggle')) {
 				if (isOwner() && Engine.state().track) {
 					Engine.toggle();
 				} else {
-					Engine.load(root.__taraTracks || tracks, 0, root, true);
+					Engine.load(root.__taraTracks || tracks, at, root, true);
 				}
 				return;
 			}
 
 			if (!isOwner()) {
-				Engine.load(root.__taraTracks || tracks, 0, root, false);
+				Engine.load(root.__taraTracks || tracks, at, root, false);
 			}
 
 			if (button.hasAttribute('data-tara-prev')) {
@@ -911,6 +934,144 @@
 	})();
 
 	/* ==================================================================
+	 * ۴.۴) رنگِ کاور ⇒ گرادیانتِ سبکِ پلیر (v3.7.8)
+	 * ------------------------------------------------------------------
+	 * رنگ غالبِ تصویر با یک کنواسِ ۲۴×۲۴ خوانده می‌شود (میانگینِ پیکسل‌های
+	 * رنگی، با حذف سفید/سیاه/خاکستری) و به‌صورت دو لایهٔ شفاف روی پس‌زمینهٔ
+	 * کارت می‌نشیند: لایهٔ اول پررنگ‌تر گوشهٔ بالا، لایهٔ دوم محو گوشهٔ پایین.
+	 * هیچ درخواست اضافه‌ای نیست (همان تصویر کاور). اگر مرورگر اجازهٔ خواندن
+	 * پیکسل نداد (تصویر از دامنهٔ دیگر)، بی‌صدا رد می‌شود و طرح پیش‌فرض
+	 * می‌ماند. شدت‌ها کم‌اند تا متن همیشه خوانا بماند.
+	 * ================================================================== */
+	function tintFromCover(root, img) {
+		if (!root || !img || !img.naturalWidth) {
+			return;
+		}
+		try {
+			var size = 24;
+			var canvas = document.createElement('canvas');
+			canvas.width = size;
+			canvas.height = size;
+			var ctx = canvas.getContext && canvas.getContext('2d');
+			if (!ctx) {
+				return;
+			}
+			ctx.drawImage(img, 0, 0, size, size);
+			var data = ctx.getImageData(0, 0, size, size).data;
+			var r = 0, g = 0, b = 0, n = 0;
+			for (var i = 0; i < data.length; i += 4) {
+				var pr = data[i], pg = data[i + 1], pb = data[i + 2], pa = data[i + 3];
+				if (pa < 200) { continue; }
+				var max = Math.max(pr, pg, pb);
+				var min = Math.min(pr, pg, pb);
+				var sat = max === 0 ? 0 : (max - min) / max;
+				var lum = (pr * 0.299 + pg * 0.587 + pb * 0.114) / 255;
+				if (sat < 0.18 || lum > 0.94 || lum < 0.06) { continue; }
+				r += pr; g += pg; b += pb; n++;
+			}
+			if (!n) {
+				return;
+			}
+			r = Math.round(r / n);
+			g = Math.round(g / n);
+			b = Math.round(b / n);
+			root.style.setProperty('--ty-cover-1', 'rgba(' + r + ',' + g + ',' + b + ',0.16)');
+			root.style.setProperty('--ty-cover-2', 'rgba(' + r + ',' + g + ',' + b + ',0.07)');
+			root.classList.add('has-cover-tint');
+		} catch (e) {
+			/* تصویر cross-origin یا کنواس غیرفعال ⇒ همان طرح پیش‌فرض */
+		}
+	}
+
+	function watchCoverTint(root, img) {
+		if (!root || !img) {
+			return;
+		}
+		if (img.complete && img.naturalWidth) {
+			tintFromCover(root, img);
+			return;
+		}
+		img.addEventListener('load', function () { tintFromCover(root, img); });
+	}
+
+	/* ==================================================================
+	 * ۴.۵) پاپ‌آپ تصویر کاور (v3.7.8)
+	 * ------------------------------------------------------------------
+	 * هر عنصری با `data-tara-zoom` (امروز: دکمهٔ دوربین روی پلیر) نسخهٔ
+	 * اصلی تصویر را در یک لایهٔ ساده نشان می‌دهد. هیچ کتابخانه‌ای اضافه
+	 * نمی‌شود؛ تصویر تازه فقط هنگام باز شدن بار می‌گیرد (lazy).
+	 * ================================================================== */
+	var lbNode = null;
+	var lbFocus = null;
+
+	function lbKey(event) {
+		if (event.key === 'Escape' || event.keyCode === 27) {
+			event.stopPropagation();
+			closeLightbox();
+		}
+	}
+
+	function closeLightbox() {
+		if (!lbNode) {
+			return;
+		}
+		document.body.classList.remove('tara-lb-open');
+		document.removeEventListener('keydown', lbKey, true);
+		if (lbNode.parentNode) {
+			lbNode.parentNode.removeChild(lbNode);
+		}
+		lbNode = null;
+		if (lbFocus && typeof lbFocus.focus === 'function') {
+			lbFocus.focus();
+		}
+	}
+
+	function openLightbox(src) {
+		if (!src) {
+			return;
+		}
+		closeLightbox();
+		lbFocus = document.activeElement;
+
+		var box = document.createElement('div');
+		box.className = 'ty-lightbox';
+		box.setAttribute('role', 'dialog');
+		box.setAttribute('aria-modal', 'true');
+		box.setAttribute('aria-label', 'تصویر کاور');
+		box.innerHTML = '<button type="button" class="ty-lightbox__close" aria-label="بستن">×</button>'
+			+ '<img class="ty-lightbox__img" alt="" loading="lazy" decoding="async">'
+			+ '<a class="ty-lightbox__open" target="_blank" rel="noopener">باز کردن اصل تصویر</a>';
+
+		var img = box.querySelector('.ty-lightbox__img');
+		img.src = src;
+		box.querySelector('.ty-lightbox__open').setAttribute('href', src);
+
+		box.addEventListener('click', function (event) {
+			var t = event.target;
+			if (t === box || (t.closest && t.closest('.ty-lightbox__close'))) {
+				closeLightbox();
+			}
+		});
+
+		document.body.appendChild(box);
+		document.body.classList.add('tara-lb-open');
+		document.addEventListener('keydown', lbKey, true);
+		box.querySelector('.ty-lightbox__close').focus();
+		lbNode = box;
+	}
+
+	function bindZoom() {
+		document.addEventListener('click', function (event) {
+			var btn = event.target && event.target.closest ? event.target.closest('[data-tara-zoom]') : null;
+			if (!btn) {
+				return;
+			}
+			event.preventDefault();
+			openLightbox(btn.getAttribute('data-tara-zoom'));
+		});
+	}
+
+	/* ==================================================================
 	 * ۵) کلیک‌های عمومی: صف‌های صفحه، دکمهٔ فهرست، ردیف‌های آهنگ
 	 * ================================================================== */
 	function bindGlobalClicks() {
@@ -953,6 +1114,28 @@
 						break;
 					}
 				}
+			}
+
+			/* v3.7.8 — اگر صف پیدا نشد یا شناسهٔ دکمه در آن نبود، خودِ دکمه
+			   دادهٔ کافی برای پخش دارد (`data-tara-src`) ⇒ یک صف تک‌قطعه‌ای
+			   ساخته می‌شود تا دکمه هرگز «بی‌اثر» نماند. این همان باگی است که
+			   در صفحهٔ هنرمند، دکمهٔ پخش را در پلیر رادیو به صدا درنمی‌آورد. */
+			if ((isNaN(index) || index < 0) && playBtn.hasAttribute('data-tara-src')) {
+				event.preventDefault();
+				var single = [{
+					id: playBtn.getAttribute('data-tara-track') || '',
+					title: playBtn.getAttribute('data-tara-title') || '',
+					artist: playBtn.getAttribute('data-tara-artist') || '',
+					src: playBtn.getAttribute('data-tara-src'),
+					cover: playBtn.getAttribute('data-tara-cover') || '',
+					link: playBtn.getAttribute('data-tara-link') || ''
+				}];
+				var singleCard = document.querySelector('[data-tara-player]');
+				if (singleCard) {
+					singleCard.__taraTracks = single;
+				}
+				Engine.load(single, 0, singleCard, true);
+				return;
 			}
 
 			if (isNaN(index) || index < 0) {
@@ -1068,6 +1251,7 @@
 			} else if (target.hasAttribute('data-tara-video-mute')) {
 				video.muted = !video.muted;
 				target.classList.toggle('is-muted', video.muted);
+				target.setAttribute('aria-pressed', video.muted ? 'true' : 'false');
 			} else if (target.hasAttribute('data-tara-video-fs')) {
 				/* v3.7.7 — تمام‌صفحهٔ واقعی + چرخش خودکار روی موبایل.
 				   * اگر مرورگر Fullscreen API دارد: خودِ کارت پلیر تمام‌صفحه
@@ -1357,10 +1541,11 @@
 		Modal.init();
 		bindGlobalClicks();
 		Engine.on();
+		bindZoom();
 
 		/* نشانهٔ سلامت برای عیب‌یابی: اگر این صفت روی <html> نبود، یعنی همین فایل
 		   اجرا نشده است (کش/CDN/خطای اسکریپت). */
-		document.documentElement.setAttribute('data-tara-ready', '3.7.7');
+		document.documentElement.setAttribute('data-tara-ready', '3.7.8');
 
 		/* v3.7.7 — وقتی کاربر با دکمهٔ Esc یا ژست بومی از تمام‌صفحه بیرون
 		   می‌آید، کلاس‌ها و قفل چرخش باید پاک شوند؛ وگرنه صفحه سیاه/

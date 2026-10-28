@@ -58,9 +58,11 @@ if ( has_post_thumbnail() ) { /* v3.3.8 — دو سایز به WP بدهید ت�
 <img src="<?php echo esc_url( get_template_directory_uri() . '/images/nomusics.jpg' ); ?>" width="190" height="190" alt="<?php echo esc_attr( get_the_title() ); ?>" title="<?php echo esc_attr( get_the_title() ); ?>" loading="lazy" decoding="async"><?php } ?></a><?php if ( ! empty( $GLOBALS['tara_card_play'] ) && function_exists( 'tara_card_play' ) ) { echo tara_card_play(); /* escape شده در تابع */ } ?><?php tara_card_stats(); ?></figure>
 <h2><a href="<?php echo esc_url( get_permalink() ); ?>"><?php if(get_field('artist') || get_field('song')){ ?> <?php echo esc_html( get_field('artist') ); ?><span><?php echo esc_html( get_field('song') ); ?></span><?php } else{ the_title(''); } ?></a></h2>
 </header>
-<footer>
-<?php $field=get_field_object('musics_type'); if($field){
-$value=$field['value']; $label=$field['choices'][$value]; ?>
-<span class="ft_box_format"><?php echo esc_attr($value); ?></span><?php } ?>
-</footer>
+<?php
+/* v3.7.8 — «mp3/mp4» روی کارت‌ها حذف شد (درخواست صریح) و خودِ <footer> هم
+   برداشته شد: با خالی‌ماندنش فقط ۱۲px فاصلهٔ بی‌دلیل زیر هر کارت می‌ساخت.
+   همان اطلاعات در تیتر صفحهٔ آهنگ هست («آهنگ»/«آلبوم»/«موزیک‌ویدیو»).
+   اگر روزی لازم شد: یک <footer> تازه با همان spanِ برچسب و مقدارِ
+   get_field_object( 'musics_type' ) برگردانید. */
+?>
 </article>

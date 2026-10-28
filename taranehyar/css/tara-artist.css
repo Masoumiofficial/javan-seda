@@ -22,15 +22,20 @@
 /* =========================================================================
    ۱) سربرگ
    ====================================================================== */
+/* v3.7.8 — سربرگ سه‌ستونه و جمع‌وجورتر (درخواست صریح):
+   ستون ۱: اطلاعات (نام، لاتین، آمار، ژانر/حال‌وهوا، دکمه‌ها، شبکه‌ها)
+   ستون ۲: بیوگرافی کوتاه + دکمهٔ «بیوگرافی کامل» زیر آن
+   ستون ۳: بنر هنرمند (اگر ثبت شده) وگرنه تصویر پروفایل مثل قبل
+   ارتفاع سربرگ حدود ۳۰٪ کم‌تر شده و فاصله‌ها منظم‌اند. */
 .ty-artist__hero {
 	position: relative;
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto;
+	grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr) 300px;
 	align-items: center;
-	gap: 28px;
-	margin: 18px 0 22px;
-	padding: 30px 32px;
-	border-radius: 26px;
+	gap: 22px 26px;
+	margin: 16px 0 20px;
+	padding: 24px 26px;
+	border-radius: 24px;
 	overflow: hidden;
 	color: var(--ty-a-ink);
 	background:
@@ -38,6 +43,53 @@
 	box-shadow: 0 26px 50px -34px rgba(17, 24, 39, 0.95);
 	isolation: isolate;
 }
+
+/* ستون سوم وقتی بنر دارد: قاب روشن و بدون بُرش تصویر */
+.ty-artist__portrait--banner {
+	width: 100%;
+	max-width: none;
+	align-self: center;
+}
+
+.ty-artist__portrait--banner img {
+	width: 100%;
+	height: auto;
+	aspect-ratio: 16 / 5;
+	object-fit: cover;
+	border-radius: 16px;
+	border: 2px solid rgba(255, 255, 255, 0.38);
+	box-shadow: 0 18px 34px -26px rgba(0, 0, 0, 0.9);
+}
+
+/* ستون دوم: بیو + دکمه */
+.ty-artist__about {
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 12px;
+	padding-inline-start: 22px;
+	border-inline-start: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.ty-artist__about .ty-artist__bio {
+	margin: 0;
+	max-width: 46ch;
+	font-size: 12.8px;
+	line-height: 2;
+	color: rgba(255, 255, 255, 0.84);
+}
+
+.ty-artist__bio--empty { color: rgba(255, 255, 255, 0.55) !important; }
+
+.ty-artist__bio-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 12.5px;
+}
+
+.ty-artist__bio-btn i { font-size: 14px; }
 
 .ty-artist__bg {
 	position: absolute;
@@ -249,6 +301,7 @@
 	flex: 0 0 auto;
 	width: 240px;
 	max-width: 34vw;
+	justify-self: center;
 }
 
 .ty-artist__portrait img {
@@ -441,18 +494,47 @@
 /* =========================================================================
    ۶) موبایل
    ====================================================================== */
+@media (max-width: 1023px) and (min-width: 783px) {
+	/* تبلت: دو ستون؛ بنر زیر هر دو، تمام‌عرض */
+	.ty-artist__hero {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 18px 22px;
+		padding: 22px;
+	}
+
+	.ty-artist__portrait,
+	.ty-artist__portrait--banner { grid-column: 1 / -1; }
+
+	.ty-artist__portrait--banner img { aspect-ratio: 16 / 5; }
+}
+
 @media (max-width: 782px) {
 	.ty-artist__hero {
 		grid-template-columns: 1fr;
-		padding: 22px 18px;
-		gap: 18px;
+		padding: 18px 16px;
+		gap: 14px;
 		border-radius: 20px;
 	}
+
+	.ty-artist__about {
+		padding-inline-start: 0;
+		border-inline-start: 0;
+		padding-top: 12px;
+		border-top: 1px solid rgba(255, 255, 255, 0.14);
+	}
+
+	.ty-artist__about .ty-artist__bio { max-width: none; font-size: 12.5px; }
 
 	.ty-artist__portrait {
 		order: -1;
 		width: 132px;
 		max-width: 44vw;
+	}
+
+	.ty-artist__portrait--banner {
+		order: -1;
+		width: 100%;
+		max-width: none;
 	}
 
 	.ty-artist__portrait figcaption { display: none; }

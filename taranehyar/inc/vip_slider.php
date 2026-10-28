@@ -44,7 +44,15 @@ if ( $tara_fixbvip ) {
 	if ( $tara_vip_query->have_posts() ) {
 		?>
 		<div class="ty-hero-slider ab-vip-slider-box">
-			<div class="vip_top_slider owl-carousel owl-theme" data-ab-vip-slider>
+			<?php
+			/* v3.7.8 — اسلایدر خانه دیگر به owl وابسته نیست.
+			   چرا؟ owl برای هر اسلاید یک `.owl-item` با عرض ۳۰۰٪ می‌ساخت و اگر
+			   یکی از فایل‌ها دیر می‌رسید یا خطایی می‌داد، ناحیهٔ سفیدِ سه‌برابرِ
+			   عرض اسلاید می‌ماند و هیچ تصویری دیده نمی‌شد. حالا یک اسلایدِ
+			   ساده (cross-fade + نشانگر) با چند خط جاوااسکریپت بدون وابستگی.
+			   مزیت جانبی: DOM سبک‌تر، بدون پرش ارتفاع، بدون درخواست اضافه. */
+			?>
+			<div class="vip_top_slider ty-hero-track" data-ty-hero data-interval="5200" role="region" aria-roledescription="carousel" aria-label="آثار ویژه">
 				<?php
 				$tara_slide = 0;
 				while ( $tara_vip_query->have_posts() ) :
@@ -66,7 +74,7 @@ if ( $tara_fixbvip ) {
 					$tara_priority   = ( 1 === $tara_slide ) ? 'high' : 'auto';
 					$tara_loading    = ( 1 === $tara_slide ) ? 'eager' : 'lazy';
 					?>
-					<article class="ty-hero-slide">
+					<article class="ty-hero-slide<?php echo ( 1 === $tara_slide ) ? ' is-active' : ''; ?>" data-ty-slide aria-hidden="<?php echo ( 1 === $tara_slide ) ? 'false' : 'true'; ?>">
 						<a class="ty-hero-slide__media" href="<?php the_permalink(); ?>">
 							<img src="<?php echo esc_url( $tara_image ); ?>"
 								width="1280" height="620"

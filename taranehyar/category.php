@@ -38,12 +38,15 @@ if ( '' !== $ab_cat_desc ) {
 <div class="clear"></div>
 </div>
 <!-- song_boxs -->
-<?php /* v3.5.2 — توضیح کامل دسته در پایین آرشیو (با نمایش بیشتر/کمتر) */
+<?php get_template_part('inc/pagination'); ?>
+<?php
+/* v3.7.8 — «دربارهٔ {نام دسته}» دقیقاً زیر صفحه‌بندی (درخواست صریح).
+   پیش از این بالای صفحه‌بندی و بیرون از `.song_boxs` بود و به‌نظر می‌رسید
+   بخشی از همان فهرست است. */
 if ( function_exists( 'tara_category_desc_full' ) ) {
 	echo tara_category_desc_full(); // خروجی در تابع، wp_kses_post شده است
 }
 ?>
-<?php get_template_part('inc/pagination'); ?>
 <div class="clear"></div>
 </div>
 </div>

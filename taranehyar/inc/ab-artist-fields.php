@@ -49,6 +49,11 @@ if ( ! function_exists( 'tara_artist_field_keys' ) ) {
 				'atwitter'    => array( 'label' => 'توییتر / X', 'type' => 'url' ),
 				'ayoutube'    => array( 'label' => 'یوتیوب', 'type' => 'url' ),
 				'ab_bio_short' => array( 'label' => 'بیوگرافی کوتاه', 'type' => 'textarea' ),
+				/* v3.7.8 — بنر اختیاری سربرگ صفحهٔ هنرمند (ستون سوم).
+				   استاندارد: ۱۲۰۰×۴۰۰ (نسبت ۱۶:۵)، حداکثر ۳۰۰KB، فرمت JPG/WebP.
+				   خالی بماند ⇒ همان تصویر پروفایل مثل قبل نشان داده می‌شود. */
+				'ab_artist_banner'    => array( 'label' => 'بنر صفحهٔ هنرمند', 'type' => 'url' ),
+				'ab_artist_banner_id' => array( 'label' => 'شناسهٔ بنر صفحهٔ هنرمند', 'type' => 'id' ),
 				'ab_bio_post' => array( 'label' => 'نوشتهٔ بیوگرافی کامل', 'type' => 'id' ),
 			)
 		);
@@ -299,6 +304,32 @@ if ( ! function_exists( 'tara_artist_socials' ) ) {
 /* ==================================================================================
    ۴) بیوگرافی کوتاه و لینک بیوگرافی کامل
    ================================================================================== */
+
+if ( ! function_exists( 'tara_artist_banner_url' ) ) {
+	/**
+	 * آدرس بنر سربرگ صفحهٔ هنرمند (نسخهٔ اصلی تصویر) یا رشتهٔ خالی.
+	 *
+	 * v3.7.8 — اگر مدیر بنر نگذاشته باشد، خروجی خالی است و قالب به همان
+	 * حالت پیش‌فرض (تصویر پروفایل در ستون سوم) برمی‌گردد؛ پس ارتقا هیچ
+	 * صفحه‌ای را «خالی» نمی‌کند.
+	 *
+	 * @param mixed  $term ترم/شناسه/slug.
+	 * @param string $size اندازهٔ تصویر وردپرس.
+	 * @return string
+	 */
+	function tara_artist_banner_url( $term, $size = 'full' ) {
+		$term = tara_term( $term );
+		if ( ! $term ) {
+			return '';
+		}
+		$url = tara_image_url_from_value( tara_artist_field( $term, 'ab_artist_banner' ), $size );
+		if ( '' === $url ) {
+			$id  = absint( tara_artist_field( $term, 'ab_artist_banner_id' ) );
+			$url = $id ? tara_image_url_from_value( $id, $size ) : '';
+		}
+		return $url;
+	}
+}
 
 if ( ! function_exists( 'tara_artist_bio_short' ) ) {
 	/**

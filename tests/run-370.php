@@ -412,13 +412,15 @@ $home_css = (string) @file_get_contents( '/tmp/theme/css/tara-home.css' );
 /* v3.7.5 — اسلاید فقط کاور است: بدون برچسب/عنوان/دکمه، تصویر کل کارت را می‌پوشاند */
 t( 'اسلایدر: کادر متن روی کاور حذف شده', false === strpos( $home_css, '.ty-hero-slide__body' ) && false === strpos( $home_css, '.ty-hero-slide__play' ) );
 t( 'اسلایدر: تصویر با نسبت تصویر کل کارت را می‌پوشاند', false !== strpos( $home_css, 'aspect-ratio: 16 / 7' ) && false !== strpos( $home_css, 'object-fit: cover' ) );
-t( 'اسلایدر: بدون owl فقط اسلاید اول دیده می‌شود', false !== strpos( $home_css, ':not(.owl-loaded)' ) );
+/* v3.7.8 — اسلایدر خانه بدون owl: یک اسلاید در جریان + cross-fade */
+t( 'اسلایدر: بدون owl و فقط اسلاید فعال در جریان', false !== strpos( $home_css, '.ty-hero-track' ) && false !== strpos( $home_css, '.ty-hero-slide.is-active' ) && false === strpos( $home_css, 'owl-loaded' ) );
 $vip_php = (string) @file_get_contents( '/tmp/theme/inc/vip_slider.php' );
 t( 'اسلایدر: برچسب/دکمه از مارک‌آپ حذف شده', false === strpos( $vip_php, 'ty-hero-slide__play' ) && false === strpos( $vip_php, 'پیشنهاد ویژه' ) );
 
 $ui_css = (string) @file_get_contents( '/tmp/theme/css/tara-ui.css' );
 t( 'کارت: دکمهٔ پخش وسط کاور', false !== strpos( $ui_css, '.ty-cardplay {' ) && false !== strpos( $ui_css, 'left: 50%;' ) );
-t( 'شناسنامه: کادر فشرده', false !== strpos( $ui_css, 'minmax(118px, 1fr)' ) );
+/* v3.7.8 — «مشخصات اثر» به کارتِ برچسب/مقدار بازطراحی شد */
+t( 'شناسنامه: کارتِ شبکه‌ای برچسب/مقدار', false !== strpos( $ui_css, 'minmax(150px, 1fr)' ) && false !== strpos( $ui_css, '.ab-credits.ab-credits .ab-credit__k' ) );
 t( 'هدر: کادر جست‌وجو روشن با متن تیره', false !== strpos( $ui_css, '#lsds' ) && false !== strpos( $ui_css, 'color: #16121f !important' ) );
 t( 'صفحهٔ آهنگ: ستون کناری چسبان', false !== strpos( $ui_css, '#left_side' ) && false !== strpos( $ui_css, 'position: sticky' ) );
 
@@ -487,7 +489,8 @@ t( 'تنظیمات: سوییچ روشن/خاموش خوانا', false !== strpos
 t( 'تنظیمات: ریشهٔ Option Tree هم پوشش دارد', false !== strpos( $settings_css, '#option-tree-settings-api' ) );
 
 $scripts = (string) @file_get_contents( '/tmp/theme/js/scripts.js' );
-t( 'اسلایدر: تک‌اسلاید شده', false !== strpos( $scripts, "0:{items:1}" ) && false === strpos( $scripts, '700:{items:2}' ) );
+/* v3.7.8 — owl برای اسلایدر خانه حذف شد؛ scripts.js هم دیگر بی‌قید آن را صدا نمی‌زند */
+t( 'اسلایدر: owl برای خانه حذف شده', false === strpos( $scripts, 'vip_top_slider' ) && false !== strpos( $scripts, '$.fn.owlCarousel' ) );
 
 t( 'تاکسونومی: قالب آرشیو برای ژانر موجود', is_readable( '/tmp/theme/taxonomy-tara_genre.php' ) );
 t( 'تاکسونومی: قالب مشترک آرشیو موجود', is_readable( '/tmp/theme/inc/tax-listing.php' ) );
@@ -495,7 +498,7 @@ t( 'تاکسونومی: قالب مشترک آرشیو موجود', is_readable(
 /* ======================================================================
    v3.7.7 — بازبینی خرابی‌های گزارش‌شده و تنظیمات تازه
    ====================================================================== */
-t( 'نسخه: style.css روی ۳.۷.۷ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.7.7' ) );
+t( 'نسخه: style.css روی ۳.۷.۸ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.7.8' ) );
 
 $opts = (string) @file_get_contents( '/tmp/theme/inc/theme-options.php' );
 t( 'تنظیمات: بخش رنگ‌ها اضافه شده', false !== strpos( $opts, "'id'=>'brand'" ) );
@@ -526,7 +529,7 @@ t( 'هنرمند: فهرست آهنگ‌ها چندستونه شده', false !==
 
 $home_css = (string) @file_get_contents( '/tmp/theme/css/tara-home.css' );
 t( 'بنر: زوم نرم‌تر شده', false !== strpos( $home_css, 'scale(1.025)' ) && false === strpos( $home_css, 'scale(1.05)' ) );
-t( 'بنر: در گوشی فلش‌ها پنهان می‌شوند', false !== strpos( $home_css, '.ty-hero-slider .owl-nav { display: none !important; }' ) );
+t( 'بنر: نشانگرهای تازهٔ اسلایدر', false !== strpos( $home_css, '.ty-hero-dots' ) && false !== strpos( $home_css, '.ty-hero-dot.is-active' ) );
 
 $shell = (string) @file_get_contents( '/tmp/theme/inc/admin-settings-shell.php' );
 t( 'تنظیمات: ردیف‌ها پیش‌فرض باز هستند', false !== strpos( $shell, "classList.add('has-label', 'is-open')" ) );
@@ -539,7 +542,64 @@ $dock_php = (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' );
 t( 'نوار چسبان: مارکاپ صدا دارد', false !== strpos( $dock_php, 'data-tara-dock-vol' ) && false !== strpos( $dock_php, 'data-tara-dock-mute' ) );
 $player_js2 = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
 t( 'ویدیو: خروج با Esc و تغییر جهت', false !== strpos( $player_js2, "'orientationchange'" ) && false !== strpos( $player_js2, "e.key !== 'Escape'" ) );
-t( 'پلیر: نشانهٔ نسخه ۳.۷.۷', false !== strpos( $player_js2, "'data-tara-ready', '3.7.7'" ) );
+t( 'پلیر: نشانهٔ نسخه ۳.۷.۸', false !== strpos( $player_js2, "'data-tara-ready', '3.7.8'" ) );
+
+/* ======================================================================
+   ۳.۷.۸ — دور ۶۶: ترتیب صفحهٔ آهنگ، اسلایدر تازه، سربرگ سه‌ستونهٔ هنرمند،
+   رنگ کاور در پلیر، «مشخصات اثر»، حذف badge فرمت، لینک‌های رنگی
+   ====================================================================== */
+$single78 = (string) @file_get_contents( '/tmp/theme/single.php' );
+
+/* ترتیب تازه: پلیر → ما را دنبال کنید → توضیحات → مشخصات اثر → دانلود → متن ترانه */
+$pos_player  = strpos( $single78, 'tara_player(' );
+$pos_social  = strpos( $single78, 'tara_social_box' );
+$pos_content = strpos( $single78, "the_content('')" );
+$pos_credits = strpos( $single78, "tara_credits_box( get_the_ID() )" );
+$pos_dl      = strpos( $single78, 'dl_links_box' );
+$pos_lyrics  = strpos( $single78, "'end' === $taranehyar_lyrics_position" );
+t(
+	'صفحهٔ آهنگ: پلیر → دنبال‌کردن → توضیحات → مشخصات → دانلود → متن ترانه',
+	false !== $pos_player && false !== $pos_social && false !== $pos_content
+		&& false !== $pos_credits && false !== $pos_dl && false !== $pos_lyrics
+		&& $pos_player < $pos_social && $pos_social < $pos_content
+		&& $pos_content < $pos_credits && $pos_credits < $pos_dl && $pos_dl < $pos_lyrics
+);
+t( 'صفحهٔ آهنگ: کاور بزرگ بالای صفحه حذف شد', false === strpos( $single78, 'single_featured_cover' ) );
+t( 'صفحهٔ آهنگ: نسخهٔ اصلی تصویر برای پاپ‌آپ دوربین', false !== strpos( $single78, "'zoom'    => $tara_cover_full" ) );
+
+$ui78 = (string) @file_get_contents( '/tmp/theme/css/tara-ui.css' );
+t( 'پلیر: دکمهٔ دوربین روی کاور', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' ), 'data-tara-zoom' ) && false !== strpos( $ui78, '.ty-player__zoom' ) );
+t( 'پلیر: پاپ‌آپ تصویر سبک و بدون کتابخانه', false !== strpos( $ui78, '.ty-lightbox' ) );
+t( 'پلیر: گرادیانتِ سبک از رنگ کاور', false !== strpos( $ui78, '--ty-cover-1' ) && false !== strpos( $player_js2, 'tintFromCover' ) );
+t( 'پلیر: آیکون بی‌صدا در BEM پلیر', false !== strpos( $ui78, '.ty-player.is-muted .ty-icon-muted' ) );
+t( 'پلیر: موبایلِ جمع‌وجور (کاور کنار سرتیتر)', false !== strpos( $ui78, '.ty-player__main { display: contents; }' ) );
+
+$artist78 = (string) @file_get_contents( '/tmp/theme/css/tara-artist.css' );
+t( 'هنرمند: سربرگ سه‌ستونه', false !== strpos( $artist78, 'minmax(0, 1.05fr) minmax(0, 1fr) 300px' ) );
+t( 'هنرمند: ستون بنر با نسبت ۱۶:۵', false !== strpos( $artist78, '.ty-artist__portrait--banner img' ) && false !== strpos( $artist78, 'aspect-ratio: 16 / 5' ) );
+$artist_tpl = (string) @file_get_contents( '/tmp/theme/taxonomy-artist.php' );
+t( 'هنرمند: دکمهٔ بیوگرافی زیر بیو', false !== strpos( $artist_tpl, 'ty-artist__bio-btn' ) && false !== strpos( $artist_tpl, 'ty-artist__about' ) );
+t( 'هنرمند: فیلد بنر در فرم ترم', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/ab-artist-fields.php' ), "'ab_artist_banner'" ) );
+$admin78 = (string) @file_get_contents( '/tmp/theme/inc/ab-terms-admin.php' );
+t( 'هنرمند: سایز استاندارد بنر در تنظیمات نوشته شده', false !== strpos( $admin78, '۱۲۰۰×۴۰۰' ) && false !== strpos( $admin78, 'tara_artist_banner_group' ) );
+
+$cat78 = (string) @file_get_contents( '/tmp/theme/category.php' );
+t( 'دسته: «دربارهٔ …» دقیقاً زیر صفحه‌بندی', strpos( $cat78, "get_template_part('inc/pagination')" ) < strpos( $cat78, 'tara_category_desc_full()' ) );
+t( 'دسته: تیتر پویا «دربارهٔ نام دسته»', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/ab-cat-desc.php' ), "'دربارهٔ ' . $term_obj->name" ) );
+
+$songs78 = (string) @file_get_contents( '/tmp/theme/inc/songs_post.php' );
+t( 'کارت: badge فرمت (mp3/mp4) حذف شد', false === strpos( $songs78, 'ft_box_format' ) );
+
+t( 'لینک‌ها: رنگ اصلی سایت در متن', false !== strpos( $ui78, '.archive_txt_box a:not([class])' ) && false !== strpos( $ui78, 'var(--ab-blue, #185adb)' ) );
+t( 'هدر: فاصلهٔ محتوا هنگام نبود تبلیغ', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), '#centers_box > :first-child{margin-top: 0 !important;}' ) );
+t( 'دکمهٔ صفحهٔ اختصاصی: چیدمان flex با فلش سمت راست', false !== strpos( $ui78, '.rel_sing_bbt .title_tarlanweb_box' ) && false !== strpos( $ui78, 'order: -1' ) );
+t( 'پخش صفحهٔ هنرمند: صف فهرست آهنگ‌ها', false !== strpos( $artist_tpl, 'tara_queue_attrs( $taranehyar_audio_tracks' ) );
+t( 'پخش: دکمه‌ها دادهٔ پشتیبان دارند', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' ), 'data-tara-src=' ) );
+t( 'پخش: پرش به آهنگ اول رفع شد', false !== strpos( $player_js2, 'root.__taraIndex' ) );
+t( 'پخش: صفِ نایافته ⇒ تک‌قطعه‌ای', false !== strpos( $player_js2, 'singleCard' ) );
+t( 'پلیر دوم قدیمی خاموش شد', false === strpos( (string) @file_get_contents( '/tmp/theme/inc/ab-post-extras.php' ), "add_action( 'wp_footer', 'tara_sticky_player', 30 );\n}" ) );
+t( 'خانه: عنوان «آثار منتخب»', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/tarlanweb_player.php' ), 'آثار منتخب' ) );
+t( 'اسلایدر: فایل مستقل بدون وابستگی', is_readable( '/tmp/theme/js/hero-slider.js' ) && false !== strpos( (string) @file_get_contents( '/tmp/theme/js/hero-slider.js' ), 'data-ty-hero' ) );
 
 /* ======================================================================
    خلاصه

@@ -6,15 +6,12 @@ var n=jQuery(this).find(" > ul");n.length>0&&jQuery(window).width()>900&&n.stop(
 function(){var n=jQuery(this).find(" > ul");n.length>0&&jQuery(window).width()>900&&n.stop().slideUp(200)
 });
 
-/* v3.7.0 — اسلایدر ویژه «تک‌اسلاید» شد: یک تصویر بزرگ به‌جای دو کارت ریز. */
-$('.vip_top_slider').owlCarousel({
-nav:false,rtl:true,autoplay:true,loop:true,autoplayTimeout:5200,autoplayHoverPause:true,margin:0,dots:true,dotsEach:false,
-smartSpeed:600,
-responsive:{
-0:{items:1}
-}
-});
+/* v3.7.8 — اسلایدر ویژهٔ صفحهٔ اصلی دیگر owl نیست (js/hero-slider.js).
+   دلیل: با owl ناحیهٔ سفیدِ سه‌برابرِ عرض اسلاید می‌ماند و تصویری دیده نمی‌شد. */
 
+/* v3.7.8 — owl فقط در صفحهٔ اصلی بار می‌شود و فقط برای ریل هنرمندان؛
+   اگر به هر دلیلی نبود، هیچ خطایی نمی‌دهیم و بقیهٔ رفتارهای صفحه سالم می‌مانند. */
+if ($.fn.owlCarousel && $('.artists_slider').length) {
 $('.artists_slider').owlCarousel({
 nav:true,rtl:true,autoplay:true,autoplayTimeout:4000,autoplayHoverPause:true,margin:20,dots:false,
 responsive:{
@@ -25,6 +22,7 @@ responsive:{
 1300:{items:7}
 }
 });
+}
 
 $(document).scroll(function(){
 var y = $(this).scrollTop();

@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.7.7
+Version: 3.7.8
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -115,8 +115,15 @@ a{color: #333;}
 
 
 
-#header{width: 100%;height: auto;position: relative;z-index: 88888;padding: 30px 0;
+#header{width: 100%;height: auto;position: relative;z-index: 88888;padding: 20px 0;
 background: #fff;box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);}
+/* v3.7.8 — «هدر کمی جمع‌تر» + «فاصلهٔ هدر تا محتوا وقتی تبلیغی نیست»:
+   ارتفاع هدر ۱۰px کم شد و اولین بلوکِ محتوا دیگر فاصلهٔ بالاییِ اضافه ندارد.
+   بلاک تبلیغ (#ads_top) اگر چاپ شود، خودش padding دارد و همان فاصله می‌ماند. */
+main > .tarlanweb_center:first-of-type #centers_box > :first-child{margin-top: 0 !important;}
+#ads_top:empty,
+#ads_top_dl:empty{display: none;}
+#ads_top, #ads_top_dl{padding: 12px 0;}
 .darkHeader{background: #fff;padding: 7px 0 !important;position: fixed !important;top: 0;
 box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.15);}
 .logo_top{width: 150px;height: 40px;float: right;line-height: 0;margin-left: 15px;}

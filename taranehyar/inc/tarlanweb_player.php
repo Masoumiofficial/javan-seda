@@ -84,7 +84,8 @@ if ( $tara_indpl && function_exists( 'tara_player' ) ) {
 			echo tara_player( // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین قالب
 				array(
 					'tracks'  => $tara_home_tracks,
-					'title'   => 'پخش آنلاین — تازه‌ترین‌ها',
+					/* v3.7.8 — «تازه‌ترین‌ها» ⇒ «آثار منتخب» (درخواست صریح) */
+					'title'   => 'آثار منتخب',
 					'context' => 'home',
 				)
 			);

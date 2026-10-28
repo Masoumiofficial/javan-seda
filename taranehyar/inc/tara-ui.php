@@ -342,7 +342,15 @@ if ( ! function_exists( 'tara_track_row' ) ) {
 			data-tara-name="<?php echo esc_attr( $title ); ?>"
 			data-tara-artist="<?php echo esc_attr( $artist ); ?>">
 			<?php if ( '' !== $src ) : ?>
-				<button type="button" class="ty-track__play" data-tara-play="<?php echo esc_attr( (int) $args['index'] ); ?>" aria-label="پخش <?php echo esc_attr( $title ); ?>">
+				<button type="button" class="ty-track__play"
+					data-tara-play="<?php echo esc_attr( (int) $args['index'] ); ?>"
+					data-tara-track="<?php echo esc_attr( $post_id ); ?>"
+					data-tara-src="<?php echo esc_url( $src ); ?>"
+					data-tara-title="<?php echo esc_attr( $title ); ?>"
+					data-tara-artist="<?php echo esc_attr( $artist ); ?>"
+					data-tara-cover="<?php echo esc_url( $cover ); ?>"
+					data-tara-link="<?php echo esc_url( $link ); ?>"
+					aria-label="پخش <?php echo esc_attr( $title ); ?>">
 					<span class="ty-icon-play" aria-hidden="true"></span>
 					<span class="ty-icon-pause" aria-hidden="true"></span>
 				</button>
@@ -427,7 +435,15 @@ if ( ! function_exists( 'tara_card_play' ) ) {
 		if ( '' === $src ) {
 			return '';
 		}
-		return '<button type="button" class="ty-cardplay" data-tara-track="' . esc_attr( $post_id ) . '" aria-label="پخش ' . esc_attr( tara_track_title( $post_id ) ) . '">'
+		/* v3.7.8 — دکمهٔ پخش خودش دادهٔ کافی را با خود می‌برد؛ اگر صف پیدا نشد
+		   (مثل فهرست صفحهٔ هنرمند)، JS یک صف تک‌قطعه‌ای می‌سازد و پخش می‌کند. */
+		return '<button type="button" class="ty-cardplay" data-tara-track="' . esc_attr( $post_id ) . '"'
+			. ' data-tara-src="' . esc_url( $src ) . '"'
+			. ' data-tara-title="' . esc_attr( tara_track_title( $post_id ) ) . '"'
+			. ' data-tara-artist="' . esc_attr( tara_track_artist( $post_id ) ) . '"'
+			. ' data-tara-cover="' . esc_url( tara_track_cover( $post_id, 'thumb2' ) ) . '"'
+			. ' data-tara-link="' . esc_url( get_permalink( $post_id ) ) . '"'
+			. ' aria-label="پخش ' . esc_attr( tara_track_title( $post_id ) ) . '">'
 			. '<span class="ty-icon-play" aria-hidden="true"></span>'
 			. '<span class="ty-icon-pause" aria-hidden="true"></span>'
 			. '</button>';
@@ -775,8 +791,9 @@ if ( ! function_exists( 'tara_video' ) ) {
 					</div>
 				</div>
 
-				<button type="button" class="ty-video__btn" data-tara-video-mute aria-label="بی‌صدا">
+				<button type="button" class="ty-video__btn" data-tara-video-mute aria-label="بی‌صدا / با صدا" aria-pressed="false">
 					<span class="ty-icon-vol" aria-hidden="true"></span>
+					<span class="ty-icon-muted" aria-hidden="true"></span>
 				</button>
 				<button type="button" class="ty-video__btn" data-tara-video-fs aria-label="تمام‌صفحه">
 					<span class="ty-icon-expand" aria-hidden="true"></span>
@@ -797,6 +814,7 @@ if ( ! function_exists( 'tara_player' ) ) {
 	 *     @type string $title       عنوان کارت.
 	 *     @type string $subtitle    زیرعنوان.
 	 *     @type string $cover       تصویر بزرگ کارت.
+	 *     @type string $zoom        نسخهٔ اصلی تصویر (دکمهٔ دوربین + پاپ‌آپ).
 	 *     @type int    $start       ایندکس شروع.
 	 *     @type string $context     شناسهٔ زمینه (artist/home/single) برای داده‌ساختاریافته.
 	 * }
@@ -814,6 +832,7 @@ if ( ! function_exists( 'tara_player' ) ) {
 				'title'    => '',
 				'subtitle' => '',
 				'cover'    => '',
+				'zoom'     => '', /* v3.7.8 — آدرس نسخهٔ اصلی تصویر برای پاپ‌آپ دوربین */
 				'start'    => 0,
 				'context'  => 'page',
 			)
@@ -841,6 +860,12 @@ if ( ! function_exists( 'tara_player' ) ) {
 			<script type="application/json" class="ty-player__data"><?php echo $json; // phpcs:ignore WordPress.Security.EscapeOutput -- JSON ساختهٔ خودمان است ?></script>
 
 			<div class="ty-player__art">
+				<?php $tara_zoom_src = isset( $args['zoom'] ) && is_scalar( $args['zoom'] ) ? (string) $args['zoom'] : ''; ?>
+				<?php if ( '' !== $tara_zoom_src ) : ?>
+					<button type="button" class="ty-player__zoom" data-tara-zoom="<?php echo esc_url( $tara_zoom_src ); ?>" aria-label="نمایش کاور در اندازهٔ بزرگ" title="نمایش کاور در اندازهٔ بزرگ">
+						<i class="icofont-camera" aria-hidden="true"></i>
+					</button>
+				<?php endif; ?>
 				<img class="ty-player__img" src="<?php echo esc_url( $args['cover'] ? $args['cover'] : $first['cover'] ); ?>" width="180" height="180" alt="" data-tara-art>
 				<span class="ty-player__pulse" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
 			</div>
@@ -894,8 +919,9 @@ if ( ! function_exists( 'tara_player' ) ) {
 					<span class="ty-player__time" data-tara-time>۰۰:۰۰ / ۰۰:۰۰</span>
 
 					<div class="ty-player__vol">
-						<button type="button" class="ty-player__vol-btn" data-tara-mute aria-label="بی‌صدا">
+						<button type="button" class="ty-player__vol-btn" data-tara-mute aria-label="بی‌صدا / با صدا" aria-pressed="false">
 							<span class="ty-icon-vol" aria-hidden="true"></span>
+							<span class="ty-icon-muted" aria-hidden="true"></span>
 						</button>
 						<input type="range" data-tara-volume min="0" max="1" step="0.01" value="1" aria-label="صدا">
 					</div>

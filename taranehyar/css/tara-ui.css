@@ -40,10 +40,35 @@
 	margin: 22px 0;
 	border: 1px solid var(--ty-line);
 	border-radius: var(--ty-radius);
+	/* v3.7.8 — گرادیانتِ سبک از رنگ کاور:
+	   `--ty-cover-1/2` را js/tara-player.js از میانگین رنگ‌های خودِ کاور
+	   می‌سازد؛ نبودشان ⇒ همان آبیِ اصلی سایت. شدت‌ها کم است تا متن همیشه
+	   خوانا بماند و کارت «رنگیِ تند» نشود. */
 	background:
-		radial-gradient(120% 140% at 100% 0%, rgba(24, 90, 219, 0.10) 0%, rgba(24, 90, 219, 0) 55%),
+		radial-gradient(120% 140% at 100% 0%, var(--ty-cover-1, rgba(24, 90, 219, 0.10)) 0%, transparent 56%),
+		radial-gradient(110% 130% at 0% 100%, var(--ty-cover-2, rgba(24, 90, 219, 0.05)) 0%, transparent 60%),
 		var(--ty-surface);
 	box-shadow: 0 16px 40px -32px rgba(17, 24, 39, 0.65);
+	transition: background .35s ease, border-color .25s ease;
+}
+
+/* نشانهٔ رنگی‌شدن: یک خطِ نازک بالای کارت با رنگ کاور (خیلی ملایم) */
+.ty-player.has-cover-tint::before {
+	content: "";
+	position: absolute;
+	inset-inline: 16px;
+	top: 0;
+	height: 2px;
+	border-radius: 0 0 999px 999px;
+	background: var(--ty-cover-1, rgba(24, 90, 219, .1));
+	pointer-events: none;
+}
+
+.night .ty-player {
+	background:
+		radial-gradient(120% 140% at 100% 0%, var(--ty-cover-1, rgba(24, 90, 219, 0.16)) 0%, transparent 58%),
+		radial-gradient(110% 130% at 0% 100%, var(--ty-cover-2, rgba(24, 90, 219, 0.08)) 0%, transparent 60%),
+		var(--ty-surface);
 }
 
 .ty-player:focus-within {
@@ -65,6 +90,82 @@
 	border-radius: 16px;
 	display: block;
 	box-shadow: 0 10px 24px -18px rgba(0, 0, 0, 0.8);
+}
+
+/* v3.7.8 — دکمهٔ کوچک دوربین روی کاور پلیر.
+   فقط با کلیک/فوکوس دیده می‌شود تا تصویر کاور تمیز بماند؛ روی دستگاه‌های لمسی
+   همیشه پیدا است. کارش: باز کردن نسخهٔ اصلی تصویر در پاپ‌آپ (data-tara-zoom).
+   تعداد درخواست‌ها بالا نمی‌رود چون تصویر بزرگ فقط هنگام باز شدن پاپ‌آپ لود می‌شود. */
+/* v3.7.8 — کاورِ جانشین: فقط وقتی آهنگ فایل صوتی ندارد (پلیر چاپ نمی‌شود).
+   همان دکمهٔ دوربین روی آن هم کار می‌کند. */
+.ty-cover-fallback {
+	position: relative;
+	margin: 0 0 16px;
+	border-radius: 18px;
+	overflow: hidden;
+	line-height: 0;
+	background: var(--ty-surface, #fff);
+	box-shadow: 0 14px 34px -30px rgba(17, 24, 39, .7);
+}
+
+.ty-cover-fallback img {
+	width: 100%;
+	height: auto;
+	display: block;
+	border-radius: 18px;
+}
+
+.ty-cover-fallback__zoom {
+	opacity: 1;
+	transform: none;
+	width: 32px;
+	height: 32px;
+	font-size: 14px;
+}
+
+.ty-player__zoom {
+	position: absolute;
+	inset-inline-start: 6px;
+	bottom: 6px;
+	z-index: 2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	border: 0;
+	border-radius: 50%;
+	background: rgba(12, 16, 28, 0.62);
+	color: #fff;
+	font-size: 13px;
+	line-height: 1;
+	cursor: pointer;
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
+	opacity: 0;
+	transform: translateY(3px);
+	transition: opacity .18s ease, transform .18s ease, background .18s ease;
+}
+
+.ty-player__art:hover .ty-player__zoom,
+.ty-player__zoom:focus-visible {
+	opacity: 1;
+	transform: none;
+}
+
+.ty-player__zoom:hover,
+.ty-player__zoom:focus-visible {
+	background: var(--ty-accent);
+	outline: none;
+}
+
+.ty-player__zoom:focus-visible {
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--ty-accent);
+}
+
+@media (hover: none) {
+	.ty-player__zoom { opacity: 1; transform: none; }
 }
 
 .ty-player__pulse {
@@ -299,61 +400,77 @@
 .ty-icon-prev::after { inset-inline-start: 2px; }
 .ty-icon-next::after { inset-inline-end: 2px; }
 
-.ty-icon-vol::before {
-	content: "";
-	position: absolute;
-	inset-inline-start: 1px;
-	top: 6px;
-	width: 5px;
-	height: 6px;
-	background: currentColor;
-	border-start-start-radius: 1px;
-	border-end-start-radius: 1px;
-}
-
-.ty-icon-vol::after {
-	content: "";
-	position: absolute;
-	inset-inline-start: 4px;
-	top: 3px;
-	border-style: solid;
-	border-width: 6px 7px 6px 0;
-	border-color: transparent currentColor transparent transparent;
-}
-
-/* v3.7.7 — آیکون «بی‌صدا» (بلندگو + ضربدر). فقط وقتی صدا بسته است دیده می‌شود. */
+/* v3.7.8 — آیکون صدا، بازطراحی‌شده.
+   قبلاً «مستطیل + مثلث» بود و لبه‌هایش با آیکون‌های همسایه هم‌تراز نبود.
+   حالا یک بلندگوی واقعی است (بدنهٔ بریده‌شده با clip-path) + یک موج کمانی
+   + نقطهٔ موج دوم که با پس‌زمینهٔ شعاعی کشیده می‌شود. هر دو حالت
+   (با صدا / بی‌صدا) دقیقاً هم‌اندازه و هم‌مرکزند، پس با کلیک «نمی‌پرد». */
+/* v3.7.8 — هندسهٔ آیکون صدا عمداً با مختصات فیزیکی (left/right) نوشته شده
+   و `direction: ltr` گرفته است؛ وگرنه در صفحهٔ راست‌به‌چپ، شکلِ بلندگو و
+   موج‌هایش روی هم می‌افتادند و «بی‌تراز» دیده می‌شدند. */
+.ty-icon-vol,
 .ty-icon-muted {
-	display: none;
+	direction: ltr;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 }
 
+.ty-icon-vol::before,
 .ty-icon-muted::before {
 	content: "";
 	position: absolute;
-	inset-inline-start: 1px;
-	top: 6px;
-	width: 5px;
-	height: 6px;
+	left: 1px;
+	top: 2px;
+	width: 11px;
+	height: 14px;
 	background: currentColor;
-	border-start-start-radius: 1px;
-	border-end-start-radius: 1px;
+	-webkit-clip-path: polygon(0 32%, 34% 32%, 74% 2%, 74% 98%, 34% 68%, 0 68%);
+	clip-path: polygon(0 32%, 34% 32%, 74% 2%, 74% 98%, 34% 68%, 0 68%);
 }
 
-.ty-icon-muted::after {
-	content: "×";
+/* با صدا: یک کمان موج + نقطهٔ موج دوم */
+.ty-icon-vol::after {
+	content: "";
 	position: absolute;
-	inset-inline-end: -1px;
-	top: -3px;
-	font-size: 17px;
-	line-height: 1;
-	font-weight: 700;
-	color: currentColor;
+	left: 9px;
+	top: 4px;
+	width: 6px;
+	height: 10px;
+	border-right: 1.8px solid currentColor;
+	border-top-right-radius: 999px;
+	border-bottom-right-radius: 999px;
 }
+
+.ty-icon-vol {
+	background-image: radial-gradient(circle at 15.5px 9px, currentColor 1.2px, transparent 1.7px);
+	background-repeat: no-repeat;
+}
+
+/* بی‌صدا: همان بلندگو + خط مورّب روی موج */
+.ty-icon-muted::after {
+	content: "";
+	position: absolute;
+	left: 6px;
+	top: 8px;
+	width: 10px;
+	height: 1.8px;
+	border-radius: 2px;
+	background: currentColor;
+	transform: rotate(40deg);
+	transform-origin: center;
+}
+
+/* آیکون بی‌صدا فقط در حالت بی‌صدا دیده می‌شود (هر سه جا: نوار، کارت، ویدیو). */
+.ty-icon-muted { display: none; }
 
 .ty-dock__btn--vol.is-muted .ty-icon-vol,
-.ty-player [data-tara-vol-mute].is-muted .ty-icon-vol { display: none; }
+.ty-player.is-muted .ty-icon-vol,
+.ty-video__btn.is-muted .ty-icon-vol { display: none; }
 
 .ty-dock__btn--vol.is-muted .ty-icon-muted,
-.ty-player [data-tara-vol-mute].is-muted .ty-icon-muted { display: inline-block; }
+.ty-player.is-muted .ty-icon-muted,
+.ty-video__btn.is-muted .ty-icon-muted { display: inline-flex; }
 
 .ty-icon-note::before {
 	content: "♪";
@@ -1061,29 +1178,94 @@ body.has-tara-dock { padding-bottom: 76px; }
 	.ty-player__seek { height: 8px; }
 }
 
+/* v3.7.8 — پلیر موبایل: جمع‌وجور و خوانا.
+   ------------------------------------------------------------------------
+   پیش از این، کاور روی گوشی تمام‌عرض و ۱۹۰px بلند می‌شد و کل کارت را
+   «بزرگ و بهم‌ریخته» می‌کرد. حالا کاور ۸۴px در کنار نام آهنگ می‌نشیند،
+   «main» با display:contents از حالت جعبه بیرون می‌آید تا سرتیتر کنار
+   کاور و نوار ترابری تمام‌عرض زیرِ هر دو قرار بگیرد؛ دسکتاپ دست‌نخورده
+   می‌ماند چون همهٔ این‌ها فقط زیر ۷۸۳px اعمال می‌شود. */
 @media (max-width: 782px) {
 	.ty-player {
-		grid-template-columns: 1fr;
-		padding: 16px;
-		gap: 14px;
+		grid-template-columns: 84px minmax(0, 1fr);
+		align-items: center;
+		gap: 10px 12px;
+		padding: 12px;
+		margin: 16px 0;
+		border-radius: 16px;
 	}
+
+	.ty-player__main { display: contents; }
 
 	.ty-player__art {
-		width: 100%;
-		height: 190px;
+		width: 84px;
+		height: 84px;
+		grid-column: 1;
+		grid-row: 1;
+		align-self: start;
 	}
 
-	.ty-player__img { border-radius: 14px; }
+	.ty-player__img { border-radius: 12px; }
 
-	.ty-player__transport { gap: 8px; }
+	.ty-player__pulse { display: none; }
 
-	.ty-player__timeline { flex-basis: 100%; order: 5; }
+	.ty-player__head {
+		grid-column: 2;
+		grid-row: 1;
+		gap: 8px;
+		align-items: center;
+	}
 
-	.ty-player__time { order: 6; }
+	.ty-player__labels { gap: 1px; }
 
-	.ty-player__vol { order: 4; margin-inline-start: auto; }
+	.ty-player__eyebrow { font-size: 10px; }
 
-	.ty-player__vol input[type="range"] { width: 56px; }
+	.ty-player__song {
+		font-size: 16px;
+		line-height: 1.45;
+	}
+
+	.ty-player__artist { font-size: 12px; }
+
+	.ty-player__count { display: none; }
+
+	.ty-player__tools { gap: 6px; }
+
+	.ty-player__tool { padding: 6px 9px; font-size: 11px; }
+
+	.ty-player__transport {
+		grid-column: 1 / -1;
+		grid-row: 2;
+		gap: 6px;
+		padding-top: 2px;
+	}
+
+	.ty-player__btn--main { width: 44px; height: 44px; }
+
+	.ty-player__btn--skip { width: 32px; height: 32px; }
+
+	.ty-player__timeline { flex-basis: 100%; order: 5; height: 6px; }
+
+	.ty-player__time { order: 6; min-width: 0; font-size: 10px; }
+
+	.ty-player__vol { order: 4; margin-inline-start: auto; gap: 2px; }
+
+	.ty-player__vol input[type="range"] { width: 54px; }
+
+	.ty-player__error {
+		grid-column: 1 / -1;
+		margin: 0;
+	}
+
+	/* خودِ <audio> همیشه پنهان است و در شبکه جای نمی‌گیرد */
+	.ty-player__audio {
+		position: absolute;
+		width: 1px;
+		height: 1px;
+		overflow: hidden;
+		clip: rect(0 0 0 0);
+		clip-path: inset(50%);
+	}
 
 	.ty-player__item-btn {
 		grid-template-columns: 24px minmax(0, 1fr) 18px;
@@ -1107,6 +1289,121 @@ body.has-tara-dock { padding-bottom: 76px; }
 	}
 
 	.ty-dock__link { display: none; }
+}
+
+/* =========================================================================
+   ۷.۵) پاپ‌آپ تصویر کاور (v3.7.8)
+   ---------------------------------------------------------------------
+   با کلیک روی دکمهٔ دوربین، همین عنصر با JS ساخته می‌شود؛ هیچ مارکاپی در
+   صفحه‌های بی‌کاور چاپ نمی‌شود. تصویر با lazy-loading بار می‌شود تا صفحه
+   سنگین نشود، و لینک «باز کردن اصل تصویر» هم برای دانلود در دسترس است.
+   ====================================================================== */
+.ty-lightbox {
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 18px;
+	background: rgba(8, 10, 18, 0.88);
+	-webkit-backdrop-filter: blur(3px);
+	backdrop-filter: blur(3px);
+	animation: ty-lb-in .16s ease;
+}
+
+@keyframes ty-lb-in { from { opacity: 0; } to { opacity: 1; } }
+
+.ty-lightbox__img {
+	max-width: min(1080px, 94vw);
+	max-height: 84vh;
+	width: auto;
+	height: auto;
+	border-radius: 14px;
+	background: #fff;
+	box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+}
+
+.ty-lightbox__close,
+.ty-lightbox__open {
+	position: fixed;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	height: 40px;
+	padding: 0 14px;
+	border: 0;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.14);
+	color: #fff;
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.ty-lightbox__close {
+	top: 14px;
+	inset-inline-end: 14px;
+	width: 40px;
+	padding: 0;
+	font-size: 20px;
+}
+
+.ty-lightbox__open {
+	bottom: 16px;
+	inset-inline-start: 50%;
+	transform: translateX(50%);
+}
+
+.ty-lightbox__close:hover,
+.ty-lightbox__close:focus-visible,
+.ty-lightbox__open:hover,
+.ty-lightbox__open:focus-visible {
+	background: rgba(255, 255, 255, 0.26);
+	color: #fff;
+	outline: none;
+}
+
+body.tara-lb-open { overflow: hidden; }
+
+/* =========================================================================
+   ۷.۶) رنگِ «کلمات لینک‌دار» = رنگ اصلی سایت (v3.7.8)
+   ---------------------------------------------------------------------
+   تا امروز لینک‌های داخل متن رنگ #333 (هم‌رنگ متن) داشتند و فقط با هاور
+   از هم تشخیص داده می‌شدند. حالا هر لینکِ داخل محتوای متنی رنگ اصلی سایت
+   (`--ab-blue` که از تنظیمات رنگ قالب می‌آید) را می‌گیرد و زیرخطِ نازکِ
+   هم‌رنگ می‌خورد. کامپوننت‌های رابط (دکمهٔ دانلود، چیپ، ردیف آهنگ، دکمهٔ
+   صفحهٔ هنرمند) از این قاعده مستثنا هستند تا ظاهرشان عوض نشود.
+   ====================================================================== */
+.single_content_box :is(p, li, blockquote, td, dd, .music_lyrics_text) a:not([class]),
+.single_content_box :is(p, li, blockquote, td, dd) a:not(.dl_link_128):not(.dl_links_320):not(.artist_songs_page):not(.ty-chip):not(.ty-track__title):not(.music_lyrics_artist_link),
+.archive_txt_box a:not([class]),
+.archive-description a:not([class]) {
+	color: var(--ab-blue, #185adb);
+	text-decoration: underline;
+	text-decoration-thickness: 1px;
+	text-underline-offset: 3px;
+	text-decoration-color: color-mix(in srgb, var(--ab-blue, #185adb) 35%, transparent);
+}
+
+.single_content_box :is(p, li, blockquote, td, dd) a:hover,
+.single_content_box :is(p, li, blockquote, td, dd) a:focus-visible,
+.archive_txt_box a:hover,
+.archive_txt_box a:focus-visible,
+.archive-description a:hover,
+.archive-description a:focus-visible {
+	color: var(--ab-blue-dark, #1246ad);
+	text-decoration-color: currentColor;
+}
+
+.night .single_content_box :is(p, li, blockquote, td, dd) a,
+.night .archive_txt_box a,
+.night .archive-description a {
+	color: #a9c1ff;
+	text-decoration-color: rgba(169, 193, 255, .45);
 }
 
 /* =========================================================================
@@ -1745,54 +2042,64 @@ body.has-tara-modal { overflow: hidden; }
 }
 
 /* =========================================================================
-   ۱۲) شناسنامهٔ اثر — نسخهٔ ۳.۷.۳ (تفکیک‌شده و شیک‌تر)
+   ۱۲) «مشخصات اثر» — بازطراحی ۳.۷.۸ (کارت استاندارد و خوانا)
+   ---------------------------------------------------------------------
+   ایرادهای نسخهٔ قبل: ردیفِ چیپ‌های ریز با جداکننده‌های نامنظم، در موبایل
+   دو ستونِ ناهم‌ارتفاع و نام‌ها بدون برچسبِ خوانا. حالا:
+     • یک کارت با سرتیتر و شبکهٔ «برچسب/مقدار» (مانند جدولِ مشخصات حرفه‌ای).
+     • خطوط مویی بین خانه‌ها با شکافِ ۱px روی پس‌زمینهٔ خط.
+     • بدون پس‌زمینهٔ سفیدِ تکراری (خودِ کارت سطح دارد) و بدون آیکون‌های
+       پرت در هر خانه؛ فقط سرتیتر آیکون دارد.
    ====================================================================== */
-.single_content_box .ab-credits.ab-credits,
-/* v3.7.5 — «کادر سفید» حذف شد: شناسنامه حالا یک فهرست تخت و بی‌جعبه است.
-   هیچ پس‌زمینهٔ سفید، قاب یا سایه‌ای پشت نام هنرمندان نمی‌ماند. */
 .ab-credits.ab-credits {
-	margin: 12px 0 16px;
+	display: block;
+	margin: 18px 0 20px;
 	padding: 0 !important;
-	border: 0 !important;
-	border-radius: 0 !important;
-	background: transparent !important;
-	box-shadow: none !important;
-	overflow: visible;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	border-radius: 16px;
+	background: var(--ty-surface, #fff);
+	box-shadow: 0 10px 30px -26px rgba(17, 24, 39, .55);
+	overflow: hidden;
 }
 
 .ab-credits.ab-credits .ab-credits__title {
 	display: flex;
 	align-items: center;
-	gap: 7px;
-	margin: 0 0 6px;
-	padding: 0 0 6px;
+	gap: 8px;
+	margin: 0;
+	padding: 11px 14px;
 	border: 0;
-	border-bottom: 1px solid rgba(17, 24, 39, .12);
-	font-size: 12px;
+	border-bottom: 1px solid var(--ty-line, #e6e8ee);
+	font-size: 12.5px;
 	font-weight: 800;
 	letter-spacing: .2px;
 	color: var(--ty-ink, #111);
-	background: transparent;
+	background: var(--ty-accent-soft, #eaf1fe);
 }
 
-.ab-credits.ab-credits .ab-credits__title i { color: #6d28d9; font-size: 14px; }
+.ab-credits.ab-credits .ab-credits__title i {
+	color: var(--ty-accent, #185adb);
+	font-size: 15px;
+}
 
 .ab-credits.ab-credits .ab-credits__row {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
-	gap: 4px 16px;
-	background: transparent;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 1px;
+	background: var(--ty-line, #e6e8ee);
 }
 
 .ab-credits.ab-credits .ab-credit {
 	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	align-items: baseline;
-	gap: 4px;
-	padding: 2px 0;
-	background: transparent;
-	position: relative;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 3px;
+	padding: 11px 14px;
+	background: var(--ty-surface, #fff);
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+	position: static;
 }
 
 .ab-credits.ab-credits .ab-credit::before { content: none; }
@@ -1800,41 +2107,72 @@ body.has-tara-modal { overflow: hidden; }
 .ab-credits.ab-credits .ab-credit > i { display: none !important; }
 
 .ab-credits.ab-credits .ab-credit__k {
-	display: inline-block;
+	display: block;
 	font-size: 11px;
 	font-weight: 600;
 	color: var(--ty-muted, #6b7280);
+	white-space: nowrap;
 }
 
-.ab-credits.ab-credits .ab-credit__k::after { content: ":"; margin-inline-start: 1px; }
+.ab-credits.ab-credits .ab-credit__k::after { content: none; }
 
 .ab-credits.ab-credits .ab-credit__v {
-	font-size: 12.5px;
+	font-size: 13px;
 	font-weight: 700;
+	line-height: 1.65;
 	color: var(--ty-ink, #111);
-	line-height: 1.7;
+	word-break: break-word;
 }
 
 .ab-credits.ab-credits .ab-credit__v a {
-	color: #4c1d95;
+	color: var(--ty-accent, #185adb);
 	text-decoration: none;
-	border-bottom: 1px solid rgba(109, 40, 217, .25);
+	border-bottom: 1px solid transparent;
+	transition: border-color .16s ease, color .16s ease;
 }
 
-.ab-credits.ab-credits .ab-credit__v a:hover { border-bottom-color: #4c1d95; }
+.ab-credits.ab-credits .ab-credit__v a:hover,
+.ab-credits.ab-credits .ab-credit__v a:focus-visible {
+	color: var(--ty-accent-dark, #1246ad);
+	border-bottom-color: currentColor;
+}
 
 .ab-credits.ab-credits .ab-credit__sep { color: var(--ty-muted, #9ca3af); }
 
-/* حالت شب: متن روشن، بدون جعبه */
-.night .ab-credits.ab-credits .ab-credits__title { color: #f2f0ff; border-bottom-color: rgba(255, 255, 255, .16); }
+/* حالت شب */
+.night .ab-credits.ab-credits {
+	background: rgba(255, 255, 255, .04);
+	border-color: rgba(255, 255, 255, .14);
+	box-shadow: none;
+}
+
+.night .ab-credits.ab-credits .ab-credits__title {
+	color: #f2f0ff;
+	background: rgba(255, 255, 255, .07);
+	border-bottom-color: rgba(255, 255, 255, .14);
+}
+
+.night .ab-credits.ab-credits .ab-credits__row { background: rgba(255, 255, 255, .14); }
+
+.night .ab-credits.ab-credits .ab-credit { background: #14121f; }
+
 .night .ab-credits.ab-credits .ab-credit__v { color: #f2f0ff; }
+
 .night .ab-credits.ab-credits .ab-credit__k { color: rgba(255, 255, 255, .62); }
 
 @media (max-width: 782px) {
-	.ab-credits.ab-credits { margin: 12px 0; }
-	.ab-credits.ab-credits .ab-credits__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-	.ab-credits.ab-credits .ab-credit { padding: 8px 10px; }
-	.ab-credits.ab-credits .ab-credit__v { font-size: 12px; }
+	.ab-credits.ab-credits { margin: 14px 0 16px; border-radius: 14px; }
+
+	.ab-credits.ab-credits .ab-credits__title { padding: 9px 12px; font-size: 12px; }
+
+	.ab-credits.ab-credits .ab-credits__row {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.ab-credits.ab-credits .ab-credit { padding: 9px 12px; }
+
+	.ab-credits.ab-credits .ab-credit__v { font-size: 12.5px; }
+
 	.ab-credits.ab-credits .ab-credit__k { font-size: 10.5px; }
 }
 
@@ -2276,6 +2614,19 @@ body.tara-dock-open .top_page { bottom: 92px; }
 		padding-inline: 8px;
 	}
 
+	/* گوشی‌های باریک: کاور و سرتیتر یک پله کوچک‌تر، بدون شکستن خط */
+	.ty-player {
+		grid-template-columns: 68px minmax(0, 1fr);
+		gap: 8px 10px;
+		padding: 10px;
+	}
+
+	.ty-player__art { width: 68px; height: 68px; }
+
+	.ty-player__song { font-size: 15px; }
+
+	.ty-player__vol input[type="range"] { display: none; }
+
 	body.has-tara-dock { padding-bottom: 130px; }
 }
 
@@ -2486,13 +2837,36 @@ html[data-tara-night="1"] .ab-credits.ab-credits .ab-credit:hover {
    برچسب خاکستری. قرصِ گرادیانی با آیکون میکروفن در دایره و فلش، همراه با
    بالا‌آمدن نرم در هاور. در گوشی هم به‌جای پنهان‌شدن، تمام‌عرض می‌شود.
    ====================================================================== */
+/* v3.7.8 — «دکمهٔ صفحهٔ اختصاصی» سمت چپ تیتر، با فاصله؛ فلش در سمت راست دکمه.
+   ساختار: تیتر (راست) + دکمه (چپ) در یک ردیفِ flex؛ خط جداکننده تمام‌عرض
+   زیر هر دو می‌نشیند. در گوشی تیتر تمام‌عرض و دکمه یک ردیف کاملِ مرتب. */
+.rel_sing_bbt .title_tarlanweb_box {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px 16px;
+}
+
+.rel_sing_bbt .title_tarlanweb_box .tarlanweb_side_titles {
+	margin: 0;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.rel_sing_bbt .title_tarlanweb_box .liner {
+	flex: 1 1 100%;
+	margin: 2px 0 0;
+}
+
 .rel_sing_bbt .left_artists_pp {
-	float: inline-start;
+	float: none;
 	display: inline-flex;
-	margin: 0 0 8px;
+	margin: 0;
 	padding: 0;
 	background: transparent;
 	border-radius: 999px;
+	flex: 0 0 auto;
 }
 
 .rel_sing_bbt .left_artists_pp:hover { background: transparent; }
@@ -2533,27 +2907,46 @@ html[data-tara-night="1"] .ab-credits.ab-credits .ab-credit:hover {
 	font-size: 15px;
 }
 
+/* فلش در سمت راستِ دکمه: یک مثلثِ CSS که در RTL جابه‌جا/معکوس نمی‌شود */
 .rel_sing_bbt .artist_songs_page::after {
-	content: "‹";
-	font-size: 17px;
-	line-height: 1;
-	margin-inline-start: 2px;
-	opacity: .8;
+	content: "";
+	order: -1;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 5px 0 5px 7px;
+	border-color: transparent transparent transparent currentColor;
+	opacity: .85;
+	margin: 0;
 }
 
 @media (max-width: 767px) {
+	.rel_sing_bbt .title_tarlanweb_box {
+		gap: 8px;
+	}
+
+	.rel_sing_bbt .title_tarlanweb_box .tarlanweb_side_titles {
+		flex: 1 1 100%;
+		font-size: 15px;
+		line-height: 1.7;
+	}
+
 	.rel_sing_bbt .left_artists_pp {
 		display: block;
 		float: none;
-		margin: 10px 0 12px;
+		margin: 2px 0 10px;
+		width: 100%;
 	}
 
+	/* دکمه در گوشی: تمام‌عرض، محتوای وسط‌چین و فلش همان سمت راست */
 	.rel_sing_bbt .artist_songs_page {
 		display: flex;
 		width: 100%;
 		justify-content: center;
-		padding: 11px 16px;
+		gap: 9px;
+		padding: 11px 14px;
 		font-size: 13px;
+		text-align: center;
 	}
 
 	/* دکمهٔ تکراری انتهای فهرست دیگر لازم نیست */

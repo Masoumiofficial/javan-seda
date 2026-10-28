@@ -386,6 +386,11 @@ if ( ! function_exists( 'tara_card_play' ) ) {
 	 * @return string
 	 */
 	function tara_card_play( $post_id = 0 ) {
+		/* خاموشی: define( 'TARA_CARD_PLAY', false ) یا تنظیمات قالب «ab_card_play» */
+		if ( ( defined( 'TARA_CARD_PLAY' ) && ! TARA_CARD_PLAY )
+			|| ( function_exists( 'tara_ui_on' ) && ! tara_ui_on( 'ab_card_play', true, 'TARA_CARD_PLAY' ) ) ) {
+			return '';
+		}
 		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
 		if ( ! $post_id ) {
 			return '';

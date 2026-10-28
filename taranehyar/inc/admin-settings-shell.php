@@ -314,6 +314,37 @@ if ( ! function_exists( 'tara_settings_shell_title' ) ) {
 				اگر این کارت را می‌بینید، یعنی فایل‌های نسخهٔ تازه روی سایت هستند.
 			</span>
 		</div>
+
+		<?php
+		/* v3.8.0 — «سایز استاندارد بنر اصلی باید چند باشد؟» پرسش تکرارشوندهٔ
+		   مدیر است. جواب همین‌جا و کنار تنظیمات است، نه در ایمیل و پیام. */
+		?>
+		<details class="tara-settings-sizes">
+			<summary>
+				<span class="dashicons dashicons-format-image"></span>
+				اندازهٔ استاندارد تصاویر سایت
+			</summary>
+			<div class="tara-settings-sizes__body">
+				<table>
+					<thead>
+						<tr><th>کاربرد</th><th>نسبت</th><th>اندازهٔ پیشنهادی</th><th>حجم</th></tr>
+					</thead>
+					<tbody>
+						<tr><td>بنر اسلایدر صفحهٔ اصلی</td><td>۱۶:۷</td><td><b>۱۹۲۰×۸۴۰</b></td><td>≤ ۳۰۰ کیلوبایت</td></tr>
+						<tr><td>همان بنر، نسخهٔ همه‌کاره</td><td>۱۶:۹</td><td>۱۹۲۰×۱۰۸۰</td><td>≤ ۳۰۰ کیلوبایت</td></tr>
+						<tr><td>حداقل قابل قبول بنر</td><td>—</td><td>۱۲۰۰×۵۲۵</td><td>—</td></tr>
+						<tr><td>بنر صفحهٔ هنرمند</td><td>۳:۱</td><td>۱۶۰۰×۵۳۳</td><td>≤ ۲۵۰ کیلوبایت</td></tr>
+						<tr><td>کاور آهنگ / آلبوم</td><td>۱:۱</td><td>۸۰۰×۸۰۰</td><td>≤ ۲۰۰ کیلوبایت</td></tr>
+						<tr><td>عکس هنرمند (دایره‌ای)</td><td>۱:۱</td><td>۶۰۰×۶۰۰</td><td>≤ ۱۲۰ کیلوبایت</td></tr>
+					</tbody>
+				</table>
+				<p class="tara-settings-sizes__note">
+					قالب خودش نسخه‌های کوچک‌تر را می‌سازد، پس آپلودِ نسخهٔ بزرگ کافی است.
+					فرمت <b>WebP</b> با کیفیت ۸۰ کمترین حجم را می‌دهد. در بنر اسلایدر،
+					نوشتهٔ مهم را داخل ناحیهٔ وسط (نسبت ۱۶:۹) نگه دارید؛ گوشی همان ناحیه را نشان می‌دهد.
+				</p>
+			</div>
+		</details>
 		<?php
 	}
 	add_action( 'admin_notices', 'tara_settings_shell_title', 5 );

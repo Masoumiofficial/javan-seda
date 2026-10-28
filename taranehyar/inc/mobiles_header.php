@@ -3,17 +3,21 @@
 <a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( ot_get_option('logo') ); ?>" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" title="<?php echo ot_get_option('head_h1'); ?>" width="150" height="40"></a>
 </figure>
 </div>
-<div class="navicon"><i class="responsive-menu-button-inner"></i></div> 
-<div class="circle_hlink search_mobile_box"><i class="icofont-search"></i></div>
-<form class="searches_mobile" method="get" action="<?php echo esc_url( home_url() ); ?>">
-<input id="lsds_mobile" class="meta searchfield" name="s" data-swplive="true" placeholder="کلمه مورد نظر ..." type="text">
-<button><i class="icofont-search"></i></button>
+<?php /* v3.8.0 — دکمهٔ منو و جست‌وجوی موبایل از <div> به <button> تبدیل شدند:
+   با صفحه‌کلید هم کار می‌کنند، aria-expanded دارند و صفحه‌خوان می‌داند چه‌اند.
+   پیش از این فقط با لمس کار می‌کردند و هیچ برچسبی هم نداشتند. */ ?>
+<button type="button" class="navicon" aria-label="منوی سایت" aria-expanded="false" aria-controls="ab-mobile-drawer"><i class="responsive-menu-button-inner" aria-hidden="true"></i></button>
+<button type="button" class="circle_hlink search_mobile_box" aria-label="جست‌وجو" aria-expanded="false" aria-controls="searches_mobile"><i class="icofont-search" aria-hidden="true"></i></button>
+<form class="searches_mobile" id="searches_mobile" method="get" role="search" action="<?php echo esc_url( home_url() ); ?>">
+<label class="screen-reader-text" for="lsds_mobile">جست‌وجو در سایت</label>
+<input id="lsds_mobile" class="meta searchfield" name="s" data-swplive="true" placeholder="کلمه مورد نظر ..." type="search" autocomplete="off" enterkeyhint="search">
+<button type="submit" aria-label="جست‌وجو"><i class="icofont-search" aria-hidden="true"></i></button>
 </form>
-<div class="mobile_box">
+<div class="mobile_box" id="ab-mobile-drawer">
 <div class="bodydeactive"></div>
-<div class="mobiles_menu">
+<div class="mobiles_menu" role="dialog" aria-modal="true" aria-label="منوی سایت" aria-hidden="true">
 <div class="top_logo_title">
-<a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( ot_get_option('logo') ); ?>" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" title="get" width="150" height="40"></a>
+<a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( ot_get_option('logo') ); ?>" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" width="150" height="40"></a>
 <div class="clear"></div>
 </div>
 <?php
@@ -52,12 +56,12 @@ if ( ! $ab_mm_done ) {
 <div class="clear"></div>
 <div class="socials_box">
 <?php if(ot_get_option('facebook') !=""){ ?>
-<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('facebook') ); ?>" aria-label="facebook" class="icofont-facebook"></a><?php } if(ot_get_option('instagram') !=""){ ?>
-<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('instagram') ); ?>" aria-label="instagram" class="icofont-instagram"></a><?php } if(ot_get_option('telegram') !=""){ ?>
-<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('telegram') ); ?>" aria-label="twitter" class="icofont-paper-plane"></a><?php } if(ot_get_option('twitter') !=""){ ?>
-<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('twitter') ); ?>" aria-label="twitter" class="icofont-twitter"></a><?php } if(ot_get_option('youtube') !=""){ ?>
-<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('youtube') ); ?>" aria-label="youtube" class="icofont-youtube-play"></a><?php } if(ot_get_option('aparat') !=""){ ?>
-<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('aparat') ); ?>" aria-label="aparat" class="icofont-movie"></a><?php } ?>
+<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('facebook') ); ?>" aria-label="فیسبوک" class="icofont-facebook"></a><?php } if(ot_get_option('instagram') !=""){ ?>
+<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('instagram') ); ?>" aria-label="اینستاگرام" class="icofont-instagram"></a><?php } if(ot_get_option('telegram') !=""){ ?>
+<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('telegram') ); ?>" aria-label="تلگرام" class="icofont-paper-plane"></a><?php } if(ot_get_option('twitter') !=""){ ?>
+<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('twitter') ); ?>" aria-label="توییتر" class="icofont-twitter"></a><?php } if(ot_get_option('youtube') !=""){ ?>
+<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('youtube') ); ?>" aria-label="یوتیوب" class="icofont-youtube-play"></a><?php } if(ot_get_option('aparat') !=""){ ?>
+<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url( ot_get_option('aparat') ); ?>" aria-label="آپارات" class="icofont-movie"></a><?php } ?>
 <div class="clear"></div>
 </div>
 <div class="clear"></div>

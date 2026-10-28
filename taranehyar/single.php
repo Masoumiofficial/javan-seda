@@ -462,19 +462,19 @@ if ( $taranehyar_download_title && (
 ?>
 <div class="dl_links_box">
 <?php if(get_field('music128')){ ?> 
-<a class="dl_link_128" href="<?php echo esc_url( get_field('music128') ); ?>"> <i class="icofont-download"></i>دانلود  آهنگ با کیفیت 128 </a><?php } if(get_field('music320')){ ?>
-<a class="dl_links_320" href="<?php echo esc_url( get_field('music320') ); ?>"> <i class="icofont-download"></i> دانلود آهنگ با کیفیت 320 </a><?php } if(get_field('album128')){ ?>	
-<a class="dl_link_128" href="<?php echo esc_url( get_field('album128') ); ?>"> <i class="icofont-download"></i>دانلود  آلبوم با کیفیت 128 </a><?php } if(get_field('album320')){ ?>
-<a class="dl_links_320" href="<?php echo esc_url( get_field('album320') ); ?>"> <i class="icofont-download"></i> دانلود  آلبوم با کیفیت 320 </a>	<?php } ?>
+<a class="dl_link_128" href="<?php echo esc_url( get_field('music128') ); ?>" target="_blank" rel="noopener">> <i class="icofont-download"></i>دانلود  آهنگ با کیفیت 128 </a><?php } if(get_field('music320')){ ?>
+<a class="dl_links_320" href="<?php echo esc_url( get_field('music320') ); ?>" target="_blank" rel="noopener">> <i class="icofont-download"></i> دانلود آهنگ با کیفیت 320 </a><?php } if(get_field('album128')){ ?>	
+<a class="dl_link_128" href="<?php echo esc_url( get_field('album128') ); ?>" target="_blank" rel="noopener">> <i class="icofont-download"></i>دانلود  آلبوم با کیفیت 128 </a><?php } if(get_field('album320')){ ?>
+<a class="dl_links_320" href="<?php echo esc_url( get_field('album320') ); ?>" target="_blank" rel="noopener">> <i class="icofont-download"></i> دانلود  آلبوم با کیفیت 320 </a>	<?php } ?>
 <div class="clear"></div>
 </div>
 <?php if((get_field('video1080')) || (get_field('video720')) || (get_field('video480'))){ ?>
 <div class="dl_linksv_box">
 <ul>
 <?php if(get_field('video1080')){ ?> 
-<li><a href="<?php echo esc_url( get_field('video1080') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  1080 </a></li><?php } if(get_field('video720')){ ?>
-<li><a href="<?php echo esc_url( get_field('video720') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  720 </a></li><?php } if(get_field('video480')){ ?>
-<li><a href="<?php echo esc_url( get_field('video480') ); ?>"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  480 </a></li><?php } ?>
+<li><a href="<?php echo esc_url( get_field('video1080') ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  1080 </a></li><?php } if(get_field('video720')){ ?>
+<li><a href="<?php echo esc_url( get_field('video720') ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  720 </a></li><?php } if(get_field('video480')){ ?>
+<li><a href="<?php echo esc_url( get_field('video480') ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  480 </a></li><?php } ?>
 </ul>
 <div class="clear"></div>
 </div>
@@ -507,10 +507,20 @@ if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID() );
 <div class="single_posts socials_shares_box">
 <p>اشتراک گذاری مطلب</p>
 <div class="socials_shares">
-<a target="_blank" href="http://www.facebook.com/share.php?v=4&src=bm&u=<?php the_permalink(); ?>"><i aria-label="facebook" class="icofont-facebook"></i></a>
-<a target="_blank" href="https://twitter.com/intent/tweet?text=<?php the_permalink(); ?>"><i aria-label="twitter" class="icofont-twitter"></i></a>
-<a target="_blank" href="https://api.whatsapp.com/send?text=<?php the_title(); bloginfo('url'); ?>/?p=<?php the_id(''); ?>"><i aria-label="whatsapp" class="icofont-whatsapp"></i></a>
-<a target="_blank" href="https://telegram.me/share/url?url=<?php the_permalink(); ?>"><i aria-label="telegram" class="icofont-paper-plane"></i></a>
+<?php
+/* v3.8.0 — لینک‌های اشتراک‌گذاری اصلاح شدند:
+   • فیسبوک روی http بود ⇒ https و آدرسِ رسمیِ sharer.php
+   • توییتر آدرس را در پارامتر text می‌فرستاد (بدون url) ⇒ url + text
+   • واتس‌اپ آدرسِ کوتاه را دستی می‌ساخت ⇒ همان پیوندِ ثابت نوشته
+   • همه: rel="noopener nofollow" و برچسب فارسی روی خودِ <a>
+     (aria-label روی <i> بود که صفحه‌خوان‌ها روی لینک نمی‌خوانند). */
+$ab_share_url   = rawurlencode( get_permalink() );
+$ab_share_title = rawurlencode( get_the_title() );
+?>
+<a target="_blank" rel="noopener nofollow" href="https://www.facebook.com/sharer/sharer.php?u=<?php echo esc_url( $ab_share_url ); ?>" aria-label="اشتراک در فیسبوک"><i class="icofont-facebook" aria-hidden="true"></i></a>
+<a target="_blank" rel="noopener nofollow" href="https://twitter.com/intent/tweet?url=<?php echo esc_url( $ab_share_url ); ?>&amp;text=<?php echo esc_attr( $ab_share_title ); ?>" aria-label="اشتراک در توییتر"><i class="icofont-twitter" aria-hidden="true"></i></a>
+<a target="_blank" rel="noopener nofollow" href="https://api.whatsapp.com/send?text=<?php echo esc_url( $ab_share_title . '%20' . $ab_share_url ); ?>" aria-label="اشتراک در واتس‌اپ"><i class="icofont-whatsapp" aria-hidden="true"></i></a>
+<a target="_blank" rel="noopener nofollow" href="https://t.me/share/url?url=<?php echo esc_url( $ab_share_url ); ?>&amp;text=<?php echo esc_attr( $ab_share_title ); ?>" aria-label="اشتراک در تلگرام"><i class="icofont-paper-plane" aria-hidden="true"></i></a>
 </div>
 <div class="clear"></div>
 </div>
@@ -534,10 +544,10 @@ array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,
 'meta_query'=>array(array('key'=>'artist','value'=>$artist,'compare'=>'LIKE')), ));
 if($my_custom_query->have_posts()) : ?>
 <div class="related_posts rel_sing_bbt">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php echo $artist; ?></h3>
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php echo esc_html( $artist ); ?></h3>
 <?php if(has_tag()){ if(isset($artist) && !empty($artist)){ $post_tags = get_the_tags(); foreach( $post_tags as $tag) :
 if ( $tag->name === $artist ){ ?>
-<div class="left_artists_pp"><a class="artist_songs_page" href="<?php bloginfo('url');?>/tag/<?php print_r($tag->slug);?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی  <?php print_r($tag->name); ?> </a></div>
+<div class="left_artists_pp"><a class="artist_songs_page" href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo esc_html( $tag->name ); ?> </a></div>
 <?php } endforeach; } } ?>
 <div class="liner clear"></div>
 <div class="tarlanweb_side_box">
@@ -550,12 +560,12 @@ the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
 <?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
 <?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
-if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
+if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo esc_html( $artist ); ?> </span> <span> <?php echo esc_html( $track ); ?> </span> <?php } else{ the_title(''); } ?>	
 </a></li>
 <?php endwhile; ?>
 <?php if(has_tag()){ if(isset($artist) && !empty($artist)){ $post_tags = get_the_tags(); foreach( $post_tags as $tag) :
 if ( $tag->name === $artist ){ ?>
-<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php bloginfo('url');?>/tag/<?php print_r($tag->slug);?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی  <?php print_r($tag->name); ?> </a></li>
+<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo esc_html( $tag->name ); ?> </a></li>
 <?php } endforeach; } } ?>
 </ul>
 <div class="clear"></div>
@@ -588,7 +598,7 @@ the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
 <?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
 <?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
-if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
+if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo esc_html( $artist ); ?> </span> <span> <?php echo esc_html( $track ); ?> </span> <?php } else{ the_title(''); } ?>	
 </a></li>
 <?php endwhile; ?> 
 <?php $terms = get_the_terms($post->ID,tara_artist_tax()); foreach ($terms as $term){ ?>
@@ -648,7 +658,7 @@ array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,
 'meta_query'=>array(array('key'=>'artist','value'=>$artist,'compare'=>'LIKE')), ));
 if($my_custom_query->have_posts()) : ?>
 <aside class="related_posts">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php echo $artist; ?></h3>
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php echo esc_html( $artist ); ?></h3>
 <div class="liner clear"></div>
 <div class="tarlanweb_side_box">
 <ul>
@@ -660,12 +670,12 @@ the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
 <?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
 <?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
-if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
+if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo esc_html( $artist ); ?> </span> <span> <?php echo esc_html( $track ); ?> </span> <?php } else{ the_title(''); } ?>	
 </a></li>
 <?php endwhile; ?>
 <?php if(has_tag()){ if(isset($artist) && !empty($artist)){ $post_tags = get_the_tags(); foreach( $post_tags as $tag) :
 if ( $tag->name === $artist ){ ?>
-<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php bloginfo('url');?>/tag/<?php print_r($tag->slug);?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی  <?php print_r($tag->name); ?> </a></li>
+<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo esc_html( $tag->name ); ?> </a></li>
 <?php } endforeach; } } ?>
 </ul>
 <div class="clear"></div>
@@ -695,7 +705,7 @@ the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
 <?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
 <?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
-if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
+if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo esc_html( $artist ); ?> </span> <span> <?php echo esc_html( $track ); ?> </span> <?php } else{ the_title(''); } ?>	
 </a></li>
 <?php endwhile; ?>
 <?php $terms = get_the_terms($post->ID,tara_artist_tax()); foreach ($terms as $term){ ?>

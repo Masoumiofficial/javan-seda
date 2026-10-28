@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.7.10' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.8.0' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -98,6 +98,10 @@ if ( ! function_exists( 'taranehyar_setup' ) ) {
 			add_image_size( 'thumb2', 190, 190, true );
 			add_image_size( 'thumb2x', 380, 380, true );
 			add_image_size( 'thumb1', 640, 360, true );
+			/* v3.8.0 — کارت شبکه‌های اجتماعی (OG/Twitter) به ۱۲۰۰×۶۳۰ نیاز دارد؛
+			   پیش از این از thumb1 (۶۴۰×۳۶۰) استفاده می‌شد. برای تصویرهای
+			   آپلودشدهٔ قدیمی این سایز ساخته نمی‌شود و همان مسیر قبلی می‌ماند. */
+			add_image_size( 'tara-og', 1200, 630, true );
 		}
 
 		/* جای منوها — همان نامک‌هایی که در قالب‌ها فراخوانی شده‌اند */

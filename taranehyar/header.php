@@ -9,14 +9,22 @@ if ( function_exists( 'wp_get_document_title' ) && ! ( function_exists( 'current
 <title><?php echo esc_html( wp_get_document_title() ); ?></title>
 <?php endif; ?>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta property="dc:creator" content=" Design Group - call by " />
-<meta name="theme-color" content="#000000">
-<meta name="apple-mobile-web-app-status-bar-style" content="#000000">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<?php /* v3.8.0 — متای بی‌معنای «dc:creator» با مقدار «Design Group - call by»
+   (بدون مقدار واقعی) حذف شد؛ چیزی جز یک برچسبِ خالی برای خزنده‌ها نبود. */ ?>
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
 <link rel="alternate" href="<?php echo esc_url( home_url() ); ?>/feed" type="application/rss+xml" title="RSS 2.0">
+<?php /* v3.8.0 — اگر آیکون در تنظیمات خالی باشد، لینکِ خالی چاپ نمی‌شود
+   (مرورگر برای href="" همان صفحهٔ جاری را درخواست می‌کرد). */ ?>
+<?php if ( '' !== (string) ot_get_option( 'favicon' ) ) : ?>
 <link rel="shortcut icon" type="image/x-icon" href="<?php echo esc_url( ot_get_option('favicon') ); ?>">
+<?php endif; ?>
+<?php if ( '' !== (string) ot_get_option( 'logo' ) ) : ?>
 <link rel="apple-touch-icon" href="<?php echo esc_url( ot_get_option('logo') ); ?>">
+<?php endif; ?>
 <?php wp_enqueue_script("jquery"); wp_head('');
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
 <?php
@@ -72,18 +80,26 @@ if ( $darks_std ) { ?>
 <?php wp_nav_menu(array('theme_location'=>'top_menu','menu_id'=>'tara-menu','container'=>'')); ?>
 <div class="clear"></div>
 </nav>
-<form id="searches" method="get" action="<?php echo esc_url( home_url() ); ?>">
-<input id="lsds" class="meta searchfield" name="s" placeholder="جستجو  ..." type="text" data-swplive="true">
-<button><i class="icofont-search"></i></button>
+<?php /* v3.8.0 — فرم جست‌وجو برچسبِ خوانا گرفت: صفحه‌خوان قبلاً فقط
+   placeholder را می‌خواند و نقشِ «جست‌وجو» را هم نمی‌شناخت. */ ?>
+<form id="searches" method="get" role="search" action="<?php echo esc_url( home_url() ); ?>">
+<label class="screen-reader-text" for="lsds">جست‌وجو در سایت</label>
+<input id="lsds" class="meta searchfield" name="s" placeholder="جستجو  ..." type="search" data-swplive="true" autocomplete="off" enterkeyhint="search">
+<button type="submit" aria-label="جست‌وجو"><i class="icofont-search" aria-hidden="true"></i></button>
 </form>
 
 <?php $enablepop = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'sun_moon' ) : ( 'off' != ot_get_option( 'sun_moon' ) );
 if ( $enablepop ) { ?>
 <?php $darks_on = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'dark_modes', false ) : ( 'off' != ot_get_option( 'dark_modes' ) ); ?>
-<div class="dark_light_mode<?php echo $darks_on ? ' dark_active' : ''; ?>">
-<i aria-label="moon" class="icofont-moon"></i>
-<div class="toggle_modes"></div>
-<i aria-label="sun" class="icofont-sun"></i>
+<?php /* v3.8.0 — کلید شب/روز حالا با صفحه‌کلید هم کار می‌کند و وضعیتش را
+   به صفحه‌خوان می‌گوید (role=switch + aria-checked). پیش از این یک divِ
+   کلیک‌پذیر بود: نه Tab می‌گرفت، نه Enter/Space. اسکریپت درون‌خطی
+   (tara_runtime_inline_js) همین aria-checked را هم‌گام نگه می‌دارد. */ ?>
+<div class="dark_light_mode<?php echo $darks_on ? ' dark_active' : ''; ?>" role="switch" tabindex="0"
+	aria-checked="<?php echo $darks_on ? 'true' : 'false'; ?>" aria-label="حالت شب" title="روشن / شب">
+<i class="icofont-moon" aria-hidden="true"></i>
+<div class="toggle_modes" aria-hidden="true"></div>
+<i class="icofont-sun" aria-hidden="true"></i>
 </div>
 <?php } ?>
 

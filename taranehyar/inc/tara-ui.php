@@ -209,6 +209,53 @@ if ( ! function_exists( 'tara_post_has_video' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_post_has_audio' ) ) {
+	/**
+	 * آیا این اثر فایل صوتی دارد؟ (v3.8.0)
+	 * ------------------------------------------------------------------
+	 * قرینهٔ `tara_post_has_video` برای نشانهٔ «آهنگ». فقط متا خوانده
+	 * می‌شود (بدون `get_field`) تا در فهرست‌های بلند هزینه‌ای نداشته باشد.
+	 *
+	 * @param int $post_id شناسهٔ نوشته (۰ = نوشتهٔ جاری).
+	 * @return bool
+	 */
+	function tara_post_has_audio( $post_id = 0 ) {
+		static $cache = array();
+
+		$id = $post_id ? (int) $post_id : (int) get_the_ID();
+		if ( ! $id ) {
+			return false;
+		}
+		if ( isset( $cache[ $id ] ) ) {
+			return $cache[ $id ];
+		}
+
+		$has = false;
+		foreach ( array( 'music320', 'music128', 'music' ) as $key ) {
+			$value = get_post_meta( $id, $key, true );
+			if ( is_scalar( $value ) && '' !== trim( (string) $value ) ) {
+				$has = true;
+				break;
+			}
+		}
+
+		/* آلبوم‌ها فایل صوتی را در ردیف‌های تکرارشونده (ACF Repeater) نگه
+		   می‌دارند؛ متای والد شمارنده است، پس عددِ بزرگ‌تر از صفر کافی است. */
+		if ( ! $has ) {
+			$album = get_post_meta( $id, 'album', true );
+			if ( is_array( $album ) ) {
+				$has = ! empty( $album );
+			} elseif ( is_scalar( $album ) && (int) $album > 0 ) {
+				$has = true;
+			}
+		}
+
+		$cache[ $id ] = (bool) apply_filters( 'tara_post_has_audio', $has, $id );
+
+		return $cache[ $id ];
+	}
+}
+
 if ( ! function_exists( 'tara_video_badge' ) ) {
 	/**
 	 * نشانهٔ «موزیک ویدیو» روی کارت/ردیف. خروجی رشتهٔ خالی برای آثار صوتی.
@@ -228,6 +275,42 @@ if ( ! function_exists( 'tara_video_badge' ) ) {
 
 		return '<span class="ab-card-video" aria-label="موزیک ویدیو" title="موزیک ویدیو">'
 			. '<i class="icofont-play-alt-2" aria-hidden="true"></i><em>ویدیو</em></span>';
+	}
+}
+
+if ( ! function_exists( 'tara_media_badge' ) ) {
+	/**
+	 * نشانهٔ نوعِ اثر روی کاور کارت (v3.8.0)
+	 * ------------------------------------------------------------------
+	 * در دور ۶۷ فقط «ویدیو» نشان داده می‌شد و بدتر از آن، در گوشهٔ **چپ**
+	 * می‌نشست (`inset-inline-end` در RTL = چپ). کاربر خواست همان نشانه به
+	 * سمت راست بیاید و برای آثار صوتی هم قرینه‌اش ساخته شود.
+	 *
+	 *   • ویدیو → پیل تیره + مثلث پخش + «ویدیو»
+	 *   • آهنگ  → پیل روشن‌تر + نت موسیقی + «آهنگ»
+	 *   • هیچ‌کدام → رشتهٔ خالی (بدون کلاس و فاصلهٔ اضافه)
+	 *
+	 * در ردیف‌های فهرست فقط «ویدیو» برچسب می‌گیرد؛ ردیف‌های صوتی خودشان
+	 * فهرست یک سایت موسیقی‌اند و آیکون «آهنگ» روی هر ۱۱۷ ردیف فقط شلوغی
+	 * می‌سازد.
+	 *
+	 * @param int    $post_id شناسهٔ نوشته.
+	 * @param string $variant 'card' یا 'row'.
+	 * @return string
+	 */
+	function tara_media_badge( $post_id = 0, $variant = 'card' ) {
+		$id = $post_id ? (int) $post_id : (int) get_the_ID();
+
+		if ( tara_post_has_video( $id ) ) {
+			return tara_video_badge( $id, $variant );
+		}
+
+		if ( 'row' === $variant || ! tara_post_has_audio( $id ) ) {
+			return '';
+		}
+
+		return '<span class="ab-card-audio" aria-label="نسخهٔ صوتی" title="نسخهٔ صوتی">'
+			. '<i class="icofont-music-note" aria-hidden="true"></i><em>آهنگ</em></span>';
 	}
 }
 
@@ -1109,7 +1192,11 @@ if ( ! function_exists( 'tara_runtime_inline_js' ) ) {
 			function paint(on) {
 				doc.body.classList.toggle('night', on);
 				var keys = doc.querySelectorAll('.dark_light_mode');
-				for (var i = 0; i < keys.length; i++) { keys[i].classList.toggle('dark_active', on); }
+				for (var i = 0; i < keys.length; i++) {
+					keys[i].classList.toggle('dark_active', on);
+					/* v3.8.0 — وضعیت کلید برای صفحه‌خوان */
+					keys[i].setAttribute('aria-checked', on ? 'true' : 'false');
+				}
 				var knobs = doc.querySelectorAll('.toggle_modes');
 				for (var j = 0; j < knobs.length; j++) { knobs[j].classList.toggle('active', on); }
 				root.setAttribute('data-tara-night', on ? '1' : '0');
@@ -1135,6 +1222,58 @@ if ( ! function_exists( 'tara_runtime_inline_js' ) ) {
 					el = el.parentNode;
 				}
 			}, true);
+
+			/* v3.8.0 — دکمهٔ «بالا» با صفحه‌کلید */
+			doc.addEventListener('keydown', function (ev) {
+				var el = ev.target;
+				if (!el || !el.classList || !el.classList.contains('top_page')) { return; }
+				if (ev.key !== 'Enter' && ev.key !== ' ' && ev.key !== 'Spacebar') { return; }
+				ev.preventDefault();
+				try { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+				catch (e) { window.scrollTo(0, 0); }
+			});
+
+			/* v3.8.0 — کلید شب/روز با صفحه‌کلید: Enter و Space */
+			doc.addEventListener('keydown', function (ev) {
+				var el = ev.target;
+				if (!el || !el.classList || !el.classList.contains('dark_light_mode')) { return; }
+				if (ev.key !== 'Enter' && ev.key !== ' ' && ev.key !== 'Spacebar') { return; }
+				ev.preventDefault();
+				var next = !doc.body.classList.contains('night');
+				paint(next);
+				store(next);
+			});
+
+			/* v3.8.0 — کشوی منوی موبایل: aria-expanded روی دکمه، aria-hidden روی
+			   کشو، بستن با Escape و برگشت فوکوس به دکمه. باز/بستنِ بصری همان
+			   انیمیشن jQuery قبلی است؛ این‌جا فقط وضعیتِ معنایی هم‌گام می‌شود. */
+			(function () {
+				var nav = doc.querySelector('#mobiles_header .navicon');
+				var drawer = doc.querySelector('#ab-mobile-drawer');
+				if (!nav || !drawer) { return; }
+
+				function setOpen(open) {
+					nav.setAttribute('aria-expanded', open ? 'true' : 'false');
+					nav.setAttribute('aria-label', open ? 'بستن منو' : 'منوی سایت');
+					var panel = drawer.querySelector('.mobiles_menu');
+					if (panel) { panel.setAttribute('aria-hidden', open ? 'false' : 'true'); }
+				}
+
+				nav.addEventListener('click', function () {
+					setOpen(nav.getAttribute('aria-expanded') !== 'true');
+				});
+
+				/* بستنِ کشو با Escape: همان مسیر بستنِ لمس (پرده) را صدا می‌زنیم
+				   تا انیمیشن و رفتارِ قبلی دست‌نخورده بماند. */
+				doc.addEventListener('keydown', function (ev) {
+					if (ev.key !== 'Escape' && ev.key !== 'Esc') { return; }
+					if (nav.getAttribute('aria-expanded') !== 'true') { return; }
+					var veil = drawer.querySelector('.bodydeactive');
+					if (veil) { veil.click(); }
+					setOpen(false);
+					try { nav.focus(); } catch (e) {}
+				});
+			})();
 
 			/* دکمهٔ «بالا» */
 			var topBtn = doc.querySelector('.top_page');

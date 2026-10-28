@@ -498,7 +498,7 @@ t( 'تاکسونومی: قالب مشترک آرشیو موجود', is_readable(
 /* ======================================================================
    v3.7.7 — بازبینی خرابی‌های گزارش‌شده و تنظیمات تازه
    ====================================================================== */
-t( 'نسخه: style.css روی ۳.۷.۱۰ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.7.10' ) );
+t( 'نسخه: style.css روی ۳.۸.۰ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.8.0' ) );
 
 $opts = (string) @file_get_contents( '/tmp/theme/inc/theme-options.php' );
 t( 'تنظیمات: بخش رنگ‌ها اضافه شده', false !== strpos( $opts, "'id'=>'brand'" ) );
@@ -551,7 +551,7 @@ $dock_php = (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' );
 t( 'نوار چسبان: مارکاپ صدا دارد', false !== strpos( $dock_php, 'data-tara-dock-vol' ) && false !== strpos( $dock_php, 'data-tara-dock-mute' ) );
 $player_js2 = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
 t( 'ویدیو: خروج با Esc و تغییر جهت', false !== strpos( $player_js2, "'orientationchange'" ) && false !== strpos( $player_js2, "e.key !== 'Escape'" ) );
-t( 'پلیر: نشانهٔ نسخه ۳.۷.۱۰', false !== strpos( $player_js2, "'data-tara-ready', '3.7.10'" ) );
+t( 'پلیر: نشانهٔ نسخه ۳.۸.۰', false !== strpos( $player_js2, "'data-tara-ready', '3.8.0'" ) );
 
 /* ======================================================================
    ۳.۷.۸ — دور ۶۶: ترتیب صفحهٔ آهنگ، اسلایدر تازه، سربرگ سه‌ستونهٔ هنرمند،
@@ -636,8 +636,9 @@ t(
 );
 t( 'اسلایدر: اسلایدها پشت‌سرهم در flow (بدون position:absolute)', false !== strpos( $home79, '.ty-hero-slide {' ) && false === strpos( $home79, 'inset: 0;\n\tdisplay: block;\n\tmargin: 0;' ) );
 t(
-	'اسلایدر: جاوااسکریپت روی scrollLeft کار می‌کند',
-	false !== strpos( $hero_js79, 'root.scrollLeft / width()' )
+	'اسلایدر: جاوااسکریپت روی scrollLeft کار می‌کند (و RTL را می‌فهمد)',
+	false !== strpos( $hero_js79, 'Math.abs(root.scrollLeft)' )
+		&& false !== strpos( $hero_js79, 'rtlNegative' )
 		&& false !== strpos( $hero_js79, 'scrollToIndex' )
 		&& false === strpos( $hero_js79, 'classList.remove(\'is-active\')' )
 );
@@ -657,7 +658,7 @@ t(
 		&& false !== strpos( $ui79, 'function tara_video_badge' )
 		&& false !== strpos( $ui79, 'video1080' )
 );
-t( 'ویدیو: نشانه روی کارت', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/songs_post.php' ), 'tara_video_badge' ) );
+t( 'ویدیو: نشانه روی کارت', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/songs_post.php' ), 'tara_media_badge' ) );
 t( 'ویدیو: نشانه کنار تیتر ردیف', false !== strpos( $ui79, "tara_video_badge( \$post_id, 'row' )" ) );
 t( 'ویدیو: استایل نشانه', false !== strpos( $ui78, '.ab-card-video' ) && false !== strpos( $ui78, '.ty-track__vid' ) );
 
@@ -724,6 +725,171 @@ t(
 	'تنظیمات: پشتیبان CSS برای بسته‌بودن آیتم‌های فهرستی',
 	false !== strpos( $shell710, '.option-tree-setting:not(.tara-li-open) > .option-tree-setting-body { display: none; }' )
 		&& false !== strpos( $shell710, 'مورد بدون عنوان' )
+);
+
+
+/* ======================================================================
+   ۳.۸.۰ — نشانهٔ نوع اثر، اسلایدر راست‌چین، کاور بزرگ‌تر و بازبینی عمومی
+   ====================================================================== */
+$uiphp80   = (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' );
+$ui80      = (string) @file_get_contents( '/tmp/theme/css/tara-ui.css' );
+$home80    = (string) @file_get_contents( '/tmp/theme/css/tara-home.css' );
+$herojs80  = (string) @file_get_contents( '/tmp/theme/js/hero-slider.js' );
+$vip80     = (string) @file_get_contents( '/tmp/theme/inc/vip_slider.php' );
+$head80    = (string) @file_get_contents( '/tmp/theme/header.php' );
+$mob80     = (string) @file_get_contents( '/tmp/theme/inc/mobiles_header.php' );
+$foot80    = (string) @file_get_contents( '/tmp/theme/footer.php' );
+$single80  = (string) @file_get_contents( '/tmp/theme/single.php' );
+$none80    = (string) @file_get_contents( '/tmp/theme/inc/no-content.php' );
+$shell80   = (string) @file_get_contents( '/tmp/theme/inc/admin-settings-shell.php' );
+$search80  = (string) @file_get_contents( '/tmp/theme/search.php' );
+$songs80   = (string) @file_get_contents( '/tmp/theme/inc/songs_post.php' );
+$chrome80  = $uiphp80;
+
+/* --- نشانهٔ نوع اثر --- */
+t(
+	'نشانه: تابع قرینهٔ صوتی اضافه شد',
+	false !== strpos( $uiphp80, 'function tara_post_has_audio' )
+		&& false !== strpos( $uiphp80, 'function tara_media_badge' )
+);
+t(
+	'نشانه: کارت‌ها از تابع تازه استفاده می‌کنند',
+	false !== strpos( $songs80, 'tara_media_badge' )
+);
+t(
+	'نشانه: هر دو پیل (ویدیو / آهنگ) در CSS هست',
+	false !== strpos( $ui80, '.ab-card-video,' )
+		&& false !== strpos( $ui80, '.ab-card-audio {' )
+);
+t(
+	'نشانه: در گوشهٔ راست نشسته (inset-inline-start)',
+	false !== strpos( $ui80, 'inset-inline-start: 7px; /* در RTL = راست-بالا */' )
+);
+t(
+	'نشانه: دیگر در گوشهٔ چپ نیست',
+	false === strpos( $ui80, 'inset-inline-end: 7px' )
+);
+
+/* --- اسلایدر راست‌چین --- */
+t(
+	'اسلایدر: ریل راست‌چین شد',
+	false !== strpos( $home80, 'direction: rtl; /* v3.8.0' )
+		&& false === strpos( $home80, 'direction: ltr; /* فقط برای ریاضیات' )
+);
+t(
+	'اسلایدر: هر دو مدل scrollLeft در RTL پوشش داده شد',
+	false !== strpos( $herojs80, 'rtlNegative = root.scrollLeft < 0' )
+		&& false !== strpos( $herojs80, '(total - 1) - Math.round(root.scrollLeft / w)' )
+		&& false !== strpos( $herojs80, 'left = -i * w' )
+);
+t(
+	'اسلایدر: کلید جهت در RTL برعکس می‌شود',
+	false !== strpos( $herojs80, 'step = -step;' )
+);
+t(
+	'اسلایدر: اسلاید پنهان با inert از مسیر Tab بیرون است',
+	false !== strpos( $herojs80, "'inert' in slides[n]" )
+);
+
+/* --- کاور بزرگ‌تر پلیر گوشی --- */
+t(
+	'پلیر موبایل: کاور ۷۶ ⇒ ۱۰۴ پیکسل',
+	false !== strpos( $ui80, 'grid-template-columns: 104px minmax(0, 1fr);' )
+		&& false === strpos( $ui80, 'grid-template-columns: 76px minmax(0, 1fr);' )
+);
+t( 'پلیر موبایل: گوشی باریک ۸۸px', false !== strpos( $ui80, 'width: 88px; height: 88px;' ) );
+
+/* --- بنر --- */
+t(
+	'بنر: فیلد آرایه/شناسه/آدرس هر سه پذیرفته می‌شوند',
+	false !== strpos( $vip80, 'is_array( $tara_custom )' )
+		&& false !== strpos( $vip80, 'is_numeric( $tara_custom )' )
+);
+t(
+	'بنر: srcset و ابعاد ۱۲۸۰×۵۶۰ (۱۶:۷)',
+	false !== strpos( $vip80, 'wp_get_attachment_image_srcset' )
+		&& false !== strpos( $vip80, 'width="1280" height="560"' )
+);
+t(
+	'بنر: راهنمای اندازه در تنظیمات',
+	false !== strpos( $shell80, 'tara-settings-sizes' )
+		&& false !== strpos( $shell80, '۱۹۲۰×۸۴۰' )
+);
+
+/* --- دسترس‌پذیری سربرگ --- */
+t(
+	'سربرگ: فرم جست‌وجو نقش و برچسب دارد',
+	false !== strpos( $head80, 'role="search"' )
+		&& false !== strpos( $head80, 'for="lsds"' )
+);
+t(
+	'سربرگ: کلید شب/روز نقش switch و aria-checked دارد',
+	false !== strpos( $head80, 'role="switch"' )
+		&& false !== strpos( $head80, 'aria-checked=' )
+		&& false !== strpos( $uiphp80, "'aria-checked'" )
+);
+t( 'سربرگ: متای بی‌معنی dc:creator حذف شد', false === strpos( $head80, 'property="dc:creator"' ) );
+
+t(
+	'موبایل: دکمهٔ منو <button> با aria-expanded و aria-controls',
+	false !== strpos( $mob80, 'class="navicon" aria-label="منوی سایت" aria-expanded="false"' )
+		&& false !== strpos( $mob80, 'aria-controls="ab-mobile-drawer"' )
+);
+t( 'موبایل: لینک تلگرام دیگر «twitter» خوانده نمی‌شود', false === strpos( $mob80, 'aria-label="twitter" class="icofont-paper-plane"' ) );
+t( 'موبایل: Escape کشو را می‌بندد', false !== strpos( $uiphp80, "ev.key !== 'Escape'" ) );
+
+/* --- پانوشت --- */
+t(
+	'پانوشت: آدرس‌های بی‌مسیر از sameAs حذف می‌شوند',
+	false !== strpos( $foot80, "'facebook.com', 'youtube.com', 'aparat.com'" )
+		&& false !== strpos( $foot80, 'set_url_scheme($s_val, \'https\')' )
+);
+t( 'پانوشت: لوگوی schema با https', false !== strpos( $foot80, 'set_url_scheme($ab_org_logo, \'https\')' ) );
+
+/* --- صفحهٔ آهنگ --- */
+t(
+	'صفحهٔ آهنگ: نام هنرمند escape می‌شود',
+	false !== strpos( $single80, '<?php echo esc_html( $artist ); ?>' )
+		&& false === strpos( $single80, '<?php echo $artist; ?>' )
+);
+t(
+	'صفحهٔ آهنگ: لینک‌های اشتراک‌گذاری درست و امن',
+	false !== strpos( $single80, 'https://www.facebook.com/sharer/sharer.php?u=' )
+		&& false !== strpos( $single80, 'https://twitter.com/intent/tweet?url=' )
+		&& false === strpos( $single80, 'http://www.facebook.com/share.php' )
+);
+t( 'صفحهٔ آهنگ: لینک دانلود در تب تازه با noopener', false !== strpos( $single80, 'target="_blank" rel="noopener"' ) );
+
+/* --- «چیزی پیدا نشد» --- */
+t(
+	'بی‌نتیجه: ریدایرکت خودکار و اسکریپت خطادار حذف شد',
+	false === strpos( $none80, 'go2NewUrl' )
+		&& false === strpos( $none80, '<script' )
+);
+t(
+	'بی‌نتیجه: فرم جست‌وجو و میان‌بُرها',
+	false !== strpos( $none80, 'role="search"' )
+		&& false !== strpos( $none80, 'ab-empty__links' )
+);
+t( 'جست‌وجو: شمارش با ارقام فارسی', false !== strpos( $search80, 'tara_number_fa' ) );
+
+/* --- عنوان ۴۰۴، تصویر شبکه‌های اجتماعی و دکمهٔ بالا --- */
+$seo80 = (string) @file_get_contents( '/tmp/theme/inc/ab-seo.php' );
+$func80 = (string) @file_get_contents( '/tmp/theme/functions.php' );
+t(
+	'۴۰۴: عنوان فارسی شد (نه «Page Not Found»)',
+	false !== strpos( $seo80, "\$parts['title'] = 'صفحه پیدا نشد';" )
+		&& false !== strpos( $seo80, 'is_404()' )
+);
+t(
+	'شبکه‌های اجتماعی: سایز ۱۲۰۰×۶۳۰ برای og:image',
+	false !== strpos( $func80, "add_image_size( 'tara-og', 1200, 630, true )" )
+		&& false !== strpos( $seo80, "wp_get_attachment_image_src( \$tara_thumb_id, 'tara-og' )" )
+);
+t(
+	'دکمهٔ بالا: نقش دکمه و ترتیب کلید',
+	false !== strpos( $foot80, 'class="top_page boxes_shadows" role="button" tabindex="0"' )
+		&& false !== strpos( $uiphp80, "el.classList.contains('top_page')" )
 );
 
 /* ======================================================================

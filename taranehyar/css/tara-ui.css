@@ -1154,6 +1154,33 @@ body.has-tara-dock { padding-bottom: 76px; }
 /* =========================================================================
    ۷) موبایل
    ====================================================================== */
+/* v3.8.0 — دکمه‌های سربرگِ موبایل حالا <button> واقعی‌اند (منو و جست‌وجو).
+   ظاهرشان نباید یک ذره عوض شود، فقط ظاهرِ پیش‌فرضِ مرورگر صفر می‌شود. */
+#mobiles_header .navicon,
+#mobiles_header .search_mobile_box {
+	appearance: none;
+	-webkit-appearance: none;
+	border: 0;
+	background: transparent;
+	padding: 0;
+	margin: 0;
+	color: inherit;
+	font: inherit;
+	cursor: pointer;
+}
+
+#mobiles_header .navicon { position: relative; }
+
+/* فیلد جست‌وجو حالا type="search" است (کیبورد گوشی دکمهٔ «جست‌وجو»
+   می‌دهد). دکمهٔ پاک‌کردنِ خودِ WebKit روی آیکون ذره‌بین می‌افتاد؛
+   خاموشش می‌کنیم تا ظاهر همان کپسول قبلی بماند. */
+#searches .searchfield::-webkit-search-decoration,
+#searches .searchfield::-webkit-search-cancel-button,
+#searches .searchfield::-webkit-search-results-button,
+#searches .searchfield::-webkit-search-results-decoration,
+.searches_mobile .searchfield::-webkit-search-decoration,
+.searches_mobile .searchfield::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+
 /* دسکتاپ: پلیر بزرگ‌تر و «چسبیده» به عرض محتوا */
 @media (min-width: 783px) {
 	.ty-player {
@@ -1193,7 +1220,11 @@ body.has-tara-dock { padding-bottom: 76px; }
    ===================================================================== */
 @media (max-width: 782px) {
 	.ty-player {
-		grid-template-columns: 76px minmax(0, 1fr);
+		/* v3.8.0 — کاربر گفت کاور صفحهٔ آهنگ در گوشی «خیلی کوچک» است؛
+		   ۷۶px به ۱۰۴px رسید (+۳۷٪). در عوض برچسب‌ها تمام عرضِ ستونِ متن را
+		   گرفتند و ابزارها به ردیف دوم رفتند، پس نام آهنگ جای بیشتری از
+		   قبل دارد (نه کمتر). */
+		grid-template-columns: 104px minmax(0, 1fr);
 		grid-template-areas:
 			"art head"
 			"transport transport";
@@ -1208,33 +1239,37 @@ body.has-tara-dock { padding-bottom: 76px; }
 
 	.ty-player__art {
 		grid-area: art;
-		width: 76px;
-		height: 76px;
+		width: 104px;
+		height: 104px;
 		align-self: start;
 	}
 
 	.ty-player__img { border-radius: 12px; }
 
-	/* کاور روی گوشی ۷۶px است؛ دکمهٔ دوربین ۲۸px نصف آن را می‌پوشاند */
+	/* کاور روی گوشی ۱۰۴px است؛ دکمهٔ دوربین کوچک می‌ماند تا روی خودِ
+	   تصویر را نپوشاند ولی با انگشت هم قابل زدن باشد. */
 	.ty-player__zoom {
-		width: 22px;
-		height: 22px;
-		font-size: 10px;
-		inset-inline-start: 4px;
-		bottom: 4px;
+		width: 26px;
+		height: 26px;
+		font-size: 11px;
+		inset-inline-start: 5px;
+		bottom: 5px;
 	}
 
 	.ty-player__pulse { display: none; }
 
 	.ty-player__head {
 		grid-area: head;
+		flex-wrap: wrap;
 		align-items: flex-start;
-		gap: 8px;
+		gap: 6px;
 	}
 
-	/* برچسب‌ها تمام عرض ستون را می‌گیرند تا دکمه‌های ابزار به لبهٔ چپ بچسبند
-	   و «وسطِ کارت شناور» نمانند (ایرادِ اسکرین‌شات). */
-	.ty-player__labels { flex: 1 1 auto; gap: 1px; }
+	/* v3.8.0 — با بزرگ‌شدن کاور به ۱۰۴px، اگر ابزارها کنار برچسب‌ها می‌ماندند
+	   ستونِ متن به ~۹۰px می‌رسید و نام آهنگ بعد از ۶ حرف «…» می‌شد. حالا
+	   برچسب‌ها تمام عرض ستون را می‌گیرند (بیشتر از قبل) و ابزارها یک ردیف
+	   پایین‌تر، چسبیده به لبهٔ چپ می‌نشینند — بدون شناوریِ وسط کارت. */
+	.ty-player__labels { flex: 1 1 100%; gap: 1px; }
 
 	.ty-player__eyebrow { font-size: 10.5px; }
 
@@ -1256,8 +1291,9 @@ body.has-tara-dock { padding-bottom: 76px; }
 
 	.ty-player__tools {
 		gap: 6px;
-		align-self: flex-start;
-		padding-top: 1px;
+		flex: 0 0 auto;
+		margin-inline-start: auto;
+		padding-top: 0;
 	}
 
 	.ty-player__tool { padding: 6px 9px; font-size: 11px; }
@@ -2132,16 +2168,24 @@ body.has-tara-modal { overflow: hidden; }
 }
 
 /* =========================================================================
-   ۱۱.۵) نشانهٔ «موزیک ویدیو» روی کارت و ردیف — v3.7.9
+   ۱۱.۵) نشانهٔ نوعِ اثر روی کارت — v3.8.0
    -------------------------------------------------------------------------
-   چون برچسبِ متنیِ فرمت (mp3/mp4) از کارت‌ها حذف شد، راهی لازم بود که از
-   فهرست معلوم شود کدام اثر ویدیو دارد. این نشانه فقط با آیکون کار می‌کند تا
-   روی کاورهای ۱۹۰ پیکسلی شلوغی نسازد.
+   ۳.۷.۹ فقط «ویدیو» را نشان می‌داد و — به‌خاطر `inset-inline-end` — در گوشهٔ
+   **چپ** می‌نشست. در RTL، `inset-inline-end` یعنی چپ؛ کاربر همین را دید و
+   خواست به **راست** برود و قرینه‌اش برای آثار صوتی هم ساخته شود.
+
+   حالا دو پیلِ هم‌اندازه داریم که هر دو در گوشهٔ **راست-بالا** می‌نشینند
+   (`inset-inline-start` در RTL = راست):
+     • `.ab-card-video` → مثلث پخش + «ویدیو»
+     • `.ab-card-audio` → نت موسیقی + «آهنگ»
+   هر کارت فقط یکی را می‌گیرد؛ کارتی که هیچ‌کدام را ندارد هیچ مارکاپی هم
+   نمی‌گیرد.
    ====================================================================== */
-.ab-card-video {
+.ab-card-video,
+.ab-card-audio {
 	position: absolute;
 	top: 7px;
-	inset-inline-end: 7px; /* گوشهٔ «شروع» در RTL = راست-بالا */
+	inset-inline-start: 7px; /* در RTL = راست-بالا */
 	z-index: 3;
 	display: inline-flex;
 	align-items: center;
@@ -2149,7 +2193,6 @@ body.has-tara-modal { overflow: hidden; }
 	height: 20px;
 	padding: 0 6px 0 5px;
 	border-radius: 999px;
-	background: rgba(12, 18, 32, 0.72);
 	color: #fff;
 	font-size: 9.5px;
 	font-weight: 700;
@@ -2161,19 +2204,39 @@ body.has-tara-modal { overflow: hidden; }
 	white-space: nowrap;
 }
 
-.ab-card-video i {
+.ab-card-video {
+	background: rgba(12, 18, 32, 0.78);
+}
+
+/* نسخهٔ صوتی: کمی کم‌رنگ‌تر تا روی کاورها داد نزند و «ویدیو» برجسته بماند */
+.ab-card-audio {
+	background: rgba(12, 18, 32, 0.52);
+	color: rgba(255, 255, 255, 0.94);
+	box-shadow: 0 3px 10px -7px rgba(0, 0, 0, .85);
+}
+
+.ab-card-video i,
+.ab-card-audio i {
 	font-size: 10px;
 	line-height: 1;
 }
 
-.ab-card-video em {
+.ab-card-video em,
+.ab-card-audio em {
 	font-style: normal;
 }
 
+/* آیکونِ ویدیو کمی روشن‌تر تا از نتِ موسیقی جدا شود */
+.ab-card-video i { color: #fff; }
+.ab-card-audio i { color: rgba(255, 255, 255, 0.8); }
+
 /* روی کارت‌های ریز (بخش‌های سه‌ستونهٔ گوشی) فقط آیکون بماند */
 @media (max-width: 480px) {
-	.ab-card-video { padding: 0 5px; height: 18px; top: 5px; inset-inline-end: 5px; }
-	.ab-card-video em { display: none; }
+	.ab-card-video,
+	.ab-card-audio { padding: 0 5px; height: 18px; top: 5px; inset-inline-start: 5px; }
+
+	.ab-card-video em,
+	.ab-card-audio em { display: none; }
 }
 
 /* ردیف فهرست آهنگ: آیکون کوچک کنار تیتر، هم‌رنگ متنِ کم‌رنگ */
@@ -2728,14 +2791,14 @@ body.tara-dock-open .top_page { bottom: 92px; }
 
 	.ty-dock__btn--main { width: 42px; height: 42px; }
 
-	/* گوشی‌های باریک: کاور و سرتیتر یک پله کوچک‌تر، بدون شکستن خط */
+	/* گوشی‌های باریک: کاور یک پله کوچک‌تر، بدون شکستن خط */
 	.ty-player {
-		grid-template-columns: 68px minmax(0, 1fr);
+		grid-template-columns: 88px minmax(0, 1fr);
 		gap: 8px 10px;
 		padding: 10px;
 	}
 
-	.ty-player__art { width: 68px; height: 68px; }
+	.ty-player__art { width: 88px; height: 88px; }
 
 	.ty-player__song { font-size: 15px; }
 
@@ -3106,4 +3169,102 @@ html[data-tara-night="1"] .rel_sing_bbt .artist_songs_page {
 @supports not (height: 100dvh) {
 	.ty-video.is-fullscreen,
 	.ty-video.is-pseudofs { height: 100vh; }
+}
+
+/* =========================================================================
+   ۱۱.۹) «چیزی پیدا نشد» — v3.8.0
+   -------------------------------------------------------------------------
+   جای تصویرِ ۶۲۶×۴۹۶ و پیام ۴۰۴، یک بلوکِ ساده و قابل‌استفاده برای
+   جست‌وجوی بی‌نتیجه و آرشیو خالی نشست. بدون تصویر، بدون JS، بدون ریدایرکت.
+   ====================================================================== */
+.ab-empty {
+	text-align: center;
+	padding: 34px 20px 38px;
+}
+
+.ab-empty__badge {
+	width: 56px;
+	height: 56px;
+	margin: 0 auto 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: var(--ty-accent-soft, rgba(24, 90, 219, .09));
+	color: var(--ty-accent, #185adb);
+	font-size: 24px;
+}
+
+.ab-empty__title {
+	margin: 0 0 8px;
+	font-size: clamp(17px, 2vw, 20px);
+	line-height: 1.7;
+	font-weight: 700;
+	color: var(--ty-ink, #16121f);
+}
+
+.ab-empty__sub {
+	margin: 0 auto 18px;
+	max-width: 46ch;
+	font-size: 13px;
+	line-height: 2;
+	color: var(--ty-muted, #6b7280);
+}
+
+.ab-empty__search {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	max-width: 420px;
+	margin: 0 auto 18px;
+	padding: 4px;
+	border: 1px solid var(--ty-line, #e5e7eb);
+	border-radius: 999px;
+	background: var(--ty-surface, #fff);
+}
+
+.ab-empty__search .searchfield {
+	flex: 1 1 auto;
+	min-width: 0;
+	border: 0;
+	background: transparent;
+	padding: 8px 14px;
+	font-size: 13px;
+	color: var(--ty-text, #16121f);
+}
+
+.ab-empty__search button {
+	appearance: none;
+	border: 0;
+	border-radius: 999px;
+	padding: 8px 14px;
+	font-size: 12px;
+	font-weight: 700;
+	color: #fff;
+	background: var(--ty-accent, #185adb);
+	cursor: pointer;
+}
+
+.ab-empty__links {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 8px 16px;
+	font-size: 12.5px;
+}
+
+.ab-empty__links a {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	color: var(--ty-accent, #185adb);
+	text-decoration: none;
+	padding: 6px 2px;
+}
+
+.ab-empty__links a:hover { text-decoration: underline; }
+
+@media (max-width: 480px) {
+	.ab-empty { padding: 24px 12px 28px; }
+	.ab-empty__search button { padding: 8px 10px; font-size: 11.5px; }
 }

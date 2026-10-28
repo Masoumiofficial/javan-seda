@@ -1,7 +1,10 @@
 <div class="clear"></div>
 </main>
 <?php $upbs = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'upb' ) : ( 'off' != ot_get_option( 'upb' ) ); if ( $upbs ) { ?>
-<div class="top_page boxes_shadows"><i class="icofont-thin-up"></i></div>
+<?php /* v3.8.0 — دکمهٔ «بالا» از divِ فقط-لمسی به role=button با tabindex و
+   برچسب تبدیل شد؛ با Tab و Enter/Space هم کار می‌کند (کلیدها در اسکریپت
+   درون‌خطی tara_runtime_inline_js). */ ?>
+<div class="top_page boxes_shadows" role="button" tabindex="0" aria-label="بازگشت به بالای صفحه"><i class="icofont-thin-up" aria-hidden="true"></i></div>
 <?php } ?>
 <?php /* v3.2.0 — «باکس شناور پایین-راست» (تلگرام/اینستاگرام) از پایین صفحه حذف شد.
    لینک‌های اجتماعی حالا در باکس «ما را دنبال کنید» بالای لینک‌های دانلودِ همان صفحهٔ پست
@@ -125,13 +128,15 @@ if ( function_exists( 'tara_ui_footer_cols_count' ) ) {
 		<div class="ab-footer__col ab-footer__col--social">
 			<h4 class="ab-footer__title">ما را دنبال کنید</h4>
 			<div class="socials_box ab-footer__socials">
+				<?php /* v3.8.0 — برچسب‌های صفحه‌خوان فارسی شدند (قبلاً «facebook» و
+				   «telegram» بود؛ بدتر از آن، لینک تلگرام aria-label="twitter" داشت). */ ?>
 				<?php if(ot_get_option('facebook') !=""){ ?>
-				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('facebook')); ?>" aria-label="facebook" class="icofont-facebook"></a><?php } if(ot_get_option('instagram') !=""){ ?>
-				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('instagram')); ?>" aria-label="instagram" class="icofont-instagram"></a><?php } if(ot_get_option('telegram') !=""){ ?>
-				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('telegram')); ?>" aria-label="telegram" class="icofont-paper-plane"></a><?php } if(ot_get_option('twitter') !=""){ ?>
-				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('twitter')); ?>" aria-label="twitter" class="icofont-twitter"></a><?php } if(ot_get_option('youtube') !=""){ ?>
-				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('youtube')); ?>" aria-label="youtube" class="icofont-youtube-play"></a><?php } if(ot_get_option('aparat') !=""){ ?>
-				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('aparat')); ?>" aria-label="aparat" class="icofont-movie"></a><?php } ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('facebook')); ?>" aria-label="فیسبوک" class="icofont-facebook"></a><?php } if(ot_get_option('instagram') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('instagram')); ?>" aria-label="اینستاگرام" class="icofont-instagram"></a><?php } if(ot_get_option('telegram') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('telegram')); ?>" aria-label="تلگرام" class="icofont-paper-plane"></a><?php } if(ot_get_option('twitter') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('twitter')); ?>" aria-label="توییتر" class="icofont-twitter"></a><?php } if(ot_get_option('youtube') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('youtube')); ?>" aria-label="یوتیوب" class="icofont-youtube-play"></a><?php } if(ot_get_option('aparat') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('aparat')); ?>" aria-label="آپارات" class="icofont-movie"></a><?php } ?>
 				<?php /* v3.2.0 — دو پیام‌رسان تازه (کلیدهایشان در تنظیمات قالب → «شبکه‌های اجتماعی» اضافه شده) */ if(ot_get_option('bale') !=""){ ?>
 				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('bale')); ?>" aria-label="bale" class="icofont-chat"></a><?php } if(ot_get_option('rubika') !=""){ ?>
 				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('rubika')); ?>" aria-label="rubika" class="icofont-comment"></a><?php } ?>
@@ -181,19 +186,36 @@ if ( function_exists( 'tara_ui_footer_cols_count' ) ) {
 	$ab_org_logo = ot_get_option('logo');
 	$ab_same_as  = array();
 	foreach (array('telegram', 'instagram', 'facebook', 'twitter', 'youtube', 'aparat') as $soc_key) {
-		$s_val = ot_get_option($soc_key);
-		if (!empty($s_val)) {
-			$ab_same_as[] = esc_url($s_val);
+		$s_val = trim((string) ot_get_option($soc_key));
+		if ('' === $s_val) {
+			continue;
 		}
+
+		/* v3.8.0 — در دادهٔ ساختاریافته، «صفحهٔ اصلیِ فیسبوک/یوتیوب/آپارات»
+		   به‌عنوان حسابِ همین سایت ثبت بود (http://facebook.com و…). این
+		   حسابِ کسی نیست و گوگل هم آن را حسابِ سایت نمی‌شناسد؛ آدرس‌های
+		   بی‌مسیر کنار گذاشته می‌شوند. */
+		$ab_host = strtolower((string) wp_parse_url($s_val, PHP_URL_HOST));
+		$ab_path = (string) wp_parse_url($s_val, PHP_URL_PATH);
+		$ab_host = preg_replace('/^www\./', '', $ab_host);
+		if (in_array($ab_host, array('facebook.com', 'youtube.com', 'aparat.com', 'twitter.com', 'x.com', 'instagram.com', 't.me'), true) && ('' === trim($ab_path, '/') || '/' === $ab_path)) {
+			continue;
+		}
+
+		$ab_same_as[] = esc_url(set_url_scheme($s_val, 'https'));
 	}
 	$ab_schema = array(
-		'@context' => 'https://schema.org',
-		'@type'    => 'Organization',
-		'name'     => $ab_org_name,
-		'url'      => $ab_org_url,
+		'@context'    => 'https://schema.org',
+		'@type'       => 'Organization',
+		'name'        => $ab_org_name,
+		'url'         => $ab_org_url,
+		'inLanguage'  => 'fa-IR',
 	);
 	if (!empty($ab_org_logo)) {
-		$ab_schema['logo'] = esc_url($ab_org_logo);
+		/* v3.8.0 — آدرس لوگو در تنظیمات با http ذخیره شده بود و همین‌جا هم
+		   http می‌ماند؛ برای گوگل «لوگوی سایتِ https با آدرس http» ناسازگار
+		   است. با همان مسیر، فقط پروتکل امن می‌شود. */
+		$ab_schema['logo'] = esc_url(set_url_scheme($ab_org_logo, 'https'));
 	}
 	if (!empty($ab_same_as)) {
 		$ab_schema['sameAs'] = $ab_same_as;

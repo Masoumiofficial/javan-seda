@@ -251,7 +251,14 @@ if ( ! function_exists( 'tara_seo_head' ) ) {
 			}
 			$title = 'دانلود ' . trim( $song . ' از ' . $artist ) . ' | ' . get_bloginfo( 'name' );
 			if ( has_post_thumbnail( $post_id ) ) {
-				$src = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), TARA_SEO_IMAGE );
+				/* v3.8.0 — اول کارتِ ۱۲۰۰×۶۳۰ (اگر برای این تصویر ساخته شده
+				   باشد)، بعد همان thumb1. `wp_get_attachment_image_src` برای
+				   سایزِ ناموجود false می‌دهد، پس آپلودهای قدیمی دست‌نخورده‌اند. */
+				$tara_thumb_id = get_post_thumbnail_id( $post_id );
+				$src           = wp_get_attachment_image_src( $tara_thumb_id, 'tara-og' );
+				if ( ! $src ) {
+					$src = wp_get_attachment_image_src( $tara_thumb_id, TARA_SEO_IMAGE );
+				}
 				if ( $src ) {
 					$img   = (string) $src[0];
 					$img_w = (int) $src[1];
@@ -408,6 +415,14 @@ if ( TARA_SEO_CRUMBS && ! function_exists( 'tara_seo_breadcrumbs' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! function_exists( 'tara_seo_title_parts' ) ) {
 	function tara_seo_title_parts( $parts ) {
+		/* v3.8.0 — عنوانِ صفحهٔ ۴۰۴ از هستهٔ وردپرس به زبانِ نصب می‌آید و روی
+		   این سایت «Page Not Found» انگلیسی چاپ می‌شد (زبانِ وردپرس انگلیسی
+		   است ولی محتوا فارسی). عنوانِ فارسی هم برای کاربر روشن‌تر است و هم
+		   در نتایج جست‌وجو بیگانه به‌نظر نمی‌رسد. */
+		if ( is_404() ) {
+			$parts['title'] = 'صفحه پیدا نشد';
+		}
+
 		/* هستۀ وردپرس خودش برای خیلی از نماها کلید 'page' را پر می‌کند (در فارسی: «صفحه ۲»);
 		   اگر پر بود دست نمی‌زنیم تا دوباره نشود. کلیدهای ناشناخته در title چاپ نمی‌شوند،
 		   پس از همان کلید 'page' استفاده می‌کنیم ⇒ عنوانِ یکتا برای /page/N/ و بقیۀ صفحه‌های شماره‌دار. */

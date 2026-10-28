@@ -8,6 +8,12 @@
  *     جز اولی را `display:none` می‌کرد ⇒ «فقط یکی می‌آید بالا».
  *
  * معماری کنونی:
+ * v3.8.0 — ریل از LTR به RTL رفت. پیش از این اسلاید اول در **چپ** می‌نشست و
+ * چرخش خودکار محتوا را به چپ می‌برد؛ در سایتی که همه‌چیزش راست‌چین است، این
+ * «حرکتِ چپ‌چین» دیده می‌شد. حالا اسلاید اول از راست شروع می‌شود و اسلاید بعد
+ * از سمت چپ وارد می‌شود. محاسبه‌های اسکرول هم همان‌جا برای RTL بازنویسی شد
+ * (دو مدلِ اسکرول در مرورگرها داریم؛ هر دو پوشش داده می‌شود).
+ *
  *   اسلایدها در یک ریل `overflow-x:auto` کنار هم نشسته‌اند و `scroll-snap`
  *   آن‌ها را می‌چسباند. یعنی **بدون این فایل هم** هر پنج اسلاید با انگشت یا
  *   تراک‌پد دیده می‌شوند. این فایل فقط سه چیز اضافه می‌کند:
@@ -30,8 +36,32 @@
 			return;
 		}
 
-		/* روی ریل، جهت ltr است (توسط CSS)؛ پس scrollLeft همیشه مثبت است. */
 		var wrap = root.parentNode && root.parentNode.nodeType === 1 ? root.parentNode : root;
+
+		/* v3.8.0 — جهت ریل از CSS می‌آید (rtl). ولی مقدارِ scrollLeft در RTL
+		   بین مرورگرها یکی نیست:
+		     • مدل مدرن (کروم/فایرفاکس/سافاری تازه): در راست ۰ است و با رفتن
+		       به چپ منفی می‌شود.
+		     • مدل قدیمی: در چپ ۰ است و در راست به بیشترین مقدار می‌رسد.
+		   یک بار با نوشتن ‎-1‎ تشخیص می‌دهیم، بعد فرمولِ درست را می‌چینیم. */
+		var rtl = false;
+		try {
+			rtl = window.getComputedStyle(root).direction === 'rtl';
+		} catch (error) {
+			rtl = false;
+		}
+
+		var rtlNegative = false;
+		if (rtl) {
+			var probe = root.scrollLeft;
+			try {
+				root.scrollLeft = -1;
+				rtlNegative = root.scrollLeft < 0;
+				root.scrollLeft = probe;
+			} catch (error) {
+				rtlNegative = false;
+			}
+		}
 
 		var interval = parseInt(root.getAttribute('data-interval'), 10);
 		if (!interval || interval < 2500) {
@@ -45,7 +75,17 @@
 		}
 
 		function index() {
-			var raw = Math.round(root.scrollLeft / width());
+			var w = width();
+			var raw;
+
+			if (!rtl) {
+				raw = Math.round(root.scrollLeft / w);
+			} else if (rtlNegative) {
+				raw = Math.round(Math.abs(root.scrollLeft) / w);
+			} else {
+				raw = (total - 1) - Math.round(root.scrollLeft / w);
+			}
+
 			if (raw < 0) {
 				raw = 0;
 			}
@@ -56,7 +96,17 @@
 		}
 
 		function scrollToIndex(i, smooth) {
-			var left = i * width();
+			var w = width();
+			var left;
+
+			if (!rtl) {
+				left = i * w;
+			} else if (rtlNegative) {
+				left = -i * w;
+			} else {
+				left = (total - 1 - i) * w;
+			}
+
 			if (smooth && typeof root.scrollTo === 'function') {
 				root.scrollTo({ left: left, behavior: 'smooth' });
 			} else {
@@ -71,14 +121,16 @@
 		if (total > 1) {
 			dots = document.createElement('div');
 			dots.className = 'ty-hero-dots';
-			dots.setAttribute('role', 'tablist');
+			/* v3.8.0 — قبلاً role="tablist"/"tab" بود بدون هیچ tabpanel؛ برای
+			   صفحه‌خوان یعنی «زبانه‌هایی که پنل ندارند». این‌ها فقط دکمه‌های
+			   انتخاب اسلایدند، پس گروه ساده‌اند و وضعیت با aria-current می‌آید. */
+			dots.setAttribute('role', 'group');
 			dots.setAttribute('aria-label', 'انتخاب اسلاید');
 
 			for (var i = 0; i < total; i++) {
 				var dot = document.createElement('button');
 				dot.type = 'button';
 				dot.className = 'ty-hero-dot';
-				dot.setAttribute('role', 'tab');
 				dot.setAttribute('aria-label', 'اسلاید ' + (i + 1) + ' از ' + total);
 				/* بستن حلقه با closure — بدون آن همه به آخرین عدد اشاره می‌کردند */
 				(function (target) {
@@ -109,10 +161,19 @@
 				slides[n].classList[on ? 'add' : 'remove']('is-active');
 				slides[n].setAttribute('aria-hidden', on ? 'false' : 'true');
 
+				/* اسلایدهای پنهان از مسیر Tab بیرون می‌مانند (وگرنه با کلید
+				   Tab کاربر روی لینکِ اسلایدِ بیرون‌از‌قاب می‌رفت). */
+				if ('inert' in slides[n]) {
+					slides[n].inert = !on;
+				}
+
 				if (buttons[n]) {
 					buttons[n].classList[on ? 'add' : 'remove']('is-active');
-					buttons[n].setAttribute('aria-selected', on ? 'true' : 'false');
-					buttons[n].setAttribute('tabindex', on ? '0' : '-1');
+					if (on) {
+						buttons[n].setAttribute('aria-current', 'true');
+					} else {
+						buttons[n].removeAttribute('aria-current');
+					}
 				}
 			}
 		}
@@ -185,7 +246,11 @@
 		root.setAttribute('tabindex', '0');
 		root.addEventListener('keydown', function (event) {
 			if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+				/* در RTL، «چپ» یعنی اسلاید بعد؛ در LTR برعکس. */
 				var step = event.key === 'ArrowRight' ? 1 : -1;
+				if (rtl) {
+					step = -step;
+				}
 				event.preventDefault();
 				scrollToIndex(index() + step, true);
 				restart();

@@ -61,13 +61,48 @@ if ( $tara_fixbvip ) {
 					$tara_vip_query->the_post();
 					$tara_slide++;
 
+					/* v3.8.0 — بنر اسلایدر دیگر به «thumb1» (۶۴۰×۳۶۰) محدود نیست
+					   و شکلِ برگشتیِ فیلد هم مهم نیست:
+					     • آرایه (ACF تازه: ID/url/sizes) → شناسه یا آدرس
+					     • عدد → شناسهٔ پیوست
+					     • رشته → آدرس دستی
+					   اگر شناسه داشته باشیم، `srcset` هم ساخته می‌شود تا گوشی
+					   نسخهٔ سبک و دسکتاپ نسخهٔ بزرگ را بگیرد (LCP و حجم). */
 					$tara_custom = function_exists( 'get_field' ) ? get_field( 'vip_img' ) : '';
 					$tara_image  = '';
-					if ( is_string( $tara_custom ) && '' !== trim( $tara_custom ) ) {
-						$tara_image = $tara_custom;
-					} elseif ( has_post_thumbnail() ) {
-						$tara_image = get_the_post_thumbnail_url( get_the_ID(), 'thumb1' );
+					$tara_srcset = '';
+					$tara_img_id = 0;
+
+					if ( is_array( $tara_custom ) ) {
+						foreach ( array( 'ID', 'id', 'attachment_id' ) as $tara_id_key ) {
+							if ( ! empty( $tara_custom[ $tara_id_key ] ) ) {
+								$tara_img_id = (int) $tara_custom[ $tara_id_key ];
+								break;
+							}
+						}
+						if ( ! $tara_img_id && ! empty( $tara_custom['url'] ) && is_string( $tara_custom['url'] ) ) {
+							$tara_image = trim( $tara_custom['url'] );
+						}
+					} elseif ( is_numeric( $tara_custom ) ) {
+						$tara_img_id = (int) $tara_custom;
+					} elseif ( is_string( $tara_custom ) && '' !== trim( $tara_custom ) ) {
+						$tara_image = trim( $tara_custom );
 					}
+
+					if ( ! $tara_img_id && '' === $tara_image && has_post_thumbnail() ) {
+						$tara_img_id = (int) get_post_thumbnail_id();
+					}
+
+					if ( $tara_img_id && function_exists( 'wp_get_attachment_image_url' ) ) {
+						$tara_full = wp_get_attachment_image_url( $tara_img_id, 'full' );
+						if ( $tara_full ) {
+							$tara_image = $tara_full;
+							if ( function_exists( 'wp_get_attachment_image_srcset' ) ) {
+								$tara_srcset = (string) wp_get_attachment_image_srcset( $tara_img_id, 'full' );
+							}
+						}
+					}
+
 					if ( ! $tara_image ) {
 						$tara_image = get_template_directory_uri() . '/images/vip_img.jpg';
 					}
@@ -91,10 +126,14 @@ if ( $tara_fixbvip ) {
 							      دو طرف می‌برید (در اسکرین‌شاتِ کاربر دیده می‌شد).
 							   لایهٔ پشت aria-hidden و alt خالی است تا صفحه‌خوان دوبار نخواند. */
 							?>
+							<?php $tara_img_attrs = 'width="1280" height="560"'; ?>
 							<img class="ty-hero-slide__bg" src="<?php echo esc_url( $tara_image ); ?>"
+								<?php if ( '' !== $tara_srcset ) { ?>srcset="<?php echo esc_attr( $tara_srcset ); ?>" sizes="(max-width: 782px) 100vw, (max-width: 1340px) 94vw, 1240px"<?php } ?>
+								<?php echo $tara_img_attrs; // phpcs:ignore WordPress.Security.EscapeOutput -- ثابت ?>
 								alt="" aria-hidden="true" loading="lazy" decoding="async" draggable="false">
 							<img class="ty-hero-slide__img" src="<?php echo esc_url( $tara_image ); ?>"
-								width="1280" height="620"
+								<?php if ( '' !== $tara_srcset ) { ?>srcset="<?php echo esc_attr( $tara_srcset ); ?>" sizes="(max-width: 782px) 100vw, (max-width: 1340px) 94vw, 1240px"<?php } ?>
+								<?php echo $tara_img_attrs; // phpcs:ignore WordPress.Security.EscapeOutput -- ثابت ?>
 								alt="<?php echo esc_attr( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?>"
 								loading="<?php echo esc_attr( $tara_loading ); ?>"
 								decoding="async"

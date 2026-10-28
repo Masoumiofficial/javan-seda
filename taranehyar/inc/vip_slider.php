@@ -62,9 +62,7 @@ if ( $tara_fixbvip ) {
 						$tara_image = get_template_directory_uri() . '/images/vip_img.jpg';
 					}
 
-					$tara_vip_artist = function_exists( 'get_field' ) ? (string) get_field( 'artist' ) : '';
 					$tara_vip_song   = function_exists( 'get_field' ) ? (string) get_field( 'song' ) : '';
-					$tara_vip_genre  = function_exists( 'tara_term_chips' ) ? tara_term_chips( 'tara_genre', get_the_ID(), '' ) : '';
 					$tara_priority   = ( 1 === $tara_slide ) ? 'high' : 'auto';
 					$tara_loading    = ( 1 === $tara_slide ) ? 'eager' : 'lazy';
 					?>
@@ -78,38 +76,11 @@ if ( $tara_fixbvip ) {
 						</a>
 
 						<?php
-						/* v3.7.4 — اطلاعات اسلاید از «روی کاور» به «کادر کوچکِ زیر کاور» منتقل شد:
-						   بنر خودش معمولاً نام خواننده و آهنگ را دارد و متن روی متن ناخوانا می‌شد.
-						   متن‌ها راست‌چین و دکمهٔ «شنیدن و دانلود» وسطِ پایینِ همان کادر است. */
+						/* v3.7.5 — به درخواست کاربر، تمام متن‌های روی اسلاید حذف شد:
+						   برچسب «پیشنهاد ویژه»، عنوان/نام خواننده و دکمهٔ «شنیدن و دانلود».
+						   اسلاید حالا فقط کاورِ تمام‌عرض است و کل کارت را می‌پوشاند؛
+						   کلیک روی تصویر همان لینک صفحهٔ آهنگ است. */
 						?>
-						<div class="ty-hero-slide__body">
-							<div class="ty-hero-slide__info">
-								<span class="ty-hero-slide__badge">
-									<i class="icofont-star" aria-hidden="true"></i>
-									پیشنهاد ویژه
-								</span>
-
-								<h2 class="ty-hero-slide__title">
-									<a href="<?php the_permalink(); ?>">
-										<?php if ( '' !== $tara_vip_artist ) : ?>
-											<span class="ty-hero-slide__artist"><?php echo esc_html( $tara_vip_artist ); ?></span>
-										<?php endif; ?>
-										<span class="ty-hero-slide__song"><?php echo esc_html( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?></span>
-									</a>
-								</h2>
-
-								<?php if ( '' !== trim( wp_strip_all_tags( $tara_vip_genre ) ) ) : ?>
-									<div class="ty-hero-slide__tags"><?php echo $tara_vip_genre; // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده ?></div>
-								<?php endif; ?>
-							</div>
-
-							<div class="ty-hero-slide__actions">
-								<a class="ty-hero-slide__play" href="<?php the_permalink(); ?>">
-									<span class="ty-icon-play" aria-hidden="true"></span>
-									شنیدن و دانلود
-								</a>
-							</div>
-						</div>
 					</article>
 					<?php
 				endwhile;

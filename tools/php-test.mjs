@@ -37,6 +37,7 @@ for (const js of ['owl.carousel.js', 'scripts.js']) {
   files.push({ parent: '/tmp/theme/js', name: js, url: 'file://' + path.join(theme, 'js', js) });
 }
 files.push({ parent: '/tmp/theme/inc', name: 'widgets.php', url: 'file://' + path.join(theme, 'inc', 'widgets.php') });
+files.push({ parent: '/tmp/theme/inc', name: 'tarlanweb_player.php', url: 'file://' + path.join(theme, 'inc', 'tarlanweb_player.php') });
 for (const name of ['admin-panel.php', 'admin-panel-views.php', 'ab-admin-ui.php']) {
   files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
 }

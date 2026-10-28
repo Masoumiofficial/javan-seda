@@ -156,7 +156,8 @@ foreach ( $health as $check ) {
 	$health_by_label[ $check['label'] ] = $check;
 }
 t( 'سلامت: هستهٔ خوانا سبز', ! empty( $health_by_label['هستهٔ خوانا']['ok'] ) );
-t( 'سلامت: فایل لایسنس نیست', ! empty( $health_by_label['فایل لایسنس']['ok'] ) );
+t( 'سلامت: فایل لایسنس/رمزگذاری‌شده نیست', ! empty( $health_by_label['فایل‌های اضافی']['ok'] ) );
+t( 'سلامت: پاک‌سازی لایسنس بی‌خطر است', '' === taranehyar_license_leftover() );
 t( 'سلامت: حافظهٔ تنظیمات پر است', ! empty( $health_by_label['حافظهٔ تنظیمات']['ok'] ) );
 t( 'سلامت: منوی اصلی تخصیص یافته', ! empty( $health_by_label['منوی اصلی']['ok'] ) );
 t( 'سلامت: توضیح حافظه کلید option_tree را می‌گوید', false !== strpos( $health_by_label['حافظهٔ تنظیمات']['note'], 'option_tree' ) );

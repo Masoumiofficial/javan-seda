@@ -565,6 +565,10 @@ if ( ! function_exists( 'tara_dock_markup' ) ) {
 			$first['link'] = home_url( '/' );
 		}
 
+		/* v3.7.5 — اگر همین حالا روی صفحهٔ همان آهنگ هستیم، لینک «صفحهٔ آهنگ»
+		   بی‌معناست (به همان صفحه برمی‌گردد). پس نشان داده نمی‌شود. */
+		$tara_same_page = is_singular() && ! empty( $first['id'] ) && (int) get_the_ID() === (int) $first['id'];
+
 		ob_start();
 		?>
 		<div class="ty-dock" data-tara-dock hidden dir="rtl">
@@ -582,9 +586,10 @@ if ( ! function_exists( 'tara_dock_markup' ) ) {
 				<span class="ty-icon-play" aria-hidden="true"></span><span class="ty-icon-pause" aria-hidden="true"></span>
 			</button>
 			<button type="button" class="ty-dock__btn" data-tara-dock-next aria-label="قطعهٔ بعد"><span class="ty-icon-next" aria-hidden="true"></span></button>
-			<button type="button" class="ty-dock__btn ty-dock__btn--list" data-tara-dock-list aria-label="فهرست پخش" aria-haspopup="dialog">
+			<button type="button" class="ty-dock__btn ty-dock__btn--list" data-tara-dock-list aria-label="فهرست پخش" aria-haspopup="dialog"<?php echo ( (int) ( isset( $first['total'] ) ? $first['total'] : 0 ) < 2 ) ? ' hidden' : ''; ?>>
 				<span class="ty-icon-list" aria-hidden="true"></span>
 			</button>
+
 			<button type="button" class="ty-dock__btn ty-dock__btn--close" data-tara-dock-close aria-label="بستن پلیر">
 				<span class="ty-icon-close" aria-hidden="true"></span>
 			</button>
@@ -789,6 +794,13 @@ if ( ! function_exists( 'tara_player' ) ) {
 		$first = isset( $tracks[ $args['start'] ] ) ? $tracks[ $args['start'] ] : $tracks[0];
 		$json  = wp_json_encode( $tracks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 
+		/* v3.7.5 — سه حالت «بی‌مصرف» پنهان می‌شود:
+		   • یک قطعه ⇒ «فهرست پخش» معنا ندارد
+		   • روی صفحهٔ همان آهنگ ⇒ «صفحهٔ آهنگ» به همین صفحه برمی‌گردد
+		   همچنین تعداد قطعه‌ها به dock داده می‌شود تا دکمهٔ فهرستش هم پنهان شود. */
+		$tara_total     = count( $tracks );
+		$tara_same_page = is_singular() && ! empty( $first['id'] ) && (int) get_the_ID() === (int) $first['id'];
+
 		ob_start();
 		?>
 		<section class="ty-player" id="<?php echo esc_attr( $uid ); ?>" data-tara-player="<?php echo esc_attr( $args['context'] ); ?>" dir="rtl">
@@ -811,14 +823,18 @@ if ( ! function_exists( 'tara_player' ) ) {
 
 					<div class="ty-player__tools">
 						<span class="ty-player__count" data-tara-count><?php echo esc_html( tara_fa_number( count( $tracks ) ) ); ?> قطعه</span>
+						<?php if ( $tara_total > 1 ) : ?>
 						<button type="button" class="ty-player__tool" data-tara-list aria-haspopup="dialog" aria-expanded="false" aria-controls="tara-playlist-modal">
 							<span class="ty-icon-list" aria-hidden="true"></span>
 							<span class="ty-player__tool-label">فهرست پخش</span>
 						</button>
+						<?php endif; ?>
+						<?php if ( ! $tara_same_page ) : ?>
 						<a class="ty-player__tool" href="<?php echo esc_url( $first['link'] ); ?>" data-tara-title-link aria-label="رفتن به صفحهٔ این آهنگ">
 							<span class="ty-icon-note" aria-hidden="true"></span>
 							<span class="ty-player__tool-label">صفحهٔ آهنگ</span>
 						</a>
+						<?php endif; ?>
 					</div>
 				</div>
 
@@ -864,7 +880,10 @@ if ( ! function_exists( 'tara_player' ) ) {
 		<?php $tara_dock_done = true; ?>
 		<?php $GLOBALS['tara_dock_printed'] = true; ?>
 		<?php $GLOBALS['tara_modal_printed'] = true; ?>
-		<?php echo tara_dock_markup( $first ); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع ?>
+		<?php
+		$first['total'] = $tara_total;
+		echo tara_dock_markup( $first ); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع
+		?>
 		<?php echo tara_playlist_modal(); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع ?>
 		<?php endif; ?>
 		<?php
@@ -932,4 +951,99 @@ if ( ! function_exists( 'tara_runtime_footer' ) ) {
 		}
 	}
 	add_action( 'wp_footer', 'tara_runtime_footer', 30 );
+}
+
+if ( ! function_exists( 'tara_runtime_inline_js' ) ) {
+	/**
+	 * اسکریپتِ کوچکِ درون‌خطی (v3.7.5)
+	 * =====================================================================
+	 * چرا درون‌خطی؟ چون در سایتِ کاربر، دکمهٔ «بالا» و کلید شب/روز اصلاً کار
+	 * نمی‌کردند؛ این دو تا فقط به JS وابسته بودند. فایلِ بیرونی می‌تواند
+	 * ۴۰۴ شود، توسط افزونهٔ کش ترکیب یا حذف شود، یا پیش از jQuery شکسته
+	 * باشد. اسکریپتِ درون‌خطی هیچ‌کدام از این ریسک‌ها را ندارد.
+	 *
+	 * همچنین اگر `js/tara-player.js` به هر دلیلی اجرا نشده باشد (نشانه:
+	 * نبودن data-tara-ready روی <html>)، همین اسکریپت دوباره آن را با
+	 * نسخهٔ تازه بارگذاری می‌کند تا پخش و پاپ‌آپ فهرست کار کند.
+	 */
+	function tara_runtime_inline_js() {
+		$player = esc_url( TARANEHYAR_URI . '/js/tara-player.js' );
+		$ver    = defined( 'TARANEHYAR_VERSION' ) ? TARANEHYAR_VERSION : '0';
+		?>
+		<script id="tara-runtime-inline">
+		(function () {
+			var doc = document, root = doc.documentElement;
+			root.setAttribute('data-tara-chrome', '1');
+			var KEY = 'tara-night';
+
+			function store(v) { try { window.localStorage.setItem(KEY, v ? '1' : '0'); } catch (e) {} }
+			function paint(on) {
+				doc.body.classList.toggle('night', on);
+				var keys = doc.querySelectorAll('.dark_light_mode');
+				for (var i = 0; i < keys.length; i++) { keys[i].classList.toggle('dark_active', on); }
+				var knobs = doc.querySelectorAll('.toggle_modes');
+				for (var j = 0; j < knobs.length; j++) { knobs[j].classList.toggle('active', on); }
+				root.setAttribute('data-tara-night', on ? '1' : '0');
+			}
+
+			try {
+				var saved = window.localStorage.getItem(KEY);
+				if (saved === '1' || saved === '0') { paint(saved === '1'); }
+			} catch (e) {}
+
+			/* کلید شب/روز: کل محدودهٔ کلید کلیک‌پذیر است، نه فقط نقطهٔ وسط */
+			doc.addEventListener('click', function (ev) {
+				var el = ev.target;
+				while (el && el !== doc.body) {
+					if (el.classList && (el.classList.contains('dark_light_mode') || el.classList.contains('toggle_modes'))) {
+						ev.preventDefault();
+						ev.stopPropagation();
+						var next = !doc.body.classList.contains('night');
+						paint(next);
+						store(next);
+						return;
+					}
+					el = el.parentNode;
+				}
+			}, true);
+
+			/* دکمهٔ «بالا» */
+			var topBtn = doc.querySelector('.top_page');
+			function onScroll() {
+				if (!topBtn) { return; }
+				var y = window.pageYOffset || doc.documentElement.scrollTop || 0;
+				topBtn.classList.toggle('is-shown', y > 420);
+			}
+			window.addEventListener('scroll', onScroll, { passive: true });
+			doc.addEventListener('DOMContentLoaded', onScroll);
+			onScroll();
+
+			doc.addEventListener('click', function (ev) {
+				var el = ev.target;
+				while (el && el !== doc.body) {
+					if (el.classList && el.classList.contains('top_page')) {
+						ev.preventDefault();
+						ev.stopPropagation();
+						try { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+						catch (e) { window.scrollTo(0, 0); }
+						return;
+					}
+					el = el.parentNode;
+				}
+			}, true);
+
+			/* خودترمیمی پلیر: اگر فایلش اجرا نشده باشد، دوباره بارگذاری می‌شود */
+			window.addEventListener('load', function () {
+				if (root.getAttribute('data-tara-ready')) { return; }
+				if (!doc.querySelector('[data-tara-player], [data-tara-queue], [data-tara-track]')) { return; }
+				var s = doc.createElement('script');
+				s.src = '<?php echo $player; ?>?v=<?php echo esc_js( $ver ); ?>-' + Date.now();
+				s.async = false;
+				doc.body.appendChild(s);
+			});
+		})();
+		</script>
+		<?php
+	}
+	add_action( 'wp_footer', 'tara_runtime_inline_js', 99 );
 }

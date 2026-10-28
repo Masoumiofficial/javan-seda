@@ -40,6 +40,42 @@ if ( $tara_indpl && function_exists( 'tara_player' ) ) {
 		)
 	);
 
+	/*
+	 * v3.7.5 — پشتیبان: اگر هیچ نوشته‌ای متای `plym = 1` ندارد (که در بسیاری از
+	 * سایت‌ها خالی است)، پلیر صفحهٔ اصلی کلاً دیده نمی‌شد. حالا اگر نتیجه خالی
+	 * بود، تازه‌ترین نوشته‌هایی که فایل صوتی دارند انتخاب می‌شوند.
+	 */
+	if ( ! $tara_home_query->have_posts() ) {
+		$tara_fb_query = new WP_Query(
+			array(
+				'post_type'           => 'post',
+				'post_status'         => 'publish',
+				'posts_per_page'      => $tara_home_num,
+				'orderby'             => 'date',
+				'order'               => 'DESC',
+				'no_found_rows'       => true,
+				'ignore_sticky_posts' => true,
+				'meta_query'          => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					'relation' => 'OR',
+					array(
+						'key'     => 'music320',
+						'value'   => '',
+						'compare' => '!=',
+					),
+					array(
+						'key'     => 'music128',
+						'value'   => '',
+						'compare' => '!=',
+					),
+				),
+			)
+		);
+
+		if ( $tara_fb_query->have_posts() ) {
+			$tara_home_query = $tara_fb_query;
+		}
+	}
+
 	if ( $tara_home_query->have_posts() ) {
 		$tara_home_tracks = tara_track_playlist( $tara_home_query->posts );
 

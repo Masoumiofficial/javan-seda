@@ -157,7 +157,7 @@
 			el.src = item.src;
 			el.load();
 
-			emit('load', { track: item, index: index, owner: owner });
+			emit('load', { track: item, index: index, owner: owner, queue: queue });
 
 			if (autoplay) {
 				play();
@@ -529,6 +529,11 @@
 
 		Engine.subscribe(function (type, data) {
 			if (type === 'load' && data.track) {
+				/* v3.7.5 — با یک قطعه، «فهرست پخش» بی‌معناست */
+				var listBtn = dock.querySelector('[data-tara-dock-list]');
+				if (listBtn) {
+					listBtn.hidden = !(data.queue && data.queue.length > 1);
+				}
 				if (refs.title) {
 					refs.title.textContent = data.track.title || '';
 				}
@@ -1130,6 +1135,11 @@
 		   این‌جا با capture می‌گیریم و از رسیدن رویداد به هندلرِ قبلی
 		   جلوگیری می‌کنیم تا اسکرول دو بار اجرا نشود. */
 		document.addEventListener('click', function (event) {
+			/* اگر اسکریپتِ درون‌خطیِ قالب (v3.7.5) همین کار را انجام می‌دهد،
+			   این‌جا تکرار نمی‌کنیم تا کلید دو بار toggle نشود. */
+			if (document.documentElement.getAttribute('data-tara-chrome') === '1') {
+				return;
+			}
 			var top = event.target.closest ? event.target.closest('.top_page') : null;
 			if (!top) {
 				return;
@@ -1144,6 +1154,11 @@
 		}, true);
 
 		document.addEventListener('click', function (event) {
+			/* اگر اسکریپتِ درون‌خطیِ قالب (v3.7.5) همین کار را انجام می‌دهد،
+			   این‌جا تکرار نمی‌کنیم تا کلید دو بار toggle نشود. */
+			if (document.documentElement.getAttribute('data-tara-chrome') === '1') {
+				return;
+			}
 			var target = event.target.closest ? event.target.closest('.dark_light_mode, .toggle_modes') : null;
 			if (!target) {
 				return;
@@ -1209,7 +1224,7 @@
 
 		/* نشانهٔ سلامت برای عیب‌یابی: اگر این صفت روی <html> نبود، یعنی همین فایل
 		   اجرا نشده است (کش/CDN/خطای اسکریپت). */
-		document.documentElement.setAttribute('data-tara-ready', '3.7.4');
+		document.documentElement.setAttribute('data-tara-ready', '3.7.5');
 	}
 
 	if (document.readyState === 'loading') {

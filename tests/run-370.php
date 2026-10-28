@@ -406,14 +406,35 @@ t( 'صفحهٔ آهنگ: ویدیو با پلیر تازه (tara_video)', false 
 t( 'صفحهٔ آهنگ: بلوک ویدیوی قدیمی نماند', false === strpos( $single, '<video width="640"' ) );
 
 $home_css = (string) @file_get_contents( '/tmp/theme/css/tara-home.css' );
-t( 'اسلایدر: کادر اطلاعات زیر تصویر (نه روی کاور)', false !== strpos( $home_css, '.ty-hero-slide__body {' ) && false !== strpos( $home_css, 'position: relative;' ) );
-t( 'اسلایدر: دکمهٔ تازه وسط‌چین', false !== strpos( $home_css, '.ty-hero-slide__actions' ) && false !== strpos( $home_css, 'justify-content: center' ) );
+/* v3.7.5 — اسلاید فقط کاور است: بدون برچسب/عنوان/دکمه، تصویر کل کارت را می‌پوشاند */
+t( 'اسلایدر: کادر متن روی کاور حذف شده', false === strpos( $home_css, '.ty-hero-slide__body' ) && false === strpos( $home_css, '.ty-hero-slide__play' ) );
+t( 'اسلایدر: تصویر با نسبت تصویر کل کارت را می‌پوشاند', false !== strpos( $home_css, 'aspect-ratio: 16 / 7' ) && false !== strpos( $home_css, 'object-fit: cover' ) );
+t( 'اسلایدر: بدون owl فقط اسلاید اول دیده می‌شود', false !== strpos( $home_css, ':not(.owl-loaded)' ) );
+$vip_php = (string) @file_get_contents( '/tmp/theme/inc/vip_slider.php' );
+t( 'اسلایدر: برچسب/دکمه از مارک‌آپ حذف شده', false === strpos( $vip_php, 'ty-hero-slide__play' ) && false === strpos( $vip_php, 'پیشنهاد ویژه' ) );
 
 $ui_css = (string) @file_get_contents( '/tmp/theme/css/tara-ui.css' );
 t( 'کارت: دکمهٔ پخش وسط کاور', false !== strpos( $ui_css, '.ty-cardplay {' ) && false !== strpos( $ui_css, 'left: 50%;' ) );
 t( 'شناسنامه: کادر فشرده', false !== strpos( $ui_css, 'minmax(118px, 1fr)' ) );
 t( 'هدر: کادر جست‌وجو روشن با متن تیره', false !== strpos( $ui_css, '#lsds' ) && false !== strpos( $ui_css, 'color: #16121f !important' ) );
 t( 'صفحهٔ آهنگ: ستون کناری چسبان', false !== strpos( $ui_css, '#left_side' ) && false !== strpos( $ui_css, 'position: sticky' ) );
+
+t( 'شناسنامه: کادر سفید پشت نام‌ها حذف شد', false !== strpos( $ui_css, 'background: transparent !important' ) && false === strpos( $ui_css, '.single_content_box .ab-credits{background' ) );
+t( 'دکمهٔ بالا: کلاس is-shown و نمایش بدون jQuery', false !== strpos( $ui_css, '.top_page.is-shown' ) );
+
+$ui_php = (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' );
+t( 'پلیر: اسکریپت درون‌خطیِ مود/بالا', false !== strpos( $ui_php, 'tara-runtime-inline' ) && false !== strpos( $ui_php, "'tara-night'" ) );
+t( 'پلیر: خودترمیمیِ بارگذاری فایل پلیر', false !== strpos( $ui_php, 'tara-ready' ) && false !== strpos( $ui_php, 'appendChild' ) );
+t( 'پلیر: «صفحهٔ آهنگ» در همان صفحه پنهان می‌شود', false !== strpos( $ui_php, '$tara_same_page' ) );
+t( 'پلیر: فهرست پخش برای یک قطعه پنهان می‌شود', false !== strpos( $ui_php, '$tara_total > 1' ) );
+
+$home_player = (string) @file_get_contents( '/tmp/theme/inc/tarlanweb_player.php' );
+t( 'پلیر صفحهٔ اصلی: پشتیبان برای نوشته‌های دارای فایل صوتی', false !== strpos( $home_player, 'music320' ) && false !== strpos( $home_player, 'music128' ) );
+
+$settings_php = (string) @file_get_contents( '/tmp/theme/inc/admin-settings-shell.php' );
+t( 'تنظیمات: جابه‌جایی بخش‌ها درون‌خطی است', false !== strpos( $settings_php, 'tara-tabs-ready' ) && false !== strpos( $settings_php, 'tara-settings-core-js' ) );
+t( 'تنظیمات: هر گزینه جمع‌شونده است', false !== strpos( $settings_php, 'has-label' ) && false !== strpos( $settings_php, 'is-open' ) );
+t( 'تنظیمات: دکمهٔ باز/بستن همه', false !== strpos( $settings_php, 'باز کردن همه' ) && false !== strpos( $settings_php, 'بستن همه' ) );
 
 $player_js = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
 t( 'کلید شب: هندلر مستقل در JS', false !== strpos( $player_js, 'tara-night' ) && false !== strpos( $player_js, 'dark_light_mode' ) );

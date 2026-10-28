@@ -293,6 +293,7 @@ if ( ! function_exists( 'tara_settings_shell_title' ) ) {
 				<span class="dashicons dashicons-admin-settings"></span>
 			</div>
 		</div>
+		<?php tara_settings_shell_core_ui(); ?>
 		<div class="tara-settings-status" role="status">
 			<span class="tara-settings-status__item<?php echo $css ? ' is-ok' : ' is-bad'; ?>">
 				<span class="dashicons <?php echo $css ? 'dashicons-yes-alt' : 'dashicons-warning'; ?>"></span>
@@ -390,4 +391,231 @@ if ( ! function_exists( 'tara_settings_persian_strings' ) ) {
 		return $translated;
 	}
 	add_filter( 'gettext', 'tara_settings_persian_strings', 20, 3 );
+}
+
+if ( ! function_exists( 'tara_settings_shell_core_ui' ) ) {
+	/**
+	 * هستهٔ کاربردیِ صفحهٔ تنظیمات — درون‌خطی و بی‌وابستگی (v3.7.5)
+	 * =====================================================================
+	 * چرا؟ گزارش کاربر: «همهٔ بخش‌ها با هم روی یک صفحه باز هستند و کلی فضا
+	 * اشغال کرده‌اند». علتش این بود که جابه‌جاییِ بخش‌ها فقط به تب‌های
+	 * jQuery UI (خودِ OptionTree) تکیه داشت؛ اگر آن اسکریپت بارگذاری یا
+	 * مقداردهی نمی‌شد، همهٔ پنل‌ها هم‌زمان دیده می‌شدند.
+	 *
+	 * این تکه **درون خودِ صفحه** چاپ می‌شود (نه فایل بیرونی)، پس هیچ کش،
+	 * فیلتر یا خطای اسکریپتی نمی‌تواند از کار بیندازدش:
+	 *   • با کلیک هر تب، فقط پنل همان بخش دیده می‌شود
+	 *   • هر گزینه یک ردیف جمع‌شونده است (پیش‌فرض بسته) + «باز/بستن همه»
+	 *   • آدرس صفحه با #section_x هم‌گام است، پس رفرش روی همان بخش می‌ماند
+	 */
+	function tara_settings_shell_core_ui() {
+		?>
+		<style id="tara-settings-core-css">
+		/* فقط وقتی اسکریپت بالا اجرا و آماده شد پنل‌ها پنهان می‌شوند؛
+		   اگر JS نبود، همان رفتار قبلی (همه باز) می‌ماند تا صفحه خالی نشود. */
+		#option-tree-settings-api.tara-tabs-ready .ui-tabs-panel { display: none !important; }
+		#option-tree-settings-api.tara-tabs-ready .ui-tabs-panel.tara-on { display: block !important; }
+		#option-tree-settings-api .ui-tabs-nav li.ui-tabs-active > a,
+		#option-tree-settings-api .ui-tabs-nav li.tara-on > a {
+			background: #6d28d9 !important;
+			color: #fff !important;
+		}
+		#option-tree-settings-api .tara-settings-toolbar {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			margin: 0 0 12px;
+		}
+		#option-tree-settings-api .tara-settings-toolbar button {
+			padding: 6px 14px;
+			border: 1px solid #e6e4ef;
+			border-radius: 999px;
+			background: #fff;
+			color: #4b4960;
+			font-size: 12px;
+			font-weight: 700;
+			cursor: pointer;
+		}
+		#option-tree-settings-api .tara-settings-toolbar button:hover {
+			border-color: #6d28d9;
+			color: #4c1d95;
+		}
+		#option-tree-settings-api .format-settings.has-label {
+			margin: 0 0 8px;
+			padding: 0;
+			border: 1px solid #eeecf6;
+			border-radius: 12px;
+			background: #fff;
+		}
+		#option-tree-settings-api .format-settings.has-label > .format-setting-wrap > .format-setting-label {
+			cursor: pointer;
+			margin: 0;
+			padding: 11px 14px;
+			border-radius: 12px;
+		}
+		#option-tree-settings-api .format-settings.has-label > .format-setting-wrap > .format-setting-label:hover {
+			background: #faf8ff;
+		}
+		#option-tree-settings-api .format-settings.has-label > .format-setting-wrap > .format-setting-label .label { margin: 0; }
+		#option-tree-settings-api .format-settings.has-label > .format-setting-wrap > .format-setting-label::after {
+			content: "▾";
+			float: left;
+			color: #8b8899;
+			font-size: 13px;
+		}
+		#option-tree-settings-api .format-settings.has-label.is-open > .format-setting-wrap > .format-setting-label {
+			border-bottom: 1px solid #f1eff8;
+			border-radius: 12px 12px 0 0;
+			background: #faf8ff;
+		}
+		#option-tree-settings-api .format-settings.has-label.is-open > .format-setting-wrap > .format-setting-label::after { content: "▴"; }
+		#option-tree-settings-api .format-settings.has-label > .format-setting-wrap > *:not(.format-setting-label) { display: none; }
+		#option-tree-settings-api .format-settings.has-label.is-open > .format-setting-wrap > *:not(.format-setting-label) { display: block; }
+		#option-tree-settings-api .format-settings.has-label.is-open > .format-setting-wrap { padding-bottom: 6px; }
+		</style>
+		<script id="tara-settings-core-js">
+		(function () {
+			function ready(fn) {
+				if (document.readyState === 'loading') {
+					document.addEventListener('DOMContentLoaded', fn);
+				} else {
+					fn();
+				}
+			}
+
+			ready(function () {
+				var root = document.getElementById('option-tree-settings-api');
+				if (!root || root.getAttribute('data-tara-core') === '1') {
+					return;
+				}
+				root.setAttribute('data-tara-core', '1');
+
+				var nav = root.querySelector('.ui-tabs-nav');
+				root.classList.add('tara-tabs-ready');
+				var panels = root.querySelectorAll('.ui-tabs-panel');
+
+				function show(id) {
+					if (!id) {
+						return;
+					}
+					for (var i = 0; i < panels.length; i++) {
+						panels[i].classList.toggle('tara-on', panels[i].id === 'section_' + id);
+					}
+					if (nav) {
+						var lis = nav.querySelectorAll('li');
+						for (var j = 0; j < lis.length; j++) {
+							var a = lis[j].querySelector('a[href^="#section_"]');
+							var active = a && a.getAttribute('href') === '#section_' + id;
+							lis[j].classList.toggle('ui-tabs-active', !!active);
+							lis[j].classList.toggle('tara-on', !!active);
+						}
+					}
+					if (window.history && window.history.replaceState) {
+						try { window.history.replaceState(null, '', '#section_' + id); } catch (e) {}
+					}
+				}
+
+				function current() {
+					var hash = String(window.location.hash || '');
+					if (hash.indexOf('#section_') === 0) {
+						return hash.replace('#section_', '');
+					}
+					if (nav) {
+						var first = nav.querySelector('a[href^="#section_"]');
+						if (first) {
+							return first.getAttribute('href').replace('#section_', '');
+						}
+					}
+					return '';
+				}
+
+				if (nav) {
+					nav.addEventListener('click', function (ev) {
+						var a = ev.target.closest ? ev.target.closest('a[href^="#section_"]') : null;
+						if (!a) {
+							return;
+						}
+						ev.preventDefault();
+						show(a.getAttribute('href').replace('#section_', ''));
+					});
+				}
+
+				/* ردیف‌های جمع‌شونده */
+				var rows = root.querySelectorAll('.format-settings');
+				for (var k = 0; k < rows.length; k++) {
+					var label = rows[k].querySelector('.format-setting-label');
+					if (!label) {
+						continue;
+					}
+					rows[k].classList.add('has-label');
+					label.setAttribute('role', 'button');
+					label.setAttribute('tabindex', '0');
+					label.setAttribute('aria-expanded', 'false');
+				}
+
+				function toggle(row, open) {
+					if (!row) {
+						return;
+					}
+					row.classList.toggle('is-open', open);
+					var lb = row.querySelector('.format-setting-label');
+					if (lb) {
+						lb.setAttribute('aria-expanded', open ? 'true' : 'false');
+					}
+				}
+
+				root.addEventListener('click', function (ev) {
+					var lb = ev.target.closest ? ev.target.closest('.format-setting-label') : null;
+					if (!lb) {
+						return;
+					}
+					var row = lb.parentNode ? lb.parentNode.parentNode : null;
+					if (!row || !row.classList.contains('has-label')) {
+						return;
+					}
+					toggle(row, !row.classList.contains('is-open'));
+				});
+
+				root.addEventListener('keydown', function (ev) {
+					if (ev.key !== 'Enter' && ev.key !== ' ') {
+						return;
+					}
+					var lb = ev.target.closest ? ev.target.closest('.format-setting-label') : null;
+					if (!lb) {
+						return;
+					}
+					ev.preventDefault();
+					lb.click();
+				});
+
+				/* نوار ابزار: باز/بستن همه */
+				var bar = document.createElement('div');
+				bar.className = 'tara-settings-toolbar';
+				bar.innerHTML = '<button type="button" data-all="open">باز کردن همه</button>'
+					+ '<button type="button" data-all="close">بستن همه</button>';
+				if (nav && nav.parentNode) {
+					nav.parentNode.insertBefore(bar, nav.nextSibling);
+				} else {
+					root.insertBefore(bar, root.firstChild);
+				}
+
+				bar.addEventListener('click', function (ev) {
+					var btn = ev.target.closest ? ev.target.closest('button[data-all]') : null;
+					if (!btn) {
+						return;
+					}
+					var open = btn.getAttribute('data-all') === 'open';
+					var panel = root.querySelector('.ui-tabs-panel.tara-on') || root;
+					var list = panel.querySelectorAll('.format-settings.has-label');
+					for (var i = 0; i < list.length; i++) {
+						toggle(list[i], open);
+					}
+				});
+
+				show(current());
+			});
+		})();
+		</script>
+		<?php
+	}
 }

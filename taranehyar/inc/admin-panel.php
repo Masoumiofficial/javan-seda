@@ -453,6 +453,61 @@ function taranehyar_panel_taxonomies() {
 }
 
 /**
+ * آیا فایل لایسنس/رمزگذاری‌شده‌ای از نسخهٔ قدیمی باقی مانده است؟
+ *
+ * نسخهٔ قدیمیِ قالب یک فایل `RTL_License_*.php` داشت که برای فعال‌سازی به
+ * سرور سازنده وصل می‌شد. در ۳.۷.x هیچ‌کدام از آن فایل‌ها لازم نیست و هیچ
+ * فایلی هم آن‌ها را صدا نمی‌زند؛ اگر نسخهٔ قدیمی روی هاست مانده باشد فقط
+ * فضا می‌گیرد. این تابع فقط «وجود» را گزارش می‌کند.
+ *
+ * @return string مسیر فایلِ باقی‌مانده، یا رشتهٔ خالی.
+ */
+function taranehyar_license_leftover() {
+	$patterns = array(
+		TARANEHYAR_DIR . '/RTL_License_*.php',
+		TARANEHYAR_DIR . '/rtl_license_*.php',
+		TARANEHYAR_DIR . '/inc/RTL_License_*.php',
+	);
+	foreach ( $patterns as $pattern ) {
+		$found = glob( $pattern );
+		if ( ! empty( $found ) ) {
+			return (string) $found[0];
+		}
+	}
+	return '';
+}
+
+/**
+ * پاک‌سازی یک‌بارهٔ فایل‌های لایسنسِ باقی‌مانده (v3.7.5)
+ *
+ * کاربر صریحاً خواست «آن لایسنس کلاً از بین برود». این کار فقط روی همان
+ * الگوی شناخته‌شده انجام می‌شود، یک‌بار در عمر نصب اجرا می‌شود و اگر
+ * فایل قابل حذف نبود، چیزی خراب نمی‌کند.
+ */
+function taranehyar_purge_license() {
+	if ( get_option( 'taranehyar_license_purged' ) ) {
+		return;
+	}
+
+	$patterns = array(
+		TARANEHYAR_DIR . '/RTL_License_*.php',
+		TARANEHYAR_DIR . '/rtl_license_*.php',
+		TARANEHYAR_DIR . '/inc/RTL_License_*.php',
+	);
+	foreach ( $patterns as $pattern ) {
+		$found = glob( $pattern );
+		foreach ( (array) $found as $file ) {
+			if ( is_writable( $file ) ) {
+				@unlink( $file ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- حذف اختیاری
+			}
+		}
+	}
+
+	update_option( 'taranehyar_license_purged', 1 );
+}
+add_action( 'admin_init', 'taranehyar_purge_license' );
+
+/**
  * بررسی‌های سلامتِ فقط‌خواندنی. هر مورد: عنوان، وضعیت و توضیح کوتاه.
  *
  * @return array
@@ -469,9 +524,9 @@ function taranehyar_panel_health() {
 			'note'  => 'functions.php از کد رمزگذاری‌شده به کد باز تبدیل شده است.',
 		),
 		array(
-			'label' => 'فایل لایسنس',
-			'ok'    => ! file_exists( TARANEHYAR_DIR . '/RTL_License_41d6c5f704e3a746.php' ),
-			'note'  => 'حذف شده؛ قالب به هیچ سرور بیرونی وصل نمی‌شود.',
+			'label' => 'فایل‌های اضافی',
+			'ok'    => ! taranehyar_license_leftover(),
+			'note'  => 'هیچ فایل لایسنس/رمزگذاری‌شده‌ای در پوشهٔ قالب نیست؛ قالب به هیچ سرور بیرونی وصل نمی‌شود.',
 		),
 		array(
 			'label' => 'OptionTree',

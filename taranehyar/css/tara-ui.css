@@ -1608,79 +1608,71 @@ body.has-tara-modal { overflow: hidden; }
    ۱۲) شناسنامهٔ اثر — نسخهٔ ۳.۷.۳ (تفکیک‌شده و شیک‌تر)
    ====================================================================== */
 .single_content_box .ab-credits.ab-credits,
-/* v3.7.4 — کادر شناسنامه فشرده‌تر شد: پدینگ و فونت‌ها کوچک‌تر، شبکهٔ ۱۲۰px،
-   روی موبایل دو ستونه با ارتفاع کمتر. */
+/* v3.7.5 — «کادر سفید» حذف شد: شناسنامه حالا یک فهرست تخت و بی‌جعبه است.
+   هیچ پس‌زمینهٔ سفید، قاب یا سایه‌ای پشت نام هنرمندان نمی‌ماند. */
 .ab-credits.ab-credits {
-	margin: 14px 0;
-	padding: 0;
-	border: 1px solid var(--ty-line, #e6e8ee);
-	border-radius: 14px;
-	background:
-		radial-gradient(120% 150% at 100% 0%, rgba(109, 40, 217, .07) 0%, rgba(109, 40, 217, 0) 58%),
-		var(--ty-surface, #fff);
-	overflow: hidden;
+	margin: 12px 0 16px;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 0 !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	overflow: visible;
 }
 
 .ab-credits.ab-credits .ab-credits__title {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	margin: 0;
-	padding: 9px 14px;
-	border-bottom: 1px solid var(--ty-line, #e6e8ee);
-	font-size: 12.5px;
+	gap: 7px;
+	margin: 0 0 6px;
+	padding: 0 0 6px;
+	border: 0;
+	border-bottom: 1px solid rgba(17, 24, 39, .12);
+	font-size: 12px;
 	font-weight: 800;
 	letter-spacing: .2px;
 	color: var(--ty-ink, #111);
-	background: rgba(17, 24, 39, .02);
+	background: transparent;
 }
 
-.ab-credits.ab-credits .ab-credits__title i { color: #6d28d9; font-size: 15px; }
+.ab-credits.ab-credits .ab-credits__title i { color: #6d28d9; font-size: 14px; }
 
 .ab-credits.ab-credits .ab-credits__row {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
-	gap: 1px;
-	background: var(--ty-line, #e6e8ee);
+	gap: 4px 16px;
+	background: transparent;
 }
 
 .ab-credits.ab-credits .ab-credit {
 	display: flex;
-	flex-direction: column;
-	gap: 3px;
-	padding: 9px 12px;
-	background: var(--ty-surface, #fff);
+	flex-direction: row;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 4px;
+	padding: 2px 0;
+	background: transparent;
 	position: relative;
 }
 
-.ab-credits.ab-credits .ab-credit::before {
-	content: "";
-	position: absolute;
-	inset-inline-start: 0;
-	top: 9px;
-	bottom: 9px;
-	width: 3px;
-	border-radius: 3px;
-	background: #6d28d9;
-	opacity: .18;
-}
+.ab-credits.ab-credits .ab-credit::before { content: none; }
 
-.ab-credits.ab-credits .ab-credit > i {
-	display: none !important;
-}
+.ab-credits.ab-credits .ab-credit > i { display: none !important; }
 
 .ab-credits.ab-credits .ab-credit__k {
-	display: block;
+	display: inline-block;
 	font-size: 11px;
-	font-weight: 700;
+	font-weight: 600;
 	color: var(--ty-muted, #6b7280);
 }
+
+.ab-credits.ab-credits .ab-credit__k::after { content: ":"; margin-inline-start: 1px; }
 
 .ab-credits.ab-credits .ab-credit__v {
 	font-size: 12.5px;
 	font-weight: 700;
 	color: var(--ty-ink, #111);
-	line-height: 1.6;
+	line-height: 1.7;
 }
 
 .ab-credits.ab-credits .ab-credit__v a {
@@ -1692,6 +1684,11 @@ body.has-tara-modal { overflow: hidden; }
 .ab-credits.ab-credits .ab-credit__v a:hover { border-bottom-color: #4c1d95; }
 
 .ab-credits.ab-credits .ab-credit__sep { color: var(--ty-muted, #9ca3af); }
+
+/* حالت شب: متن روشن، بدون جعبه */
+.night .ab-credits.ab-credits .ab-credits__title { color: #f2f0ff; border-bottom-color: rgba(255, 255, 255, .16); }
+.night .ab-credits.ab-credits .ab-credit__v { color: #f2f0ff; }
+.night .ab-credits.ab-credits .ab-credit__k { color: rgba(255, 255, 255, .62); }
 
 @media (max-width: 782px) {
 	.ab-credits.ab-credits { margin: 12px 0; }
@@ -1925,6 +1922,26 @@ a.ty-person__chip:hover {
 .dark_light_mode:hover { background: rgba(255, 255, 255, .10); }
 .dark_light_mode i { pointer-events: none; }
 .toggle_modes { cursor: pointer; }
+
+/* دکمهٔ «بالا» — v3.7.5
+   دیگر به jQuery وابسته نیست: کلاس is-shown را اسکریپت داخلیِ پانوشت
+   می‌گذارد. تا وقتی اسکرول نشده، دکمه دیده نمی‌شود ولی جای صفحه را نمی‌گیرد. */
+.top_page {
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(6px);
+	transition: opacity .2s ease, transform .2s ease, visibility .2s;
+}
+
+.top_page.is-shown,
+.top_page:hover {
+	opacity: 1;
+	visibility: visible;
+	transform: none;
+}
 
 /* دکمهٔ «بالا» — v3.7.4
    نکته: display را دست نزنید! style.css آن را display:none می‌گذارد و

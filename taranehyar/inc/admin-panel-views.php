@@ -33,8 +33,13 @@ function taranehyar_panel_number( $number ) {
 function taranehyar_panel_settings_url( $section = '' ) {
 	$url = 'admin.php?page=ot-theme-options';
 
+	/*
+	 * دو نشانه با هم: `?section=` را پوستهٔ تازهٔ صفحهٔ تنظیمات می‌خواند
+	 * (js/admin-settings.js) و `#section_` را خودِ jQuery UI می‌فهمد.
+	 * اگر روزی پوسته خاموش شود، همان لینک قدیمی باز هم کار می‌کند.
+	 */
 	if ( '' !== $section ) {
-		$url .= '#section_' . $section;
+		$url .= '&section=' . rawurlencode( $section ) . '#section_' . $section;
 	}
 
 	return esc_url( admin_url( $url ) );

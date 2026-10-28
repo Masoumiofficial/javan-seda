@@ -184,7 +184,7 @@ t( 'نما: نام قالب در سربرگ', false !== strpos( $html, '<h1>تر
 t( 'نما: نسخه در نشان', false !== strpos( $html, 'نسخهٔ 3.6.0' ) );
 t( 'نما: چهار کارت آمار', 4 === substr_count( $html, 'class="ty-stat"' ) );
 t( 'نما: هشت کارت تنظیمات', 8 === substr_count( $html, 'ty-card--link' ), (string) substr_count( $html, 'ty-card--link' ) );
-t( 'نما: لینک تب‌های OptionTree', false !== strpos( $html, 'admin.php?page=ot-theme-options#section_ab_ui' ) );
+t( 'نما: لینک تب‌های OptionTree', false !== strpos( $html, 'page=ot-theme-options&section=ab_ui#section_ab_ui' ) );
 t( 'نما: بررسی سلامت', false !== strpos( $html, 'بررسی سلامت' ) );
 t( 'نما: میان‌بُرها', false !== strpos( $html, 'میان‌بُرها' ) );
 t( 'نما: ذکر نگه‌داشتن کلید option_tree', false !== strpos( $html, '<code>option_tree</code>' ) );

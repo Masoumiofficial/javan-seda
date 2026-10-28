@@ -9,7 +9,7 @@ Version: 3.6.0
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
-Text Domain: javanseda
+Text Domain: taranehyar
 Tags: rtl-language-support, music, dark-mode, custom-menu, featured-images, threaded-comments
 */
 /*
@@ -558,7 +558,7 @@ height: 150px !important;float: left !important;margin-bottom: 5px;}
 #reviews input#email,#reviews input#author,.side_boxs select,
 #edd_checkout_form_wrap input[type="text"],#edd_checkout_form_wrap input[type="email"],
 #edd_checkout_form_wrap input[type="password"],#edd_checkout_form_wrap input[type="tel"],
-#edd_checkout_form_wrap textarea,.rkianoosh_txt form input{
+#edd_checkout_form_wrap textarea,.r_txt form input{
   width: 100%;
   height: 40px;
   float: right;
@@ -569,7 +569,7 @@ border: 1px solid rgba(255,255,255,0.2);
   text-indent: 10px;
   border-radius: 5px;
 }
-.rkianoosh_fields input[type="submit"]{color: #fff !important;}
+.r_fields input[type="submit"]{color: #fff !important;}
 
 
 .wpcf7-quiz-label{width: 100%;clear: both;display: block;}
@@ -577,7 +577,7 @@ border: 1px solid rgba(255,255,255,0.2);
 
 .comment-form-comment textarea#comment{width: 100% !important;}
 .logged-in .comment-form-comment textarea#comment{width: 100% !important;}
-.comment-form-comment textarea#comment,#reviews textarea,.rkianoosh_txt form textarea{
+.comment-form-comment textarea#comment,#reviews textarea,.r_txt form textarea{
   font-size: 13px !important;
   height: 150px;background: rgba(255,255,255,0.2);color: #fff;
 border: 1px solid rgba(255,255,255,0.2);
@@ -585,10 +585,10 @@ border: 1px solid rgba(255,255,255,0.2);
   position: relative;
   text-align: justify !important;
   float: left;border-radius: 5px;}
-.rkianoosh_txt form textarea,.rkianoosh_txt form input[type="submit"]{float: right !important;clear: both;}
+.r_txt form textarea,.r_txt form input[type="submit"]{float: right !important;clear: both;}
 #comments input#author,#comments input#email,#comments input#url,#comments textarea#comment,
 #reviews input#author{transition: all 0.5s;margin:0 0 10px 0;}
-.form-submit #submit,#reviews #submit,.rkianoosh_txt form input[type="submit"]{
+.form-submit #submit,#reviews #submit,.r_txt form input[type="submit"]{
 width: 110px !important;
 height: 40px !important;
 font-size: 15px;border: unset;outline: unset;
@@ -600,10 +600,10 @@ box-shadow: inset 0 1px 0 rgba(255,255,255,.15),0 1px 1px rgba(0,0,0,.075);
 border: 1px solid transparent;
 border-radius: 3px;
 }
-.form-submit #submit:hover,.rkianoosh_txt form input[type="submit"]:hover{color: #fff;background: var(--ab-blue);}
+.form-submit #submit:hover,.r_txt form input[type="submit"]:hover{color: #fff;background: var(--ab-blue);}
 .bypostauthor{}
 .comment-content{width: 100%;float: left;height: auto;position: relative;text-align: justify;}
-.rkianoosh_ir_com{width: 100%;position: relative;margin-top: 5px;}
+.tara-comment{width: 100%;position: relative;margin-top: 5px;}
 #respond{width:100%;height:auto;margin-bottom: 25px;}
 .commentlist li{width:100%;height:auto;margin:0 auto;position: relative;border: 1px solid rgba(0,0,0,0.4);
 padding:10px 15px;margin-bottom: 15px;background: rgba(255,255,255,0.2);
@@ -611,7 +611,7 @@ border-radius: 5px;}
 .commentlist li footer{border-bottom: 1px solid rgba(0,0,0,.4);padding-bottom: 5px;margin-bottom: 5px;}
 
 #reply-title{margin:0 20px;font-size: 14px;}
-.left_kianoosh_like{width: auto;float: right;text-align: center;margin: 3px 7px 0 0;
+.tara-comment-like{width: auto;float: right;text-align: center;margin: 3px 7px 0 0;
 font-size: 13px;padding: 0;line-height: 25px;}
 .comments_likes{width: 40%;float: right;display: inline-grid;}
 .comment-date{float: left;text-align: left;padding: 0;}
@@ -1242,7 +1242,7 @@ border-radius:7px;box-shadow: 0 6px 20px rgba(17,17,17,.08);}
 .single_posts{width: 100%;height: auto;padding: 20px;position: relative;background: #fff;
 margin-bottom: 20px;border-radius: 7px;box-shadow: 0 6px 20px rgba(17,17,17,.08);}
 .last_item_c{margin-bottom: 0;}
-.rkianoosh_comment_box{border-bottom: 0;}
+.r_comment_box{border-bottom: 0;}
 .tarlanweb_post_box header{margin: 5px 0 10px 0;clear: both;}
 .tarlanweb_post_box header h1{font-size: 17px;font-weight: 500;padding-bottom:15px;display:inline-block;
 border-bottom: 1px solid var(--ab-blue);
@@ -1339,7 +1339,7 @@ padding-bottom: 15px;border-bottom: 1px solid var(--ab-blue);display: inline-blo
 .tarlanweb_side_box li{width: 100%;height: 80px;clear: both;padding: 10px;border-radius: 3px;}
 .tarlanweb_side_box li:hover{background: rgba(0,0,0,0.1);}
 .night .tarlanweb_side_box li:hover{background: rgba(255,255,255,0.1);}
-.tarlanweb_side_box li .img_rkianoosh_box{width: 60px;height: 60px;float: right;margin-left: 10px;position: relative;}
+.tarlanweb_side_box li .tara-thumb-box{width: 60px;height: 60px;float: right;margin-left: 10px;position: relative;}
 .tarlanweb_side_box li a{width: 100%;height: 60px;display: block;position: relative;}
 .tarlanweb_side_box li a span{display: block;}
 .tarlanweb_side_box li:last-child{border: unset;}
@@ -1430,9 +1430,9 @@ margin: 26px 0 4px 0;font-size: 16px;font-weight: 600;line-height: 2;text-align:
 .video_player{margin-top: 20px;}
 .video_player video{width: 100%;height: auto;}
 
-.rkianoosh_tags_box span,.comm_titrs{font-size: 15px;font-weight: bold;}
-.rkianoosh_tags_box a{display: inline-block;margin: 2px;}
-.rkianoosh_tags_box a:hover{color: var(--ab-blue-accent);}
+.tara-tags-box span,.comm_titrs{font-size: 15px;font-weight: bold;}
+.tara-tags-box a{display: inline-block;margin: 2px;}
+.tara-tags-box a:hover{color: var(--ab-blue-accent);}
 
 .tarlanweb_post_ft{float: right;height: 30px;line-height: 31px;margin-left: 15px;font-size: 12px;}
 .tarlanweb_post_ft i{display: inline-block;font-size: 15px;vertical-align: middle;}
@@ -1649,7 +1649,7 @@ body{padding-top:0;}
 .dl_linksv_box ul li{width: 100%;padding: 5px 0;}
 .dl_linksv_box ul li a{margin: 0;}
 .comment-form-author,.comment-form-email,.form-submit #submit,#reviews #submit,
-.rkianoosh_txt form input[type="submit"]{width: 100% !important;}
+.r_txt form input[type="submit"]{width: 100% !important;}
 .fix_bottom_right_box a{font-size: 12px;}
 .volume_box{display: none !important;}
 #searches{width: 100%;}
@@ -2679,7 +2679,7 @@ body.ab-has-mh{padding-top:90px;}
    بلوک ۲۴ (3.2.0 · نوار پخش در 3.2.4: تیره‌پسند، کوتاه‌تر، قبلی/بعدی) — باکس «ما را دنبال کنید» + نوارِ چسبانِ پخش
    فایل: inc/ab-post-extras.php  ·  فراخوانی: single.php (بالای باکس پلیر)
    پالت سازمانی: #FFFFFF · #185ADB · #111111 — بدون گرادینت، بدون رنگ جدید
-   خاموشی: JAVANSEDA_POST_EXTRAS / JAVANSEDA_STICKY_PLAYER یا گزینهٔ fixbtn
+   خاموشی: TARA_POST_EXTRAS / TARA_STICKY_PLAYER یا گزینهٔ fixbtn
    اگر فایل لایه حذف شود، این قواعد بی‌مصرف می‌مانند ولی چیزی را نمی‌شکنند.
    ========================================================================== */
 .ab-social-box{display:block;margin:14px 0 8px;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:12px;box-shadow:0 1px 2px rgba(17,17,17,.04);overflow:hidden}
@@ -3080,7 +3080,7 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 /* ============================================================================================
    بلوک ۲۸ (نسخۀ 3.3.4) — فلاشِ «کل صفحه را گرفتنِ اسلایدر» هنگام رفرش
    ------------------------------------------------------------------------------------------
-   علت: `inc/ab-perf.php` اسکریپت‌ها را defer می‌کند (JAVANSEDA_PERF_DEFER=true — کار درست برای
+   علت: `inc/ab-perf.php` اسکریپت‌ها را defer می‌کند (TARA_PERF_DEFER=true — کار درست برای
    سرعت) و owl هنگام init کلاس `.owl-loaded` را اضافه می‌کند. تুকۀ owl که در style.css قالب
    هست، قاعدۀ `.owl-carousel{display:none}` را ندارد؛ پس تا لحظۀ init، هر ۵ آیندِ
    `.vip_top_slider` (و همهِ خواننده‌ها) پشت‌سرهم و تمام‌عرض چیده می‌شوند ⇒ «یک‌دفعه کل صفحه».
@@ -3230,7 +3230,7 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
    فایل‌ها: header.php (wp_body_open + .ab-skip-link) · single.php و
             inc/tarlanweb_player.php (data-ab-player + id یکتا، بدون هیچ
             display:none — در 3.3.8 پنهان‌سازی چیدمان پلیر را به‌هم ریخت)
-   پالت سازمانی بدون گرادینت · خاموشی: JAVANSEDA_SKIP_LINK / JAVANSEDA_UI_GUARD
+   پالت سازمانی بدون گرادینت · خاموشی: TARA_SKIP_LINK / TARA_UI_GUARD
    ========================================================================== */
 
 /* ۱) لینک «پرش به محتوا»: پیش از اولین Tab دیده نمی‌شود، با فوکوس ظاهر می‌شود
@@ -3248,7 +3248,7 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
       «اول/دوم» روی برخی صفحه‌ها پلیرِ درست را بی‌کار می‌کند (تجربۀ 3.3.8). اگر روزی
       JS چندنمونگی شد، همان لحظه می‌توان روی data-ab-player استایل بست. */
 
-/* ۳) حالت خاموشی JAVANSEDA_SKIP_LINK: لینک پرش چاپ نمی‌شود، پس قاعده هم لازم نیست */
+/* ۳) حالت خاموشی TARA_SKIP_LINK: لینک پرش چاپ نمی‌شود، پس قاعده هم لازم نیست */
 
 /* انتهای بلوک ۳۲ (v3.3.8 · اصلاحیۀ 3.3.9) */
 
@@ -3636,7 +3636,7 @@ body.ab-player-novol .music_box_player .volume_box{display: none}
        img ما نمی‌شود.
      · @supports: برای مرورگرهای بدون aspect-ratio (سافاری ۱۴ و قدیمی‌تر) ارتفاع صریح
    PHP هیچ ارتفاع/عرضی به img نمی‌نویسد؛ فقط sizes و سایزِ source درست می‌شود
-   (javan_seda_post_cover_size/args) ⇒ srcset نزدیک‌ترین فایل را برمی‌دارد، پس ۵۰۰px
+   (tara_post_cover_size/args) ⇒ srcset نزدیک‌ترین فایل را برمی‌دارد، پس ۵۰۰px
    روی دسکتاپ ۱۰۲۴ پیکسل دانلود نمی‌کند.
    بازگشت: «تنظیمات قالب ← کنترل رابط ← کات مربعی کاور» = خاموش (مربع نبود) یا حذف همین
    بلوک از انتهای style.css. بدون !important · بدون گرادینت · پالت #FFFFFF #185ADB #111111
@@ -3659,6 +3659,6 @@ body.ab-post-img-square .single_featured_cover .single_featured_image img{
 		height: var(--ab-post-img-size, 500px);max-height: 100vw;
 	}
 }
-/* در فهرست‌ها/جست‌وجو هم همان کادر استفاده می‌شود؛ اگر cover در محتوا تزریق شده باشد (*JAVANSEDA_COVER_IN_CONTENT*)
+/* در فهرست‌ها/جست‌وجو هم همان کادر استفاده می‌شود؛ اگر cover در محتوا تزریق شده باشد (*TARA_COVER_IN_CONTENT*)
    چون کلاس‌ها یکی‌اند، همین قواعد یک‌دست می‌گیرد. */
 /* انتهای بلوک ۳۷ (v3.4.5) */

@@ -10,7 +10,7 @@ if ( function_exists( 'wp_get_document_title' ) && ! ( function_exists( 'current
 <?php endif; ?>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta property="dc:creator" content="tarlanweb.ir Design Group - call by 09158856205" />
+<meta property="dc:creator" content=" Design Group - call by " />
 <meta name="theme-color" content="#000000">
 <meta name="apple-mobile-web-app-status-bar-style" content="#000000">
 <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
@@ -59,16 +59,16 @@ body.ab-has-mh{padding-top:90px;}
 <?php if ( function_exists( 'wp_body_open' ) ) { wp_body_open(); } ?>
 <?php /* v3.4.2 — متنِ راهنما عمداً داخل بلوک PHP است (در 3.4.1 بعد از ?> رفته و چاپ می‌شد).
    خاموشیِ این لینک: «تنظیمات قالب ← کنترل رابط ← لینک پرش به محتوا»
-   یا define( 'JAVANSEDA_SKIP_LINK', false ); */ ?>
-<?php if ( ( ! defined( 'JAVANSEDA_SKIP_LINK' ) || JAVANSEDA_SKIP_LINK ) && ( ! function_exists( 'javan_seda_ui_on' ) || javan_seda_ui_on( 'ab_skip_link', true, 'JAVANSEDA_SKIP_LINK' ) ) ) { ?>
+   یا define( 'TARA_SKIP_LINK', false ); */ ?>
+<?php if ( ( ! defined( 'TARA_SKIP_LINK' ) || TARA_SKIP_LINK ) && ( ! function_exists( 'tara_ui_on' ) || tara_ui_on( 'ab_skip_link', true, 'TARA_SKIP_LINK' ) ) ) { ?>
 <a class="ab-skip-link" href="#centers_box">پرش به محتوای اصلی</a>
-<?php } /* JAVANSEDA_SKIP_LINK */ ?>
+<?php } /* TARA_SKIP_LINK */ ?>
 <header id="header">
 <div class="tarlanweb_center">
 <?php if(is_home()){ ?> <h1 class="h1_hidden_home"><?php echo esc_html( ot_get_option('head_h1') ); ?></h1> <?php } ?>
 <div class="logo_top"><figure><a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( ot_get_option('logo') ); ?>" width="150" height="40" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" title="<?php echo ot_get_option('head_h1'); ?>"></a></figure></div>
 <nav class="menu_right">
-<?php wp_nav_menu(array('theme_location'=>'top_menu','menu_id'=>'rkianoosh_ir','container'=>'')); ?>
+<?php wp_nav_menu(array('theme_location'=>'top_menu','menu_id'=>'tara-menu','container'=>'')); ?>
 <div class="clear"></div>
 </nav>
 <form id="searches" method="get" action="<?php echo esc_url( home_url() ); ?>">

@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا ۳.۵.۳ — عنوان و توضیحات متای «صفحهٔ اصلی»
+ * ترانه یار ۳.۵.۳ — عنوان و توضیحات متای «صفحهٔ اصلی»
  * =============================================================================
  * مسئله: صفحهٔ اصلی این قالب یک «برگه» نیست؛ فهرستِ نوشته‌هاست (home.php). پس در
  * «برگه‌ها» چیزی برای ویرایش عنوان/توضیح متا وجود ندارد و در تنظیمات قالب هم فیلدی
@@ -19,7 +19,7 @@
  *   اگر افزونهٔ سئو فعال باشد، آن افزونه خروجیِ نهایی را می‌گیرد و چیز تکراری چاپ
  *   نمی‌شود. (فیلدهای ما در آن حالت بی‌اثرند و همین را در راهنما نوشته‌ایم.)
  *
- * خاموشی کامل (بدون تغییر کد):  define( 'JAVANSEDA_HOME_META', false );
+ * خاموشی کامل (بدون تغییر کد):  define( 'TARA_HOME_META', false );
  * =============================================================================
  */
 
@@ -27,18 +27,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( defined( 'JAVANSEDA_HOME_META' ) && false === JAVANSEDA_HOME_META ) {
+if ( defined( 'TARA_HOME_META' ) && false === TARA_HOME_META ) {
 	return;
 }
 
-if ( ! function_exists( 'javan_seda_home_meta' ) ) {
+if ( ! function_exists( 'tara_home_meta' ) ) {
 	/**
 	 * خواندنِ فیلدهای صفحهٔ اصلی از تنظیمات قالب.
 	 *
 	 * @param string $key 'title' یا 'desc'.
 	 * @return string مقدارِ پاک‌شده یا رشتهٔ خالی.
 	 */
-	function javan_seda_home_meta( $key ) {
+	function tara_home_meta( $key ) {
 		$map = array(
 			'title' => 'home_meta_title',
 			'desc'  => 'home_meta_desc',
@@ -57,35 +57,35 @@ if ( ! function_exists( 'javan_seda_home_meta' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_home_title' ) ) {
+if ( ! function_exists( 'tara_home_title' ) ) {
 	/**
 	 * عنوانِ صفحهٔ اصلی: فیلدِ دستی، وگرنه نام سایت (رفتار ۳.۵.۲).
 	 *
 	 * @param string $default نام سایت.
 	 * @return string
 	 */
-	function javan_seda_home_title( $default = '' ) {
-		$custom = javan_seda_home_meta( 'title' );
+	function tara_home_title( $default = '' ) {
+		$custom = tara_home_meta( 'title' );
 		return '' !== $custom ? $custom : (string) $default;
 	}
 }
 
-if ( ! function_exists( 'javan_seda_home_description' ) ) {
+if ( ! function_exists( 'tara_home_description' ) ) {
 	/**
 	 * توضیحِ متای صفحهٔ اصلی: فیلدِ دستی، وگرنه همان مقداری که قبلاً استفاده می‌شد.
 	 *
 	 * @param string $default توضیح کوتاهِ سایت.
 	 * @return string
 	 */
-	function javan_seda_home_description( $default = '' ) {
-		$custom = javan_seda_home_meta( 'desc' );
+	function tara_home_description( $default = '' ) {
+		$custom = tara_home_meta( 'desc' );
 		return '' !== $custom ? $custom : (string) $default;
 	}
 }
 
-if ( ! function_exists( 'javan_seda_home_is_front' ) ) {
+if ( ! function_exists( 'tara_home_is_front' ) ) {
 	/** آیا این درخواست «صفحهٔ اصلی» است؟ (بدون وابستگی به is_home در پیشخوان) */
-	function javan_seda_home_is_front() {
+	function tara_home_is_front() {
 		if ( function_exists( 'is_admin' ) && is_admin() ) {
 			return false;
 		}
@@ -99,7 +99,7 @@ if ( ! function_exists( 'javan_seda_home_is_front' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_home_title_parts' ) ) {
+if ( ! function_exists( 'tara_home_title_parts' ) ) {
 	/**
 	 * جایگزینیِ بخش‌های عنوان فقط برای صفحهٔ اصلی.
 	 *
@@ -109,18 +109,18 @@ if ( ! function_exists( 'javan_seda_home_title_parts' ) ) {
 	 * @param array $parts بخش‌های عنوان.
 	 * @return array
 	 */
-	function javan_seda_home_title_parts( $parts ) {
-		if ( ! is_array( $parts ) || ! javan_seda_home_is_front() ) {
+	function tara_home_title_parts( $parts ) {
+		if ( ! is_array( $parts ) || ! tara_home_is_front() ) {
 			return $parts;
 		}
 		$default = isset( $parts['title'] ) ? (string) $parts['title'] : '';
 		if ( '' === $default && function_exists( 'get_bloginfo' ) ) {
 			$default = (string) get_bloginfo( 'name' );
 		}
-		$parts['title']   = javan_seda_home_title( $default );
+		$parts['title']   = tara_home_title( $default );
 		$parts['tagline'] = '';
 		$parts['site']    = '';
 		return $parts;
 	}
-	add_filter( 'document_title_parts', 'javan_seda_home_title_parts', 15 );
+	add_filter( 'document_title_parts', 'tara_home_title_parts', 15 );
 }

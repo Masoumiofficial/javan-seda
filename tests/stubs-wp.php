@@ -391,7 +391,7 @@ function wp_set_object_terms( $id, $terms, $tax, $append = false ) {
 	$GLOBALS['__calls'][] = array( 'set_object_terms', (int) $id, $terms, $tax, $append );
 	return array();
 }
-function javan_seda_artist_tax() {
+function tara_artist_tax() {
 	return 'artist';
 }
 
@@ -436,7 +436,7 @@ function current_user_can( $cap, $arg = null ) {
 	return ! empty( $GLOBALS['__caps'][ $cap ] );
 }
 function wp_verify_nonce( $nonce, $action ) {
-	return ( 'good' === $nonce && 'javan_seda_save_term' === $action ) || ( 'good-post' === $nonce && 'javan_seda_post_artist' === $action );
+	return ( 'good' === $nonce && 'tara_save_term' === $action ) || ( 'good-post' === $nonce && 'tara_post_artist' === $action );
 }
 function check_ajax_referer( $action, $name ) {
 	return true;

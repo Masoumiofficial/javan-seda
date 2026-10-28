@@ -1,7 +1,7 @@
 <?php
 /**
  * صفحهٔ اختصاصی هر هنرمند (taxonomy-artist.php) — نسخهٔ ۳
- * نامکِ فعالِ آرشیو را javan_seda_artist_tax() تعیین می‌کند؛ taxonomy-singer.php هم
+ * نامکِ فعالِ آرشیو را tara_artist_tax() تعیین می‌کند؛ taxonomy-singer.php هم
  * به‌عنوان سازگاری باقی مانده و همین فایل را بارگذاری می‌کند.
  *
  * این فایل فقط «نمایش» است: نه تاکسونومی ثبت می‌کند، نه rewrite را دست می‌زند و نه
@@ -17,12 +17,12 @@
  *   • حفظ همان کلاس‌های CSS قبلی (artist_box_tarlanweb، artist_resume_box، song_boxs، …)
  *
  * قابل تنظیم با فیلترها:
- *   javanseda_artist_page_config    تنظیم‌های این صفحه (جدول پایین‌تر)
- *   javanseda_artist_type_map       نگاشت مقادیر musics_type به دسته‌ها
- *   javanseda_artist_type_labels    برچسب دسته‌ها
- *   javanseda_artist_directory_cache خاموش‌کردن کش ۱۲ساعتهٔ آدرس برگهٔ فهرست هنرمندان
- *   javanseda_artist_resume_labels  برچسب کوتاه نشان‌های سرتیتر (آهنگ/آلبوم/…)
- *   javanseda_artist_posts_limit    سقف تعداد نوشته‌های هنرمند (پیش‌فرض -۱ = همه)
+ *   tara_artist_page_config    تنظیم‌های این صفحه (جدول پایین‌تر)
+ *   tara_artist_type_map       نگاشت مقادیر musics_type به دسته‌ها
+ *   tara_artist_type_labels    برچسب دسته‌ها
+ *   tara_artist_directory_cache خاموش‌کردن کش ۱۲ساعتهٔ آدرس برگهٔ فهرست هنرمندان
+ *   tara_artist_resume_labels  برچسب کوتاه نشان‌های سرتیتر (آهنگ/آلبوم/…)
+ *   tara_artist_posts_limit    سقف تعداد نوشته‌های هنرمند (پیش‌فرض -۱ = همه)
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -33,7 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
    ۰) تنظیم‌ها
    ================================================================================== */
 $taranehyar_cfg = apply_filters(
-	'javanseda_artist_page_config',
+	'tara_artist_page_config',
 	array(
 		'show_sort'      => true,  // نوار «ترتیب: جدیدترین / قدیمی‌ترین / الفبایی»
 		'show_related'   => true,  // بخش «هنرمندانِ مشابه»
@@ -45,11 +45,11 @@ $taranehyar_cfg = apply_filters(
 );
 
 /* ==================================================================================
-   ۱) توابع کمکی (نام‌ها با javanseda_artist_ شروع می‌شوند تا با فایل فهرست هنرمندان تداخل نکنند)
+   ۱) توابع کمکی (نام‌ها با tara_artist_ شروع می‌شوند تا با فایل فهرست هنرمندان تداخل نکنند)
    ================================================================================== */
-if ( ! function_exists( 'javanseda_artist_digits' ) ) {
+if ( ! function_exists( 'tara_artist_digits' ) ) {
 	/** تبدیل رقم‌های لاتین به رقم‌های فارسی («12» → «۱۲») */
-	function javanseda_artist_digits( $text ) {
+	function tara_artist_digits( $text ) {
 		return str_replace(
 			array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
 			array( '۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹' ),
@@ -58,20 +58,20 @@ if ( ! function_exists( 'javanseda_artist_digits' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javanseda_artist_fa_date' ) ) {
+if ( ! function_exists( 'tara_artist_fa_date' ) ) {
 	/** تاریخ خوانا برای سرتیتر: «بهمن 4, 1399» → «۴ بهمن ۱۳۹۹» */
-	function javanseda_artist_fa_date( $date ) {
+	function tara_artist_fa_date( $date ) {
 		$date = trim( (string) $date );
 		if ( preg_match( '/^(\S+)\s+([0-9]{1,2})\s*[،,]\s*([0-9]{4})$/u', $date, $m ) ) {
 			$date = $m[2] . ' ' . $m[1] . ' ' . $m[3];
 		}
-		return javanseda_artist_digits( $date );
+		return tara_artist_digits( $date );
 	}
 }
 
-if ( ! function_exists( 'javanseda_artist_normalize' ) ) {
+if ( ! function_exists( 'tara_artist_normalize' ) ) {
 	/** نرمال‌سازی فارسی برای مرتب‌سازی و مقایسه */
-	function javanseda_artist_normalize( $text ) {
+	function tara_artist_normalize( $text ) {
 		$text = (string) $text;
 		$text = str_replace(
 			array( "\xE2\x80\x8C", "\xE2\x80\x8D", 'ي', 'ك', 'ة', 'ۀ', 'ؤ', 'أ', 'إ', 'آ', 'ٱ', 'ئ', 'ى' ),
@@ -83,9 +83,9 @@ if ( ! function_exists( 'javanseda_artist_normalize' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javanseda_artist_sort_key' ) ) {
+if ( ! function_exists( 'tara_artist_sort_key' ) ) {
 	/** کلید مرتب‌سازی الفبایی فارسی (هر حرف → شمارهٔ جای آن در الفبا) */
-	function javanseda_artist_sort_key( $text ) {
+	function tara_artist_sort_key( $text ) {
 		$alphabet = 'ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی';
 		$index    = array();
 		$chars    = preg_split( '//u', $alphabet, -1, PREG_SPLIT_NO_EMPTY );
@@ -94,7 +94,7 @@ if ( ! function_exists( 'javanseda_artist_sort_key' ) ) {
 		}
 
 		$key   = '';
-		$parts = preg_split( '//u', javanseda_artist_normalize( $text ), -1, PREG_SPLIT_NO_EMPTY );
+		$parts = preg_split( '//u', tara_artist_normalize( $text ), -1, PREG_SPLIT_NO_EMPTY );
 		foreach ( (array) $parts as $char ) {
 			if ( isset( $index[ $char ] ) ) {
 				$key .= sprintf( '%02d', $index[ $char ] );
@@ -112,20 +112,20 @@ if ( ! function_exists( 'javanseda_artist_sort_key' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javanseda_artist_directory_url' ) ) {
+if ( ! function_exists( 'tara_artist_directory_url' ) ) {
 	/**
 	 * آدرسِ صفحۀ «همهٔ هنرمندان» — از 3.4.8 فقط یک رابطِ سازگار است.
-	 * منطقِ واقعی در javan_seda_artists_index_url() (لایۀ inc/ab-tax-artist.php) است:
+	 * منطقِ واقعی در tara_artists_index_url() (لایۀ inc/ab-tax-artist.php) است:
 	 * arti_url ← اسلاگِ برگه (artists → artist → singers) ← قالبِ artist-template.php ← آرشیوِ تاکسونومی,
 	 * و کلیدِ کشش با شمارۀ قالب می‌سازد، پس بعدِ هر آپدیت دیگر مقدارِ کهنه سرو نمی‌شود.
 	 */
-	function javanseda_artist_directory_url() {
+	function tara_artist_directory_url() {
 		static $url = null;
 		if ( null !== $url ) {
 			return $url;
 		}
-		if ( function_exists( 'javan_seda_artists_index_url' ) ) {
-			$url = javan_seda_artists_index_url();
+		if ( function_exists( 'tara_artists_index_url' ) ) {
+			$url = tara_artists_index_url();
 		} else {
 			/* لایه نصب نشده؟ همان رفتارِ سادهٔ قبلی، بدونِ کش */
 			$page = get_page_by_path( 'artists', 'OBJECT', 'page' );
@@ -137,7 +137,7 @@ if ( ! function_exists( 'javanseda_artist_directory_url' ) ) {
 		if ( ! $url || is_wp_error( $url ) ) {
 			$url = home_url( '/singers/' );
 		}
-		return apply_filters( 'javanseda_artist_directory_url', $url );
+		return apply_filters( 'tara_artist_directory_url', $url );
 	}
 }
 
@@ -175,8 +175,8 @@ if ( isset( $_GET['ab_artist_diag'] ) && current_user_can( 'manage_options' ) ) 
 	$taranehyar_lines[] = '=== گزارش تشخیص «صفحهٔ هنرمند» — ترانه‌یار ===';
 	$taranehyar_lines[] = 'فایل قالب در حال اجرا: ' . __FILE__;
 	$taranehyar_lines[] = 'queried_object: ' . ( is_object( $taranehyar_diag_term ) ? get_class( $taranehyar_diag_term ) : gettype( $taranehyar_diag_term ) );
-	$taranehyar_lines[] = 'taxonomy_exists(' . javan_seda_artist_tax() . '): ' . ( taxonomy_exists( javan_seda_artist_tax() ) ? 'YES' : 'NO' );
-	$taranehyar_lines[] = 'sort: ' . $taranehyar_sort . ' | posts_limit: ' . (int) apply_filters( 'javanseda_artist_posts_limit', -1 );
+	$taranehyar_lines[] = 'taxonomy_exists(' . tara_artist_tax() . '): ' . ( taxonomy_exists( tara_artist_tax() ) ? 'YES' : 'NO' );
+	$taranehyar_lines[] = 'sort: ' . $taranehyar_sort . ' | posts_limit: ' . (int) apply_filters( 'tara_artist_posts_limit', -1 );
 	$taranehyar_lines[] = '';
 
 	if ( ! $taranehyar_diag_term instanceof WP_Term ) {
@@ -202,7 +202,7 @@ if ( isset( $_GET['ab_artist_diag'] ) && current_user_can( 'manage_options' ) ) 
 				'suppress_filters' => false,
 				'tax_query'        => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 					array(
-						'taxonomy' => javan_seda_artist_tax(),
+						'taxonomy' => tara_artist_tax(),
 						'field'    => 'term_id',
 						'terms'    => $taranehyar_diag_term->term_id,
 					),
@@ -222,7 +222,7 @@ if ( isset( $_GET['ab_artist_diag'] ) && current_user_can( 'manage_options' ) ) 
 
 	$taranehyar_lines[] = '';
 	$taranehyar_lines[] = '--- لینک‌ها ---';
-	$taranehyar_lines[] = 'فهرست همهٔ هنرمندان: ' . javanseda_artist_directory_url();
+	$taranehyar_lines[] = 'فهرست همهٔ هنرمندان: ' . tara_artist_directory_url();
 
 	echo esc_html( implode( "\n", $taranehyar_lines ) );
 	exit;
@@ -257,17 +257,17 @@ if ( ! $taranehyar_term instanceof WP_Term ) {
 $taranehyar_term_field = function ( $key ) use ( $taranehyar_term ) {
 	/* v3.5.2 — ترتیبِ خواندن: ACF → term meta (inc/ab-artist-fields.php).
 	   بدون ACF هم تصویر/شبکه‌های اجتماعی/بیوگرافی نمایش داده می‌شوند. */
-	if ( function_exists( 'javan_seda_artist_field' ) ) {
-		return javan_seda_artist_field( $taranehyar_term, $key );
+	if ( function_exists( 'tara_artist_field' ) ) {
+		return tara_artist_field( $taranehyar_term, $key );
 	}
 	return function_exists( 'get_field' ) ? get_field( $key, $taranehyar_term ) : '';
 };
 
 $taranehyar_image     = $taranehyar_term_field( 'aimg2' );
 $taranehyar_image_url = '';
-if ( function_exists( 'javan_seda_image_url_from_value' ) ) {
+if ( function_exists( 'tara_image_url_from_value' ) ) {
 	/* v3.5.2 — شناسهٔ پیوست، آرایهٔ ACF و URL هر سه پشتیبانی می‌شوند */
-	$taranehyar_image_url = javan_seda_image_url_from_value( $taranehyar_image );
+	$taranehyar_image_url = tara_image_url_from_value( $taranehyar_image );
 } elseif ( is_array( $taranehyar_image ) && isset( $taranehyar_image['url'] ) ) {
 	$taranehyar_image_url = $taranehyar_image['url'];
 } elseif ( is_string( $taranehyar_image ) ) {
@@ -286,7 +286,7 @@ $taranehyar_socials = array(
    نگاشت نوع محتوا: هر مقدار ناشناخته در «سایر موارد» می‌افتد (پنهان نمی‌شود)
 ------------------------------------------------------------------- */
 $taranehyar_type_map = apply_filters(
-	'javanseda_artist_type_map',
+	'tara_artist_type_map',
 	array(
 		/* صوتی */
 		'mp3'         => 'audio',
@@ -310,7 +310,7 @@ $taranehyar_type_map = apply_filters(
 );
 
 $taranehyar_labels = apply_filters(
-	'javanseda_artist_type_labels',
+	'tara_artist_type_labels',
 	array(
 		'album' => 'آلبوم ها',
 		'audio' => 'آهنگ ها',
@@ -321,7 +321,7 @@ $taranehyar_labels = apply_filters(
 
 /* برچسب کوتاه نشان‌های سرتیتر: «۶ آهنگ» به‌جای «۶ آهنگ ها» */
 $taranehyar_resume_labels = apply_filters(
-	'javanseda_artist_resume_labels',
+	'tara_artist_resume_labels',
 	array(
 		'album' => 'آلبوم',
 		'audio' => 'آهنگ',
@@ -330,7 +330,7 @@ $taranehyar_resume_labels = apply_filters(
 	)
 );
 
-$taranehyar_limit = (int) apply_filters( 'javanseda_artist_posts_limit', -1 );
+$taranehyar_limit = (int) apply_filters( 'tara_artist_posts_limit', -1 );
 
 /* ترتیب کوئری بر اساس ?sort= (مرتب‌سازی الفبایی بعد از کوئری و در PHP انجام می‌شود) */
 $taranehyar_orderby = ( 'old' === $taranehyar_sort ) ? 'ASC' : 'DESC';
@@ -345,7 +345,7 @@ $taranehyar_query = new WP_Query(
 		'ignore_sticky_posts' => true,
 		'tax_query'           => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 			array(
-				'taxonomy' => javan_seda_artist_tax(),
+				'taxonomy' => tara_artist_tax(),
 				'field'    => 'slug',
 				'terms'    => $taranehyar_term->slug,
 				'operator' => 'IN',
@@ -376,7 +376,7 @@ if ( $taranehyar_query->have_posts() ) {
 				if ( '' === $title_b ) {
 					$title_b = $b->post_title;
 				}
-				return strcmp( javanseda_artist_sort_key( $title_a ), javanseda_artist_sort_key( $title_b ) );
+				return strcmp( tara_artist_sort_key( $title_a ), tara_artist_sort_key( $title_b ) );
 			}
 		);
 	}
@@ -408,7 +408,7 @@ wp_reset_postdata();
 $taranehyar_related = array();
 if ( ! empty( $taranehyar_cfg['show_related'] ) && ! empty( $taranehyar_query->posts ) ) {
 	$taranehyar_ids   = wp_list_pluck( $taranehyar_query->posts, 'ID' );
-	$taranehyar_terms = wp_get_object_terms( $taranehyar_ids, javan_seda_artist_tax(), array( 'fields' => 'all_with_object_id' ) );
+	$taranehyar_terms = wp_get_object_terms( $taranehyar_ids, tara_artist_tax(), array( 'fields' => 'all_with_object_id' ) );
 
 	if ( ! is_wp_error( $taranehyar_terms ) && $taranehyar_terms ) {
 		$taranehyar_scores = array();
@@ -426,7 +426,7 @@ if ( ! empty( $taranehyar_cfg['show_related'] ) && ! empty( $taranehyar_query->p
 			$taranehyar_scores = array_slice( $taranehyar_scores, 0, max( 1, (int) $taranehyar_cfg['related_limit'] ), true );
 			$taranehyar_related = get_terms(
 				array(
-					'taxonomy'   => javan_seda_artist_tax(),
+					'taxonomy'   => tara_artist_tax(),
 					'include'    => array_keys( $taranehyar_scores ),
 					'hide_empty' => true,
 					'orderby'    => 'include',
@@ -461,8 +461,8 @@ if ( 'old' === $taranehyar_sort && ! empty( $taranehyar_query->posts ) ) {
 }
 $taranehyar_latest_date = $taranehyar_latest_post ? get_the_date( get_option( 'date_format' ), $taranehyar_latest_post->ID ) : '';
 
-$taranehyar_directory_url = javanseda_artist_directory_url();
-$taranehyar_term_norm     = javanseda_artist_normalize( $taranehyar_term->name );
+$taranehyar_directory_url = tara_artist_directory_url();
+$taranehyar_term_norm     = tara_artist_normalize( $taranehyar_term->name );
 $taranehyar_term_chars    = preg_split( '//u', $taranehyar_term_norm, -1, PREG_SPLIT_NO_EMPTY );
 $taranehyar_letter        = ( is_array( $taranehyar_term_chars ) && ! empty( $taranehyar_term_chars[0] ) )
 	? $taranehyar_term_chars[0]
@@ -489,7 +489,7 @@ $taranehyar_sort_labels = array(
 			<?php if ( '' !== $taranehyar_image_url ) : ?>
 				<img src="<?php echo esc_url( $taranehyar_image_url ); ?>" width="200" height="200" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" title="<?php echo esc_attr( $taranehyar_term->name ); ?>">
 			<?php else : ?>
-				<img src="<?php echo esc_url( function_exists( 'javan_seda_artist_default_image' ) ? javan_seda_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp' ); ?>" width="200" height="200" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" title="<?php echo esc_attr( $taranehyar_term->name ); ?>">
+				<img src="<?php echo esc_url( function_exists( 'tara_artist_default_image' ) ? tara_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp' ); ?>" width="200" height="200" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" title="<?php echo esc_attr( $taranehyar_term->name ); ?>">
 			<?php endif; ?>
 			<div class="socials_box">
 				<span>صفحات مجازی هنرمند</span>
@@ -516,13 +516,13 @@ $taranehyar_sort_labels = array(
 				<?php foreach ( array( 'album', 'audio', 'video', 'other' ) as $taranehyar_key ) : ?>
 					<?php $taranehyar_count = count( $taranehyar_buckets[ $taranehyar_key ] ); ?>
 					<?php if ( $taranehyar_count > 0 ) : ?>
-						<li><span class="ab-resume__num"><?php echo esc_html( javanseda_artist_digits( absint( $taranehyar_count ) ) ); ?></span> <?php echo esc_html( isset( $taranehyar_resume_labels[ $taranehyar_key ] ) ? $taranehyar_resume_labels[ $taranehyar_key ] : $taranehyar_key ); ?></li>
+						<li><span class="ab-resume__num"><?php echo esc_html( tara_artist_digits( absint( $taranehyar_count ) ) ); ?></span> <?php echo esc_html( isset( $taranehyar_resume_labels[ $taranehyar_key ] ) ? $taranehyar_resume_labels[ $taranehyar_key ] : $taranehyar_key ); ?></li>
 					<?php endif; ?>
 				<?php endforeach; ?>
 				<?php
 				/* v3.5.2 — مجموع بازدید آثار. اگر هنوز آماری نباشد، li چاپ نمی‌شود. */
-				if ( function_exists( 'javan_seda_artist_views_html' ) ) {
-					echo javan_seda_artist_views_html( $taranehyar_term ); // خروجی escape شده است
+				if ( function_exists( 'tara_artist_views_html' ) ) {
+					echo tara_artist_views_html( $taranehyar_term ); // خروجی escape شده است
 				}
 				?>
 			</ul>
@@ -530,11 +530,11 @@ $taranehyar_sort_labels = array(
 			<?php if ( ! empty( $taranehyar_cfg['show_meta'] ) && ( $taranehyar_found > 0 || '' !== $taranehyar_latest_date ) ) : ?>
 				<p class="ab-artist-page__meta">
 					<?php if ( $taranehyar_found > 0 ) : ?>
-						<?php echo esc_html( sprintf( '%s اثر در این صفحه', javanseda_artist_digits( number_format_i18n( $taranehyar_found ) ) ) ); ?>
+						<?php echo esc_html( sprintf( '%s اثر در این صفحه', tara_artist_digits( number_format_i18n( $taranehyar_found ) ) ) ); ?>
 					<?php endif; ?>
 					<?php if ( '' !== $taranehyar_latest_date ) : ?>
 						<span class="ab-artist-page__dot">•</span>
-						<?php echo esc_html( 'آخرین به‌روزرسانی: ' . javanseda_artist_fa_date( $taranehyar_latest_date ) ); ?>
+						<?php echo esc_html( 'آخرین به‌روزرسانی: ' . tara_artist_fa_date( $taranehyar_latest_date ) ); ?>
 					<?php endif; ?>
 				</p>
 			<?php endif; ?>
@@ -554,11 +554,11 @@ $taranehyar_sort_labels = array(
 			/* v3.5.2 — بیوگرافی کوتاه + دکمهٔ «بیوگرافی کامل».
 			   دکمه فقط وقتی چاپ می‌شود که مقصد معتبر باشد (منتشرشده، یا خصوصی/پیش‌نویس
 			   برای کاربری که اجازهٔ خواندنش را دارد) ⇒ هیچ لینک شکسته‌ای ساخته نمی‌شود. */
-			$taranehyar_bio_short = function_exists( 'javan_seda_artist_bio_short' )
-				? javan_seda_artist_bio_short( $taranehyar_term, false )
+			$taranehyar_bio_short = function_exists( 'tara_artist_bio_short' )
+				? tara_artist_bio_short( $taranehyar_term, false )
 				: '';
-			$taranehyar_bio_link = function_exists( 'javan_seda_artist_bio_link' )
-				? javan_seda_artist_bio_link( $taranehyar_term )
+			$taranehyar_bio_link = function_exists( 'tara_artist_bio_link' )
+				? tara_artist_bio_link( $taranehyar_term )
 				: '';
 			if ( '' !== $taranehyar_bio_short || '' !== $taranehyar_bio_link ) :
 				?>

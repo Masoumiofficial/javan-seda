@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا ۳.۵.۲ — فرم‌های پیشخوانِ هنرمند و دسته‌بندی
+ * ترانه یار ۳.۵.۲ — فرم‌های پیشخوانِ هنرمند و دسته‌بندی
  * ==========================================================================
  * چه چیزی را برمی‌گرداند؟
  *   نسخهٔ مبنا (۳.۴.۸) در صفحهٔ «افزودن/ویرایش هنرمند» هیچ فیلدی نداشت؛ مقدارها
@@ -13,7 +13,7 @@
  *   توضیح کامل (پایین آرشیو، با «نمایش بیشتر»).
  *
  * قواعد امنیت:
- *   • هر فرم یک nonce دارد (javan_seda_term_fields).
+ *   • هر فرم یک nonce دارد (tara_term_fields).
  *   • ذخیره فقط با تواناییِ ویرایشِ همان تاکسونومی (cap->edit_terms) و
  *     در نبودِ آن manage_categories.
  *   • هر مقدار بر اساس نوعش پاک‌سازی می‌شود (esc_url_raw / absint /
@@ -34,12 +34,12 @@ if ( ! defined( 'ABSPATH' ) ) {
    ۱) تشخیص مدیریتِ ACF (برای جلوگیری از فیلد تکراری)
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_acf_manages_fields' ) ) {
+if ( ! function_exists( 'tara_acf_manages_fields' ) ) {
 	/**
 	 * آیا ACF برای این تاکسونومی/کلیدها گروه فیلد دارد؟
 	 * فقط خواندن است؛ اگر API نبود false ⇒ فرمِ خودمان چاپ می‌شود.
 	 */
-	function javan_seda_acf_manages_fields( $taxonomy, $keys = array( 'aimg2' ) ) {
+	function tara_acf_manages_fields( $taxonomy, $keys = array( 'aimg2' ) ) {
 		static $cache = array();
 		$ckey = $taxonomy . '|' . implode( ',', (array) $keys );
 		if ( isset( $cache[ $ckey ] ) ) {
@@ -75,15 +75,15 @@ if ( ! function_exists( 'javan_seda_acf_manages_fields' ) ) {
    ۲) ثبت term meta (برای REST و پاک‌سازیِ استاندارد)
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_register_term_meta' ) ) {
-	function javan_seda_register_term_meta() {
+if ( ! function_exists( 'tara_register_term_meta' ) ) {
+	function tara_register_term_meta() {
 		if ( ! function_exists( 'register_term_meta' ) ) {
 			return;
 		}
-		$defs = javan_seda_artist_field_keys();
+		$defs = tara_artist_field_keys();
 		$taxes = array( 'artist', 'singer' );
-		if ( function_exists( 'javan_seda_artist_tax' ) ) {
-			$taxes[] = javan_seda_artist_tax();
+		if ( function_exists( 'tara_artist_tax' ) ) {
+			$taxes[] = tara_artist_tax();
 		}
 		foreach ( array_unique( $taxes ) as $tax ) {
 			if ( ! taxonomy_exists( $tax ) ) {
@@ -134,16 +134,16 @@ if ( ! function_exists( 'javan_seda_register_term_meta' ) ) {
 			);
 		}
 	}
-	add_action( 'init', 'javan_seda_register_term_meta', 20 );
+	add_action( 'init', 'tara_register_term_meta', 20 );
 }
 
 /* ==================================================================================
    ۳) قطعه‌های رابط مشترک
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_field_image_control' ) ) {
+if ( ! function_exists( 'tara_field_image_control' ) ) {
 	/** کنترل تصویر با پیش‌نمایش + کتابخانهٔ رسانه (بدون ساخت سیستم آپلود موازی). */
-	function javan_seda_field_image_control( $url, $id, $name_url, $name_id, $label = 'تصویر پروفایل' ) {
+	function tara_field_image_control( $url, $id, $name_url, $name_id, $label = 'تصویر پروفایل' ) {
 		$has = ( '' !== $url );
 		?>
 		<div class="ab-imgfield" data-ab-image>
@@ -169,10 +169,10 @@ if ( ! function_exists( 'javan_seda_field_image_control' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_field_social_controls' ) ) {
-	function javan_seda_field_social_controls( $term = null ) {
-		foreach ( javan_seda_artist_social_keys() as $key => $meta ) {
-			$value = $term ? javan_seda_artist_field( $term, $key ) : '';
+if ( ! function_exists( 'tara_field_social_controls' ) ) {
+	function tara_field_social_controls( $term = null ) {
+		foreach ( tara_artist_social_keys() as $key => $meta ) {
+			$value = $term ? tara_artist_field( $term, $key ) : '';
 			?>
 			<p class="ab-social-field">
 				<label for="ab-<?php echo esc_attr( $key ); ?>"><i class="<?php echo esc_attr( $meta['icon'] ); ?>" aria-hidden="true"></i> <?php echo esc_html( $meta['label'] ); ?></label>
@@ -185,12 +185,12 @@ if ( ! function_exists( 'javan_seda_field_social_controls' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_field_post_picker' ) ) {
+if ( ! function_exists( 'tara_field_post_picker' ) ) {
 	/**
 	 * جست‌وجو و انتخاب یک نوشته (برای «بیوگرافی کامل»).
 	 * ورودیِ مخفی، شناسه را نگه می‌دارد؛ نتایج با AJAX می‌آید (بدون لیستِ کاملِ نوشته‌ها).
 	 */
-	function javan_seda_field_post_picker( $value_id, $name = 'ab_bio_post', $label = 'نوشتهٔ بیوگرافی کامل' ) {
+	function tara_field_post_picker( $value_id, $name = 'ab_bio_post', $label = 'نوشتهٔ بیوگرافی کامل' ) {
 		$value_id = absint( $value_id );
 		$title    = '';
 		if ( $value_id ) {
@@ -219,21 +219,21 @@ if ( ! function_exists( 'javan_seda_field_post_picker' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_form_body' ) ) {
+if ( ! function_exists( 'tara_artist_form_body' ) ) {
 	/** بدنهٔ مشترکِ فرم هنرمند (در «افزودن» و «ویرایش» عیناً یکی است). */
-	function javan_seda_artist_form_body( $term = null ) {
-		$img_url = $term ? javan_seda_image_url_from_value( javan_seda_artist_field( $term, 'aimg2' ) ) : '';
-		$img_id  = $term ? absint( javan_seda_artist_field( $term, 'aimg2_id' ) ) : 0;
-		$latin   = $term ? javan_seda_artist_field( $term, 'artist_en' ) : '';
-		$bio     = $term ? javan_seda_artist_field( $term, 'ab_bio_short' ) : '';
-		$bio_id  = $term ? absint( javan_seda_artist_field( $term, 'ab_bio_post' ) ) : 0;
+	function tara_artist_form_body( $term = null ) {
+		$img_url = $term ? tara_image_url_from_value( tara_artist_field( $term, 'aimg2' ) ) : '';
+		$img_id  = $term ? absint( tara_artist_field( $term, 'aimg2_id' ) ) : 0;
+		$latin   = $term ? tara_artist_field( $term, 'artist_en' ) : '';
+		$bio     = $term ? tara_artist_field( $term, 'ab_bio_short' ) : '';
+		$bio_id  = $term ? absint( tara_artist_field( $term, 'ab_bio_post' ) ) : 0;
 
-		wp_nonce_field( 'javan_seda_save_term', 'javan_seda_term_nonce' );
-		echo '<input type="hidden" name="javan_seda_artist_form" value="1">';
+		wp_nonce_field( 'tara_save_term', 'tara_term_nonce' );
+		echo '<input type="hidden" name="tara_artist_form" value="1">';
 		?>
 		<div class="ab-termgroup">
 			<h3 class="ab-termgroup__title">تصویر و نام</h3>
-			<?php javan_seda_field_image_control( $img_url, $img_id, 'aimg2', 'aimg2_id' ); ?>
+			<?php tara_field_image_control( $img_url, $img_id, 'aimg2', 'aimg2_id' ); ?>
 			<p class="ab-field">
 				<label for="ab-artist-en">نام لاتین</label>
 				<input type="text" id="ab-artist-en" name="artist_en" value="<?php echo esc_attr( $latin ); ?>" class="regular-text" dir="ltr">
@@ -244,7 +244,7 @@ if ( ! function_exists( 'javan_seda_artist_form_body' ) ) {
 		<div class="ab-termgroup">
 			<h3 class="ab-termgroup__title">شبکه‌های اجتماعی</h3>
 			<p class="description ab-termgroup__hint">هر مورد خالی بماند، آیکونش در سایت چاپ نمی‌شود.</p>
-			<?php javan_seda_field_social_controls( $term ); ?>
+			<?php tara_field_social_controls( $term ); ?>
 		</div>
 
 		<div class="ab-termgroup">
@@ -260,7 +260,7 @@ if ( ! function_exists( 'javan_seda_artist_form_body' ) ) {
 			</p>
 			<p class="ab-field">
 				<label><strong>بیوگرافی کامل</strong> (نوشتهٔ مستقل)</label>
-				<?php javan_seda_field_post_picker( $bio_id ); ?>
+				<?php tara_field_post_picker( $bio_id ); ?>
 			</p>
 		</div>
 		<?php
@@ -271,61 +271,61 @@ if ( ! function_exists( 'javan_seda_artist_form_body' ) ) {
    ۴) فرم هنرمند — افزودن و ویرایش
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_artist_add_fields' ) ) {
-	function javan_seda_artist_add_fields( $taxonomy ) {
-		if ( javan_seda_acf_manages_fields( $taxonomy ) ) {
+if ( ! function_exists( 'tara_artist_add_fields' ) ) {
+	function tara_artist_add_fields( $taxonomy ) {
+		if ( tara_acf_manages_fields( $taxonomy ) ) {
 			return;
 		}
 		?>
 		<div class="form-field ab-termform">
-			<?php javan_seda_artist_form_body( null ); ?>
+			<?php tara_artist_form_body( null ); ?>
 		</div>
 		<?php
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_edit_fields' ) ) {
-	function javan_seda_artist_edit_fields( $term, $taxonomy ) {
-		if ( javan_seda_acf_manages_fields( $taxonomy ) ) {
+if ( ! function_exists( 'tara_artist_edit_fields' ) ) {
+	function tara_artist_edit_fields( $term, $taxonomy ) {
+		if ( tara_acf_manages_fields( $taxonomy ) ) {
 			return;
 		}
 		?>
 		<tr class="form-field ab-termform">
 			<th scope="row"><label>اطلاعات هنرمند</label></th>
-			<td><?php javan_seda_artist_form_body( $term ); ?></td>
+			<td><?php tara_artist_form_body( $term ); ?></td>
 		</tr>
 		<?php
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_fields_hooks' ) ) {
-	function javan_seda_artist_fields_hooks() {
+if ( ! function_exists( 'tara_artist_fields_hooks' ) ) {
+	function tara_artist_fields_hooks() {
 		$taxes = array( 'artist', 'singer' );
-		if ( function_exists( 'javan_seda_artist_tax' ) ) {
-			$taxes[] = javan_seda_artist_tax();
+		if ( function_exists( 'tara_artist_tax' ) ) {
+			$taxes[] = tara_artist_tax();
 		}
 		foreach ( array_unique( $taxes ) as $tax ) {
-			add_action( $tax . '_add_form_fields', 'javan_seda_artist_add_fields', 10, 1 );
-			add_action( $tax . '_edit_form_fields', 'javan_seda_artist_edit_fields', 10, 2 );
+			add_action( $tax . '_add_form_fields', 'tara_artist_add_fields', 10, 1 );
+			add_action( $tax . '_edit_form_fields', 'tara_artist_edit_fields', 10, 2 );
 		}
 	}
-	add_action( 'init', 'javan_seda_artist_fields_hooks', 30 );
+	add_action( 'init', 'tara_artist_fields_hooks', 30 );
 }
 
 /* ==================================================================================
    ۵) فرم دسته‌بندی — توضیح کوتاه و کامل
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_category_desc_fields' ) ) {
-	function javan_seda_category_desc_fields( $term = null ) {
+if ( ! function_exists( 'tara_category_desc_fields' ) ) {
+	function tara_category_desc_fields( $term = null ) {
 		$short = '';
 		$full  = '';
 		if ( $term ) {
 			$short = (string) get_term_meta( $term->term_id, 'ab_desc_short', true );
 			$full  = (string) get_term_meta( $term->term_id, 'ab_desc_full', true );
 		}
-		wp_nonce_field( 'javan_seda_save_term', 'javan_seda_term_nonce' );
-		echo '<input type="hidden" name="javan_seda_cat_form" value="1">';
+		wp_nonce_field( 'tara_save_term', 'tara_term_nonce' );
+		echo '<input type="hidden" name="tara_cat_form" value="1">';
 		?>
 		<p class="ab-field">
 			<label for="ab-desc-short">توضیح کوتاه (بالای آرشیو)</label>
@@ -367,41 +367,41 @@ if ( ! function_exists( 'javan_seda_category_desc_fields' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_category_add_fields' ) ) {
-	function javan_seda_category_add_fields( $taxonomy ) {
+if ( ! function_exists( 'tara_category_add_fields' ) ) {
+	function tara_category_add_fields( $taxonomy ) {
 		if ( 'category' !== $taxonomy ) {
 			return;
 		}
 		?>
-		<div class="form-field ab-termform ab-termform--cat"><?php javan_seda_category_desc_fields( null ); ?></div>
+		<div class="form-field ab-termform ab-termform--cat"><?php tara_category_desc_fields( null ); ?></div>
 		<?php
 	}
 }
 
-if ( ! function_exists( 'javan_seda_category_edit_fields' ) ) {
-	function javan_seda_category_edit_fields( $term, $taxonomy ) {
+if ( ! function_exists( 'tara_category_edit_fields' ) ) {
+	function tara_category_edit_fields( $term, $taxonomy ) {
 		if ( 'category' !== $taxonomy ) {
 			return;
 		}
 		?>
 		<tr class="form-field ab-termform ab-termform--cat">
 			<th scope="row"><label>توضیحات دسته</label></th>
-			<td><?php javan_seda_category_desc_fields( $term ); ?></td>
+			<td><?php tara_category_desc_fields( $term ); ?></td>
 		</tr>
 		<?php
 	}
 }
 
-add_action( 'category_add_form_fields', 'javan_seda_category_add_fields', 10, 1 );
-add_action( 'category_edit_form_fields', 'javan_seda_category_edit_fields', 10, 2 );
+add_action( 'category_add_form_fields', 'tara_category_add_fields', 10, 1 );
+add_action( 'category_edit_form_fields', 'tara_category_edit_fields', 10, 2 );
 
 /* ==================================================================================
    ۶) ذخیره‌سازی
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_can_edit_terms' ) ) {
+if ( ! function_exists( 'tara_can_edit_terms' ) ) {
 	/** توانایی ویرایش ترم‌های همان تاکسونومی (پیش‌فرض وردپرس: manage_categories). */
-	function javan_seda_can_edit_terms( $taxonomy ) {
+	function tara_can_edit_terms( $taxonomy ) {
 		$tax = get_taxonomy( $taxonomy );
 		if ( $tax && isset( $tax->cap ) && isset( $tax->cap->edit_terms ) ) {
 			return current_user_can( $tax->cap->edit_terms );
@@ -410,12 +410,12 @@ if ( ! function_exists( 'javan_seda_can_edit_terms' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_save_term_fields' ) ) {
+if ( ! function_exists( 'tara_save_term_fields' ) ) {
 	/**
 	 * ذخیرهٔ فیلدهای هنرمند و دسته‌بندی.
 	 * روی edited_terms و created_term نصب می‌شود (هر دو، بعد از ذخیرهٔ خودِ ترم).
 	 */
-	function javan_seda_save_term_fields( $term_id, $tt_id = 0, $taxonomy = '' ) {
+	function tara_save_term_fields( $term_id, $tt_id = 0, $taxonomy = '' ) {
 		$term_id = absint( $term_id );
 		if ( ! $term_id ) {
 			return;
@@ -428,19 +428,19 @@ if ( ! function_exists( 'javan_seda_save_term_fields' ) ) {
 			return;
 		}
 
-		if ( ! isset( $_POST['javan_seda_term_nonce'] ) ) {
+		if ( ! isset( $_POST['tara_term_nonce'] ) ) {
 			return;
 		}
-		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['javan_seda_term_nonce'] ) ), 'javan_seda_save_term' ) ) {
+		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['tara_term_nonce'] ) ), 'tara_save_term' ) ) {
 			return;
 		}
-		if ( ! javan_seda_can_edit_terms( $taxonomy ) ) {
+		if ( ! tara_can_edit_terms( $taxonomy ) ) {
 			return;
 		}
 
 		/* ---------- هنرمند ---------- */
-		if ( isset( $_POST['javan_seda_artist_form'] ) ) {
-			$keys = javan_seda_artist_field_keys();
+		if ( isset( $_POST['tara_artist_form'] ) ) {
+			$keys = tara_artist_field_keys();
 			foreach ( $keys as $key => $def ) {
 				if ( ! isset( $_POST[ $key ] ) ) {
 					continue;
@@ -468,12 +468,12 @@ if ( ! function_exists( 'javan_seda_save_term_fields' ) ) {
 		}
 
 		/* ---------- دسته‌بندی ---------- */
-		if ( isset( $_POST['javan_seda_cat_form'] ) && 'category' === $taxonomy ) {
+		if ( isset( $_POST['tara_cat_form'] ) && 'category' === $taxonomy ) {
 			$short = isset( $_POST['ab_desc_short'] ) ? trim( wp_strip_all_tags( (string) wp_unslash( $_POST['ab_desc_short'] ) ) ) : '';
 			if ( '' === $short ) {
 				delete_term_meta( $term_id, 'ab_desc_short' );
 			} else {
-				update_term_meta( $term_id, 'ab_desc_short', javan_seda_substr_utf8( $short, 0, 400 ) );
+				update_term_meta( $term_id, 'ab_desc_short', tara_substr_utf8( $short, 0, 400 ) );
 			}
 
 			$full = isset( $_POST['ab_desc_full'] ) ? wp_kses_post( (string) wp_unslash( $_POST['ab_desc_full'] ) ) : '';
@@ -484,18 +484,18 @@ if ( ! function_exists( 'javan_seda_save_term_fields' ) ) {
 			}
 		}
 
-		javan_seda_artist_views_flush();
+		tara_artist_views_flush();
 	}
-	add_action( 'edited_term', 'javan_seda_save_term_fields', 10, 3 );
-	add_action( 'created_term', 'javan_seda_save_term_fields', 10, 3 );
+	add_action( 'edited_term', 'tara_save_term_fields', 10, 3 );
+	add_action( 'created_term', 'tara_save_term_fields', 10, 3 );
 }
 
 /* ==================================================================================
    ۷) دارایی‌های پیشخوان (کتابخانهٔ رسانه + انتخاب‌گر)
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_admin_assets' ) ) {
-	function javan_seda_admin_assets( $hook = '' ) {
+if ( ! function_exists( 'tara_admin_assets' ) ) {
+	function tara_admin_assets( $hook = '' ) {
 		$screens = array( 'edit-tags.php', 'term.php', 'post.php', 'post-new.php' );
 		if ( ! in_array( $hook, $screens, true ) ) {
 			return;
@@ -514,7 +514,7 @@ if ( ! function_exists( 'javan_seda_admin_assets' ) ) {
 				'JavanSedaPicker',
 				array(
 					'ajax'  => admin_url( 'admin-ajax.php' ),
-					'nonce' => wp_create_nonce( 'javan_seda_picker' ),
+					'nonce' => wp_create_nonce( 'tara_picker' ),
 					'empty' => 'نتیجه‌ای پیدا نشد.',
 					'error' => 'خطا در جست‌وجو. دوباره تلاش کنید.',
 					'min'   => 'دست‌کم ۲ نویسه بنویسید…',
@@ -525,16 +525,16 @@ if ( ! function_exists( 'javan_seda_admin_assets' ) ) {
 			wp_enqueue_style( 'javan-seda-admin-352', trailingslashit( $uri ) . 'css/ab-admin-352.css', array(), $ver );
 		}
 	}
-	add_action( 'admin_enqueue_scripts', 'javan_seda_admin_assets' );
+	add_action( 'admin_enqueue_scripts', 'tara_admin_assets' );
 }
 
 /* ==================================================================================
    ۸) AJAX: جست‌وجوی هنرمند و نوشته
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_ajax_picker' ) ) {
-	function javan_seda_ajax_picker() {
-		check_ajax_referer( 'javan_seda_picker', 'nonce' );
+if ( ! function_exists( 'tara_ajax_picker' ) ) {
+	function tara_ajax_picker() {
+		check_ajax_referer( 'tara_picker', 'nonce' );
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
 			wp_send_json_error( array( 'message' => 'دسترسی ندارید.' ), 403 );
@@ -544,14 +544,14 @@ if ( ! function_exists( 'javan_seda_ajax_picker' ) ) {
 		$query = isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
 		$query = trim( $query );
 
-		if ( javan_seda_strlen_utf8( $query ) < 2 && '' !== $query ) {
+		if ( tara_strlen_utf8( $query ) < 2 && '' !== $query ) {
 			wp_send_json_success( array( 'items' => array(), 'hint' => 'min' ) );
 		}
 
 		$items = array();
 
 		if ( 'artist' === $type ) {
-			$tax = function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'artist';
+			$tax = function_exists( 'tara_artist_tax' ) ? tara_artist_tax() : 'artist';
 			if ( ! taxonomy_exists( $tax ) && taxonomy_exists( 'singer' ) ) {
 				$tax = 'singer';
 			}
@@ -574,7 +574,7 @@ if ( ! function_exists( 'javan_seda_ajax_picker' ) ) {
 						'id'     => (int) $term->term_id,
 						'title'  => $term->name,
 						'sub'    => (int) $term->count . ' اثر',
-						'image'  => javan_seda_artist_image_url( $term, 'thumbnail' ),
+						'image'  => tara_artist_image_url( $term, 'thumbnail' ),
 						'status' => '',
 					);
 				}
@@ -608,5 +608,5 @@ if ( ! function_exists( 'javan_seda_ajax_picker' ) ) {
 
 		wp_send_json_success( array( 'items' => $items ) );
 	}
-	add_action( 'wp_ajax_javan_seda_picker', 'javan_seda_ajax_picker' );
+	add_action( 'wp_ajax_tara_picker', 'tara_ajax_picker' );
 }

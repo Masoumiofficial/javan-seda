@@ -5,10 +5,10 @@
 <?php
 /* v3.5.2 — تصویر و شبکه‌های اجتماعی از لایهٔ دادهٔ هنرمند خوانده می‌شوند:
    اول ACF، بعد term meta. قبلاً فقط get_field() بود و اگر ACF نبود همه‌چیز خالی می‌شد. */
-$ab_tag_image  = function_exists( 'javan_seda_artist_image_url' ) ? javan_seda_artist_image_url( $term, 'medium' ) : '';
-$ab_tag_has    = function_exists( 'javan_seda_artist_has_image' ) ? javan_seda_artist_has_image( $term ) : false;
-$ab_tag_social = function_exists( 'javan_seda_artist_socials' ) ? javan_seda_artist_socials( $term ) : array();
-$ab_tag_latin  = function_exists( 'javan_seda_artist_field' ) ? javan_seda_artist_field( $term, 'artist_en' ) : '';
+$ab_tag_image  = function_exists( 'tara_artist_image_url' ) ? tara_artist_image_url( $term, 'medium' ) : '';
+$ab_tag_has    = function_exists( 'tara_artist_has_image' ) ? tara_artist_has_image( $term ) : false;
+$ab_tag_social = function_exists( 'tara_artist_socials' ) ? tara_artist_socials( $term ) : array();
+$ab_tag_latin  = function_exists( 'tara_artist_field' ) ? tara_artist_field( $term, 'artist_en' ) : '';
 ?>
 
 <div class="tarlanweb_center">

@@ -44,7 +44,7 @@ get_header('');
 <li><a href="<?php echo esc_url( home_url( '/music/' ) ); ?>"><i class="icofont-music-note" aria-hidden="true"></i> تازه‌ترین آهنگ‌ها</a></li>
 <li><a href="<?php echo esc_url( home_url( '/music-video/' ) ); ?>"><i class="icofont-video" aria-hidden="true"></i> موزیک‌ویدیوها</a></li>
 <li><a href="<?php echo esc_url( home_url( '/album/' ) ); ?>"><i class="icofont-music-disk" aria-hidden="true"></i> آلبوم‌ها</a></li>
-<li><a href="<?php echo esc_url( javan_seda_artists_index_url() ); ?>"><i class="icofont-microphone-alt" aria-hidden="true"></i> همهٔ هنرمندان</a></li>
+<li><a href="<?php echo esc_url( tara_artists_index_url() ); ?>"><i class="icofont-microphone-alt" aria-hidden="true"></i> همهٔ هنرمندان</a></li>
 </ul>
 
 <img class="ab-404-art" src="<?php echo esc_url( get_template_directory_uri() . '/images/error404.jpg' ); ?>" width="626" height="496" alt="صفحه پیدا نشد" loading="lazy" decoding="async">

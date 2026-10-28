@@ -7,9 +7,9 @@
  *  هیچ اسکریپت تازه و هیچ تغییر داده‌ای ندارد.
  *
  *  خاموشی کامل لایۀ شیشه‌ای (همه‌چیز به ساختار و رنگ 3.2.4 برمی‌گردد):
- *      define( 'JAVANSEDA_GLASS_UI', false );        // در wp-config.php
+ *      define( 'TARA_GLASS_UI', false );        // در wp-config.php
  *  خاموشی فقط blur (سطوح نیمه‌شفافِ مات بدون تارکردگی — برای دستگاه‌های ضعیف‌تر):
- *      define( 'JAVANSEDA_GLASS_BLUR', false );
+ *      define( 'TARA_GLASS_BLUR', false );
  *
  *  اگر فایل css/ab-glass.css روی هاست نباشد، این فایل سکوت می‌کند (نه خطا، نه صفحهٔ سفید).
  *  همه‌چیز با PHP 5.6 سازگار است (بدون ??، بدون static closure، بدون fn()).
@@ -19,22 +19,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! defined( 'JAVANSEDA_GLASS_UI' ) ) {
-	define( 'JAVANSEDA_GLASS_UI', true );
+if ( ! defined( 'TARA_GLASS_UI' ) ) {
+	define( 'TARA_GLASS_UI', true );
 }
-if ( ! defined( 'JAVANSEDA_GLASS_BLUR' ) ) {
-	define( 'JAVANSEDA_GLASS_BLUR', true );
+if ( ! defined( 'TARA_GLASS_BLUR' ) ) {
+	define( 'TARA_GLASS_BLUR', true );
 }
 
-if ( ! function_exists( 'javan_seda_glass_enabled' ) ) {
-	function javan_seda_glass_enabled() {
+if ( ! function_exists( 'tara_glass_enabled' ) ) {
+	function tara_glass_enabled() {
 		/* v3.4.1 — «لایۀ شیشۀ‌ای» در تنظیمات قالب (کنترل رابط ← ab_glass_ui).
 		   define() در wp-config.php همچنان برنده است؛ اگر inc/ab-controls.php نصب
 		   نباشد هم رفتار قبلی دست‌نخورده می‌ماند. */
-		if ( function_exists( 'javan_seda_ui_on' ) && ! javan_seda_ui_on( 'ab_glass_ui', true, 'JAVANSEDA_GLASS_UI' ) ) {
+		if ( function_exists( 'tara_ui_on' ) && ! tara_ui_on( 'ab_glass_ui', true, 'TARA_GLASS_UI' ) ) {
 			return false;
 		}
-		if ( defined( 'JAVANSEDA_GLASS_UI' ) && false === JAVANSEDA_GLASS_UI ) {
+		if ( defined( 'TARA_GLASS_UI' ) && false === TARA_GLASS_UI ) {
 			return false;
 		}
 		if ( function_exists( 'is_admin' ) && is_admin() ) {
@@ -44,18 +44,18 @@ if ( ! function_exists( 'javan_seda_glass_enabled' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_glass_path' ) ) {
-	function javan_seda_glass_path() {
+if ( ! function_exists( 'tara_glass_path' ) ) {
+	function tara_glass_path() {
 		return trailingslashit( get_template_directory() ) . 'css/ab-glass.css';
 	}
 }
 
-if ( ! function_exists( 'javan_seda_glass_enqueue' ) ) {
-	function javan_seda_glass_enqueue() {
-		if ( ! javan_seda_glass_enabled() || ! function_exists( 'wp_enqueue_style' ) ) {
+if ( ! function_exists( 'tara_glass_enqueue' ) ) {
+	function tara_glass_enqueue() {
+		if ( ! tara_glass_enabled() || ! function_exists( 'wp_enqueue_style' ) ) {
 			return;
 		}
-		$path = javan_seda_glass_path();
+		$path = tara_glass_path();
 		if ( ! is_readable( $path ) ) {
 			return; /* فایل نبود ⇒ بی‌صدا رد می‌شویم (ساختار در style.css دست‌نخورده می‌ماند) */
 		}
@@ -68,12 +68,12 @@ if ( ! function_exists( 'javan_seda_glass_enqueue' ) ) {
 		 * بدون !important بر قواعد قبلی می‌برد و حذفش هم بی‌خطر است.
 		 */
 		wp_enqueue_style( 'javan-seda-glass', trailingslashit( get_template_directory_uri() ) . 'css/ab-glass.css', array(), $ver );
-		if ( ( defined( 'JAVANSEDA_GLASS_BLUR' ) && false === JAVANSEDA_GLASS_BLUR ) && function_exists( 'wp_add_inline_style' ) ) {
+		if ( ( defined( 'TARA_GLASS_BLUR' ) && false === TARA_GLASS_BLUR ) && function_exists( 'wp_add_inline_style' ) ) {
 			wp_add_inline_style( 'javan-seda-glass', ':root{--ab-glass-blur:0px}' );
 		}
 	}
 }
 
 if ( function_exists( 'add_action' ) ) {
-	add_action( 'wp_enqueue_scripts', 'javan_seda_glass_enqueue', 20 );
+	add_action( 'wp_enqueue_scripts', 'tara_glass_enqueue', 20 );
 }

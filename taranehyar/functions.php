@@ -38,8 +38,8 @@ if ( ! defined( 'TARANEHYAR_URI' ) ) {
 	define( 'TARANEHYAR_URI', get_template_directory_uri() );
 }
 /* سازگاری با لایه‌های ۳.۵.x که این نام‌ها را می‌خوانند */
-if ( ! defined( 'JAVANSEDA_VERSION' ) ) {
-	define( 'JAVANSEDA_VERSION', TARANEHYAR_VERSION );
+if ( ! defined( 'TARA_VERSION' ) ) {
+	define( 'TARA_VERSION', TARANEHYAR_VERSION );
 }
 
 /* -------------------------------------------------------------------------
@@ -80,7 +80,7 @@ if ( ! function_exists( 'ot_get_option' ) ) {
 if ( ! function_exists( 'taranehyar_setup' ) ) {
 	function taranehyar_setup() {
 		/* ترجمه — همان دامنهٔ متنیِ قبلی تا رشته‌های موجود از دست نروند */
-		load_theme_textdomain( 'javanseda', TARANEHYAR_DIR . '/languages' );
+		load_theme_textdomain( 'taranehyar', TARANEHYAR_DIR . '/languages' );
 
 		add_theme_support( 'automatic-feed-links' );
 		add_theme_support( 'post-thumbnails' );
@@ -182,8 +182,8 @@ if ( ! function_exists( 'the_views' ) ) {
 		$views   = $post_id ? (int) get_post_meta( $post_id, 'views', true ) : 0;
 		$views   = max( 0, $views );
 
-		if ( function_exists( 'javan_seda_number_fa' ) ) {
-			$number = javan_seda_number_fa( $views );
+		if ( function_exists( 'tara_number_fa' ) ) {
+			$number = tara_number_fa( $views );
 		} else {
 			$number = number_format_i18n( $views );
 		}
@@ -294,7 +294,7 @@ if ( ! function_exists( 'pagination' ) ) {
 
 		/* عدد فارسی اگر لایه‌اش هست */
 		$num = function ( $n ) {
-			return function_exists( 'javan_seda_digits' ) ? javan_seda_digits( (string) $n ) : (string) $n;
+			return function_exists( 'tara_digits' ) ? tara_digits( (string) $n ) : (string) $n;
 		};
 
 		echo '<div class="pagination_box"><ul class="pagination" aria-label="صفحه‌بندی">';

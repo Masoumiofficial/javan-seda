@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا ۳.۵.۴ — دیدگاه‌ها: صفحه‌بندی، سرتیتر و ناوبریِ حرفه‌ای
+ * ترانه یار ۳.۵.۴ — دیدگاه‌ها: صفحه‌بندی، سرتیتر و ناوبریِ حرفه‌ای
  * =============================================================================
  * مسئله: با زیادشدنِ دیدگاه‌ها، صفحۀ نوشته بی‌نهایت بلند می‌شد؛ چون وردپرس به‌طور
  * پیش‌فرض صفحه‌بندیِ دیدگاه را خاموش دارد (`page_comments = 0`) و قالب هم فقط دو
@@ -21,9 +21,9 @@
  *   نمی‌کند، پس صفحۀ «تنظیمات → گفتگو» همیشه مقدارِ واقعیِ دیتابیس را نشان می‌دهد.
  *
  * خاموش‌کردنِ کامل (بدون تغییر کد):
- *   add_filter( 'javanseda_comment_paging', '__return_false' );
- *   یا در wp-config.php:  define( 'JAVANSEDA_COMMENT_PAGING', false );
- * تغییرِ تعداد در کد:  add_filter( 'javanseda_comments_per_page', function(){ return 30; } );
+ *   add_filter( 'tara_comment_paging', '__return_false' );
+ *   یا در wp-config.php:  define( 'TARA_COMMENT_PAGING', false );
+ * تغییرِ تعداد در کد:  add_filter( 'tara_comments_per_page', function(){ return 30; } );
  * =============================================================================
  */
 
@@ -31,37 +31,37 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( defined( 'JAVANSEDA_COMMENTS' ) && false === JAVANSEDA_COMMENTS ) {
+if ( defined( 'TARA_COMMENTS' ) && false === TARA_COMMENTS ) {
 	return;
 }
 
-if ( ! function_exists( 'javan_seda_comment_paging_on' ) ) {
+if ( ! function_exists( 'tara_comment_paging_on' ) ) {
 	/**
 	 * آیا صفحه‌بندیِ دیدگاه‌ها روشن است؟
 	 *
 	 * اولویت: define() در wp-config → تنظیمات قالب → پیش‌فرضِ روشن.
-	 * فیلترِ `javanseda_comment_paging` آخرین حرف را می‌زند.
+	 * فیلترِ `tara_comment_paging` آخرین حرف را می‌زند.
 	 *
 	 * @return bool
 	 */
-	function javan_seda_comment_paging_on() {
+	function tara_comment_paging_on() {
 		$on = true;
-		if ( function_exists( 'javan_seda_ui_on' ) ) {
-			$on = (bool) javan_seda_ui_on( 'ab_comments_paging', true, 'JAVANSEDA_COMMENT_PAGING' );
-		} elseif ( defined( 'JAVANSEDA_COMMENT_PAGING' ) ) {
-			$on = (bool) JAVANSEDA_COMMENT_PAGING;
+		if ( function_exists( 'tara_ui_on' ) ) {
+			$on = (bool) tara_ui_on( 'ab_comments_paging', true, 'TARA_COMMENT_PAGING' );
+		} elseif ( defined( 'TARA_COMMENT_PAGING' ) ) {
+			$on = (bool) TARA_COMMENT_PAGING;
 		}
-		return (bool) apply_filters( 'javanseda_comment_paging', $on );
+		return (bool) apply_filters( 'tara_comment_paging', $on );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_comments_per_page' ) ) {
+if ( ! function_exists( 'tara_comments_per_page' ) ) {
 	/**
 	 * تعداد دیدگاه در هر صفحه (۵ تا ۱۰۰؛ پیش‌فرض ۲۰).
 	 *
 	 * @return int
 	 */
-	function javan_seda_comments_per_page() {
+	function tara_comments_per_page() {
 		static $busy = false;
 
 		/* گاردِ بازگشت: خواندنِ تنظیمات قالب خودش get_option صدا می‌زند و همین فیلتر
@@ -73,10 +73,10 @@ if ( ! function_exists( 'javan_seda_comments_per_page' ) ) {
 		$busy = true;
 
 		$value = 20;
-		if ( function_exists( 'javan_seda_ui_num' ) ) {
-			$value = (int) javan_seda_ui_num( 'ab_comments_per_page', 20, 5, 100 );
+		if ( function_exists( 'tara_ui_num' ) ) {
+			$value = (int) tara_ui_num( 'ab_comments_per_page', 20, 5, 100 );
 		}
-		$value = (int) apply_filters( 'javanseda_comments_per_page', $value );
+		$value = (int) apply_filters( 'tara_comments_per_page', $value );
 		$value = max( 5, min( 200, $value ) );
 
 		$busy = false;
@@ -84,14 +84,14 @@ if ( ! function_exists( 'javan_seda_comments_per_page' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_comment_paging_context' ) ) {
+if ( ! function_exists( 'tara_comment_paging_context' ) ) {
 	/**
 	 * آیا در بستری هستیم که باید صفحه‌بندیِ فرانت اعمال شود؟
 	 * (پیشخوان، آجاکس، REST و کرون دست‌نخورده می‌مانند.)
 	 *
 	 * @return bool
 	 */
-	function javan_seda_comment_paging_context() {
+	function tara_comment_paging_context() {
 		if ( function_exists( 'is_admin' ) && is_admin() ) {
 			return false;
 		}
@@ -108,41 +108,41 @@ if ( ! function_exists( 'javan_seda_comment_paging_context' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_comments_force_paging' ) ) {
+if ( ! function_exists( 'tara_comments_force_paging' ) ) {
 	/** فیلترِ pre_option_page_comments: فقط در فرانت و فقط اگر گزینهٔ قالب روشن باشد. */
-	function javan_seda_comments_force_paging( $pre ) {
-		if ( ! javan_seda_comment_paging_context() || ! javan_seda_comment_paging_on() ) {
+	function tara_comments_force_paging( $pre ) {
+		if ( ! tara_comment_paging_context() || ! tara_comment_paging_on() ) {
 			return $pre;
 		}
 		return '1';
 	}
-	add_filter( 'pre_option_page_comments', 'javan_seda_comments_force_paging' );
+	add_filter( 'pre_option_page_comments', 'tara_comments_force_paging' );
 }
 
-if ( ! function_exists( 'javan_seda_comments_force_per_page' ) ) {
+if ( ! function_exists( 'tara_comments_force_per_page' ) ) {
 	/** فیلترِ pre_option_comments_per_page: همان عددی که در تنظیمات قالب است. */
-	function javan_seda_comments_force_per_page( $pre ) {
-		if ( ! javan_seda_comment_paging_context() || ! javan_seda_comment_paging_on() ) {
+	function tara_comments_force_per_page( $pre ) {
+		if ( ! tara_comment_paging_context() || ! tara_comment_paging_on() ) {
 			return $pre;
 		}
-		return (string) javan_seda_comments_per_page();
+		return (string) tara_comments_per_page();
 	}
-	add_filter( 'pre_option_comments_per_page', 'javan_seda_comments_force_per_page' );
+	add_filter( 'pre_option_comments_per_page', 'tara_comments_force_per_page' );
 }
 
-if ( ! function_exists( 'javan_seda_comments_stats' ) ) {
+if ( ! function_exists( 'tara_comments_stats' ) ) {
 	/**
 	 * آمارِ صفحه‌بندیِ دیدگاه‌های یک نوشته.
 	 *
 	 * @param int $post_id شناسهٔ نوشته (۰ = نوشتهٔ جاری).
 	 * @return array total, per_page, pages, current, from, to
 	 */
-	function javan_seda_comments_stats( $post_id = 0 ) {
+	function tara_comments_stats( $post_id = 0 ) {
 		static $memo = array();
 
 		$post_id = $post_id ? (int) $post_id : ( function_exists( 'get_the_ID' ) ? (int) get_the_ID() : 0 );
 
-		$per   = javan_seda_comments_per_page();
+		$per   = tara_comments_per_page();
 		$total = function_exists( 'get_comments_number' ) ? max( 0, (int) get_comments_number( $post_id ) ) : 0;
 		$pages = max( 1, (int) ceil( $total / max( 1, $per ) ) );
 
@@ -175,16 +175,16 @@ if ( ! function_exists( 'javan_seda_comments_stats' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_comment_number' ) ) {
+if ( ! function_exists( 'tara_comment_number' ) ) {
 	/** عددِ فارسی با جداکنندهٔ هزارگان (مستقل از بقیهٔ لایه‌ها). */
-	function javan_seda_comment_number( $number ) {
+	function tara_comment_number( $number ) {
 		$number = max( 0, (int) $number );
-		if ( function_exists( 'javan_seda_number_fa' ) ) {
-			return javan_seda_number_fa( $number );
+		if ( function_exists( 'tara_number_fa' ) ) {
+			return tara_number_fa( $number );
 		}
 		$text = function_exists( 'number_format_i18n' ) ? number_format_i18n( $number ) : number_format( $number );
-		if ( function_exists( 'javan_seda_digits' ) ) {
-			return javan_seda_digits( $text );
+		if ( function_exists( 'tara_digits' ) ) {
+			return tara_digits( $text );
 		}
 		return str_replace(
 			array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
@@ -194,37 +194,37 @@ if ( ! function_exists( 'javan_seda_comment_number' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_comments_summary' ) ) {
+if ( ! function_exists( 'tara_comments_summary' ) ) {
 	/**
 	 * خطِ خلاصهٔ بالای ناوبری.
 	 *
-	 * @param array $stats خروجیِ javan_seda_comments_stats().
+	 * @param array $stats خروجیِ tara_comments_stats().
 	 * @return string متنِ ساده (بدون HTML).
 	 */
-	function javan_seda_comments_summary( $stats ) {
+	function tara_comments_summary( $stats ) {
 		if ( ! is_array( $stats ) || empty( $stats['total'] ) ) {
 			return '';
 		}
 		if ( (int) $stats['pages'] <= 1 ) {
-			return javan_seda_comment_number( $stats['total'] ) . ' دیدگاه';
+			return tara_comment_number( $stats['total'] ) . ' دیدگاه';
 		}
 		return sprintf(
 			'نمایش دیدگاه‌های %s تا %s از %s — صفحهٔ %s از %s',
-			javan_seda_comment_number( $stats['from'] ),
-			javan_seda_comment_number( $stats['to'] ),
-			javan_seda_comment_number( $stats['total'] ),
-			javan_seda_comment_number( $stats['current'] ),
-			javan_seda_comment_number( $stats['pages'] )
+			tara_comment_number( $stats['from'] ),
+			tara_comment_number( $stats['to'] ),
+			tara_comment_number( $stats['total'] ),
+			tara_comment_number( $stats['current'] ),
+			tara_comment_number( $stats['pages'] )
 		);
 	}
 }
 
-if ( ! function_exists( 'javan_seda_comment_page_num' ) ) {
+if ( ! function_exists( 'tara_comment_page_num' ) ) {
 	/** شمارهٔ صفحه با رقمِ فارسی، بدون جداکنندهٔ هزارگان (۱ … ۱۲). */
-	function javan_seda_comment_page_num( $number ) {
+	function tara_comment_page_num( $number ) {
 		$text = (string) max( 0, (int) $number );
-		if ( function_exists( 'javan_seda_digits' ) ) {
-			return javan_seda_digits( $text );
+		if ( function_exists( 'tara_digits' ) ) {
+			return tara_digits( $text );
 		}
 		return str_replace(
 			array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
@@ -234,7 +234,7 @@ if ( ! function_exists( 'javan_seda_comment_page_num' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_comment_pager_link' ) ) {
+if ( ! function_exists( 'tara_comment_pager_link' ) ) {
 	/**
 	 * تزئینِ یک آیتمِ خروجیِ `paginate_comments_links`:
 	 * `rel="prev"/"next"` برای پیمایش، و `aria-label` فارسی برای شماره‌ها.
@@ -243,7 +243,7 @@ if ( ! function_exists( 'javan_seda_comment_pager_link' ) ) {
 	 * @param string $link یک آیتم (a/span) از `paginate_links`.
 	 * @return string
 	 */
-	function javan_seda_comment_pager_link( $link ) {
+	function tara_comment_pager_link( $link ) {
 		$link = (string) $link;
 
 		if ( false !== strpos( $link, 'class="prev page-numbers"' ) ) {
@@ -255,7 +255,7 @@ if ( ! function_exists( 'javan_seda_comment_pager_link' ) ) {
 		$link = preg_replace_callback(
 			'#<a class="page-numbers" href="([^"]*)">(\d+)</a>#',
 			function ( $m ) {
-				return '<a class="page-numbers" href="' . $m[1] . '" aria-label="صفحهٔ ' . javan_seda_comment_page_num( $m[2] ) . '">' . javan_seda_comment_page_num( $m[2] ) . '</a>';
+				return '<a class="page-numbers" href="' . $m[1] . '" aria-label="صفحهٔ ' . tara_comment_page_num( $m[2] ) . '">' . tara_comment_page_num( $m[2] ) . '</a>';
 			},
 			$link
 		);
@@ -264,7 +264,7 @@ if ( ! function_exists( 'javan_seda_comment_pager_link' ) ) {
 		$link = preg_replace_callback(
 			'#>([0-9]+)</(span|a)>#',
 			function ( $m ) {
-				return '>' . javan_seda_comment_page_num( $m[1] ) . '</' . $m[2] . '>';
+				return '>' . tara_comment_page_num( $m[1] ) . '</' . $m[2] . '>';
 			},
 			$link
 		);
@@ -273,20 +273,20 @@ if ( ! function_exists( 'javan_seda_comment_pager_link' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_comments_pager' ) ) {
+if ( ! function_exists( 'tara_comments_pager' ) ) {
 	/**
 	 * ناوبریِ صفحه‌بندیِ دیدگاه‌ها (بالا و پایینِ فهرست).
 	 *
 	 * @param array $args position (top|bottom) — فقط برای کلاس/داده‌ی ظاهری.
 	 * @return string HTML امن (همهٔ اجزا escape شده‌اند).
 	 */
-	function javan_seda_comments_pager( $args = array() ) {
+	function tara_comments_pager( $args = array() ) {
 		$args = function_exists( 'wp_parse_args' )
 			? wp_parse_args( $args, array( 'position' => 'bottom' ) )
 			: array_merge( array( 'position' => 'bottom' ), (array) $args );
 
 		$position = ( 'top' === $args['position'] ) ? 'top' : 'bottom';
-		$stats    = javan_seda_comments_stats();
+		$stats    = tara_comments_stats();
 
 		if ( empty( $stats['total'] ) ) {
 			return '';
@@ -310,12 +310,12 @@ if ( ! function_exists( 'javan_seda_comments_pager' ) ) {
 		}
 
 		$out  = '<nav class="ab-cpager ab-cpager--' . esc_attr( $position ) . '" aria-label="صفحه‌بندی دیدگاه‌ها" data-ab-cpager>';
-		$out .= '<p class="ab-cpager__summary">' . esc_html( javan_seda_comments_summary( $stats ) ) . '</p>';
+		$out .= '<p class="ab-cpager__summary">' . esc_html( tara_comments_summary( $stats ) ) . '</p>';
 
 		if ( ! empty( $links ) ) {
 			$out .= '<ul class="ab-cpager__list">';
 			foreach ( $links as $link ) {
-				$out .= '<li class="ab-cpager__item">' . javan_seda_comment_pager_link( $link ) . '</li>';
+				$out .= '<li class="ab-cpager__item">' . tara_comment_pager_link( $link ) . '</li>';
 			}
 			$out .= '</ul>';
 		}
@@ -325,20 +325,20 @@ if ( ! function_exists( 'javan_seda_comments_pager' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_comments_heading' ) ) {
+if ( ! function_exists( 'tara_comments_heading' ) ) {
 	/**
 	 * سرتیترِ فهرستِ دیدگاه‌ها («دیدگاه‌ها (۱۲۳)»).
 	 *
 	 * @param int $post_id شناسهٔ نوشته.
 	 * @return string
 	 */
-	function javan_seda_comments_heading( $post_id = 0 ) {
-		$stats = javan_seda_comments_stats( $post_id );
+	function tara_comments_heading( $post_id = 0 ) {
+		$stats = tara_comments_stats( $post_id );
 		if ( empty( $stats['total'] ) ) {
 			return '';
 		}
 		return '<h2 class="comments-title ab-comments-title" id="ab-comments-title">'
-			. 'دیدگاه‌ها <span class="ab-comments-title__count">(' . esc_html( javan_seda_comment_number( $stats['total'] ) ) . ')</span>'
+			. 'دیدگاه‌ها <span class="ab-comments-title__count">(' . esc_html( tara_comment_number( $stats['total'] ) ) . ')</span>'
 			. '</h2>';
 	}
 }

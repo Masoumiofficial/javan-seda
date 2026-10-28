@@ -13,8 +13,8 @@
    پدینگ و مرز می‌دهد، پس یک div بی‌محتوا = یک کادر خالی).
    v3.5.2 — اول «توضیح کوتاه» ثبت‌شده در پیشخوان؛ اگر خالی بود، همان توضیح دسته. */
 $ab_cat_desc = '';
-if ( function_exists( 'javan_seda_category_desc_short' ) ) {
-	$ab_cat_desc = javan_seda_category_desc_short();
+if ( function_exists( 'tara_category_desc_short' ) ) {
+	$ab_cat_desc = tara_category_desc_short();
 } else {
 	$ab_cat_legacy = trim( (string) category_description() );
 	if ( '' !== wp_strip_all_tags( $ab_cat_legacy ) ) {
@@ -39,8 +39,8 @@ if ( '' !== $ab_cat_desc ) {
 </div>
 <!-- song_boxs -->
 <?php /* v3.5.2 — توضیح کامل دسته در پایین آرشیو (با نمایش بیشتر/کمتر) */
-if ( function_exists( 'javan_seda_category_desc_full' ) ) {
-	echo javan_seda_category_desc_full(); // خروجی در تابع، wp_kses_post شده است
+if ( function_exists( 'tara_category_desc_full' ) ) {
+	echo tara_category_desc_full(); // خروجی در تابع، wp_kses_post شده است
 }
 ?>
 <?php get_template_part('inc/pagination'); ?>

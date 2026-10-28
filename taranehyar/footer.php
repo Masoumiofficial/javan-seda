@@ -13,26 +13,26 @@
 /* v3.4.1 — کنترل فوتر از «تنظیمات قالب ← کنترل رابط». اگر فایل inc/ab-controls.php
    نصب نباشد، مقدارهای زیر دقیقاً رفتار نسخهٔ قبل را بازتولید می‌کنند. */
 $ab_footer_cats_num = 8;
-if ( function_exists( 'javan_seda_ui_footer_cats' ) ) {
-	$ab_footer_cats_num = javan_seda_ui_footer_cats();
+if ( function_exists( 'tara_ui_footer_cats' ) ) {
+	$ab_footer_cats_num = tara_ui_footer_cats();
 }
 $ab_footer_links = array(
-	array( 'label' => 'همهٔ هنرمندان', 'url' => javan_seda_artists_index_url(), 'icon' => 'icofont-microphone-alt' ),
+	array( 'label' => 'همهٔ هنرمندان', 'url' => tara_artists_index_url(), 'icon' => 'icofont-microphone-alt' ),
 	array( 'label' => 'تازه‌ترین آهنگ‌ها', 'url' => home_url('/#new-songs'), 'icon' => 'icofont-music-notes' ),
 );
-if ( function_exists( 'javan_seda_ui_footer_links' ) ) {
-	$ab_footer_links = javan_seda_ui_footer_links();
+if ( function_exists( 'tara_ui_footer_links' ) ) {
+	$ab_footer_links = tara_ui_footer_links();
 }
 $ab_footer_cols_on = 4;
-if ( function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
-	$ab_footer_cols_on = javan_seda_ui_footer_cols_count();
+if ( function_exists( 'tara_ui_footer_cols_count' ) ) {
+	$ab_footer_cols_on = tara_ui_footer_cols_count();
 }
 ?>
 <footer id="footer" class="ab-footer" role="contentinfo">
 <div class="tarlanweb_center">
 	<div class="ab-footer__grid" data-ab-cols="<?php echo esc_attr( $ab_footer_cols_on ); ?>">
 		<!-- ستون ۱: درباره ما -->
-		<?php if ( ! function_exists( 'javan_seda_ui_footer_col' ) || javan_seda_ui_footer_col( 'about' ) ) { ?>
+		<?php if ( ! function_exists( 'tara_ui_footer_col' ) || tara_ui_footer_col( 'about' ) ) { ?>
 		<div class="ab-footer__col ab-footer__col--about">
 			<h4 class="ab-footer__title">درباره ما</h4>
 			<div class="ab-footer__content">
@@ -56,7 +56,7 @@ if ( function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
 		<?php } ?>
 
 		<!-- ستون ۲: لینک‌های مفید -->
-		<?php if ( ! function_exists( 'javan_seda_ui_footer_col' ) || javan_seda_ui_footer_col( 'links' ) ) { ?>
+		<?php if ( ! function_exists( 'tara_ui_footer_col' ) || tara_ui_footer_col( 'links' ) ) { ?>
 		<div class="ab-footer__col ab-footer__col--links">
 			<h4 class="ab-footer__title">لینک‌های مفید</h4>
 			<nav class="ab-footer__nav" aria-label="لینک‌های مفید فوتر">
@@ -90,7 +90,7 @@ if ( function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
 		<?php } ?>
 
 		<!-- ستون ۳: دسته‌های پرطرفدار -->
-		<?php if ( ! function_exists( 'javan_seda_ui_footer_col' ) || javan_seda_ui_footer_col( 'cats' ) ) { ?>
+		<?php if ( ! function_exists( 'tara_ui_footer_col' ) || tara_ui_footer_col( 'cats' ) ) { ?>
 		<div class="ab-footer__col ab-footer__col--cats">
 			<h4 class="ab-footer__title">دسته‌های پرطرفدار</h4>
 			<ul class="ab-footer__cats">
@@ -112,7 +112,7 @@ if ( function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
 		<?php } ?>
 
 		<!-- ستون ۴: ما را دنبال کنید -->
-		<?php if ( ! function_exists( 'javan_seda_ui_footer_col' ) || javan_seda_ui_footer_col( 'social' ) ) { ?>
+		<?php if ( ! function_exists( 'tara_ui_footer_col' ) || tara_ui_footer_col( 'social' ) ) { ?>
 		<div class="ab-footer__col ab-footer__col--social">
 			<h4 class="ab-footer__title">ما را دنبال کنید</h4>
 			<div class="socials_box ab-footer__socials">
@@ -129,7 +129,7 @@ if ( function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
 				<div class="clear"></div>
 			</div>
 
-			<?php if ( ! function_exists( 'javan_seda_ui_footer_search' ) || javan_seda_ui_footer_search() ) { ?>
+			<?php if ( ! function_exists( 'tara_ui_footer_search' ) || tara_ui_footer_search() ) { ?>
 			<form class="ab-footer__search" method="get" action="<?php echo esc_url(home_url('/')); ?>" role="search">
 				<label for="ab-footer-search-input" class="screen-reader-text">جستجو در سایت</label>
 				<input id="ab-footer-search-input" class="ab-footer__search-input" name="s" placeholder="جستجوی ترانه، هنرمند..." type="text" required>

@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا ۳.۵.۲ — توضیح کوتاه و کاملِ دسته‌بندی در فرانت
+ * ترانه یار ۳.۵.۲ — توضیح کوتاه و کاملِ دسته‌بندی در فرانت
  * ==========================================================================
  * کوتاه: بالای آرشیو، در همان کادرِ `archive_txt_box` که نسخهٔ مبنا استفاده می‌کرد.
  *         اگر فیلد تازه خالی باشد، به توضیحِ خودِ دسته برمی‌گردد ⇒ هیچ محتوای
@@ -18,14 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! function_exists( 'javan_seda_category_term' ) ) {
-	function javan_seda_category_term( $term = null ) {
+if ( ! function_exists( 'tara_category_term' ) ) {
+	function tara_category_term( $term = null ) {
 		if ( $term instanceof WP_Term ) {
 			return $term;
 		}
 		/* شناسه یا slug هم پذیرفته می‌شود (همان قراردادِ بقیهٔ توابعِ این نسخه) */
-		if ( ( is_numeric( $term ) || ( is_string( $term ) && '' !== $term ) ) && function_exists( 'javan_seda_term' ) ) {
-			$found = javan_seda_term( $term, 'category' );
+		if ( ( is_numeric( $term ) || ( is_string( $term ) && '' !== $term ) ) && function_exists( 'tara_term' ) ) {
+			$found = tara_term( $term, 'category' );
 			if ( $found ) {
 				return $found;
 			}
@@ -40,10 +40,10 @@ if ( ! function_exists( 'javan_seda_category_term' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_category_desc_short_text' ) ) {
+if ( ! function_exists( 'tara_category_desc_short_text' ) ) {
 	/** متنِ خامِ توضیح کوتاه (با fallback به توضیح دسته). */
-	function javan_seda_category_desc_short_text( $term = null ) {
-		$term = javan_seda_category_term( $term );
+	function tara_category_desc_short_text( $term = null ) {
+		$term = tara_category_term( $term );
 		if ( ! $term ) {
 			return '';
 		}
@@ -56,10 +56,10 @@ if ( ! function_exists( 'javan_seda_category_desc_short_text' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_category_desc_full_html' ) ) {
+if ( ! function_exists( 'tara_category_desc_full_html' ) ) {
 	/** متنِ کاملِ پاک‌سازی‌شده (HTML مجازِ نوشته) یا رشتهٔ خالی. */
-	function javan_seda_category_desc_full_html( $term = null ) {
-		$term = javan_seda_category_term( $term );
+	function tara_category_desc_full_html( $term = null ) {
+		$term = tara_category_term( $term );
 		if ( ! $term ) {
 			return '';
 		}
@@ -71,14 +71,14 @@ if ( ! function_exists( 'javan_seda_category_desc_full_html' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_category_desc_short' ) ) {
+if ( ! function_exists( 'tara_category_desc_short' ) ) {
 	/** خروجیِ آمادهٔ بالای آرشیو. */
-	function javan_seda_category_desc_short( $term = null ) {
-		$term = javan_seda_category_term( $term );
+	function tara_category_desc_short( $term = null ) {
+		$term = tara_category_term( $term );
 		if ( ! $term ) {
 			return '';
 		}
-		$text = javan_seda_category_desc_short_text( $term );
+		$text = tara_category_desc_short_text( $term );
 		if ( '' === trim( wp_strip_all_tags( $text ) ) ) {
 			return '';
 		}
@@ -88,11 +88,11 @@ if ( ! function_exists( 'javan_seda_category_desc_short' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_category_desc_full' ) ) {
+if ( ! function_exists( 'tara_category_desc_full' ) ) {
 	/** خروجیِ آمادهٔ پایین آرشیو، با دکمهٔ نمایش بیشتر/کمتر. */
-	function javan_seda_category_desc_full( $term = null ) {
+	function tara_category_desc_full( $term = null ) {
 		static $n = 0;
-		$html = javan_seda_category_desc_full_html( $term );
+		$html = tara_category_desc_full_html( $term );
 		if ( '' === $html ) {
 			return '';
 		}
@@ -110,8 +110,8 @@ if ( ! function_exists( 'javan_seda_category_desc_full' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_category_desc_has_full' ) ) {
-	function javan_seda_category_desc_has_full( $term = null ) {
-		return ( '' !== javan_seda_category_desc_full_html( $term ) );
+if ( ! function_exists( 'tara_category_desc_has_full' ) ) {
+	function tara_category_desc_has_full( $term = null ) {
+		return ( '' !== tara_category_desc_full_html( $term ) );
 	}
 }

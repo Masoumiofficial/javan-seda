@@ -19,43 +19,43 @@
  * هم همه‌چیز درست می‌ماند — ولی این کار را فقط وقتی انجام دهید که هر دو فایل را
  * با هم آپلود می‌کنید (اگر یکی جا بیفتد، سایت بدون استایل می‌شود).
  *
- * خاموشی:  define( 'JAVANSEDA_UI_GUARD', false );
+ * خاموشی:  define( 'TARA_UI_GUARD', false );
  * بررسی فوری (فقط مدیر):  آدرس سایت + ?ab_uiguard=1  ⇒ کش وضعیت پاک می‌شود.
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-if ( defined( 'JAVANSEDA_UI_GUARD' ) && ! JAVANSEDA_UI_GUARD ) {
+if ( defined( 'TARA_UI_GUARD' ) && ! TARA_UI_GUARD ) {
 	return;
 }
 /* v3.4.1 — خاموش‌کردن گارد از تنظیمات قالب (کنترل رابط ← ab_ui_guard) */
-if ( function_exists( 'javan_seda_ui_on' ) && ! javan_seda_ui_on( 'ab_ui_guard', true, 'JAVANSEDA_UI_GUARD' ) ) {
+if ( function_exists( 'tara_ui_on' ) && ! tara_ui_on( 'ab_ui_guard', true, 'TARA_UI_GUARD' ) ) {
 	return;
 }
 
-if ( ! function_exists( 'javan_seda_ui_layer_cache_key' ) ) {
-	function javan_seda_ui_layer_cache_key() {
+if ( ! function_exists( 'tara_ui_layer_cache_key' ) ) {
+	function tara_ui_layer_cache_key() {
 		return 'ab_ui_layer_v1';
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_layer_flush' ) ) {
-	function javan_seda_ui_layer_flush() {
+if ( ! function_exists( 'tara_ui_layer_flush' ) ) {
+	function tara_ui_layer_flush() {
 		if ( function_exists( 'delete_transient' ) ) {
-			delete_transient( javan_seda_ui_layer_cache_key() );
+			delete_transient( tara_ui_layer_cache_key() );
 		}
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_layer_marker_present' ) ) {
+if ( ! function_exists( 'tara_ui_layer_marker_present' ) ) {
 	/**
 	 * آیا لایه هنوز داخل style.css هست؟
 	 *
 	 * @param bool $force خواندن دوباره از دیسک و تازه‌کردن کش.
 	 * @return bool true = style.css مارکر را دارد (گارد لازم نیست).
 	 */
-	function javan_seda_ui_layer_marker_present( $force = false ) {
-		$key = javan_seda_ui_layer_cache_key();
+	function tara_ui_layer_marker_present( $force = false ) {
+		$key = tara_ui_layer_cache_key();
 		if ( ! $force && function_exists( 'get_transient' ) ) {
 			$cached = get_transient( $key );
 			if ( 'yes' === $cached || 'no' === $cached ) {
@@ -78,9 +78,9 @@ if ( ! function_exists( 'javan_seda_ui_layer_marker_present' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_layer_enqueue' ) ) {
-	function javan_seda_ui_layer_enqueue() {
-		if ( javan_seda_ui_layer_marker_present() ) {
+if ( ! function_exists( 'tara_ui_layer_enqueue' ) ) {
+	function tara_ui_layer_enqueue() {
+		if ( tara_ui_layer_marker_present() ) {
 			return; /* style.css سالم است؛ هیچ چیزی اضافه نمی‌شود */
 		}
 		$dir = trailingslashit( get_stylesheet_directory() ) . 'css/ab-ui.css';
@@ -102,17 +102,17 @@ if ( ! function_exists( 'javan_seda_ui_layer_enqueue' ) ) {
 		}
 		wp_enqueue_style( 'ab-ui-layer', $url, $dep, $ver );
 	}
-	add_action( 'wp_enqueue_scripts', 'javan_seda_ui_layer_enqueue', 25 );
-	add_action( 'after_switch_theme', 'javan_seda_ui_layer_flush' );
-	add_action( 'upgrader_process_complete', 'javan_seda_ui_layer_flush' );
+	add_action( 'wp_enqueue_scripts', 'tara_ui_layer_enqueue', 25 );
+	add_action( 'after_switch_theme', 'tara_ui_layer_flush' );
+	add_action( 'upgrader_process_complete', 'tara_ui_layer_flush' );
 }
 
-if ( ! function_exists( 'javan_seda_ui_layer_nocache' ) ) {
-	function javan_seda_ui_layer_nocache() {
+if ( ! function_exists( 'tara_ui_layer_nocache' ) ) {
+	function tara_ui_layer_nocache() {
 		if ( isset( $_GET['ab_uiguard'] ) && current_user_can( 'manage_options' ) ) {
-			javan_seda_ui_layer_flush();
-			javan_seda_ui_layer_marker_present( true );
+			tara_ui_layer_flush();
+			tara_ui_layer_marker_present( true );
 		}
 	}
-	add_action( 'init', 'javan_seda_ui_layer_nocache' );
+	add_action( 'init', 'tara_ui_layer_nocache' );
 }

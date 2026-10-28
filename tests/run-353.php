@@ -62,41 +62,41 @@ function reset_state() {
    ====================================================================== */
 reset_state();
 
-t( 'متا: بدون تنظیم، عنوان خالی است', javan_seda_home_meta( 'title' ) === '' );
-t( 'متا: کلیدِ ناشناخته خالی است', javan_seda_home_meta( 'unknown' ) === '' );
-t( 'عنوان: بدون تنظیم ⇒ همان نام سایت (رفتار ۳.۵.۲)', javan_seda_home_title( 'آهنگ‌بان' ) === 'آهنگ‌بان' );
-t( 'توضیح: بدون تنظیم ⇒ همان توضیح کوتاه (رفتار ۳.۵.۲)', javan_seda_home_description( 'توضیح سایت' ) === 'توضیح سایت' );
+t( 'متا: بدون تنظیم، عنوان خالی است', tara_home_meta( 'title' ) === '' );
+t( 'متا: کلیدِ ناشناخته خالی است', tara_home_meta( 'unknown' ) === '' );
+t( 'عنوان: بدون تنظیم ⇒ همان نام سایت (رفتار ۳.۵.۲)', tara_home_title( 'آهنگ‌بان' ) === 'آهنگ‌بان' );
+t( 'توضیح: بدون تنظیم ⇒ همان توضیح کوتاه (رفتار ۳.۵.۲)', tara_home_description( 'توضیح سایت' ) === 'توضیح سایت' );
 
 $GLOBALS['__ot']['home_meta_title'] = '  دانلود آهنگ جدید | آهنگ‌بان  ';
-t( 'عنوان: مقدار تنظیمات قالب و حذف فاصله‌های اضافه', javan_seda_home_title( 'x' ) === 'دانلود آهنگ جدید | آهنگ‌بان' );
+t( 'عنوان: مقدار تنظیمات قالب و حذف فاصله‌های اضافه', tara_home_title( 'x' ) === 'دانلود آهنگ جدید | آهنگ‌بان' );
 
 $GLOBALS['__ot']['home_meta_title'] = 'a <b>b</b> <script>alert(1)</script>';
-$title_clean = javan_seda_home_meta( 'title' );
+$title_clean = tara_home_meta( 'title' );
 t( 'عنوان: تگ‌ها حذف می‌شوند', strpos( $title_clean, '<' ) === false, $title_clean );
 
 $GLOBALS['__ot']['home_meta_desc'] = "خط اول\nخط دوم   با فاصله";
-t( 'توضیح: چندخطی ⇒ یک‌خطی', javan_seda_home_meta( 'desc' ) === 'خط اول خط دوم با فاصله', javan_seda_home_meta( 'desc' ) );
-t( 'توضیح: مقدار دستی بر توضیح سایت اولویت دارد', javan_seda_home_description( 'سایت' ) === 'خط اول خط دوم با فاصله' );
+t( 'توضیح: چندخطی ⇒ یک‌خطی', tara_home_meta( 'desc' ) === 'خط اول خط دوم با فاصله', tara_home_meta( 'desc' ) );
+t( 'توضیح: مقدار دستی بر توضیح سایت اولویت دارد', tara_home_description( 'سایت' ) === 'خط اول خط دوم با فاصله' );
 
 /* فیلتر عنوان — فقط صفحهٔ اصلی */
 $GLOBALS['__ot'] = array( 'home_meta_title' => 'آهنگ‌بان | دانلود آهنگ' );
 $GLOBALS['__is_home'] = true;
-$parts = javan_seda_home_title_parts( array( 'title' => 'آهنگ‌بان', 'tagline' => 'توضیح کوتاه', 'site' => 'آهنگ‌بان' ) );
+$parts = tara_home_title_parts( array( 'title' => 'آهنگ‌بان', 'tagline' => 'توضیح کوتاه', 'site' => 'آهنگ‌بان' ) );
 t( 'عنوان: صفحهٔ اصلی ⇒ فیلد دستی', isset( $parts['title'] ) && $parts['title'] === 'آهنگ‌بان | دانلود آهنگ', json_encode( $parts ) );
 t( 'عنوان: تکرارِ نام سایت حذف می‌شود', '' === $parts['tagline'] && '' === $parts['site'] );
-t( 'عنوان: فیلتر document_title_parts ثبت شده', has_filter( 'document_title_parts', 'javan_seda_home_title_parts' ) );
+t( 'عنوان: فیلتر document_title_parts ثبت شده', has_filter( 'document_title_parts', 'tara_home_title_parts' ) );
 
 $GLOBALS['__ot'] = array();
-$parts = javan_seda_home_title_parts( array( 'title' => 'آهنگ‌بان', 'tagline' => 'توضیح', 'site' => 'آهنگ‌بان' ) );
+$parts = tara_home_title_parts( array( 'title' => 'آهنگ‌بان', 'tagline' => 'توضیح', 'site' => 'آهنگ‌بان' ) );
 t( 'عنوان: فیلد خالی ⇒ فقط نام سایت (بدون تکرار)', $parts['title'] === 'آهنگ‌بان' && '' === $parts['tagline'] && '' === $parts['site'] );
 
 $GLOBALS['__is_home'] = false;
 $plain = array( 'title' => 'یک آهنگ', 'site' => 'آهنگ‌بان' );
-t( 'عنوان: صفحه‌های دیگر دست‌نخورده می‌مانند', javan_seda_home_title_parts( $plain ) === $plain );
+t( 'عنوان: صفحه‌های دیگر دست‌نخورده می‌مانند', tara_home_title_parts( $plain ) === $plain );
 
 $GLOBALS['__is_admin'] = true;
 $GLOBALS['__is_home']  = true;
-t( 'عنوان: در پیشخوان هیچ تغییری نمی‌دهد', javan_seda_home_title_parts( $plain ) === $plain );
+t( 'عنوان: در پیشخوان هیچ تغییری نمی‌دهد', tara_home_title_parts( $plain ) === $plain );
 $GLOBALS['__is_admin'] = false;
 $GLOBALS['__is_home']  = false;
 
@@ -127,16 +127,16 @@ $GLOBALS['__terms'][3] = new WP_Term( 3, 'محسن یگانه', 'artist', 'mohse
 $GLOBALS['__terms'][4] = new WP_Term( 4, 'سارا', 'artist', 'sara' );
 $GLOBALS['__db_sum']   = 128500;
 
-$term = javan_seda_artist_card_term( 'نامِ نمایشیِ دیگر', 'https://ahangban.ir/artist/mohsen-yeganeh/' );
+$term = tara_artist_card_term( 'نامِ نمایشیِ دیگر', 'https://ahangban.ir/artist/mohsen-yeganeh/' );
 t( 'کارت: تطبیق ترم با نامکِ آدرس', $term && 3 === (int) $term->term_id, $term ? $term->name : 'null' );
 
-$term = javan_seda_artist_card_term( 'سارا', '' );
+$term = tara_artist_card_term( 'سارا', '' );
 t( 'کارت: تطبیق ترم با نامِ هنرمند', $term && 4 === (int) $term->term_id, $term ? $term->name : 'null' );
 
-$term = javan_seda_artist_card_term( 'ناشناس', 'https://ahangban.ir/artist/nobody/' );
+$term = tara_artist_card_term( 'ناشناس', 'https://ahangban.ir/artist/nobody/' );
 t( 'کارت: بدون ترمِ متناظر ⇒ null (عدد حدسی نمی‌سازیم)', null === $term );
 
-$html = javan_seda_artist_card(
+$html = tara_artist_card(
 	array(
 		'title'     => 'محسن یگانه',
 		'siing_u'   => 'https://ahangban.ir/artist/mohsen-yeganeh/',
@@ -155,7 +155,7 @@ t( 'کارت: لینک خارجی با rel بی‌خطر', false !== strpos( $ht
 
 /* بدون بازدید ⇒ بدون لایهٔ آمار */
 $GLOBALS['__db_sum'] = 0;
-$html_zero = javan_seda_artist_card(
+$html_zero = tara_artist_card(
 	array(
 		'title'     => 'سارا',
 		'siing_u'   => 'https://ahangban.ir/artist/sara/',
@@ -167,13 +167,13 @@ t( 'کارت: با بازدید صفر، کارت و نام سرجایشان ه�
 
 /* خاموشیِ آمار با فیلتر */
 add_filter(
-	'javanseda_artist_card_stats',
+	'tara_artist_card_stats',
 	function () {
 		return false;
 	}
 );
 $GLOBALS['__db_sum'] = 900;
-$html_off = javan_seda_artist_card(
+$html_off = tara_artist_card(
 	array(
 		'title'     => 'محسن یگانه',
 		'siing_u'   => 'https://ahangban.ir/artist/mohsen-yeganeh/',
@@ -185,7 +185,7 @@ t( 'کارت: فیلتر خاموشیِ آمار کار می‌کند', false ==
 /* ایمنی */
 reset_state();
 $GLOBALS['__terms'][4] = new WP_Term( 4, 'سارا', 'artist', 'sara' );
-$html_bad = javan_seda_artist_card(
+$html_bad = tara_artist_card(
 	array(
 		'title'     => '<script>alert(1)</script>',
 		'siing_u'   => 'https://ahangban.ir/artist/sara/" onmouseover="x',
@@ -195,15 +195,15 @@ $html_bad = javan_seda_artist_card(
 t( 'کارت: تزریقِ اسکریپت در نام بی‌اثر است', false === strpos( $html_bad, '<script>alert' ) );
 t( 'کارت: تزریق در آدرس خنثی می‌شود', false === strpos( $html_bad, 'onmouseover="x"' ) );
 
-t( 'کارت: آیتمِ ناقص ⇒ رشتهٔ خالی', javan_seda_artist_card( array( 'title' => 'x' ) ) === '' );
-t( 'کارت: ورودیِ غیرآرایه ⇒ رشتهٔ خالی', javan_seda_artist_card( 'x' ) === '' );
+t( 'کارت: آیتمِ ناقص ⇒ رشتهٔ خالی', tara_artist_card( array( 'title' => 'x' ) ) === '' );
+t( 'کارت: ورودیِ غیرآرایه ⇒ رشتهٔ خالی', tara_artist_card( 'x' ) === '' );
 
 /* ======================================================================
    ۴) یکپارچگیِ خودِ اسلایدر (فایل واقعی قالب)
    ====================================================================== */
 reset_state();
 /* فیلترِ «خاموشیِ آمار» مربوط به آزمونِ بالاست؛ برای این بخش پاک می‌شود */
-unset( $GLOBALS['__hooks']['javanseda_artist_card_stats'] );
+unset( $GLOBALS['__hooks']['tara_artist_card_stats'] );
 $GLOBALS['__terms'][3] = new WP_Term( 3, 'محسن یگانه', 'artist', 'mohsen-yeganeh' );
 $GLOBALS['__db_sum']   = 500;
 $GLOBALS['__ot']       = array(

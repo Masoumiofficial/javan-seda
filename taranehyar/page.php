@@ -29,8 +29,8 @@
 <div id="left_side">
 <?php
 /* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
-if ( function_exists( 'javan_seda_sidebar' ) ) {
-	javan_seda_sidebar( 'left_side1' );
+if ( function_exists( 'tara_sidebar' ) ) {
+	tara_sidebar( 'left_side1' );
 } else {
 	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side1' ) ) :
 	endif;

@@ -394,7 +394,7 @@ if ( ! class_exists( 'OT_Settings' ) ) {
           /* loop through page sections */
           foreach( (array) $this->get_sections( $page ) as $section ) {
             
-            /* add each section - reza kianoosh - rkianoosh.ir - ronakweb.com */
+            /* add each section - reza  - tara_row.ir - ronakweb.com */
             add_settings_section( 
               $section['id'], 
               $section['title'], 
@@ -894,7 +894,7 @@ if ( ! class_exists( 'OT_Settings' ) ) {
 
             /**
              * Hook to insert arbitrary markup after the `do_settings_fields` method.
-             * reza kianoosh - rkianoosh.ir - ronakweb.com
+             * reza  - tara_row.ir - ronakweb.com
              * @since 2.6.0
              *
              * @param string $page       The page slug.

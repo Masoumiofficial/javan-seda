@@ -53,10 +53,10 @@ $jv_need_login = ( get_option( 'comment_registration' ) && ! is_user_logged_in()
 <?php
 /* v3.5.4 — سرتیتر + ناوبریِ صفحه‌بندی (بالا و پایینِ فهرست).
    اگر لایهٔ تازه روی سرور نبود، همان ناوبریِ سادهٔ قبلی چاپ می‌شود (سازگاری کامل). */
-$jv_pager = function_exists( 'javan_seda_comments_pager' );
+$jv_pager = function_exists( 'tara_comments_pager' );
 if ( $jv_pager ) {
-	echo javan_seda_comments_heading(); /* html امن؛ داخل تابع escape شده است */
-	echo javan_seda_comments_pager( array( 'position' => 'top' ) );
+	echo tara_comments_heading(); /* html امن؛ داخل تابع escape شده است */
+	echo tara_comments_pager( array( 'position' => 'top' ) );
 } elseif ( $jv_have && get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) {
 	?>
 <nav id="comment-nav-above">
@@ -72,7 +72,7 @@ if ( $jv_pager ) {
 
 <ol class="commentlist"><?php if ( $jv_have ) { wp_list_comments( array( 'callback' => 'comment_loop_cd' ) ); } else { wp_list_comments( array( 'callback' => 'comment_loop_cd' ), $jv_fallback ); } ?></ol>
 
-<?php if ( $jv_pager ) { echo javan_seda_comments_pager( array( 'position' => 'bottom' ) ); } ?>
+<?php if ( $jv_pager ) { echo tara_comments_pager( array( 'position' => 'bottom' ) ); } ?>
 
 <?php elseif ( ! comments_open() && ! is_page() && post_type_supports( get_post_type(), 'comments' ) ) : ?>
 

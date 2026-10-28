@@ -18,7 +18,7 @@
  *   ۲) رجیستر: اگر تاکسونومیِ مادر ثبت شده باشد، آرگومان‌های واقعیِ خودش را
  *      برمی‌داریم (public/show_ui/show_in_rest/query_var/hierarchical/…) و فقط
  *      نامک + برچسب + rewrite را عوض می‌کنیم. اگر ثبت نشده باشد، خودمان ثبت
- *      می‌کنیم (حالتی که قبلاً با JAVANSEDA_SINGER_FIX دستی انجام می‌شد).
+ *      می‌کنیم (حالتی که قبلاً با TARA_SINGER_FIX دستی انجام می‌شد).
  *   ۳) سازگاری: نامک قدیمی (`singer`) به‌صورت یک تاکسونومیِ **پنهان و بدون
  *      آدرس** ثبت می‌ماند؛ پس اگر کد رمزنگاری‌شدۀ مادر یا افزونه‌ای
  *      `get_the_terms( $id, 'singer' )` را بخواند، آرایهٔ خالی می‌گیرد نه
@@ -32,9 +32,9 @@
  *   ab_artist_tax   (on-off) = artist فعال باشد (خاموش ⇒ همان singer قبلی)
  *   ab_artist_slug  (text)   = نامک آدرس، پیش‌فرض artist
  * خاموش‌کردن کاملِ این لایه (بدون مهاجرت): در wp-config.php
- *   define( 'JAVANSEDA_ARTIST_TAX', false );
+ *   define( 'TARA_ARTIST_TAX', false );
  *
- * @package javanseda
+ * @package taranehyar
  * @since   3.4.7
  */
 
@@ -42,15 +42,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! function_exists( 'javan_seda_artist_tax_enabled' ) ) {
+if ( ! function_exists( 'tara_artist_tax_enabled' ) ) {
 	/** آیا نامک artist فعال است؟ (define → تنظیمات پوسته → پیش‌فرض on) */
-	function javan_seda_artist_tax_enabled() {
+	function tara_artist_tax_enabled() {
 		static $cache = null;
 		if ( null !== $cache ) {
 			return $cache;
 		}
-		if ( defined( 'JAVANSEDA_ARTIST_TAX' ) ) {
-			$on = (bool) JAVANSEDA_ARTIST_TAX;
+		if ( defined( 'TARA_ARTIST_TAX' ) ) {
+			$on = (bool) TARA_ARTIST_TAX;
 		} else {
 			$opt = function_exists( 'ot_get_option' ) ? ot_get_option( 'ab_artist_tax', 'on' ) : 'on';
 			$on  = ( 'off' !== $opt );
@@ -60,17 +60,17 @@ if ( ! function_exists( 'javan_seda_artist_tax_enabled' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_tax' ) ) {
+if ( ! function_exists( 'tara_artist_tax' ) ) {
 	/** نامکِ فعالِ تاکسونومی هنرمند: 'artist' یا 'singer' */
-	function javan_seda_artist_tax() {
+	function tara_artist_tax() {
 		static $key = null;
 		if ( null !== $key ) {
 			return $key;
 		}
-		$key = javan_seda_artist_tax_enabled() ? 'artist' : 'singer';
-		/** با فیلتر هم می‌شود بازنویسی کرد: add_filter( 'javan_seda_artist_tax', ... ) */
-		if ( has_filter( 'javan_seda_artist_tax' ) ) {
-			$filtered = sanitize_key( (string) apply_filters( 'javan_seda_artist_tax', $key ) );
+		$key = tara_artist_tax_enabled() ? 'artist' : 'singer';
+		/** با فیلتر هم می‌شود بازنویسی کرد: add_filter( 'tara_artist_tax', ... ) */
+		if ( has_filter( 'tara_artist_tax' ) ) {
+			$filtered = sanitize_key( (string) apply_filters( 'tara_artist_tax', $key ) );
 			if ( in_array( $filtered, array( 'artist', 'singer' ), true ) ) {
 				$key = $filtered;
 			}
@@ -79,22 +79,22 @@ if ( ! function_exists( 'javan_seda_artist_tax' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_tax_other' ) ) {
+if ( ! function_exists( 'tara_artist_tax_other' ) ) {
 	/** نامکی که در این لحظه کنار گذاشته شده (برای لایۀ سازگاری و مهاجرت) */
-	function javan_seda_artist_tax_other( $tax = '' ) {
-		$tax = ( '' === $tax ) ? javan_seda_artist_tax() : (string) $tax;
+	function tara_artist_tax_other( $tax = '' ) {
+		$tax = ( '' === $tax ) ? tara_artist_tax() : (string) $tax;
 		return ( 'artist' === $tax ) ? 'singer' : 'artist';
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_slug' ) ) {
+if ( ! function_exists( 'tara_artist_slug' ) ) {
 	/** نامک آدرس (rewrite slug) — از تنظیمات پوسته */
-	function javan_seda_artist_slug() {
+	function tara_artist_slug() {
 		static $slug = null;
 		if ( null !== $slug ) {
 			return $slug;
 		}
-		$raw = defined( 'JAVANSEDA_ARTIST_SLUG' ) ? JAVANSEDA_ARTIST_SLUG : '';
+		$raw = defined( 'TARA_ARTIST_SLUG' ) ? TARA_ARTIST_SLUG : '';
 		if ( '' === $raw && function_exists( 'ot_get_option' ) ) {
 			$raw = ot_get_option( 'ab_artist_slug', 'artist' );
 		}
@@ -109,17 +109,17 @@ if ( ! function_exists( 'javan_seda_artist_slug' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_term_link' ) ) {
+if ( ! function_exists( 'tara_artist_term_link' ) ) {
 	/**
 	 * لینک ترمِ هنرمند — جایگزین آدرس‌های دست‌نویسِ /singer/<slug>
 	 * اگر ترمی نبود، رشتهٔ خالی می‌دهد (چیزی نمی‌سازد و ۴۰۴ نمی‌سازد).
 	 */
-	function javan_seda_artist_term_link( $term ) {
+	function tara_artist_term_link( $term ) {
 		if ( ! $term ) {
 			return '';
 		}
 		if ( ! is_object( $term ) ) {
-			$term = get_term_by( 'slug', (string) $term, javan_seda_artist_tax() );
+			$term = get_term_by( 'slug', (string) $term, tara_artist_tax() );
 		}
 		if ( ! $term || is_wp_error( $term ) ) {
 			return '';
@@ -131,15 +131,15 @@ if ( ! function_exists( 'javan_seda_artist_term_link' ) ) {
 		/* لینک نداشت (مثلاً قوانین پیوند یکتا هنوز بازسازی نشده‌اند) ⇒ همان آدرسِ
 		   استاندارد را از نامکِ آرشیو می‌سازیم؛ صفحۀ خالی/۴۰۴ نمی‌سازیم. */
 		if ( ! empty( $term->slug ) ) {
-			return home_url( '/' . javan_seda_artist_slug() . '/' . $term->slug . '/' );
+			return home_url( '/' . tara_artist_slug() . '/' . $term->slug . '/' );
 		}
 		return '';
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_ver' ) ) {
+if ( ! function_exists( 'tara_artist_ver' ) ) {
 	/** شمارۀ قالب — برای کلیدِ کش؛ با هر آپدیت خودبه‌خود بازمی‌گردد */
-	function javan_seda_artist_ver() {
+	function tara_artist_ver() {
 		static $v = null;
 		if ( null === $v ) {
 			$v = wp_get_theme()->get( 'Version' );
@@ -149,36 +149,36 @@ if ( ! function_exists( 'javan_seda_artist_ver' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_url_cache_key' ) ) {
-	function javan_seda_artist_url_cache_key() {
-		return 'javan_seda_artist_dir_' . javan_seda_artist_ver();
+if ( ! function_exists( 'tara_artist_url_cache_key' ) ) {
+	function tara_artist_url_cache_key() {
+		return 'tara_artist_dir_' . tara_artist_ver();
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_flush_url_cache' ) ) {
+if ( ! function_exists( 'tara_artist_flush_url_cache' ) ) {
 	/**
 	 * با هر تغییرِ اسلاگ/برگه/تنظیم، کشِ آدرسِ فهرست پاک می‌شود.
 	 * (باگِ نسخهٔ قبل: کشِ ۱۲ ساعته باعث شد بعد از singer→artists شدنِ اسلاگِ برگه،
 	 *  لینکِ «بازگشت به فهرست» در صفحۀ هنرمند همان آدرسِ کهنه را نشان بدهد.)
 	 */
-	function javan_seda_artist_flush_url_cache() {
+	function tara_artist_flush_url_cache() {
 		if ( function_exists( 'delete_transient' ) ) {
-			delete_transient( javan_seda_artist_url_cache_key() );
-			delete_transient( 'javanseda_artist_directory_url' ); // کلیدِ کهنهٔ 3.4.7
-			delete_transient( 'javan_seda_artists_index' );
+			delete_transient( tara_artist_url_cache_key() );
+			delete_transient( 'tara_artist_directory_url' ); // کلیدِ کهنهٔ 3.4.7
+			delete_transient( 'tara_artists_index' );
 		}
 	}
 }
 foreach ( array( 'save_post', 'deleted_post', 'switch_theme', 'updated_option' ) as $jv_hook ) {
-	add_action( $jv_hook, 'javan_seda_artist_flush_url_cache', 50 );
+	add_action( $jv_hook, 'tara_artist_flush_url_cache', 50 );
 }
 
-if ( ! function_exists( 'javan_seda_artist_default_image' ) ) {
+if ( ! function_exists( 'tara_artist_default_image' ) ) {
 	/**
 	 * تصویرِ پیش‌فرضِ هنرمند. از 3.4.8 فایلِ def-artist.webp اولویت دارد و
 	 * def-singer.webp فقط به‌عنوانِ فالبک نگه داشته می‌شود (تا نصبِ ناقص، کارت‌ها بی‌تصویر نشوند).
 	 */
-	function javan_seda_artist_default_image() {
+	function tara_artist_default_image() {
 		$dir = get_template_directory();
 		foreach ( array( 'def-artist.webp', 'def-singer.webp' ) as $f ) {
 			if ( file_exists( $dir . '/images/' . $f ) ) {
@@ -189,7 +189,7 @@ if ( ! function_exists( 'javan_seda_artist_default_image' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
+if ( ! function_exists( 'tara_artists_index_url' ) ) {
 	/**
 	 * آدرسِ یک‌جا‌و‌تنهای صفحۀ «همهٔ هنرمندان». ترتیب حل‌کردن:
 	 *   ۰) تنظیمات مادر: arti_url (ردیف «صفحه هنرمندان») — اگر پر باشد، حرفِ آخر با شماست
@@ -197,7 +197,7 @@ if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
 	 *   ۲) برگه‌ای که قالبش artist-template.php است (کوئریِ سنگین → کشِ ۱۲ ساعتهٔ نسخه‌دار)
 	 *   ۳) آرشیوِ خودِ تاکسونومی، و در پایان /singers/ تا هیچ لینکی مرده نشود
 	 */
-	function javan_seda_artists_index_url() {
+	function tara_artists_index_url() {
 		static $url = null;
 		if ( null !== $url ) {
 			return $url;
@@ -213,7 +213,7 @@ if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
 
 		// ۱) برگه بر پایهٔ اسلاگ
 		$slugs = array( 'artists', 'artist', 'singers', 'singer' );
-		$slugs = (array) apply_filters( 'javan_seda_artists_index_slugs', $slugs );
+		$slugs = (array) apply_filters( 'tara_artists_index_slugs', $slugs );
 		foreach ( $slugs as $s ) {
 			$page = get_page_by_path( sanitize_title( (string) $s ), 'OBJECT', 'page' );
 			if ( $page ) {
@@ -226,8 +226,8 @@ if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
 		}
 
 		// ۲) برگه‌ای که قالبش artist-template.php است (کلیدِ کش با شمارۀ قالب ⇒ با آپدیت معتبر نمی‌ماند)
-		$key     = javan_seda_artist_url_cache_key();
-		$cache  = ( function_exists( 'get_transient' ) && apply_filters( 'javan_seda_artist_url_cache', true ) ) ? get_transient( $key ) : '';
+		$key     = tara_artist_url_cache_key();
+		$cache  = ( function_exists( 'get_transient' ) && apply_filters( 'tara_artist_url_cache', true ) ) ? get_transient( $key ) : '';
 		if ( is_string( $cache ) && '' !== $cache ) {
 			$url = $cache;
 			return $url;
@@ -255,7 +255,7 @@ if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
 		}
 
 		// ۳) آرشیوِ تاکسونومی
-		$tax = get_taxonomy( javan_seda_artist_tax() );
+		$tax = get_taxonomy( tara_artist_tax() );
 		if ( $tax && ! empty( $tax->rewrite ) && is_array( $tax->rewrite ) && ! empty( $tax->rewrite['slug'] ) ) {
 			$url = home_url( '/' . trim( (string) $tax->rewrite['slug'], '/' ) . '/' );
 			return $url;
@@ -267,17 +267,17 @@ if ( ! function_exists( 'javan_seda_artists_index_url' ) ) {
 /* -------------------------------------------------------------------------
    ۱) مهاجرتِ ستون taxonomy در wp_term_taxonomy (یک‌باره، نسخه‌دار)
    ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_artist_tax_migrate' ) ) {
-	function javan_seda_artist_tax_migrate() {
+if ( ! function_exists( 'tara_artist_tax_migrate' ) ) {
+	function tara_artist_tax_migrate() {
 		global $wpdb;
 		if ( is_admin() && function_exists( 'wp_doing_cron' ) && wp_doing_cron() ) {
 			return; // در کرانِ برنامه‌ریزی‌شده مهاجرت نمی‌کنیم
 		}
-		$to   = javan_seda_artist_tax();
-		$from = javan_seda_artist_tax_other( $to );
-		$slug = javan_seda_artist_slug();
+		$to   = tara_artist_tax();
+		$from = tara_artist_tax_other( $to );
+		$slug = tara_artist_slug();
 
-		$ver   = 'javan_seda_artist_tax_ver';
+		$ver   = 'tara_artist_tax_ver';
 		$stamp = $to . '|' . $from . '|' . $slug . '|1';
 		if ( (string) get_option( $ver, '' ) === $stamp ) {
 			return; // قبلاً اعمال شده
@@ -292,7 +292,7 @@ if ( ! function_exists( 'javan_seda_artist_tax_migrate' ) ) {
 			if ( $n_to > 0 ) {
 				// هر دو نامک ردیف دارند: ادغام نمی‌کنیم (ریسکِ از‌دست‌رفتنِ رابطه‌ها).
 				// فقط گزارش می‌گذاریم تا مدیر بداند؛ مهاجرت دستی را ما انجام نمی‌دهیم.
-				update_option( 'javan_seda_artist_tax_note', 'skip-merge: هر دو تاکسونومی «' . $from . '» و «' . $to . '» ردیف دارند (' . $n_from . ' و ' . $n_to . ').', false );
+				update_option( 'tara_artist_tax_note', 'skip-merge: هر دو تاکسونومی «' . $from . '» و «' . $to . '» ردیف دارند (' . $n_from . ' و ' . $n_to . ').', false );
 			} else {
 				$ids = $wpdb->get_col( $wpdb->prepare( "SELECT term_id FROM {$tbl} WHERE taxonomy = %s", $from ) ); // phpcs:ignore
 				$ok  = (int) $wpdb->query( $wpdb->prepare( "UPDATE {$tbl} SET taxonomy = %s WHERE taxonomy = %s", $to, $from ) ); // phpcs:ignore
@@ -302,41 +302,41 @@ if ( ! function_exists( 'javan_seda_artist_tax_migrate' ) ) {
 					clean_term_cache( $ids_int, $from );
 					clean_term_cache( $ids_int, $to );
 					if ( function_exists( 'wp_cache_set' ) ) {
-						wp_cache_set( 'javan_seda_artist_tax_moved', (int) count( $ids ) );
+						wp_cache_set( 'tara_artist_tax_moved', (int) count( $ids ) );
 					}
 					$moved = true;
 				}
-				update_option( 'javan_seda_artist_tax_log', gmdate( 'Y-m-d H:i:s' ) . ' — ' . $ok . ' ردیف: ' . $from . ' → ' . $to, false );
+				update_option( 'tara_artist_tax_log', gmdate( 'Y-m-d H:i:s' ) . ' — ' . $ok . ' ردیف: ' . $from . ' → ' . $to, false );
 			}
 		}
 
 		update_option( $ver, $stamp, false );
 		if ( $moved || $n_to > 0 ) {
 			// قوانین پیوند یکتا لازم است بازچینی شود (نرم: بدون دست‌زدن به .htaccess)
-			wp_schedule_single_event( time() + 3, 'javan_seda_artist_flush' );
+			wp_schedule_single_event( time() + 3, 'tara_artist_flush' );
 		}
 	}
 }
 /* اگر لایه دیر load شده باشد (init رد شده) همان لحظه اجرا می‌شود؛ وگرنه با هوک. */
 if ( did_action( 'init' ) >= 1 ) {
-	javan_seda_artist_tax_migrate();
+	tara_artist_tax_migrate();
 } else {
-	add_action( 'init', 'javan_seda_artist_tax_migrate', 3 );
+	add_action( 'init', 'tara_artist_tax_migrate', 3 );
 }
 
-if ( ! function_exists( 'javan_seda_artist_flush_cb' ) ) {
-	function javan_seda_artist_flush_cb() {
+if ( ! function_exists( 'tara_artist_flush_cb' ) ) {
+	function tara_artist_flush_cb() {
 		flush_rewrite_rules( false );
 	}
 }
-add_action( 'javan_seda_artist_flush', 'javan_seda_artist_flush_cb' );
+add_action( 'tara_artist_flush', 'tara_artist_flush_cb' );
 
 /* -------------------------------------------------------------------------
    ۲) ثبتِ نامک فعال، با حفظِ آرگومان‌های واقعیِ مادر
    ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_artist_tax_args' ) ) {
+if ( ! function_exists( 'tara_artist_tax_args' ) ) {
 	/** آرگومان‌ها را از تاکسونومیِ موجود برمی‌داریم تا تنظیم مادر گم نشود */
-	function javan_seda_artist_tax_args( $tax ) {
+	function tara_artist_tax_args( $tax ) {
 		$base = get_taxonomy( $tax );
 		$args = array();
 		if ( $base ) {
@@ -387,7 +387,7 @@ if ( ! function_exists( 'javan_seda_artist_tax_args' ) ) {
 			$args['rest_base'] = $tax;
 		}
 		$args['rewrite'] = array(
-			'slug'       => javan_seda_artist_slug(),
+			'slug'       => tara_artist_slug(),
 			'with_front' => false,
 		);
 		$args['labels']  = array(
@@ -408,13 +408,13 @@ if ( ! function_exists( 'javan_seda_artist_tax_args' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_tax_register' ) ) {
-	function javan_seda_artist_tax_register() {
-		$to   = javan_seda_artist_tax();
-		$from = javan_seda_artist_tax_other( $to );
+if ( ! function_exists( 'tara_artist_tax_register' ) ) {
+	function tara_artist_tax_register() {
+		$to   = tara_artist_tax();
+		$from = tara_artist_tax_other( $to );
 
 		// اگر پست‌تایپی هم‌نام وجود دارد، ثبتِ تاکسونومیِ هم‌نام rewrite را می‌شکند
-		// (همان درسی که از JAVANSEDA_SINGER_FIX گرفتیم).
+		// (همان درسی که از TARA_SINGER_FIX گرفتیم).
 		$blocked = post_type_exists( $to );
 
 		/* اگر مادر نامک قدیمی را عمومی و با آدرس ثبت کرده باشد، بعد از مهاجرت همان را به
@@ -428,9 +428,9 @@ if ( ! function_exists( 'javan_seda_artist_tax_register' ) ) {
 		}
 
 		if ( ! $blocked && ! taxonomy_exists( $to ) ) {
-			register_taxonomy( $to, array( 'post' ), javan_seda_artist_tax_args( ( 'artist' === $to ) ? $from : $to ) );
+			register_taxonomy( $to, array( 'post' ), tara_artist_tax_args( ( 'artist' === $to ) ? $from : $to ) );
 		} elseif ( $blocked ) {
-			update_option( 'javan_seda_artist_tax_note', 'skip-register: یک پست‌تایپ با نامک «' . $to . '» وجود دارد؛ برای جلوگیری از ۴۰۴، رجیستر لغو شد.', false );
+			update_option( 'tara_artist_tax_note', 'skip-register: یک پست‌تایپ با نامک «' . $to . '» وجود دارد؛ برای جلوگیری از ۴۰۴، رجیستر لغو شد.', false );
 		}
 
 		// لایۀ سازگاری: نامکِ کنارگذاشته‌شده ثبت می‌ماند ولی پنهان و بدون آدرس،
@@ -456,25 +456,25 @@ if ( ! function_exists( 'javan_seda_artist_tax_register' ) ) {
 		}
 	}
 }
-if ( taxonomy_exists( javan_seda_artist_tax() ) ) {
+if ( taxonomy_exists( tara_artist_tax() ) ) {
 	// ثبت شده (توسط مادر یا فراخوانی قبلی)؛ فقط نامک کناری لازم است
-	javan_seda_artist_tax_register();
+	tara_artist_tax_register();
 } elseif ( did_action( 'init' ) >= 1 ) {
-	javan_seda_artist_tax_register();
+	tara_artist_tax_register();
 } else {
-	add_action( 'init', 'javan_seda_artist_tax_register', 99 );
+	add_action( 'init', 'tara_artist_tax_register', 99 );
 }
 
 /* -------------------------------------------------------------------------
    ۳) ریدایرکت ۳۰۱ از آدرسِ قدیمی به آدرسِ تازه
    ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_artist_legacy_redirect' ) ) {
-	function javan_seda_artist_legacy_redirect() {
+if ( ! function_exists( 'tara_artist_legacy_redirect' ) ) {
+	function tara_artist_legacy_redirect() {
 		if ( is_admin() ) {
 			return;
 		}
-		$from = javan_seda_artist_tax_other(); // وقتی artist فعال است، این singer است
-		if ( javan_seda_artist_tax() === $from ) {
+		$from = tara_artist_tax_other(); // وقتی artist فعال است، این singer است
+		if ( tara_artist_tax() === $from ) {
 			return;
 		}
 		$req = isset( $GLOBALS['wp']->request ) ? (string) $GLOBALS['wp']->request : '';
@@ -485,8 +485,8 @@ if ( ! function_exists( 'javan_seda_artist_legacy_redirect' ) ) {
 		$jv_404 = ( function_exists( 'is_404' ) && is_404() );
 		/* آدرسِ کهنۀ صفحۀ فهرست: /singers (اسلاگِ برگه پیش از یکدست‌سازی). فقط وقتی اجرا
 		   می‌شود که درخواست ۴۰۴ شده باشد، پس هیچ صفحۀ زنده‌ای را نمی‌پوشاند. */
-		if ( $jv_404 && ( 'singers' === $req || 'singer' === $req ) && function_exists( 'javan_seda_artists_index_url' ) ) {
-			$jv_index = javan_seda_artists_index_url();
+		if ( $jv_404 && ( 'singers' === $req || 'singer' === $req ) && function_exists( 'tara_artists_index_url' ) ) {
+			$jv_index = tara_artists_index_url();
 			$jv_path  = trim( (string) wp_parse_url( $jv_index, PHP_URL_PATH ), '/' );
 			if ( $jv_index && $jv_path !== $req ) {
 				if ( isset( $_SERVER['QUERY_STRING'] ) && '' !== (string) $_SERVER['QUERY_STRING'] ) {
@@ -500,7 +500,7 @@ if ( ! function_exists( 'javan_seda_artist_legacy_redirect' ) ) {
 		if ( ! preg_match( '#^' . preg_quote( $from, '#' ) . '/([^/]+)(?:/page/(\d+))?/?$#u', $req, $m ) ) {
 			return;
 		}
-		$term = get_term_by( 'slug', $m[1], javan_seda_artist_tax() );
+		$term = get_term_by( 'slug', $m[1], tara_artist_tax() );
 		if ( ! $term || is_wp_error( $term ) ) {
 			return;
 		}
@@ -518,27 +518,27 @@ if ( ! function_exists( 'javan_seda_artist_legacy_redirect' ) ) {
 		exit;
 	}
 }
-add_action( 'template_redirect', 'javan_seda_artist_legacy_redirect', 1 );
+add_action( 'template_redirect', 'tara_artist_legacy_redirect', 1 );
 
 /* -------------------------------------------------------------------------
    ۴) گزارشِ تشخیصی کوچک (فقط مدیر، فقط خواندنی) — ?ab_artist_diag=1
    ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_artist_diag' ) ) {
-	function javan_seda_artist_diag() {
+if ( ! function_exists( 'tara_artist_diag' ) ) {
+	function tara_artist_diag() {
 		$want = isset( $_GET['ab_artist_diag'] ) ? 'ab_artist_diag' : ( isset( $_GET['ab_singer_diag'] ) ? 'ab_singer_diag' : '' );
 		if ( '' === $want || ! current_user_can( 'manage_options' ) ) {
 			return;
 		}
 		$out  = array();
-		$out[] = 'نامک فعال: ' . javan_seda_artist_tax() . ' | آدرس: /' . javan_seda_artist_slug() . '/';
+		$out[] = 'نامک فعال: ' . tara_artist_tax() . ' | آدرس: /' . tara_artist_slug() . '/';
 		$out[] = 'taxonomy_exists(artist): ' . ( taxonomy_exists( 'artist' ) ? 'YES' : 'no' );
 		$out[] = 'taxonomy_exists(singer): ' . ( taxonomy_exists( 'singer' ) ? 'YES' : 'no' );
-		$out[] = 'is_tax(' . javan_seda_artist_tax() . '): ' . ( is_tax( javan_seda_artist_tax() ) ? 'YES' : 'no' );
-		$counts = wp_count_terms( array( 'taxonomy' => javan_seda_artist_tax(), 'hide_empty' => false ) );
+		$out[] = 'is_tax(' . tara_artist_tax() . '): ' . ( is_tax( tara_artist_tax() ) ? 'YES' : 'no' );
+		$counts = wp_count_terms( array( 'taxonomy' => tara_artist_tax(), 'hide_empty' => false ) );
 		$out[]  = 'تعداد اصطلاح: ' . ( ( is_wp_error( $counts ) ) ? 'خطا' : (string) (int) $counts );
-		$out[]  = 'صفحۀ فهرست: ' . esc_url( javan_seda_artists_index_url() );
-		$log    = get_option( 'javan_seda_artist_tax_log', '' );
-		$note   = get_option( 'javan_seda_artist_tax_note', '' );
+		$out[]  = 'صفحۀ فهرست: ' . esc_url( tara_artists_index_url() );
+		$log    = get_option( 'tara_artist_tax_log', '' );
+		$note   = get_option( 'tara_artist_tax_note', '' );
 		if ( $log ) {
 			$out[] = 'مهاجرت: ' . $log;
 		}
@@ -548,4 +548,4 @@ if ( ! function_exists( 'javan_seda_artist_diag' ) ) {
 		echo '<pre style="background:#111;color:#fff;padding:12px;font:13px/1.7 monospace;direction:rtl;text-align:right">' . esc_html( implode( "\n", $out ) ) . '</pre>';
 	}
 }
-add_action( 'wp_footer', 'javan_seda_artist_diag', 99 );
+add_action( 'wp_footer', 'tara_artist_diag', 99 );

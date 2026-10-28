@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا ۳.۵.۲ — لایهٔ دادهٔ هنرمند (تک‌منبعِ حقیقت)
+ * ترانه یار ۳.۵.۲ — لایهٔ دادهٔ هنرمند (تک‌منبعِ حقیقت)
  * ==========================================================================
  * چرا این فایل؟
  *   در نسخهٔ مبنا (۳.۴.۸) قالب‌ها مقدارها را مستقیم با get_field() می‌خواندند.
@@ -31,14 +31,14 @@ if ( ! defined( 'ABSPATH' ) ) {
    ۱) کلیدها و خواندن مقدار
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_artist_field_keys' ) ) {
+if ( ! function_exists( 'tara_artist_field_keys' ) ) {
 	/**
 	 * فهرست کلیدهای رسمی + برچسب فارسی + نوع پاک‌سازی.
 	 * نوع‌ها: url | text | textarea | id
 	 */
-	function javan_seda_artist_field_keys() {
+	function tara_artist_field_keys() {
 		return apply_filters(
-			'javan_seda_artist_field_keys',
+			'tara_artist_field_keys',
 			array(
 				'aimg2'       => array( 'label' => 'تصویر پروفایل', 'type' => 'url' ),
 				'aimg2_id'    => array( 'label' => 'شناسهٔ تصویر پروفایل', 'type' => 'id' ),
@@ -55,11 +55,11 @@ if ( ! function_exists( 'javan_seda_artist_field_keys' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_social_keys' ) ) {
+if ( ! function_exists( 'tara_artist_social_keys' ) ) {
 	/** شبکه‌های اجتماعی با آیکون IcoFont قالب (همان آیکون‌های نسخهٔ مبنا) */
-	function javan_seda_artist_social_keys() {
+	function tara_artist_social_keys() {
 		return apply_filters(
-			'javan_seda_artist_social_keys',
+			'tara_artist_social_keys',
 			array(
 				'afacebook'  => array( 'label' => 'فیسبوک', 'icon' => 'icofont-facebook' ),
 				'atelegram'  => array( 'label' => 'تلگرام', 'icon' => 'icofont-paper-plane' ),
@@ -71,9 +71,9 @@ if ( ! function_exists( 'javan_seda_artist_social_keys' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_term' ) ) {
+if ( ! function_exists( 'tara_term' ) ) {
 	/** ورودی می‌تواند WP_Term، شناسه، slug یا هیچ‌کدام باشد. */
-	function javan_seda_term( $term, $taxonomy = '' ) {
+	function tara_term( $term, $taxonomy = '' ) {
 		if ( $term instanceof WP_Term ) {
 			return $term;
 		}
@@ -89,13 +89,13 @@ if ( ! function_exists( 'javan_seda_term' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_field' ) ) {
+if ( ! function_exists( 'tara_artist_field' ) ) {
 	/**
 	 * خواندن یک فیلد هنرمند با ترتیب: ACF → term meta → پیش‌فرض.
 	 * مقدار برگشتی همیشه اسکالر (رشته) است تا در قالب‌ها بی‌خطر باشد.
 	 */
-	function javan_seda_artist_field( $term, $key, $default = '' ) {
-		$term = javan_seda_term( $term );
+	function tara_artist_field( $term, $key, $default = '' ) {
+		$term = tara_term( $term );
 		if ( ! $term ) {
 			return $default;
 		}
@@ -147,13 +147,13 @@ if ( ! function_exists( 'javan_seda_artist_field' ) ) {
 			return $default;
 		}
 
-		$defs = javan_seda_artist_field_keys();
+		$defs = tara_artist_field_keys();
 		$type = isset( $defs[ $key ]['type'] ) ? $defs[ $key ]['type'] : 'text';
 		switch ( $type ) {
 			case 'url':
 				$clean = esc_url_raw( trim( $value ) );
 				/* اگر ACF فیلد را «تصویر» تعریف کرده باشد، مقدار = شناسهٔ پیوست است.
-				   اینجا نگه می‌داریم تا javan_seda_image_url_from_value آن را به URL بدل کند. */
+				   اینجا نگه می‌داریم تا tara_image_url_from_value آن را به URL بدل کند. */
 				if ( '' === $clean && ctype_digit( trim( $value ) ) ) {
 					$clean = trim( $value );
 				}
@@ -177,12 +177,12 @@ if ( ! function_exists( 'javan_seda_artist_field' ) ) {
    ۲) تصویر — یک منبع، چند نمایش
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_image_url_from_value' ) ) {
+if ( ! function_exists( 'tara_image_url_from_value' ) ) {
 	/**
 	 * مقدارهای رایجِ فیلد تصویر را به URL تبدیل می‌کند:
 	 * شناسهٔ پیوست، آرایهٔ ACF (url/ID/sizes)، رشتهٔ عددی، URL کامل یا مسیر نسبی.
 	 */
-	function javan_seda_image_url_from_value( $value, $size = 'medium' ) {
+	function tara_image_url_from_value( $value, $size = 'medium' ) {
 		if ( is_array( $value ) ) {
 			if ( ! empty( $value['sizes'][ $size ] ) ) {
 				return esc_url_raw( $value['sizes'][ $size ] );
@@ -223,11 +223,11 @@ if ( ! function_exists( 'javan_seda_image_url_from_value' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_default_image_url' ) ) {
+if ( ! function_exists( 'tara_artist_default_image_url' ) ) {
 	/** تصویر پیش‌فرض هنرمند — همان منطق نسخهٔ مبنا (def-artist.webp، بعد def-singer.webp). */
-	function javan_seda_artist_default_image_url() {
-		if ( function_exists( 'javan_seda_artist_default_image' ) ) {
-			return javan_seda_artist_default_image();
+	function tara_artist_default_image_url() {
+		if ( function_exists( 'tara_artist_default_image' ) ) {
+			return tara_artist_default_image();
 		}
 		$dir = function_exists( 'get_template_directory' ) ? get_template_directory() : '';
 		$uri = function_exists( 'get_template_directory_uri' ) ? get_template_directory_uri() : '';
@@ -238,34 +238,34 @@ if ( ! function_exists( 'javan_seda_artist_default_image_url' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_image_url' ) ) {
+if ( ! function_exists( 'tara_artist_image_url' ) ) {
 	/** URL تصویر هنرمند؛ اگر نبود، تصویر پیش‌فرض قالب. */
-	function javan_seda_artist_image_url( $term, $size = 'medium' ) {
-		$term = javan_seda_term( $term );
+	function tara_artist_image_url( $term, $size = 'medium' ) {
+		$term = tara_term( $term );
 		$url  = '';
 		if ( $term ) {
-			$url = javan_seda_image_url_from_value( javan_seda_artist_field( $term, 'aimg2' ), $size );
+			$url = tara_image_url_from_value( tara_artist_field( $term, 'aimg2' ), $size );
 			if ( '' === $url ) {
-				$id  = absint( javan_seda_artist_field( $term, 'aimg2_id' ) );
-				$url = $id ? javan_seda_image_url_from_value( $id, $size ) : '';
+				$id  = absint( tara_artist_field( $term, 'aimg2_id' ) );
+				$url = $id ? tara_image_url_from_value( $id, $size ) : '';
 			}
 		}
-		return ( '' !== $url ) ? $url : javan_seda_artist_default_image_url();
+		return ( '' !== $url ) ? $url : tara_artist_default_image_url();
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_has_image' ) ) {
+if ( ! function_exists( 'tara_artist_has_image' ) ) {
 	/** آیا هنرمند تصویرِ ثبت‌شده دارد؟ (برای پیام «تصویری ثبت نشده» در پیشخوان) */
-	function javan_seda_artist_has_image( $term ) {
-		$term = javan_seda_term( $term );
+	function tara_artist_has_image( $term ) {
+		$term = tara_term( $term );
 		if ( ! $term ) {
 			return false;
 		}
-		if ( '' !== javan_seda_image_url_from_value( javan_seda_artist_field( $term, 'aimg2' ) ) ) {
+		if ( '' !== tara_image_url_from_value( tara_artist_field( $term, 'aimg2' ) ) ) {
 			return true;
 		}
-		$id = absint( javan_seda_artist_field( $term, 'aimg2_id' ) );
-		return (bool) ( $id && javan_seda_image_url_from_value( $id ) );
+		$id = absint( tara_artist_field( $term, 'aimg2_id' ) );
+		return (bool) ( $id && tara_image_url_from_value( $id ) );
 	}
 }
 
@@ -273,16 +273,16 @@ if ( ! function_exists( 'javan_seda_artist_has_image' ) ) {
    ۳) شبکه‌های اجتماعی
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_artist_socials' ) ) {
+if ( ! function_exists( 'tara_artist_socials' ) ) {
 	/** فهرست [key,label,icon,url] فقط برای مواردی که مقدار دارند. */
-	function javan_seda_artist_socials( $term ) {
-		$term = javan_seda_term( $term );
+	function tara_artist_socials( $term ) {
+		$term = tara_term( $term );
 		$out  = array();
 		if ( ! $term ) {
 			return $out;
 		}
-		foreach ( javan_seda_artist_social_keys() as $key => $meta ) {
-			$url = javan_seda_artist_field( $term, $key );
+		foreach ( tara_artist_social_keys() as $key => $meta ) {
+			$url = tara_artist_field( $term, $key );
 			if ( '' === $url ) {
 				continue;
 			}
@@ -300,18 +300,18 @@ if ( ! function_exists( 'javan_seda_artist_socials' ) ) {
    ۴) بیوگرافی کوتاه و لینک بیوگرافی کامل
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_artist_bio_short' ) ) {
+if ( ! function_exists( 'tara_artist_bio_short' ) ) {
 	/**
 	 * بیوگرافی کوتاه. اگر خالی بود، به توضیح ترم (همان جایی که نسخهٔ مبنا
 	 * بیوگرافی را نشان می‌داد) برنمی‌گردیم؟ برمی‌گردیم — ولی فقط برای نمایشِ
 	 * «معرفی»، نه برای ذخیره. این کار داده‌های قدیمی را از دست نمی‌دهد.
 	 */
-	function javan_seda_artist_bio_short( $term, $fallback_description = true ) {
-		$term = javan_seda_term( $term );
+	function tara_artist_bio_short( $term, $fallback_description = true ) {
+		$term = tara_term( $term );
 		if ( ! $term ) {
 			return '';
 		}
-		$bio = javan_seda_artist_field( $term, 'ab_bio_short' );
+		$bio = tara_artist_field( $term, 'ab_bio_short' );
 		if ( '' === $bio && $fallback_description ) {
 			$bio = trim( wp_strip_all_tags( (string) term_description( $term->term_id, $term->taxonomy ) ) );
 		}
@@ -319,14 +319,14 @@ if ( ! function_exists( 'javan_seda_artist_bio_short' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_bio_post_id' ) ) {
+if ( ! function_exists( 'tara_artist_bio_post_id' ) ) {
 	/** شناسهٔ نوشتهٔ «بیوگرافی کامل» — فقط عددِ معتبر. */
-	function javan_seda_artist_bio_post_id( $term ) {
-		return absint( javan_seda_artist_field( $term, 'ab_bio_post' ) );
+	function tara_artist_bio_post_id( $term ) {
+		return absint( tara_artist_field( $term, 'ab_bio_post' ) );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_bio_link' ) ) {
+if ( ! function_exists( 'tara_artist_bio_link' ) ) {
 	/**
 	 * لینک «بیوگرافی کامل» فقط در این حالت‌ها برمی‌گردد:
 	 *   • نوشته منتشر شده باشد،
@@ -334,8 +334,8 @@ if ( ! function_exists( 'javan_seda_artist_bio_link' ) ) {
 	 *     (پیش‌نویس/خصوصی برای مدیر و نویسنده — همان قاعدهٔ خودِ وردپرس).
 	 * در غیر این صورت رشتهٔ خالی ⇒ دکمه‌ای چاپ نمی‌شود، پس لینک شکسته نداریم.
 	 */
-	function javan_seda_artist_bio_link( $term ) {
-		$id = javan_seda_artist_bio_post_id( $term );
+	function tara_artist_bio_link( $term ) {
+		$id = tara_artist_bio_post_id( $term );
 		if ( ! $id ) {
 			return '';
 		}
@@ -361,33 +361,33 @@ if ( ! function_exists( 'javan_seda_artist_bio_link' ) ) {
    ----------------------------------------------------------------------------------
    منبعِ بازدید: همان متای «views» که افزونهٔ شمارش بازدید روی سرور می‌نویسد.
    این لایه هیچ‌وقت «views» را نمی‌نویسد/زیاد نمی‌کند؛ فقط جمع می‌زند.
-   رابطهٔ اثر و هنرمند: تاکسونومی هنرمند (javan_seda_artist_tax()).
+   رابطهٔ اثر و هنرمند: تاکسونومی هنرمند (tara_artist_tax()).
    اگر هنرمند هیچ اثری در تاکسونومی نداشت (نوشته‌های قدیمیِ فقط با متای «artist»)،
    جمع از روی نام هنرمند در همان متا محاسبه می‌شود تا آمار صفرِ نادرست ندهیم.
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_views_source_key' ) ) {
+if ( ! function_exists( 'tara_views_source_key' ) ) {
 	/** کلید متای بازدید (همان کلید افزونهٔ سرور؛ قابل تغییر با فیلتر). */
-	function javan_seda_views_source_key() {
-		return (string) apply_filters( 'javan_seda_views_source_key', 'views' );
+	function tara_views_source_key() {
+		return (string) apply_filters( 'tara_views_source_key', 'views' );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_views_epoch' ) ) {
+if ( ! function_exists( 'tara_artist_views_epoch' ) ) {
 	/** شمارندهٔ نسخهٔ کش؛ با هر تغییرِ اثر/ترم یک واحد بالا می‌رود ⇒ همهٔ کش‌ها بی‌اعتبار. */
-	function javan_seda_artist_views_epoch() {
-		return (int) get_option( 'javan_seda_views_epoch', 1 );
+	function tara_artist_views_epoch() {
+		return (int) get_option( 'tara_views_epoch', 1 );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_views_flush' ) ) {
-	function javan_seda_artist_views_flush() {
-		$next = javan_seda_artist_views_epoch() + 1;
-		update_option( 'javan_seda_views_epoch', $next, false );
+if ( ! function_exists( 'tara_artist_views_flush' ) ) {
+	function tara_artist_views_flush() {
+		$next = tara_artist_views_epoch() + 1;
+		update_option( 'tara_views_epoch', $next, false );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_total_views' ) ) {
+if ( ! function_exists( 'tara_artist_total_views' ) ) {
 	/**
 	 * مجموع بازدید آثار منتشرشدهٔ هنرمند.
 	 *
@@ -395,14 +395,14 @@ if ( ! function_exists( 'javan_seda_artist_total_views' ) ) {
 	 * @param bool        $use_cache پیش‌فرض true (کش ۱۵ دقیقه‌ای).
 	 * @return int
 	 */
-	function javan_seda_artist_total_views( $term, $use_cache = true ) {
-		$term = javan_seda_term( $term );
+	function tara_artist_total_views( $term, $use_cache = true ) {
+		$term = tara_term( $term );
 		if ( ! $term ) {
 			return 0;
 		}
 
-		$ttl = (int) apply_filters( 'javan_seda_artist_views_ttl', 15 * MINUTE_IN_SECONDS, $term );
-		$key = 'jv_av_' . (int) $term->term_id . '_' . javan_seda_artist_views_epoch();
+		$ttl = (int) apply_filters( 'tara_artist_views_ttl', 15 * MINUTE_IN_SECONDS, $term );
+		$key = 'jv_av_' . (int) $term->term_id . '_' . tara_artist_views_epoch();
 
 		if ( $use_cache && $ttl > 0 ) {
 			$cached = get_transient( $key );
@@ -411,7 +411,7 @@ if ( ! function_exists( 'javan_seda_artist_total_views' ) ) {
 			}
 		}
 
-		$total = javan_seda_artist_views_compute( $term );
+		$total = tara_artist_views_compute( $term );
 
 		if ( $use_cache && $ttl > 0 ) {
 			set_transient( $key, $total, $ttl );
@@ -420,16 +420,16 @@ if ( ! function_exists( 'javan_seda_artist_total_views' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_views_compute' ) ) {
+if ( ! function_exists( 'tara_artist_views_compute' ) ) {
 	/** محاسبهٔ واقعی (بدون کش) — دو مسیر: تاکسونومی، بعد نامِ متای قدیمی. */
-	function javan_seda_artist_views_compute( $term ) {
+	function tara_artist_views_compute( $term ) {
 		global $wpdb;
 		if ( ! isset( $wpdb ) || ! is_object( $wpdb ) ) {
 			return 0;
 		}
 
-		$views_key = javan_seda_views_source_key();
-		$taxonomy  = isset( $term->taxonomy ) ? $term->taxonomy : ( function_exists( 'javan_seda_artist_tax' ) ? javan_seda_artist_tax() : 'artist' );
+		$views_key = tara_views_source_key();
+		$taxonomy  = isset( $term->taxonomy ) ? $term->taxonomy : ( function_exists( 'tara_artist_tax' ) ? tara_artist_tax() : 'artist' );
 
 		/* ۱) مسیرِ دقیق: پیوندِ تاکسونومی
 		   GREATEST(...,0) ⇒ مقدارهای منفی/ناخالص صفر حساب می‌شوند، نه عددِ منفی. */
@@ -496,9 +496,9 @@ if ( ! function_exists( 'javan_seda_artist_views_compute' ) ) {
 }
 
 
-if ( ! function_exists( 'javan_seda_strlen_utf8' ) ) {
+if ( ! function_exists( 'tara_strlen_utf8' ) ) {
 	/** طولِ متن به نویسه (نه بایت) — مستقل از mbstring. */
-	function javan_seda_strlen_utf8( $text ) {
+	function tara_strlen_utf8( $text ) {
 		if ( function_exists( 'mb_strlen' ) ) {
 			return (int) mb_strlen( (string) $text, 'UTF-8' );
 		}
@@ -507,9 +507,9 @@ if ( ! function_exists( 'javan_seda_strlen_utf8' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_substr_utf8' ) ) {
+if ( ! function_exists( 'tara_substr_utf8' ) ) {
 	/** برشِ متن روی مرزِ نویسه (نه بایت) — مستقل از mbstring. */
-	function javan_seda_substr_utf8( $text, $start, $length = null ) {
+	function tara_substr_utf8( $text, $start, $length = null ) {
 		$text = (string) $text;
 		if ( function_exists( 'mb_substr' ) ) {
 			return mb_substr( $text, (int) $start, $length, 'UTF-8' );
@@ -523,9 +523,9 @@ if ( ! function_exists( 'javan_seda_substr_utf8' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_digits' ) ) {
+if ( ! function_exists( 'tara_digits' ) ) {
 	/** رقم‌های لاتین → فارسی. (نسخهٔ مستقل تا وابسته به فایل قالب نباشیم.) */
-	function javan_seda_digits( $text ) {
+	function tara_digits( $text ) {
 		return str_replace(
 			array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
 			array( '۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹' ),
@@ -534,32 +534,32 @@ if ( ! function_exists( 'javan_seda_digits' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_number_fa' ) ) {
+if ( ! function_exists( 'tara_number_fa' ) ) {
 	/** عدد با جداکنندهٔ هزارگانِ وردپرس + رقم فارسی. */
-	function javan_seda_number_fa( $number ) {
+	function tara_number_fa( $number ) {
 		$number = max( 0, (int) $number );
 		$text   = function_exists( 'number_format_i18n' ) ? number_format_i18n( $number ) : number_format( $number );
-		return javan_seda_digits( $text );
+		return tara_digits( $text );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_artist_views_html' ) ) {
+if ( ! function_exists( 'tara_artist_views_html' ) ) {
 	/**
 	 * نشانِ «مجموع بازدید آثار» برای صفحهٔ هنرمند.
 	 * اگر هنوز آماری نیست، چیزی چاپ نمی‌شود (رابط برای دادهٔ ناموجود فضا نمی‌گیرد).
 	 */
-	function javan_seda_artist_views_html( $term ) {
-		$term = javan_seda_term( $term );
+	function tara_artist_views_html( $term ) {
+		$term = tara_term( $term );
 		if ( ! $term ) {
 			return '';
 		}
-		$total = javan_seda_artist_total_views( $term );
+		$total = tara_artist_total_views( $term );
 		if ( $total < 1 ) {
 			return '';
 		}
-		$label = apply_filters( 'javan_seda_artist_views_label', 'مجموع بازدید آثار', $term );
+		$label = apply_filters( 'tara_artist_views_label', 'مجموع بازدید آثار', $term );
 		return '<li class="ab-resume__views"><span class="ab-resume__num">'
-			. esc_html( javan_seda_number_fa( $total ) )
+			. esc_html( tara_number_fa( $total ) )
 			. '</span> ' . esc_html( $label ) . '</li>';
 	}
 }
@@ -568,33 +568,33 @@ if ( ! function_exists( 'javan_seda_artist_views_html' ) ) {
    ۶) ابطال کش — با تغییرِ رابطه/انتشار/حذف
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_views_flush_on_terms' ) ) {
-	function javan_seda_views_flush_on_terms() {
-		javan_seda_artist_views_flush();
+if ( ! function_exists( 'tara_views_flush_on_terms' ) ) {
+	function tara_views_flush_on_terms() {
+		tara_artist_views_flush();
 	}
 }
-add_action( 'set_object_terms', 'javan_seda_views_flush_on_terms' );
-add_action( 'edited_term', 'javan_seda_views_flush_on_terms' );
-add_action( 'delete_term', 'javan_seda_views_flush_on_terms' );
+add_action( 'set_object_terms', 'tara_views_flush_on_terms' );
+add_action( 'edited_term', 'tara_views_flush_on_terms' );
+add_action( 'delete_term', 'tara_views_flush_on_terms' );
 
-if ( ! function_exists( 'javan_seda_views_flush_on_post' ) ) {
-	function javan_seda_views_flush_on_post( $post_id ) {
+if ( ! function_exists( 'tara_views_flush_on_post' ) ) {
+	function tara_views_flush_on_post( $post_id ) {
 		$post = get_post( $post_id );
 		if ( $post && 'revision' !== $post->post_type ) {
-			javan_seda_artist_views_flush();
+			tara_artist_views_flush();
 		}
 	}
 }
-add_action( 'save_post', 'javan_seda_views_flush_on_post' );
-add_action( 'deleted_post', 'javan_seda_views_flush_on_post' );
-add_action( 'transition_post_status', 'javan_seda_views_flush_on_post' );
+add_action( 'save_post', 'tara_views_flush_on_post' );
+add_action( 'deleted_post', 'tara_views_flush_on_post' );
+add_action( 'transition_post_status', 'tara_views_flush_on_post' );
 
 /* ==================================================================================
    ۷) دارایی‌های فرانت (CSS کوچک و مستقل؛ style.css دست‌نخورده می‌ماند)
    ================================================================================== */
 
-if ( ! function_exists( 'javan_seda_352_assets' ) ) {
-	function javan_seda_352_assets() {
+if ( ! function_exists( 'tara_352_assets' ) ) {
+	function tara_352_assets() {
 		if ( ! function_exists( 'wp_enqueue_style' ) ) {
 			return;
 		}
@@ -610,5 +610,5 @@ if ( ! function_exists( 'javan_seda_352_assets' ) ) {
 			wp_enqueue_script( 'javan-seda-cat-desc', trailingslashit( $uri ) . 'js/ab-cat-desc.js', array(), $ver, true );
 		}
 	}
-	add_action( 'wp_enqueue_scripts', 'javan_seda_352_assets', 30 );
+	add_action( 'wp_enqueue_scripts', 'tara_352_assets', 30 );
 }

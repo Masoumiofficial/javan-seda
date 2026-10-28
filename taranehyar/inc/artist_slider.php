@@ -11,8 +11,8 @@
 <?php $artista = ot_get_option('siing_t',array()); foreach($artista as $artise){
 	/* v3.5.3 — کارتِ یکدست با صفحهٔ اصلی: لایهٔ «مات» + مجموع بازدید روی عکس + نام زیرِ عکس.
 	   اگر لایهٔ تازه روی سرور نبود، دقیقاً همان مارکاپِ قبلی چاپ می‌شود. */
-	if ( function_exists( 'javan_seda_artist_card' ) ) {
-		echo javan_seda_artist_card( $artise ); /* html امن؛ داخل تابع escape شده است */
+	if ( function_exists( 'tara_artist_card' ) ) {
+		echo tara_artist_card( $artise ); /* html امن؛ داخل تابع escape شده است */
 	} else { ?>
 <a rel="noreferrer noopener" href="<?php echo esc_url( $artise['siing_u'] ); ?>"><img src="<?php echo esc_url( $artise['siing_img'] ); ?>" width="150" height="150" alt="<?php echo esc_attr( $artise['title'] ); ?>"><span><?php echo esc_html( $artise['title'] ); ?></span></a>
 <?php }

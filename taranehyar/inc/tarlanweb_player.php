@@ -1,7 +1,7 @@
 <?php $indpl = ot_get_option('indpl'); if('off' != $indpl){ ?>
 <!-- index_music_player -->
 <div id="index_music_player">
-<div class="music_box_player" data-ab-player="<?php $ab_pu = javan_seda_player_uid(); echo (int) $ab_pu; ?>">
+<div class="music_box_player" data-ab-player="<?php $ab_pu = tara_player_uid(); echo (int) $ab_pu; ?>">
 <?php $vip_np=ot_get_option('v_num'); $my_custom_query= new WP_Query(
 array('post_type'=>'post','post_status'=>'publish','posts_per_page'=>$vip_np,'orderby'=>'meta_value',
         'order'=>'DESC','no_found_rows'=>true,'ignore_sticky_posts'=>true,'update_post_term_cache'=>false,'meta_query'=>array(array('key'=>'plym','value'=>'1')) ));

@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا — لایۀ «دیده‌شدن» (SEO بدون افزونه) — نسخهٔ 3.1.4
+ * ترانه یار — لایۀ «دیده‌شدن» (SEO بدون افزونه) — نسخهٔ 3.1.4
  * =============================================================================
  * از آنالیز (docs/AUDIT_2026-10.md) — سه سوراخ بزرگ:
  *   ۱) هیچ meta description در کل قالب چاپ نمی‌شود؛
@@ -26,33 +26,33 @@
  *   • هیچ فیلتری روی the_content / template_include ندارد (قواعد پروژه).
  *   • title موجود را بازنویسی نمی‌کند (الان عنوان‌ها قابل قبول‌اند)؛ فقط بخش «صفحۀ N».
  *
- * خاموش‌کردن:  define( 'JAVANSEDA_SEO', false );
- * ریز:         JAVANSEDA_SEO_DESC (طول توضیح) · JAVANSEDA_SEO_OG · JAVANSEDA_SEO_ROBOTS
- *              JAVANSEDA_SEO_CRUMBS · JAVANSEDA_SEO_IMAGE (سایز تصویر og)
+ * خاموش‌کردن:  define( 'TARA_SEO', false );
+ * ریز:         TARA_SEO_DESC (طول توضیح) · TARA_SEO_OG · TARA_SEO_ROBOTS
+ *              TARA_SEO_CRUMBS · TARA_SEO_IMAGE (سایز تصویر og)
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( defined( 'JAVANSEDA_SEO' ) && false === JAVANSEDA_SEO ) {
+if ( defined( 'TARA_SEO' ) && false === TARA_SEO ) {
 	return;
 }
 
-if ( ! defined( 'JAVANSEDA_SEO_DESC' ) ) {
-	define( 'JAVANSEDA_SEO_DESC', 155 );
+if ( ! defined( 'TARA_SEO_DESC' ) ) {
+	define( 'TARA_SEO_DESC', 155 );
 }
-if ( ! defined( 'JAVANSEDA_SEO_OG' ) ) {
-	define( 'JAVANSEDA_SEO_OG', true );
+if ( ! defined( 'TARA_SEO_OG' ) ) {
+	define( 'TARA_SEO_OG', true );
 }
-if ( ! defined( 'JAVANSEDA_SEO_ROBOTS' ) ) {
-	define( 'JAVANSEDA_SEO_ROBOTS', true );
+if ( ! defined( 'TARA_SEO_ROBOTS' ) ) {
+	define( 'TARA_SEO_ROBOTS', true );
 }
-if ( ! defined( 'JAVANSEDA_SEO_CRUMBS' ) ) {
-	define( 'JAVANSEDA_SEO_CRUMBS', true );
+if ( ! defined( 'TARA_SEO_CRUMBS' ) ) {
+	define( 'TARA_SEO_CRUMBS', true );
 }
-if ( ! defined( 'JAVANSEDA_SEO_IMAGE' ) ) {
-	define( 'JAVANSEDA_SEO_IMAGE', 'thumb1' );
+if ( ! defined( 'TARA_SEO_IMAGE' ) ) {
+	define( 'TARA_SEO_IMAGE', 'thumb1' );
 }
 
 /* -------------------------------------------------------------------------
@@ -60,8 +60,8 @@ if ( ! defined( 'JAVANSEDA_SEO_IMAGE' ) ) {
  *      اگر بله، لایه از چاپ meta/OG/canonical/BreadcrumbList دست می‌کشد تا
  *      تکراری نشود؛ فقط داده ساختاریافتهٔ موسیقی (که افزونه‌ها نمی‌سازند) می‌ماند.
  * ---------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_seo_has_plugin' ) ) {
-	function javan_seda_seo_has_plugin() {
+if ( ! function_exists( 'tara_seo_has_plugin' ) ) {
+	function tara_seo_has_plugin() {
 		$const = array( 'WPSEO_VERSION', 'RANK_MATH_VERSION', 'AIOSEO_VERSION', 'SEOPRESS_VERSION', 'SEOPRO_VERSION' );
 		foreach ( $const as $name ) {
 			if ( defined( $name ) ) {
@@ -84,8 +84,8 @@ if ( ! function_exists( 'javan_seda_seo_has_plugin' ) ) {
 }
 
 /** آدرسِ امنِ یک ترم/دسته — هیچ‌وقت (string) روی WP_Error نمی‌شود (PHP 8: کشنده) */
-if ( ! function_exists( 'javan_seda_seo_term_url' ) ) {
-	function javan_seda_seo_term_url( $term ) {
+if ( ! function_exists( 'tara_seo_term_url' ) ) {
+	function tara_seo_term_url( $term ) {
 		if ( ! $term ) {
 			return '';
 		}
@@ -98,8 +98,8 @@ if ( ! function_exists( 'javan_seda_seo_term_url' ) ) {
 }
 
 /** آدرسِ امنِ دسته */
-if ( ! function_exists( 'javan_seda_seo_cat_url' ) ) {
-	function javan_seda_seo_cat_url( $cat_id ) {
+if ( ! function_exists( 'tara_seo_cat_url' ) ) {
+	function tara_seo_cat_url( $cat_id ) {
 		$link = get_category_link( (int) $cat_id );
 		if ( is_wp_error( $link ) ) {
 			return '';
@@ -108,8 +108,8 @@ if ( ! function_exists( 'javan_seda_seo_cat_url' ) ) {
 	}
 }
 /** آیا در این درخواست خروجی SEO لازم است؟ */
-if ( ! function_exists( 'javan_seda_seo_active' ) ) {
-	function javan_seda_seo_active() {
+if ( ! function_exists( 'tara_seo_active' ) ) {
+	function tara_seo_active() {
 		if ( is_admin() || is_feed() || is_trackback() || is_robots() || is_favicon() ) {
 			return false;
 		}
@@ -124,8 +124,8 @@ if ( ! function_exists( 'javan_seda_seo_active' ) ) {
 }
 
 /** برچسب‌های «هنرمند» و «آهنگ» از ACF (یا از عنوان)، برای ساختن توضیح یکدست */
-if ( ! function_exists( 'javan_seda_seo_song_labels' ) ) {
-	function javan_seda_seo_song_labels( $post_id = 0 ) {
+if ( ! function_exists( 'tara_seo_song_labels' ) ) {
+	function tara_seo_song_labels( $post_id = 0 ) {
 		$post_id = $post_id ? (int) $post_id : get_the_ID();
 		$artist  = '';
 		$song    = '';
@@ -138,7 +138,7 @@ if ( ! function_exists( 'javan_seda_seo_song_labels' ) ) {
 			$song = $title;
 		}
 		if ( '' === $artist ) {
-			$terms = get_the_terms( $post_id, javan_seda_artist_tax() );
+			$terms = get_the_terms( $post_id, tara_artist_tax() );
 			if ( is_array( $terms ) && ! is_wp_error( $terms ) ) {
 				$artist = (string) $terms[0]->name;
 			}
@@ -148,14 +148,14 @@ if ( ! function_exists( 'javan_seda_seo_song_labels' ) ) {
 }
 
 /** ساخت توضیحِ متا (بدون برچسب، بدون کدکوتاه، با حدِ طول) */
-if ( ! function_exists( 'javan_seda_seo_description' ) ) {
-	function javan_seda_seo_description() {
-		$max = (int) JAVANSEDA_SEO_DESC;
+if ( ! function_exists( 'tara_seo_description' ) ) {
+	function tara_seo_description() {
+		$max = (int) TARA_SEO_DESC;
 		$txt = '';
 
 		if ( is_singular() ) {
 			$post_id = get_the_ID();
-			$exc     = get_post_meta( $post_id, '_javan_seda_description', true ); // دستی (اختیاری)
+			$exc     = get_post_meta( $post_id, '_tara_description', true ); // دستی (اختیاری)
 			if ( '' !== (string) $exc ) {
 				$txt = (string) $exc;
 			} else {
@@ -166,7 +166,7 @@ if ( ! function_exists( 'javan_seda_seo_description' ) ) {
 				}
 				$txt = (string) $raw;
 			}
-			list( $artist, $song ) = javan_seda_seo_song_labels( $post_id );
+			list( $artist, $song ) = tara_seo_song_labels( $post_id );
 			$txt = preg_replace( '/\s+/u', ' ', wp_strip_all_tags( str_replace( '&nbsp;', ' ', $txt ) ) );
 			$txt = trim( $txt );
 			/* اگر متن کوتاه/بی‌فایده بود، جملهٔ استانداردِ خودِ قالب را بساز */
@@ -182,7 +182,7 @@ if ( ! function_exists( 'javan_seda_seo_description' ) ) {
 				$d = 'آرشیو ' . ( $term ? $term->name : '' ) . ' — ' . $n . ' اثر برای دانلود با کیفیت ۱۲۸ و ۳۲۰';
 			}
 			$txt = $d;
-		} elseif ( is_tax( javan_seda_artist_tax() ) ) {
+		} elseif ( is_tax( tara_artist_tax() ) ) {
 			$term = get_queried_object();
 			$n    = ( isset( $GLOBALS['wp_query']->found_posts ) ) ? (int) $GLOBALS['wp_query']->found_posts : 0;
 			$txt  = 'صفحهٔ اختصاصی ' . ( $term ? $term->name : 'هنرمند' ) . ' — دانلود ' . $n . ' آهنگ و موزیک‌ویدیو، متن ترانه و شبکه‌های اجتماعی';
@@ -192,8 +192,8 @@ if ( ! function_exists( 'javan_seda_seo_description' ) ) {
 			/* v3.5.3 — اول فیلدِ «توضیحات متا» در تنظیمات قالب؛ اگر خالی بود همان
 			   توضیح کوتاهِ سایت (رفتار ۳.۵.۲). */
 			$txt = get_bloginfo( 'description' );
-			if ( function_exists( 'javan_seda_home_description' ) ) {
-				$txt = javan_seda_home_description( $txt );
+			if ( function_exists( 'tara_home_description' ) ) {
+				$txt = tara_home_description( $txt );
 			}
 			if ( '' === trim( (string) $txt ) ) {
 				$txt = 'تازه‌ترین آهنگ‌های ایرانی، موزیک‌ویدیو و آلبوم‌ها — پخش آنلاین و دانلود با کیفیت ۱۲۸ و ۳۲۰';
@@ -215,20 +215,20 @@ if ( ! function_exists( 'javan_seda_seo_description' ) ) {
 /* -------------------------------------------------------------------------
  * ۱) meta description + ۲) Open Graph / Twitter + ۳) og:audio
  * ---------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_seo_head' ) ) {
-	function javan_seda_seo_head() {
-		if ( ! javan_seda_seo_active() ) {
+if ( ! function_exists( 'tara_seo_head' ) ) {
+	function tara_seo_head() {
+		if ( ! tara_seo_active() ) {
 			return;
 		}
 		/* اگر افزونۀ سئو فعال است، توضیح/OG را او می‌سازد؛ دو بار چاپ نکنیم */
-		if ( '' !== javan_seda_seo_has_plugin() && ! ( defined( 'JAVANSEDA_SEO_OVERRIDE_PLUGIN' ) && JAVANSEDA_SEO_OVERRIDE_PLUGIN ) ) {
+		if ( '' !== tara_seo_has_plugin() && ! ( defined( 'TARA_SEO_OVERRIDE_PLUGIN' ) && TARA_SEO_OVERRIDE_PLUGIN ) ) {
 			return;
 		}
-		$desc = javan_seda_seo_description();
+		$desc = tara_seo_description();
 		if ( '' !== $desc ) {
 			echo '<meta name="description" content="' . esc_attr( $desc ) . '">' . "\n";
 		}
-		if ( ! JAVANSEDA_SEO_OG ) {
+		if ( ! TARA_SEO_OG ) {
 			return;
 		}
 
@@ -244,14 +244,14 @@ if ( ! function_exists( 'javan_seda_seo_head' ) ) {
 		$audio   = '';
 		$post_id = is_singular() ? get_the_ID() : 0;
 		if ( $post_id ) {
-			list( $artist, $song ) = javan_seda_seo_song_labels( $post_id );
+			list( $artist, $song ) = tara_seo_song_labels( $post_id );
 			if ( '' === $artist && '' === $song ) {
 				$artist = '';
 				$song   = wp_strip_all_tags( get_the_title( $post_id ) );
 			}
 			$title = 'دانلود ' . trim( $song . ' از ' . $artist ) . ' | ' . get_bloginfo( 'name' );
 			if ( has_post_thumbnail( $post_id ) ) {
-				$src = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), JAVANSEDA_SEO_IMAGE );
+				$src = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), TARA_SEO_IMAGE );
 				if ( $src ) {
 					$img   = (string) $src[0];
 					$img_w = (int) $src[1];
@@ -306,15 +306,15 @@ if ( ! function_exists( 'javan_seda_seo_head' ) ) {
 			}
 		}
 	}
-	add_action( 'wp_head', 'javan_seda_seo_head', 4 );
+	add_action( 'wp_head', 'tara_seo_head', 4 );
 }
 
 /* -------------------------------------------------------------------------
  * ۴) canonical — اگر هستۀ وردپرس/افزونه‌ای آن را حذف کرده بود، جبران شود
  * ---------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_seo_canonical_backstop' ) ) {
-	function javan_seda_seo_canonical_backstop() {
-		if ( ! javan_seda_seo_active() ) {
+if ( ! function_exists( 'tara_seo_canonical_backstop' ) ) {
+	function tara_seo_canonical_backstop() {
+		if ( ! tara_seo_active() ) {
 			return;
 		}
 		/* وردپرس با rel_canonical آن را چاپ می‌کند؛ این فقط یک تورِ نجات است:
@@ -328,26 +328,26 @@ if ( ! function_exists( 'javan_seda_seo_canonical_backstop' ) ) {
 		} elseif ( is_category() || is_tag() || is_tax() ) {
 			$t = get_queried_object();
 			if ( $t ) {
-				$u = javan_seda_seo_term_url( $t );
+				$u = tara_seo_term_url( $t );
 			}
 		}
 		if ( $u && ! is_wp_error( $u ) ) {
 			echo '<link rel="canonical" href="' . esc_url( $u ) . '">' . "\n";
 		}
 	}
-	add_action( 'wp_head', 'javan_seda_seo_canonical_backstop', 5 );
+	add_action( 'wp_head', 'tara_seo_canonical_backstop', 5 );
 }
 
 /* -------------------------------------------------------------------------
  * ۵) BreadcrumbList (JSON-LD)
  * ---------------------------------------------------------------------- */
-if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) ) {
-	function javan_seda_seo_breadcrumbs() {
-		if ( ! javan_seda_seo_active() || ! ( is_singular() || is_category() || is_tag() || is_tax() ) ) {
+if ( TARA_SEO_CRUMBS && ! function_exists( 'tara_seo_breadcrumbs' ) ) {
+	function tara_seo_breadcrumbs() {
+		if ( ! tara_seo_active() || ! ( is_singular() || is_category() || is_tag() || is_tax() ) ) {
 			return;
 		}
 		/* افزونۀ سئو خودش BreadcrumbList می‌سازد ⇒ تکراری نشود */
-		if ( '' !== javan_seda_seo_has_plugin() && ! ( defined( 'JAVANSEDA_SEO_OVERRIDE_PLUGIN' ) && JAVANSEDA_SEO_OVERRIDE_PLUGIN ) ) {
+		if ( '' !== tara_seo_has_plugin() && ! ( defined( 'TARA_SEO_OVERRIDE_PLUGIN' ) && TARA_SEO_OVERRIDE_PLUGIN ) ) {
 			return;
 		}
 		$items = array(
@@ -358,14 +358,14 @@ if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) )
 			if ( is_array( $cats ) && $cats ) {
 				$items[] = array(
 					'name' => wp_strip_all_tags( $cats[0]->name ),
-					'item' => javan_seda_seo_cat_url( $cats[0]->term_id ),
+					'item' => tara_seo_cat_url( $cats[0]->term_id ),
 				);
 			}
-			$singers = get_the_terms( get_the_ID(), javan_seda_artist_tax() );
+			$singers = get_the_terms( get_the_ID(), tara_artist_tax() );
 			if ( is_array( $singers ) && $singers ) {
 				$items[] = array(
 					'name' => wp_strip_all_tags( $singers[0]->name ),
-					'item' => javan_seda_seo_term_url( $singers[0] ),
+					'item' => tara_seo_term_url( $singers[0] ),
 				);
 			}
 			$items[] = array( 'name' => wp_strip_all_tags( get_the_title() ), 'item' => '' );
@@ -400,14 +400,14 @@ if ( JAVANSEDA_SEO_CRUMBS && ! function_exists( 'javan_seda_seo_breadcrumbs' ) )
 			)
 			. '</script>' . "\n";
 	}
-	add_action( 'wp_head', 'javan_seda_seo_breadcrumbs', 8 );
+	add_action( 'wp_head', 'tara_seo_breadcrumbs', 8 );
 }
 
 /* -------------------------------------------------------------------------
  * ۶) title یکتا برای صفحاتِ صفحه‌بندی‌شده
  * ---------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_seo_title_parts' ) ) {
-	function javan_seda_seo_title_parts( $parts ) {
+if ( ! function_exists( 'tara_seo_title_parts' ) ) {
+	function tara_seo_title_parts( $parts ) {
 		/* هستۀ وردپرس خودش برای خیلی از نماها کلید 'page' را پر می‌کند (در فارسی: «صفحه ۲»);
 		   اگر پر بود دست نمی‌زنیم تا دوباره نشود. کلیدهای ناشناخته در title چاپ نمی‌شوند،
 		   پس از همان کلید 'page' استفاده می‌کنیم ⇒ عنوانِ یکتا برای /page/N/ و بقیۀ صفحه‌های شماره‌دار. */
@@ -417,14 +417,14 @@ if ( ! function_exists( 'javan_seda_seo_title_parts' ) ) {
 		}
 		return $parts;
 	}
-	add_filter( 'document_title_parts', 'javan_seda_seo_title_parts', 20 );
+	add_filter( 'document_title_parts', 'tara_seo_title_parts', 20 );
 }
 
 /* -------------------------------------------------------------------------
  * ۷) wp_robots — بستنِ صفحاتِ تکراری/نازک (فقط noindex، follow همیشه باز)
  * ---------------------------------------------------------------------- */
-if ( JAVANSEDA_SEO_ROBOTS && ! function_exists( 'javan_seda_seo_robots' ) ) {
-	function javan_seda_seo_robots( $robots ) {
+if ( TARA_SEO_ROBOTS && ! function_exists( 'tara_seo_robots' ) ) {
+	function tara_seo_robots( $robots ) {
 		/* ۱) کپی‌های صفحهٔ اول: /page/2/ ، /page/3/ … (تا زمانی که ساختار بایت را عوض کنید)
 		   با دور ۱۱ home.php این صفحه‌ها به لوپ استاندارد می‌روند؛ noindex هم می‌ماند
 		   چون عنوان/توضیحشان با صفحهٔ ۱ مشترک است. */
@@ -436,7 +436,7 @@ if ( JAVANSEDA_SEO_ROBOTS && ! function_exists( 'javan_seda_seo_robots' ) ) {
 		if ( is_tag() ) {
 			$q     = $GLOBALS['wp_query'];
 			$total = ( isset( $q->found_posts ) ) ? (int) $q->found_posts : 0;
-			if ( $total < (int) apply_filters( 'javanseda_seo_thin_tag_min', 2 ) ) {
+			if ( $total < (int) apply_filters( 'tara_seo_thin_tag_min', 2 ) ) {
 				$robots['noindex'] = true;
 				$robots['follow']  = true;
 			}
@@ -453,22 +453,22 @@ if ( JAVANSEDA_SEO_ROBOTS && ! function_exists( 'javan_seda_seo_robots' ) ) {
 		}
 		return $robots;
 	}
-	add_filter( 'wp_robots', 'javan_seda_seo_robots', 20 );
+	add_filter( 'wp_robots', 'tara_seo_robots', 20 );
 }
 
 /* -------------------------------------------------------------------------
  * ۸) «نظارتِ سئو» — فقط‌خواندنی؛ در ab-mobile-probe.php (بخش ۱۱) چاپ می‌شود
  * ---------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_seo_report' ) ) {
-	function javan_seda_seo_report() {
+if ( ! function_exists( 'tara_seo_report' ) ) {
+	function tara_seo_report() {
 		$L = array();
 		$line = function ( $s = '' ) use ( &$L ) {
 			$L[] = $s;
 		};
 		$line( '=== لایۀ «دیده‌شدن» v3.1.4 ===' );
-		$line( 'لایه                    : ' . ( ( defined( 'JAVANSEDA_SEO' ) && false === JAVANSEDA_SEO ) ? '✗ خاموش' : '✓ روشن' ) . ' | og=' . ( JAVANSEDA_SEO_OG ? 'on' : 'off' ) . ' robots=' . ( JAVANSEDA_SEO_ROBOTS ? 'on' : 'off' ) . ' crumbs=' . ( JAVANSEDA_SEO_CRUMBS ? 'on' : 'off' ) );
-		$line( 'توضیحِ ساختنیِ این صفحه  : «' . mb_substr( javan_seda_seo_description(), 0, 90, 'UTF-8' ) . '»' );
-		$line( 'افزونۀ سئو شناسایی‌شده   : ' . ( ( '' !== javan_seda_seo_has_plugin() ) ? javan_seda_seo_has_plugin() . '  ← لایه از چاپ meta/OG/BreadcrumbList عقب کشید' : 'هیچ  ← لایه خودش meta/OG را می‌سازد' ) );
+		$line( 'لایه                    : ' . ( ( defined( 'TARA_SEO' ) && false === TARA_SEO ) ? '✗ خاموش' : '✓ روشن' ) . ' | og=' . ( TARA_SEO_OG ? 'on' : 'off' ) . ' robots=' . ( TARA_SEO_ROBOTS ? 'on' : 'off' ) . ' crumbs=' . ( TARA_SEO_CRUMBS ? 'on' : 'off' ) );
+		$line( 'توضیحِ ساختنیِ این صفحه  : «' . mb_substr( tara_seo_description(), 0, 90, 'UTF-8' ) . '»' );
+		$line( 'افزونۀ سئو شناسایی‌شده   : ' . ( ( '' !== tara_seo_has_plugin() ) ? tara_seo_has_plugin() . '  ← لایه از چاپ meta/OG/BreadcrumbList عقب کشید' : 'هیچ  ← لایه خودش meta/OG را می‌سازد' ) );
 		$line( 'core sitemap             : ' );
 		foreach ( array( '/wp-sitemap.xml', '/sitemap_index.xml', '/sitemap.xml' ) as $sm ) {
 			$code = '—';

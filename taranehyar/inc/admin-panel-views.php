@@ -17,8 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return string
  */
 function taranehyar_panel_number( $number ) {
-	if ( function_exists( 'javan_seda_number_fa' ) ) {
-		return javan_seda_number_fa( $number );
+	if ( function_exists( 'tara_number_fa' ) ) {
+		return tara_number_fa( $number );
 	}
 
 	return number_format_i18n( $number );

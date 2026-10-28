@@ -7,9 +7,9 @@
  * بارگذاری می‌کند و هیچ چیزی خودش رندر نمی‌کند. اگر فایل اصلی نبود،
  * به آرشیوی برمی‌گردد که وردپرس خودش می‌سازد (نه صفحۀ سفید).
  */
-$javan_seda_artist_tpl = locate_template( array( 'taxonomy-artist.php' ) );
-if ( $javan_seda_artist_tpl && is_readable( $javan_seda_artist_tpl ) ) {
-	require $javan_seda_artist_tpl;
+$tara_artist_tpl = locate_template( array( 'taxonomy-artist.php' ) );
+if ( $tara_artist_tpl && is_readable( $tara_artist_tpl ) ) {
+	require $tara_artist_tpl;
 } else {
 	get_header();
 	while ( have_posts() ) :

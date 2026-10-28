@@ -44,9 +44,9 @@ if ( function_exists( 'is_plugin_active' ) && is_plugin_active( 'kk-star-ratings
    کاتِ مربعی). اگر فایلش موجود باشد سایز ab_cover (۵۰۰² کات‌شده) درخواست می‌شود و
    srcset/sizes خودش نزدیک‌ترین را برمی‌دارد؛ اگر نبود به 'large' برمی‌گردد.
    تغییر دستی: 'large' یا 'full' = اندازهٔ بزرگ/اصلی | 'thumb1' = ۶۴۰×۳۶۰ */
-$taranehyar_featured_size  = function_exists( 'javan_seda_post_cover_size' ) ? javan_seda_post_cover_size() : 'large';
-$taranehyar_featured_args  = function_exists( 'javan_seda_post_cover_args' )
-	? javan_seda_post_cover_args()
+$taranehyar_featured_size  = function_exists( 'tara_post_cover_size' ) ? tara_post_cover_size() : 'large';
+$taranehyar_featured_args  = function_exists( 'tara_post_cover_args' )
+	? tara_post_cover_args()
 	: array( 'alt' => get_the_title(), 'title' => get_the_title() );
 if ( has_post_thumbnail() ) {
 	?>
@@ -60,7 +60,7 @@ if ( has_post_thumbnail() ) {
 
 <?php
 /* ---------- نام آهنگ / هنرمند / لینک صفحهٔ هنرمند (مشترک بین باکس متن ترانه و تیتر دانلود) ----------
-   لینک هنرمند روی تاکسونومی هنرمند ساخته می‌شود؛ نامک فعال را javan_seda_artist_tax() می‌دهد
+   لینک هنرمند روی تاکسونومی هنرمند ساخته می‌شود؛ نامک فعال را tara_artist_tax() می‌دهد
    مثال: «محسن یگانه» → https://site/artist/mohsen-yeganeh
    ترتیب جست‌وجو: فیلد اختیاری artist_link روی خود نوشته ← ترم هنرمند با همان نام ← با اسلاگ ←
    جست‌وجوی تقریبی با نرمال‌سازی ي/ك/ة و نیم‌فاصله ← برچسب هم‌نام.
@@ -86,8 +86,8 @@ if ( '' !== $taranehyar_artist ) {
 		$taranehyar_artist_url = trim( $taranehyar_custom_link );
 	} else {
 		$taranehyar_lookups = array(
-			array( 'name', $taranehyar_artist, javan_seda_artist_tax() ),
-			array( 'slug', sanitize_title( $taranehyar_artist ), javan_seda_artist_tax() ),
+			array( 'name', $taranehyar_artist, tara_artist_tax() ),
+			array( 'slug', sanitize_title( $taranehyar_artist ), tara_artist_tax() ),
 		);
 		foreach ( $taranehyar_lookups as $taranehyar_lookup ) {
 			if ( '' === $taranehyar_lookup[1] ) {
@@ -109,7 +109,7 @@ if ( '' !== $taranehyar_artist ) {
 				return trim( preg_replace( '/\s+/u', ' ', $value ) );
 			};
 			$taranehyar_needle = $taranehyar_normalize( $taranehyar_artist );
-			foreach ( array( javan_seda_artist_tax(), 'post_tag' ) as $taranehyar_tax ) {
+			foreach ( array( tara_artist_tax(), 'post_tag' ) as $taranehyar_tax ) {
 				$taranehyar_matches = get_terms(
 					array(
 						'taxonomy'   => $taranehyar_tax,
@@ -195,7 +195,7 @@ if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw 
 		</div>
 		<div class="music_lyrics_text" id="taranehyar_lyrics_text"><?php echo $taranehyar_lyrics_html; // خروجی با wp_kses_post یا esc_html پاک‌سازی شده است. ?></div>
 		<?php
-		if ( $taranehyar_lyrics_schema && ! function_exists( 'javan_seda_music_schema' ) ) {
+		if ( $taranehyar_lyrics_schema && ! function_exists( 'tara_music_schema' ) ) {
 		/* v3.2.2 — اگر inc/ab-credits.php نصب باشد، schema از همان فایل و در wp_head چاپ می‌شود
 		   (برای همهٔ نوشته‌ها، حتی وقتی متن ترانه خالی است) و این بلوکِ قدیمی اجرا نمی‌شود تا دو بار چاپ نشود. */
 			$taranehyar_permalink = get_permalink();
@@ -299,8 +299,8 @@ if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
    زیر متن/ترانه و پیش از ویدیو و پلیر. تابع در inc/ab-post-extras.php است و با function_exists محافظت
    شده؛ نبودن فایل ⇒ صفر خروجی و صفر خطا. لینک‌ها و متن دکمه‌ها از تنظیمات قالب → «شبکه‌های اجتماعی»
    می‌آیند و با همان گزینهٔ fixbtn روشن/خاموش می‌شوند. */
-if ( function_exists( 'javan_seda_social_box' ) ) { javan_seda_social_box( get_the_ID() ); }
-if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get_the_ID(), 'before_player' ); }
+if ( function_exists( 'tara_social_box' ) ) { tara_social_box( get_the_ID() ); }
+if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID(), 'before_player' ); }
 ?>
 
 <?php if(get_field('video720') || get_field('video1080') || get_field('video480')){ ?> 
@@ -319,7 +319,7 @@ if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get
 
 <?php if(get_field('music128')){ ?> 
 <!-- music player -->
-<div class="music_box_player taktarcks" data-ab-player="<?php $ab_pu = javan_seda_player_uid(); echo (int) $ab_pu; ?>">
+<div class="music_box_player taktarcks" data-ab-player="<?php $ab_pu = tara_player_uid(); echo (int) $ab_pu; ?>">
 <audio id="audio<?php echo ( ! empty( $ab_pu ) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" preload="none" tabindex="0">
 <source src="<?php echo esc_url( get_field('music128') ); ?>" data-track-number="1" />    
 پلیر شما قدیمی است و از پخش آنلاین پشتیبانی نمیکند.
@@ -364,7 +364,7 @@ if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get
 <i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i>
 </div>
 <div class="track-number">1.</div>
-<div class="track-title"><?php if(get_field('song')){ ?><a class="playlist-track" href="#" data-play-track="<?php echo $rkianoosh; ?>"><?php the_field('artist');?> - <?php the_field('song') ?></a><?php } ?></div>
+<div class="track-title"><?php if(get_field('song')){ ?><a class="playlist-track" href="#" data-play-track="<?php echo $tara_row; ?>"><?php the_field('artist');?> - <?php the_field('song') ?></a><?php } ?></div>
 </div>
 </div>
 </div>
@@ -375,12 +375,12 @@ if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get
 
 <?php if( have_rows('album') ): ?>
 <!-- album player -->
-<div class="music_box_player" data-ab-player="<?php $ab_pu = javan_seda_player_uid(); echo (int) $ab_pu; ?>">
+<div class="music_box_player" data-ab-player="<?php $ab_pu = tara_player_uid(); echo (int) $ab_pu; ?>">
 
 <audio id="audio<?php echo ( ! empty( $ab_pu ) && $ab_pu > 1 ) ? '-' . (int) $ab_pu : ''; ?>" preload="none" tabindex="0">
-<?php $rkianoosh=1; while( have_rows('album') ): the_row(); ?>
-<source src="<?php if(get_sub_field('albumlink128')){the_sub_field('albumlink128');}else{the_sub_field('albumlink320');} ?>" data-track-number="<?php echo $rkianoosh; ?>" />
-<?php $rkianoosh++; endwhile; ?>    
+<?php $tara_row=1; while( have_rows('album') ): the_row(); ?>
+<source src="<?php if(get_sub_field('albumlink128')){the_sub_field('albumlink128');}else{the_sub_field('albumlink320');} ?>" data-track-number="<?php echo $tara_row; ?>" />
+<?php $tara_row++; endwhile; ?>    
 Your browser does not support HTML5 audio.
 </audio>
 <div class="player">
@@ -415,13 +415,13 @@ Your browser does not support HTML5 audio.
 </div>
 <!-- /.player -->
 <div class="play-list">
-<?php $rkianoosh=1; while( have_rows('album') ): the_row(); ?>
-<div class="play-list-row <?php if($rkianoosh % 2 == 0){echo 'plylodd';}?>" data-track-row="<?php echo $rkianoosh; ?>">
+<?php $tara_row=1; while( have_rows('album') ): the_row(); ?>
+<div class="play-list-row <?php if($tara_row % 2 == 0){echo 'plylodd';}?>" data-track-row="<?php echo $tara_row; ?>">
 <div class="small-toggle-btn">
 <i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i>
 </div>
-<div class="track-number"><?php echo $rkianoosh; ?>.</div>
-<div class="track-title"><?php if(get_sub_field('song_names')){ ?><a class="playlist-track" href="#" data-play-track="<?php echo $rkianoosh; ?>"><?php the_sub_field('song_names'); ?></a><?php } ?></div>
+<div class="track-number"><?php echo $tara_row; ?>.</div>
+<div class="track-title"><?php if(get_sub_field('song_names')){ ?><a class="playlist-track" href="#" data-play-track="<?php echo $tara_row; ?>"><?php the_sub_field('song_names'); ?></a><?php } ?></div>
 <div class="download_box">
 <?php if(get_sub_field('albumlink128')){ ?>
 <a target="_blank" href="<?php the_sub_field('albumlink128'); ?>">دانلود  128</a>
@@ -429,7 +429,7 @@ Your browser does not support HTML5 audio.
 <a target="_blank" href="<?php the_sub_field('albumlink320'); ?>">دانلود  320</a><?php } ?>
 </div>
 </div>
-<?php $rkianoosh++; endwhile; ?> 
+<?php $tara_row++; endwhile; ?> 
 </div>
 </div>
 <!-- album player -->
@@ -474,7 +474,7 @@ if ( $taranehyar_download_title && (
 <?php /* v3.2.1 — «شناسنامۀ آهنگ» (هنرمند · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید).
    جایگاه از تنظیمات قالب → «صفحه دانلود آهنگ» → «شناسنامه بالای پلیر» عوض می‌شود؛ اگر فایل
    inc/ab-credits.php نصب نباشد، این دو خط هیچ خروجی و هیچ خطایی ندارند. */
-if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get_the_ID(), 'after_download' ); } ?>
+if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID(), 'after_download' ); } ?>
 <div class="clear"></div>
 </div>
 
@@ -504,7 +504,7 @@ if ( function_exists( 'javan_seda_credits_box' ) ) { javan_seda_credits_box( get
 <?php } ?>
 
 <?php $tag_off = ot_get_option('tag_off'); if('off' != $tag_off){ if(has_tag()){ ?>
-<div class="single_posts rkianoosh_tags_box">
+<div class="single_posts tara-tags-box">
 <span> برچسب ها :</span> <?php the_tags('','',''); ?>
 <div class="clear"></div>
 </div>
@@ -531,7 +531,7 @@ if ( $tag->name === $artist ){ ?>
 <ul>
 <?php while($my_custom_query->have_posts()) : $my_custom_query->the_post(); ?>
 <li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
-<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
 <?php if(has_post_thumbnail()){
 the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
@@ -551,17 +551,17 @@ if ( $tag->name === $artist ){ ?>
 </div>
 <?php endif; wp_reset_postdata(); ?>
 <?php } else{ ?>
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,javan_seda_artist_tax(),'string'); $term_ids=wp_list_pluck($terms,'term_id');
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,tara_artist_tax(),'string'); $term_ids=wp_list_pluck($terms,'term_id');
 $second_query = new WP_Query( array('post_type'=>'post',
-'tax_query' => array( array('taxonomy'=>javan_seda_artist_tax(),'field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
+'tax_query' => array( array('taxonomy'=>tara_artist_tax(),'field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
 'posts_per_page'=>$pppr,'ignore_sticky_posts'=>1,'orderby'=>'id'));
 if($second_query->have_posts()) { ?>	
 <div class="related_posts rel_sing_bbt">
 <div class="title_tarlanweb_box">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,javan_seda_artist_tax());
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,tara_artist_tax());
 $terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_string; ?></h3>
-<?php $terms = get_the_terms($post->ID,javan_seda_artist_tax()); foreach ($terms as $term){ ?>
-<div class="left_artists_pp"><a class="artist_songs_page" href="<?php echo esc_url( javan_seda_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></div>
+<?php $terms = get_the_terms($post->ID,tara_artist_tax()); foreach ($terms as $term){ ?>
+<div class="left_artists_pp"><a class="artist_songs_page" href="<?php echo esc_url( tara_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></div>
 <?php } ?>
 <div class="liner clear"></div>
 </div>
@@ -569,7 +569,7 @@ $terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_stri
 <ul>
 <?php while($second_query->have_posts()) : $second_query->the_post(); ?>
 <li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
-<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
 <?php if(has_post_thumbnail()){
 the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
@@ -578,8 +578,8 @@ the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_
 if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
 </a></li>
 <?php endwhile; ?> 
-<?php $terms = get_the_terms($post->ID,javan_seda_artist_tax()); foreach ($terms as $term){ ?>
-<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php echo esc_url( javan_seda_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
+<?php $terms = get_the_terms($post->ID,tara_artist_tax()); foreach ($terms as $term){ ?>
+<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php echo esc_url( tara_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
 <?php } ?>
 </ul>
 <div class="clear"></div>
@@ -605,7 +605,7 @@ $cm_has = (int) get_comments_number() > 0;
 $cm_lock = ( 'off' === $cm_off && $cm_has );
 if ( $cm_lock ) { add_filter( 'comments_open', '__return_false', 99 ); }
 if ( 'off' !== $cm_off || $cm_has ) { ?>
-<div class="single_posts rkianoosh_comment_box">
+<div class="single_posts r_comment_box">
 <h3 class="comm_titrs"><?php echo $cm_lock ? 'دیدگاه‌ها' : 'نظر خود را بنویسید'; ?></h3>
 <?php comments_template(); ?>
 <div class="clear"></div>
@@ -619,8 +619,8 @@ if ( 'off' !== $cm_off || $cm_has ) { ?>
 <div id="left_side">
 <?php
 /* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
-if ( function_exists( 'javan_seda_sidebar' ) ) {
-	javan_seda_sidebar( 'left_side' );
+if ( function_exists( 'tara_sidebar' ) ) {
+	tara_sidebar( 'left_side' );
 } else {
 	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side' ) ) :
 	endif;
@@ -640,7 +640,7 @@ if($my_custom_query->have_posts()) : ?>
 <ul>
 <?php while($my_custom_query->have_posts()) : $my_custom_query->the_post(); ?>
 <li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
-<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
 <?php if(has_post_thumbnail()){
 the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
@@ -660,14 +660,14 @@ if ( $tag->name === $artist ){ ?>
 </aside>
 <?php endif; wp_reset_postdata(); ?>
 <?php } else{ ?>
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,javan_seda_artist_tax(),'string'); $term_ids=wp_list_pluck($terms,'term_id');
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,tara_artist_tax(),'string'); $term_ids=wp_list_pluck($terms,'term_id');
 $second_query = new WP_Query( array('post_type'=>'post',
-'tax_query' => array( array('taxonomy'=>javan_seda_artist_tax(),'field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
+'tax_query' => array( array('taxonomy'=>tara_artist_tax(),'field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
 'posts_per_page'=>$pppr,'ignore_sticky_posts'=>1,'orderby'=>'id'));
 if($second_query->have_posts()) { ?>	
 <aside class="related_posts">
 <div class="title_tarlanweb_box">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,javan_seda_artist_tax());
+<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,tara_artist_tax());
 $terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_string; ?></h3>
 <div class="liner clear"></div>
 </div>
@@ -675,7 +675,7 @@ $terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_stri
 <ul>
 <?php while($second_query->have_posts()) : $second_query->the_post(); ?>
 <li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
-<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
 <?php if(has_post_thumbnail()){
 the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
@@ -684,8 +684,8 @@ the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_
 if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo $artist; ?> </span> <span> <?php echo $track; ?> </span> <?php } else{ the_title(''); } ?>	
 </a></li>
 <?php endwhile; ?>
-<?php $terms = get_the_terms($post->ID,javan_seda_artist_tax()); foreach ($terms as $term){ ?>
-<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php echo esc_url( javan_seda_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
+<?php $terms = get_the_terms($post->ID,tara_artist_tax()); foreach ($terms as $term){ ?>
+<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php echo esc_url( tara_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
 <?php } ?>
 </ul>
 <div class="clear"></div>
@@ -697,8 +697,8 @@ if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo 
 	} ?>
 <?php
 /* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
-if ( function_exists( 'javan_seda_sidebar' ) ) {
-	javan_seda_sidebar( 'left_side2' );
+if ( function_exists( 'tara_sidebar' ) ) {
+	tara_sidebar( 'left_side2' );
 } else {
 	if ( ! function_exists( 'dynamic_sidebar' ) || ! dynamic_sidebar( 'left_side2' ) ) :
 	endif;

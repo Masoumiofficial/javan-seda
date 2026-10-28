@@ -55,17 +55,17 @@ function reset_state() {
    ====================================================================== */
 reset_state();
 
-t( 'تصویر: شناسهٔ پیوست → URL اندازهٔ medium', javan_seda_image_url_from_value( 123, 'medium' ) === 'https://ex/123-medium.jpg' );
+t( 'تصویر: شناسهٔ پیوست → URL اندازهٔ medium', tara_image_url_from_value( 123, 'medium' ) === 'https://ex/123-medium.jpg' );
 t(
 	'تصویر: آرایهٔ ACF با sizes → اندازهٔ خواسته‌شده',
-	javan_seda_image_url_from_value( array( 'sizes' => array( 'medium' => 'https://ex/sized.jpg' ), 'url' => 'https://ex/full.jpg' ), 'medium' ) === 'https://ex/sized.jpg'
+	tara_image_url_from_value( array( 'sizes' => array( 'medium' => 'https://ex/sized.jpg' ), 'url' => 'https://ex/full.jpg' ), 'medium' ) === 'https://ex/sized.jpg'
 );
-t( 'تصویر: آرایهٔ ACF بدون sizes → url', javan_seda_image_url_from_value( array( 'url' => 'https://ex/full.jpg' ) ) === 'https://ex/full.jpg' );
-t( 'تصویر: رشتهٔ URL', javan_seda_image_url_from_value( 'https://cdn.ex/x.jpg' ) === 'https://cdn.ex/x.jpg' );
-t( 'تصویر: مسیر نسبی', javan_seda_image_url_from_value( '/wp-content/x.jpg' ) === '/wp-content/x.jpg' );
-t( 'تصویر: خالی', javan_seda_image_url_from_value( '' ) === '' );
-t( 'تصویر: رشتهٔ بی‌معنی', javan_seda_image_url_from_value( 'not-a-url' ) === '' );
-t( 'تصویر: شناسهٔ ناموجود', javan_seda_image_url_from_value( 999 ) === '' );
+t( 'تصویر: آرایهٔ ACF بدون sizes → url', tara_image_url_from_value( array( 'url' => 'https://ex/full.jpg' ) ) === 'https://ex/full.jpg' );
+t( 'تصویر: رشتهٔ URL', tara_image_url_from_value( 'https://cdn.ex/x.jpg' ) === 'https://cdn.ex/x.jpg' );
+t( 'تصویر: مسیر نسبی', tara_image_url_from_value( '/wp-content/x.jpg' ) === '/wp-content/x.jpg' );
+t( 'تصویر: خالی', tara_image_url_from_value( '' ) === '' );
+t( 'تصویر: رشتهٔ بی‌معنی', tara_image_url_from_value( 'not-a-url' ) === '' );
+t( 'تصویر: شناسهٔ ناموجود', tara_image_url_from_value( 999 ) === '' );
 
 /* ======================================================================
    ۲) خواندن فیلد هنرمند: ACF → term meta
@@ -75,29 +75,29 @@ $term = new WP_Term( 5, 'محسن یگانه', 'artist', 'mohsen-yeganeh', 42 );
 $GLOBALS['__terms'][5] = $term;
 
 update_term_meta( 5, 'aimg2', 'https://ex/meta.jpg' );
-t( 'فیلد: وقتی ACF مقدار ندارد، term meta خوانده می‌شود', javan_seda_artist_field( 5, 'aimg2' ) === 'https://ex/meta.jpg' );
+t( 'فیلد: وقتی ACF مقدار ندارد، term meta خوانده می‌شود', tara_artist_field( 5, 'aimg2' ) === 'https://ex/meta.jpg' );
 
 $GLOBALS['__acf']['aimg2'] = array( 'url' => 'https://ex/acf.jpg' );
-t( 'فیلد: ACF اولویت دارد', javan_seda_artist_field( 5, 'aimg2' ) === 'https://ex/acf.jpg' );
+t( 'فیلد: ACF اولویت دارد', tara_artist_field( 5, 'aimg2' ) === 'https://ex/acf.jpg' );
 $GLOBALS['__acf'] = array();
 
 update_term_meta( 5, 'afacebook', 'javascript:alert(1)' );
-t( 'فیلد: URL ناامن پاک می‌شود', javan_seda_artist_field( 5, 'afacebook' ) === '' );
+t( 'فیلد: URL ناامن پاک می‌شود', tara_artist_field( 5, 'afacebook' ) === '' );
 
 update_term_meta( 5, 'afacebook', 'https://facebook.com/x' );
-t( 'فیلد: URL سالم می‌ماند', javan_seda_artist_field( 5, 'afacebook' ) === 'https://facebook.com/x' );
+t( 'فیلد: URL سالم می‌ماند', tara_artist_field( 5, 'afacebook' ) === 'https://facebook.com/x' );
 
-t( 'فیلد: ترمِ ناموجود → پیش‌فرض', javan_seda_artist_field( 999, 'aimg2', 'DEF' ) === 'DEF' );
+t( 'فیلد: ترمِ ناموجود → پیش‌فرض', tara_artist_field( 999, 'aimg2', 'DEF' ) === 'DEF' );
 
 update_term_meta( 5, 'ab_bio_short', '<b>سلام</b> دنیا' );
-t( 'فیلد: بیوگرافی کوتاه، تگ‌ها حذف می‌شوند', javan_seda_artist_field( 5, 'ab_bio_short' ) === 'سلام دنیا' );
+t( 'فیلد: بیوگرافی کوتاه، تگ‌ها حذف می‌شوند', tara_artist_field( 5, 'ab_bio_short' ) === 'سلام دنیا' );
 
 /* شناسهٔ پیوست در فیلد (سازگاری با ACF type=image) */
 reset_state();
 $GLOBALS['__terms'][5] = $term;
 update_term_meta( 5, 'aimg2', '123' );
-t( 'فیلد: شناسهٔ عددی به‌عنوان مقدار تصویر حفظ می‌شود', javan_seda_artist_field( 5, 'aimg2' ) === '123' );
-t( 'تصویر: شناسهٔ ذخیره‌شده در aimg2 → URL پیوست', javan_seda_artist_image_url( 5 ) === 'https://ex/123-medium.jpg' );
+t( 'فیلد: شناسهٔ عددی به‌عنوان مقدار تصویر حفظ می‌شود', tara_artist_field( 5, 'aimg2' ) === '123' );
+t( 'تصویر: شناسهٔ ذخیره‌شده در aimg2 → URL پیوست', tara_artist_image_url( 5 ) === 'https://ex/123-medium.jpg' );
 
 /* ======================================================================
    ۳) تصویر هنرمند و پیش‌فرض
@@ -105,12 +105,12 @@ t( 'تصویر: شناسهٔ ذخیره‌شده در aimg2 → URL پیوست',
 reset_state();
 $GLOBALS['__terms'][5] = $term;
 update_term_meta( 5, 'aimg2', 'https://ex/artist.jpg' );
-t( 'تصویر هنرمند: از term meta', javan_seda_artist_image_url( 5 ) === 'https://ex/artist.jpg' );
-t( 'تصویر هنرمند: has_image درست است', javan_seda_artist_has_image( 5 ) === true );
+t( 'تصویر هنرمند: از term meta', tara_artist_image_url( 5 ) === 'https://ex/artist.jpg' );
+t( 'تصویر هنرمند: has_image درست است', tara_artist_has_image( 5 ) === true );
 
 $GLOBALS['__termmeta'][5] = array();
-t( 'تصویر هنرمند: نبود تصویر → پیش‌فرض قالب', substr( javan_seda_artist_image_url( 5 ), -15 ) === 'def-singer.webp' || substr( javan_seda_artist_image_url( 5 ), -15 ) === 'def-artist.webp' );
-t( 'تصویر هنرمند: has_image=false', javan_seda_artist_has_image( 5 ) === false );
+t( 'تصویر هنرمند: نبود تصویر → پیش‌فرض قالب', substr( tara_artist_image_url( 5 ), -15 ) === 'def-singer.webp' || substr( tara_artist_image_url( 5 ), -15 ) === 'def-artist.webp' );
+t( 'تصویر هنرمند: has_image=false', tara_artist_has_image( 5 ) === false );
 
 /* ======================================================================
    ۴) شبکه‌های اجتماعی
@@ -119,7 +119,7 @@ reset_state();
 $GLOBALS['__terms'][5] = $term;
 update_term_meta( 5, 'atelegram', 'https://t.me/x' );
 update_term_meta( 5, 'ayoutube', 'https://youtube.com/@x' );
-$soc = javan_seda_artist_socials( 5 );
+$soc = tara_artist_socials( 5 );
 t( 'اجتماعی: فقط پرشده‌ها برمی‌گردند', count( $soc ) === 2 && isset( $soc['atelegram'], $soc['ayoutube'] ) );
 t( 'اجتماعی: آیکون تلگرام درست است', isset( $soc['atelegram'] ) && $soc['atelegram']['icon'] === 'icofont-paper-plane' );
 
@@ -131,25 +131,25 @@ $GLOBALS['__terms'][5] = $term;
 
 $GLOBALS['__posts'][12] = new WP_Post( 12, 'بیوگرافی کامل', 'publish' );
 update_term_meta( 5, 'ab_bio_post', '12' );
-t( 'بیوگرافی: نوشتهٔ منتشرشده → لینک', javan_seda_artist_bio_link( 5 ) === 'https://ex/?p=12' );
+t( 'بیوگرافی: نوشتهٔ منتشرشده → لینک', tara_artist_bio_link( 5 ) === 'https://ex/?p=12' );
 
 $GLOBALS['__posts'][13] = new WP_Post( 13, 'پیش‌نویس', 'draft' );
 update_term_meta( 5, 'ab_bio_post', '13' );
-t( 'بیوگرافی: پیش‌نویس برای مهمان → بدون لینک', javan_seda_artist_bio_link( 5 ) === '' );
+t( 'بیوگرافی: پیش‌نویس برای مهمان → بدون لینک', tara_artist_bio_link( 5 ) === '' );
 
 $GLOBALS['__caps']['read_post'] = true;
-t( 'بیوگرافی: پیش‌نویس برای کاربر مجاز → لینک', javan_seda_artist_bio_link( 5 ) === 'https://ex/?p=13' );
+t( 'بیوگرافی: پیش‌نویس برای کاربر مجاز → لینک', tara_artist_bio_link( 5 ) === 'https://ex/?p=13' );
 $GLOBALS['__caps'] = array();
 
 $GLOBALS['__posts'][14] = new WP_Post( 14, 'خصوصی', 'private' );
 update_term_meta( 5, 'ab_bio_post', '14' );
-t( 'بیوگرافی: خصوصی برای مهمان → بدون لینک', javan_seda_artist_bio_link( 5 ) === '' );
+t( 'بیوگرافی: خصوصی برای مهمان → بدون لینک', tara_artist_bio_link( 5 ) === '' );
 
 update_term_meta( 5, 'ab_bio_post', '99999' );
-t( 'بیوگرافی: نوشتهٔ حذف‌شده → بدون لینک', javan_seda_artist_bio_link( 5 ) === '' );
+t( 'بیوگرافی: نوشتهٔ حذف‌شده → بدون لینک', tara_artist_bio_link( 5 ) === '' );
 
 update_term_meta( 5, 'ab_bio_post', '0' );
-t( 'بیوگرافی: بدون انتخاب → بدون لینک', javan_seda_artist_bio_link( 5 ) === '' );
+t( 'بیوگرافی: بدون انتخاب → بدون لینک', tara_artist_bio_link( 5 ) === '' );
 
 /* ======================================================================
    ۶) مجموع بازدید
@@ -158,33 +158,33 @@ reset_state();
 $GLOBALS['__terms'][5] = $term;
 
 $GLOBALS['__db_sum'] = 1234;
-t( 'بازدید: جمع از کوئری', javan_seda_artist_total_views( 5 ) === 1234 );
-t( 'بازدید: کش پس از محاسبه', get_transient( 'jv_av_5_' . javan_seda_artist_views_epoch() ) === 1234 );
+t( 'بازدید: جمع از کوئری', tara_artist_total_views( 5 ) === 1234 );
+t( 'بازدید: کش پس از محاسبه', get_transient( 'jv_av_5_' . tara_artist_views_epoch() ) === 1234 );
 
 $GLOBALS['__db_sum'] = 9999;
-t( 'بازدید: بار دوم از کش (بدون کوئری تازه)', javan_seda_artist_total_views( 5 ) === 1234 );
+t( 'بازدید: بار دوم از کش (بدون کوئری تازه)', tara_artist_total_views( 5 ) === 1234 );
 
-javan_seda_artist_views_flush();
-t( 'بازدید: ابطال کش با تغییرِ نسخه', javan_seda_artist_total_views( 5 ) === 9999 );
+tara_artist_views_flush();
+t( 'بازدید: ابطال کش با تغییرِ نسخه', tara_artist_total_views( 5 ) === 9999 );
 
 $GLOBALS['__db_sum'] = -20;
-javan_seda_artist_views_flush();
-t( 'بازدید: مقدار منفی/نامعتبر → صفر', javan_seda_artist_total_views( 5 ) === 0 );
+tara_artist_views_flush();
+t( 'بازدید: مقدار منفی/نامعتبر → صفر', tara_artist_total_views( 5 ) === 0 );
 
-javan_seda_artist_views_flush();
+tara_artist_views_flush();
 $GLOBALS['__db_queue'] = array( 0, 500 ); /* کوئریِ تاکسونومی=۰، بعد جمعِ متای نامی=۵۰۰ */
 $GLOBALS['__db_ids']   = array( 21, 22 );
-t( 'بازدید: مسیر نامِ متای قدیمی وقتی تاکسونومی جمع صفر است', javan_seda_artist_total_views( 5 ) === 500 );
+t( 'بازدید: مسیر نامِ متای قدیمی وقتی تاکسونومی جمع صفر است', tara_artist_total_views( 5 ) === 500 );
 $GLOBALS['__db_queue'] = array();
 
 $GLOBALS['__db_sum'] = 0;
-javan_seda_artist_views_flush();
-t( 'بازدید: صفر → خروجی HTML خالی (بدون کادر بی‌محتوا)', javan_seda_artist_views_html( 5 ) === '' );
+tara_artist_views_flush();
+t( 'بازدید: صفر → خروجی HTML خالی (بدون کادر بی‌محتوا)', tara_artist_views_html( 5 ) === '' );
 
 $GLOBALS['__db_queue'] = array( 128500 );
 $GLOBALS['__db_sum'] = 128500;
-javan_seda_artist_views_flush();
-$html = javan_seda_artist_views_html( 5 );
+tara_artist_views_flush();
+$html = tara_artist_views_html( 5 );
 t( 'بازدید: HTML شامل عددِ فارسی', false !== strpos( $html, '۱۲۸٬۵۰۰' ) || false !== strpos( $html, '۱۲۸,۵۰۰' ) || false !== strpos( $html, '۱۲۸۵۰۰' ), $html );
 t( 'بازدید: HTML شامل برچسب', false !== strpos( $html, 'مجموع بازدید آثار' ), $html );
 t( 'بازدید: HTML شامل li', 0 === strpos( $html, '<li class="ab-resume__views">' ), $html );
@@ -197,18 +197,18 @@ $cat = new WP_Term( 8, 'پاپ', 'category', 'pop', 10 );
 $GLOBALS['__terms'][8] = $cat;
 $GLOBALS['__termdesc'][8] = 'توضیح قدیمی دسته';
 
-t( 'دسته: نبودِ فیلد تازه → fallback به توضیح قدیمی', false !== strpos( javan_seda_category_desc_short( 8 ), 'توضیح قدیمی دسته' ) );
-t( 'دسته: کوتاه شامل کلاس archive_txt_box', false !== strpos( javan_seda_category_desc_short( 8 ), 'archive_txt_box' ) );
+t( 'دسته: نبودِ فیلد تازه → fallback به توضیح قدیمی', false !== strpos( tara_category_desc_short( 8 ), 'توضیح قدیمی دسته' ) );
+t( 'دسته: کوتاه شامل کلاس archive_txt_box', false !== strpos( tara_category_desc_short( 8 ), 'archive_txt_box' ) );
 
 update_term_meta( 8, 'ab_desc_short', 'معرفی کوتاه <script>alert(1)</script>تازه' );
-$short = javan_seda_category_desc_short( 8 );
+$short = tara_category_desc_short( 8 );
 t( 'دسته: توضیح کوتاه اولویت دارد', false !== strpos( $short, 'معرفی کوتاه' ) && false === strpos( $short, 'توضیح قدیمی' ), $short );
 t( 'دسته: توضیح کوتاه escape شده است', false === strpos( $short, '<script>' ), $short );
 
-t( 'دسته: نبود توضیح کامل → رشتهٔ خالی', javan_seda_category_desc_full( 8 ) === '' );
+t( 'دسته: نبود توضیح کامل → رشتهٔ خالی', tara_category_desc_full( 8 ) === '' );
 
 update_term_meta( 8, 'ab_desc_full', '<p>متن کامل <strong>دسته</strong></p><script>bad()</script>' );
-$full = javan_seda_category_desc_full( 8 );
+$full = tara_category_desc_full( 8 );
 t( 'دسته: کامل شامل بخش ab-cat-desc', false !== strpos( $full, 'class="ab-cat-desc"' ), $full );
 t( 'دسته: دکمهٔ نمایش بیشتر در HTML با aria', false !== strpos( $full, 'data-ab-desc-toggle' ) && false !== strpos( $full, 'aria-expanded="true"' ) && false !== strpos( $full, 'aria-controls=' ), $full );
 t( 'دسته: دکمه در ابتدا hidden است (بدون JS دیده نشود)', false !== strpos( $full, 'hidden>نمایش بیشتر' ), $full );
@@ -223,20 +223,20 @@ $GLOBALS['__terms'][5] = $term;
 update_term_meta( 5, 'artist_en', 'OLD' );
 
 /* بدون nonce */
-$_POST = array( 'javan_seda_artist_form' => '1', 'artist_en' => 'HACK' );
-javan_seda_save_term_fields( 5, 5, 'artist' );
+$_POST = array( 'tara_artist_form' => '1', 'artist_en' => 'HACK' );
+tara_save_term_fields( 5, 5, 'artist' );
 t( 'ذخیره: بدون nonce چیزی عوض نمی‌شود', get_term_meta( 5, 'artist_en' ) === 'OLD' );
 
 /* با nonce، بدون مجوز */
-$_POST = array( 'javan_seda_term_nonce' => 'good', 'javan_seda_artist_form' => '1', 'artist_en' => 'HACK' );
-javan_seda_save_term_fields( 5, 5, 'artist' );
+$_POST = array( 'tara_term_nonce' => 'good', 'tara_artist_form' => '1', 'artist_en' => 'HACK' );
+tara_save_term_fields( 5, 5, 'artist' );
 t( 'ذخیره: بدون مجوز چیزی عوض نمی‌شود', get_term_meta( 5, 'artist_en' ) === 'OLD' );
 
 /* با nonce و مجوز */
 $GLOBALS['__caps']['manage_categories'] = true;
 $_POST = array(
-	'javan_seda_term_nonce'  => 'good',
-	'javan_seda_artist_form' => '1',
+	'tara_term_nonce'  => 'good',
+	'tara_artist_form' => '1',
 	'aimg2'                  => 'https://ex/new.jpg',
 	'aimg2_id'               => '77abc',
 	'artist_en'              => '  Mohsen   Yeganeh ',
@@ -244,7 +244,7 @@ $_POST = array(
 	'ab_bio_short'           => '<b>بیو</b> کوتاه',
 	'ab_bio_post'            => '12x',
 );
-javan_seda_save_term_fields( 5, 5, 'artist' );
+tara_save_term_fields( 5, 5, 'artist' );
 t( 'ذخیره: تصویر ذخیره شد', get_term_meta( 5, 'aimg2' ) === 'https://ex/new.jpg' );
 t( 'ذخیره: شناسهٔ تصویر فقط عدد', get_term_meta( 5, 'aimg2_id' ) === '77' );
 t( 'ذخیره: نام لاتین تمیز شد', get_term_meta( 5, 'artist_en' ) === 'Mohsen Yeganeh', get_term_meta( 5, 'artist_en' ) );
@@ -257,23 +257,23 @@ reset_state();
 $GLOBALS['__terms'][8] = $cat;
 $GLOBALS['__caps']['manage_categories'] = true;
 $_POST = array(
-	'javan_seda_term_nonce' => 'good',
-	'javan_seda_cat_form'   => '1',
+	'tara_term_nonce' => 'good',
+	'tara_cat_form'   => '1',
 	'ab_desc_short'         => '<em>' . str_repeat( 'ا', 420 ) . '</em>',
 	'ab_desc_full'          => '<p>کامل</p><script>x()</script>',
 );
-javan_seda_save_term_fields( 8, 8, 'category' );
+tara_save_term_fields( 8, 8, 'category' );
 $saved_short = get_term_meta( 8, 'ab_desc_short' );
-t( 'ذخیرهٔ دسته: توضیح کوتاه تا ۴۰۰ نویسه', javan_seda_strlen_utf8( $saved_short ) === 400, (string) javan_seda_strlen_utf8( $saved_short ) );
+t( 'ذخیرهٔ دسته: توضیح کوتاه تا ۴۰۰ نویسه', tara_strlen_utf8( $saved_short ) === 400, (string) tara_strlen_utf8( $saved_short ) );
 t( 'ذخیرهٔ دسته: توضیح کامل HTML مجاز را نگه می‌دارد', get_term_meta( 8, 'ab_desc_full' ) === '<p>کامل</p>' );
 
 $_POST = array(
-	'javan_seda_term_nonce' => 'good',
-	'javan_seda_cat_form'   => '1',
+	'tara_term_nonce' => 'good',
+	'tara_cat_form'   => '1',
 	'ab_desc_short'         => '   ',
 	'ab_desc_full'          => '   ',
 );
-javan_seda_save_term_fields( 8, 8, 'category' );
+tara_save_term_fields( 8, 8, 'category' );
 t( 'ذخیرهٔ دسته: مقدار خالی → حذف متا (نه رشتهٔ خالی)', get_term_meta( 8, 'ab_desc_short' ) === '' && get_term_meta( 8, 'ab_desc_full' ) === '' );
 
 /* ======================================================================
@@ -287,31 +287,31 @@ $GLOBALS['__caps']['edit_post'] = true;
 
 /* بدون nonce */
 $_POST = array( 'ab_artist_ids' => array( '3' ) );
-javan_seda_save_post_artists( 10 );
+tara_save_post_artists( 10 );
 t( 'متای پست: بدون nonce تغییری نمی‌کند', get_post_meta( 10, 'artist' ) === '' );
 
 /* با nonce؛ شناسهٔ نامعتبر و تکراری */
 $_POST = array(
-	'javan_seda_post_artist_nonce' => 'good-post',
+	'tara_post_artist_nonce' => 'good-post',
 	'ab_artist_ids'                => array( '3', '999', '3', '4' ),
 );
-javan_seda_save_post_artists( 10 );
+tara_save_post_artists( 10 );
 t( 'متای پست: فقط ترم‌های معتبر', isset( $GLOBALS['__objterms'][10] ) && $GLOBALS['__objterms'][10] === array( 3, 4 ), json_encode( isset( $GLOBALS['__objterms'][10] ) ? $GLOBALS['__objterms'][10] : null ) );
 t( 'متای پست: «artist» متنی همگام شد', get_post_meta( 10, 'artist' ) === 'علی, سارا', get_post_meta( 10, 'artist' ) );
 
 /* خالی‌کردن */
 $_POST = array(
-	'javan_seda_post_artist_nonce' => 'good-post',
+	'tara_post_artist_nonce' => 'good-post',
 	'ab_artist_ids'                => array(),
 	'ab_artist_original'           => '3,4',
 );
-javan_seda_save_post_artists( 10 );
+tara_save_post_artists( 10 );
 t( 'متای پست: با حذف همه (فرم نمایش داشت)، متای متنی پاک می‌شود', get_post_meta( 10, 'artist' ) === '' );
 
 /* بدون مجوز */
 $GLOBALS['__caps'] = array();
-$_POST = array( 'javan_seda_post_artist_nonce' => 'good-post', 'ab_artist_ids' => array( 3 ) );
-javan_seda_save_post_artists( 10 );
+$_POST = array( 'tara_post_artist_nonce' => 'good-post', 'ab_artist_ids' => array( 3 ) );
+tara_save_post_artists( 10 );
 t( 'متای پست: بدون مجوز ویرایش تغییری نمی‌کند', get_post_meta( 10, 'artist' ) === '' );
 
 /* ---------- سناریوی مهم: نوشتهٔ قدیمی با متای artist و بدون ترم ---------- */
@@ -323,38 +323,38 @@ $GLOBALS['__caps']['edit_post'] = true;
 
 /* ویرایشِ نوشته بدون دست‌زدن به جعبهٔ هنرمند (چیپ‌ها خالی، اصلی هم خالی) */
 $_POST = array(
-	'javan_seda_post_artist_nonce' => 'good-post',
+	'tara_post_artist_nonce' => 'good-post',
 	'ab_artist_ids'                => array(),
 	'ab_artist_original'           => '',
 );
-javan_seda_save_post_artists( 11 );
+tara_save_post_artists( 11 );
 t( 'متای پست: ذخیرهٔ بدون تغییر، متای قدیمی را پاک نمی‌کند', get_post_meta( 11, 'artist' ) === 'هنرمند قدیمی', get_post_meta( 11, 'artist' ) );
 
 /* ذخیره از ویرایش سریع (جعبه رندر نشده) یا بدون فرم ⇒ هیچ تغییری نباید رخ دهد */
 $_POST = array(
-	'javan_seda_post_artist_nonce' => 'good-post',
+	'tara_post_artist_nonce' => 'good-post',
 	'ab_artist_ids'                => array( 3 ),
 	'ab_artist_original'           => '',
 );
-javan_seda_save_post_artists( 11 );
+tara_save_post_artists( 11 );
 t( 'متای پست: افزودنِ ترم بدون وضعیتِ اولیه هم بی‌خطر است', get_post_meta( 11, 'artist' ) === 'علی', get_post_meta( 11, 'artist' ) );
 
 /* حالا مدیر عمداً یک هنرمند اضافه می‌کند */
 $_POST = array(
-	'javan_seda_post_artist_nonce' => 'good-post',
+	'tara_post_artist_nonce' => 'good-post',
 	'ab_artist_ids'                => array( 3 ),
 	'ab_artist_original'           => '',
 );
-javan_seda_save_post_artists( 11 );
+tara_save_post_artists( 11 );
 t( 'متای پست: تغییرِ عمدی ⇒ همگام‌سازی انجام می‌شود', get_post_meta( 11, 'artist' ) === 'علی', get_post_meta( 11, 'artist' ) );
 
 /* و اگر دقیقاً همان وضعیت قبلی دوباره ذخیره شود، تغییری نمی‌کند */
 $_POST = array(
-	'javan_seda_post_artist_nonce' => 'good-post',
+	'tara_post_artist_nonce' => 'good-post',
 	'ab_artist_ids'                => array( '3' ),
 	'ab_artist_original'           => '3',
 );
-javan_seda_save_post_artists( 11 );
+tara_save_post_artists( 11 );
 t( 'متای پست: ذخیرهٔ تکراری، تغییری ایجاد نمی‌کند', get_post_meta( 11, 'artist' ) === 'علی' );
 
 /* ======================================================================

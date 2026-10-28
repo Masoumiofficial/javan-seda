@@ -30,7 +30,7 @@ $wp_query = new WP_Query($arms); if($wp_query->have_posts()) : ?>
 <ul>
 <?php while ($wp_query->have_posts()) : $wp_query->the_post(); $post_id = $wp_query->post->ID; ?>
 <li><a href="<?php the_permalink(); ?>">
-<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
 <?php if(has_post_thumbnail()){
 the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?></div>
@@ -116,7 +116,7 @@ array(
 $wp_query = new WP_Query($arms);
 if ($wp_query->have_posts()) : while ($wp_query->have_posts()) : $wp_query->the_post(); $post_id = $wp_query->post->ID; ?>
 <li><a href="<?php the_permalink(); ?>">
-<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
 <?php if(has_post_thumbnail()){
 the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?></div>
@@ -198,7 +198,7 @@ $wp_query = new WP_Query($arms); if($wp_query->have_posts()) : ?>
 <ul>
 <?php while ($wp_query->have_posts()) : $wp_query->the_post(); $post_id = $wp_query->post->ID; ?>
 <li><a href="<?php the_permalink(); ?>">
-<div class="img_rkianoosh_box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
+<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
 <?php if(has_post_thumbnail()){
 the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
 <img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?></div>

@@ -1,5 +1,5 @@
 /**
- * جوان‌صدا ۳.۵.۲ — کنترل‌های پیشخوان
+ * ترانه یار ۳.۵.۲ — کنترل‌های پیشخوان
  * ---------------------------------------------------------------------------
  * ۱) انتخاب تصویر از کتابخانهٔ رسانهٔ خودِ وردپرس (هیچ آپلودرِ موازی‌ای ساخته نشده).
  * ۲) جست‌وجوی زندهٔ هنرمند/نوشته با AJAX (بدون بارگذاریِ کاملِ فهرست).
@@ -110,7 +110,7 @@
 
 	function request(type, query, done, fail) {
 		var url = AJAX + (AJAX.indexOf('?') === -1 ? '?' : '&') +
-			'action=javan_seda_picker&type=' + encodeURIComponent(type) +
+			'action=tara_picker&type=' + encodeURIComponent(type) +
 			'&q=' + encodeURIComponent(query) +
 			'&nonce=' + encodeURIComponent(NONCE);
 

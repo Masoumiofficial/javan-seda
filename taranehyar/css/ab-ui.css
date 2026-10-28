@@ -11,7 +11,7 @@
    · ابتدا از style.css بلوک‌های جدید را به انتهایش اضافه کنید، سپس این فایل را
      از همان مارکر تا EOF بازنویسی کنید.
 
- خاموشی کل گارد:  define( 'JAVANSEDA_UI_GUARD', false );
+ خاموشی کل گارد:  define( 'TARA_UI_GUARD', false );
 */
 
 /* ── ab-ui-layer ──────────────────────────────────────────────────────────────────
@@ -23,7 +23,7 @@
    بلوک ۲۴ (3.2.0 · نوار پخش در 3.2.4: تیره‌پسند، کوتاه‌تر، قبلی/بعدی) — باکس «ما را دنبال کنید» + نوارِ چسبانِ پخش
    فایل: inc/ab-post-extras.php  ·  فراخوانی: single.php (بالای باکس پلیر)
    پالت سازمانی: #FFFFFF · #185ADB · #111111 — بدون گرادینت، بدون رنگ جدید
-   خاموشی: JAVANSEDA_POST_EXTRAS / JAVANSEDA_STICKY_PLAYER یا گزینهٔ fixbtn
+   خاموشی: TARA_POST_EXTRAS / TARA_STICKY_PLAYER یا گزینهٔ fixbtn
    اگر فایل لایه حذف شود، این قواعد بی‌مصرف می‌مانند ولی چیزی را نمی‌شکنند.
    ========================================================================== */
 .ab-social-box{display:block;margin:14px 0 8px;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:12px;box-shadow:0 1px 2px rgba(17,17,17,.04);overflow:hidden}
@@ -424,7 +424,7 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
 /* ============================================================================================
    بلوک ۲۸ (نسخۀ 3.3.4) — فلاشِ «کل صفحه را گرفتنِ اسلایدر» هنگام رفرش
    ------------------------------------------------------------------------------------------
-   علت: `inc/ab-perf.php` اسکریپت‌ها را defer می‌کند (JAVANSEDA_PERF_DEFER=true — کار درست برای
+   علت: `inc/ab-perf.php` اسکریپت‌ها را defer می‌کند (TARA_PERF_DEFER=true — کار درست برای
    سرعت) و owl هنگام init کلاس `.owl-loaded` را اضافه می‌کند. تুকۀ owl که در style.css قالب
    هست، قاعدۀ `.owl-carousel{display:none}` را ندارد؛ پس تا لحظۀ init، هر ۵ آیندِ
    `.vip_top_slider` (و همهِ خواننده‌ها) پشت‌سرهم و تمام‌عرض چیده می‌شوند ⇒ «یک‌دفعه کل صفحه».
@@ -574,7 +574,7 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
    فایل‌ها: header.php (wp_body_open + .ab-skip-link) · single.php و
             inc/tarlanweb_player.php (data-ab-player + id یکتا، بدون هیچ
             display:none — در 3.3.8 پنهان‌سازی چیدمان پلیر را به‌هم ریخت)
-   پالت سازمانی بدون گرادینت · خاموشی: JAVANSEDA_SKIP_LINK / JAVANSEDA_UI_GUARD
+   پالت سازمانی بدون گرادینت · خاموشی: TARA_SKIP_LINK / TARA_UI_GUARD
    ========================================================================== */
 
 /* ۱) لینک «پرش به محتوا»: پیش از اولین Tab دیده نمی‌شود، با فوکوس ظاهر می‌شود
@@ -592,7 +592,7 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
       «اول/دوم» روی برخی صفحه‌ها پلیرِ درست را بی‌کار می‌کند (تجربۀ 3.3.8). اگر روزی
       JS چندنمونگی شد، همان لحظه می‌توان روی data-ab-player استایل بست. */
 
-/* ۳) حالت خاموشی JAVANSEDA_SKIP_LINK: لینک پرش چاپ نمی‌شود، پس قاعده هم لازم نیست */
+/* ۳) حالت خاموشی TARA_SKIP_LINK: لینک پرش چاپ نمی‌شود، پس قاعده هم لازم نیست */
 
 /* انتهای بلوک ۳۲ (v3.3.8 · اصلاحیۀ 3.3.9) */
 
@@ -980,7 +980,7 @@ body.ab-player-novol .music_box_player .volume_box{display: none}
        img ما نمی‌شود.
      · @supports: برای مرورگرهای بدون aspect-ratio (سافاری ۱۴ و قدیمی‌تر) ارتفاع صریح
    PHP هیچ ارتفاع/عرضی به img نمی‌نویسد؛ فقط sizes و سایزِ source درست می‌شود
-   (javan_seda_post_cover_size/args) ⇒ srcset نزدیک‌ترین فایل را برمی‌دارد، پس ۵۰۰px
+   (tara_post_cover_size/args) ⇒ srcset نزدیک‌ترین فایل را برمی‌دارد، پس ۵۰۰px
    روی دسکتاپ ۱۰۲۴ پیکسل دانلود نمی‌کند.
    بازگشت: «تنظیمات قالب ← کنترل رابط ← کات مربعی کاور» = خاموش (مربع نبود) یا حذف همین
    بلوک از انتهای style.css. بدون !important · بدون گرادینت · پالت #FFFFFF #185ADB #111111
@@ -1003,6 +1003,6 @@ body.ab-post-img-square .single_featured_cover .single_featured_image img{
 		height: var(--ab-post-img-size, 500px);max-height: 100vw;
 	}
 }
-/* در فهرست‌ها/جست‌وجو هم همان کادر استفاده می‌شود؛ اگر cover در محتوا تزریق شده باشد (*JAVANSEDA_COVER_IN_CONTENT*)
+/* در فهرست‌ها/جست‌وجو هم همان کادر استفاده می‌شود؛ اگر cover در محتوا تزریق شده باشد (*TARA_COVER_IN_CONTENT*)
    چون کلاس‌ها یکی‌اند، همین قواعد یک‌دست می‌گیرد. */
 /* انتهای بلوک ۳۷ (v3.4.5) */

@@ -1,7 +1,7 @@
 <?php
 /**
- * جوان‌صدا (آهنگ‌بان) — لایهٔ ایمنی «سایدبار / ابزارک» — نسخهٔ 3.1.0 (بازمهندسی‌شده)
- * امضای نسخه برای تشخیص خودکار کاوشگر: JAVANSEDA_SIDE_LAYER = 3.1.0 (کمینه؛ بدون هوکِ رندر) — بستهٔ 3.1.2
+ * ترانه یار (آهنگ‌بان) — لایهٔ ایمنی «سایدبار / ابزارک» — نسخهٔ 3.1.0 (بازمهندسی‌شده)
+ * امضای نسخه برای تشخیص خودکار کاوشگر: TARA_SIDE_LAYER = 3.1.0 (کمینه؛ بدون هوکِ رندر) — بستهٔ 3.1.2
  * ==================================================================================
  * چرا این بازنویسی؟  نسخهٔ ۳.۰.۵ روی هاستِ شما باعث خرابیِ صفحه شد و شما کلاً
  * محتوای فایل را حذف کردید. آن نسخه سه کار «پرخطر» می‌کرد که در خطِ رندرِ صفحه
@@ -14,19 +14,19 @@
  * این نسخه «هیچ‌کدام» از آن‌ها را نمی‌کند. فهرست کامل کارها:
  *   ۱) اگر ناحیه‌های left_side / left_side2 / left_side1 ثبت نشده باشند، ثبتشان می‌کند
  *      (فقط در widgets_init، فقط در صورت نبود، با نام‌های دست‌نخورده).
- *   ۲) تابع رندر امن javan_seda_sidebar() که single.php / page.php صدا می‌زنند؛
+ *   ۲) تابع رندر امن tara_sidebar() که single.php / page.php صدا می‌زنند؛
  *      اگراگر داخلش خطایی رخ دهد، صفحه نمی‌میرد (try/catch) و فقط یک کامنت HTML می‌ماند.
  *   ۳) گزارش تشخیصیِ فقط‌خواندنی به‌صورت «آرایهٔ خطوط»؛ خروجی را هیچ‌گاه با
  *      template_include چاپ نمی‌کند — فقط فایل ab-mobile-probe.php آن را صدا می‌زند.
  *   ۴) (اختیاری و خاموش‌به‌مروز) بازگردانی ابزارک‌های افتاده در «ابزارک‌های غیرفعال»
- *      با JAVANSEDA_SIDEBAR_RECOVERY = true. تا وقتی این define نشود، هیچ فیلتری
+ *      با TARA_SIDEBAR_RECOVERY = true. تا وقتی این define نشود، هیچ فیلتری
  *      روی دادهٔ ابزارک‌ها اعمال نمی‌شود.
  *
  * هرگز انجام نمی‌دهد:  the_content · the_title · template_redirect · pre_get_posts ·
  *   template_include · wp_head/wp_footer · نوشتن در دیتابیس · include کردن فایل‌های قالب.
  *
  * کلید خاموشیِ کامل (اگر یک روز دوباره مشکوک شدید، در wp-config.php بنویسید):
- *   define( 'JAVANSEDA_SIDE', false );
+ *   define( 'TARA_SIDE', false );
  *
  * قوانین همیشگی: بدون دست‌زدن به تاکسونومی/هوک سراسری، بدون گرادینت،
  * پالت سازمانی #FFFFFF / #185ADB / #111111.
@@ -37,22 +37,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /* هیچ کاری نکن — کلید خاموشی */
-if ( defined( 'JAVANSEDA_SIDE' ) && false === JAVANSEDA_SIDE ) {
+if ( defined( 'TARA_SIDE' ) && false === TARA_SIDE ) {
 	return;
 }
 
-if ( ! defined( 'JAVANSEDA_SIDEBAR_RECOVERY' ) ) {
-	define( 'JAVANSEDA_SIDEBAR_RECOVERY', false ); // خاموش‌به‌مروز (تصمیم آگاهانهٔ v3.1.0)
+if ( ! defined( 'TARA_SIDEBAR_RECOVERY' ) ) {
+	define( 'TARA_SIDEBAR_RECOVERY', false ); // خاموش‌به‌مروز (تصمیم آگاهانهٔ v3.1.0)
 }
-if ( ! defined( 'JAVANSEDA_SIDEBAR_MARKERS' ) ) {
-	define( 'JAVANSEDA_SIDEBAR_MARKERS', true );     // کامنت تشخیصی وقتی ناحیه خالی است
+if ( ! defined( 'TARA_SIDEBAR_MARKERS' ) ) {
+	define( 'TARA_SIDEBAR_MARKERS', true );     // کامنت تشخیصی وقتی ناحیه خالی است
 }
 
 /* ---------------------------------------------------------------------------
  * ۰) ابزار کمکی: اجرای محافظت‌شده (خطای PHP داخل کار ما، صفحه را نکشد)
  * ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_safe_run' ) ) {
-	function javan_seda_safe_run( $fn ) {
+if ( ! function_exists( 'tara_safe_run' ) ) {
+	function tara_safe_run( $fn ) {
 		try {
 			$fn();
 		} catch ( Exception $e ) {
@@ -66,14 +66,14 @@ if ( ! function_exists( 'javan_seda_safe_run' ) ) {
 /* ---------------------------------------------------------------------------
  * ۱) تعریف ناحیه‌ها — شناسه‌ها هرگز تغییر نمی‌کنند
  * ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_widget_id_bases' ) ) {
-	function javan_seda_widget_id_bases() {
+if ( ! function_exists( 'tara_widget_id_bases' ) ) {
+	function tara_widget_id_bases() {
 		return array( 'tarlanweb_ir_newp', 'tarlanweb_ir_popular', 'tarlanweb_ir_rand' );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sidebar_defs' ) ) {
-	function javan_seda_sidebar_defs() {
+if ( ! function_exists( 'tara_sidebar_defs' ) ) {
+	function tara_sidebar_defs() {
 		$shared = array(
 			'before_widget' => '<aside id="%1$s" class="related_posts %2$s">',
 			'after_widget'  => '<div class="clear"></div></div></aside>',
@@ -104,32 +104,32 @@ if ( ! function_exists( 'javan_seda_sidebar_defs' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sidebar_registered' ) ) {
-	function javan_seda_sidebar_registered( $id ) {
+if ( ! function_exists( 'tara_sidebar_registered' ) ) {
+	function tara_sidebar_registered( $id ) {
 		global $wp_registered_sidebars;
 		return is_array( $wp_registered_sidebars ) && isset( $wp_registered_sidebars[ $id ] );
 	}
 }
 
 /** ثبت ناحیه‌های جاافتاده — idempotent و بدون بازنویسی ناحیه‌های موجود. */
-if ( ! function_exists( 'javan_seda_register_missing_sidebars' ) ) {
-	function javan_seda_register_missing_sidebars() {
-		foreach ( javan_seda_sidebar_defs() as $id => $args ) {
-			if ( ! javan_seda_sidebar_registered( $id ) && function_exists( 'register_sidebar' ) ) {
+if ( ! function_exists( 'tara_register_missing_sidebars' ) ) {
+	function tara_register_missing_sidebars() {
+		foreach ( tara_sidebar_defs() as $id => $args ) {
+			if ( ! tara_sidebar_registered( $id ) && function_exists( 'register_sidebar' ) ) {
 				register_sidebar( $args );
 			}
 		}
 	}
 }
-add_action( 'widgets_init', 'javan_seda_register_missing_sidebars', 20 );
+add_action( 'widgets_init', 'tara_register_missing_sidebars', 20 );
 
 /**
  * (اختیاری و خاموش) بازگردانی ابزارک از «ابزارک‌های غیرفعال».
- * فقط با define( 'JAVANSEDA_SIDEBAR_RECOVERY', true ) فعال می‌شود؛ به‌طور پیش‌فرض
+ * فقط با define( 'TARA_SIDEBAR_RECOVERY', true ) فعال می‌شود؛ به‌طور پیش‌فرض
  * هیچ فیلتری روی sidebars_widgets نصب نمی‌شود (حذفِ ریسکِ بازگشتی در v3.1.0).
  */
-if ( JAVANSEDA_SIDEBAR_RECOVERY && ! function_exists( 'javan_seda_recover_sidebars' ) ) {
-	function javan_seda_is_theme_widget_id( $widget_id ) {
+if ( TARA_SIDEBAR_RECOVERY && ! function_exists( 'tara_recover_sidebars' ) ) {
+	function tara_is_theme_widget_id( $widget_id ) {
 		$widget_id = (string) $widget_id;
 		if ( '' === $widget_id ) {
 			return false;
@@ -137,7 +137,7 @@ if ( JAVANSEDA_SIDEBAR_RECOVERY && ! function_exists( 'javan_seda_recover_sideba
 		if ( 0 === strpos( $widget_id, 'block-' ) ) {
 			return true;
 		}
-		foreach ( javan_seda_widget_id_bases() as $base ) {
+		foreach ( tara_widget_id_bases() as $base ) {
 			if ( 0 === strpos( $widget_id, $base . '-' ) || 0 === strpos( $widget_id, $base . '__' ) ) {
 				return true;
 			}
@@ -145,8 +145,8 @@ if ( JAVANSEDA_SIDEBAR_RECOVERY && ! function_exists( 'javan_seda_recover_sideba
 		return false;
 	}
 
-	function javan_seda_recover_sidebars( $sidebars_widgets ) {
-		return javan_seda_safe_run( function () use ( &$sidebars_widgets ) {
+	function tara_recover_sidebars( $sidebars_widgets ) {
+		return tara_safe_run( function () use ( &$sidebars_widgets ) {
 			if ( ! is_array( $sidebars_widgets ) || is_admin() ) {
 				return;
 			}
@@ -167,7 +167,7 @@ if ( JAVANSEDA_SIDEBAR_RECOVERY && ! function_exists( 'javan_seda_recover_sideba
 			$mine = array();
 			$keep = array();
 			foreach ( $pool as $wid ) {
-				if ( javan_seda_is_theme_widget_id( $wid ) ) {
+				if ( tara_is_theme_widget_id( $wid ) ) {
 					$mine[] = $wid;
 				} else {
 					$keep[] = $wid;
@@ -180,12 +180,12 @@ if ( JAVANSEDA_SIDEBAR_RECOVERY && ! function_exists( 'javan_seda_recover_sideba
 			if ( isset( $sidebars_widgets['wp_inactive_widgets'] ) ) {
 				$sidebars_widgets['wp_inactive_widgets'] = $keep;
 			}
-			$GLOBALS['javan_seda_sidebar_recovered'] = $mine;
+			$GLOBALS['tara_sidebar_recovered'] = $mine;
 		} );
 
 		return $sidebars_widgets;
 	}
-	add_filter( 'sidebars_widgets', 'javan_seda_recover_sidebars', 20 );
+	add_filter( 'sidebars_widgets', 'tara_recover_sidebars', 20 );
 }
 
 /* ---------------------------------------------------------------------------
@@ -194,15 +194,15 @@ if ( JAVANSEDA_SIDEBAR_RECOVERY && ! function_exists( 'javan_seda_recover_sideba
  *    - اگر dynamic_sidebar خطا بدهد، صفحه نمی‌میرد
  *    - وضعیتِ حلقهٔ جهانی را برمی‌گرداند (ابزارک‌های این قالب $wp_query را عوض می‌کنند)
  * ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_sidebar' ) ) {
-	function javan_seda_sidebar( $index ) {
+if ( ! function_exists( 'tara_sidebar' ) ) {
+	function tara_sidebar( $index ) {
 		$index = preg_replace( '/[^a-z0-9_\-]/i', '', (string) $index );
 		if ( '' === $index ) {
 			return;
 		}
 
-		if ( ! javan_seda_sidebar_registered( $index ) ) {
-			javan_seda_register_missing_sidebars();
+		if ( ! tara_sidebar_registered( $index ) ) {
+			tara_register_missing_sidebars();
 		}
 
 		$snap_post    = isset( $GLOBALS['post'] ) ? $GLOBALS['post'] : null;
@@ -211,13 +211,13 @@ if ( ! function_exists( 'javan_seda_sidebar' ) ) {
 		$state = 'rendered';
 		if ( ! function_exists( 'dynamic_sidebar' ) ) {
 			$state = 'no-dynamic_sidebar';
-		} elseif ( ! javan_seda_sidebar_registered( $index ) ) {
+		} elseif ( ! tara_sidebar_registered( $index ) ) {
 			$state = 'not-registered';
 		} elseif ( function_exists( 'is_active_sidebar' ) && ! is_active_sidebar( $index ) ) {
 			$state = 'no-active-widget';
 		} else {
 			$ok = false;
-			javan_seda_safe_run( function () use ( $index, &$ok ) {
+			tara_safe_run( function () use ( $index, &$ok ) {
 				$ok = dynamic_sidebar( $index );
 			} );
 			if ( ! $ok ) {
@@ -232,7 +232,7 @@ if ( ! function_exists( 'javan_seda_sidebar' ) ) {
 			$GLOBALS['wp_query'] = $snap_wpquery;
 		}
 
-		if ( 'rendered' !== $state && JAVANSEDA_SIDEBAR_MARKERS ) {
+		if ( 'rendered' !== $state && TARA_SIDEBAR_MARKERS ) {
 			echo '<!-- javan_seda: sidebar ' . esc_html( $index ) . ' => ' . esc_html( $state ) . ' -->';
 		}
 	}
@@ -242,8 +242,8 @@ if ( ! function_exists( 'javan_seda_sidebar' ) ) {
  * ۳) گزارش تشخیصی — فقط‌خواندنی، فقط وقتی از «ab-mobile-probe.php» صدا زده شود.
  *    (در این نسخه هیچ مسیری در template_include ندارد؛ پس در رندرِ عادی، صفر است.)
  * ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
-	function javan_seda_expected_hashes() {
+if ( ! function_exists( 'tara_expected_hashes' ) ) {
+	function tara_expected_hashes() {
 	return array(
 		'single.php'                => '974d71338fb89856abc086031dc17223ecc19dc83e8d7f4257e7ddda4a228224',
 		'page.php'                  => 'fee8efe74cec41f61d2c0598cfb8308fd90ab8ad66b09b1c30c51bde465948ad',
@@ -270,8 +270,8 @@ if ( ! function_exists( 'javan_seda_expected_hashes' ) ) {
 }
 }
 
-if ( ! function_exists( 'javan_seda_file_hash' ) ) {
-	function javan_seda_file_hash( $path ) {
+if ( ! function_exists( 'tara_file_hash' ) ) {
+	function tara_file_hash( $path ) {
 		if ( ! is_readable( $path ) ) {
 			return 'MISSING';
 		}
@@ -288,8 +288,8 @@ if ( ! function_exists( 'javan_seda_file_hash' ) ) {
  * خطوط گزارش را به‌صورت آرایه برمی‌گرداند (بدون echo، بدون exit، بدون کش‌کردن صفحه).
  * @return array
  */
-if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
-	function javan_seda_diag_lines( $template = '' ) {
+if ( ! function_exists( 'tara_diag_lines' ) ) {
+	function tara_diag_lines( $template = '' ) {
 		global $wp_registered_sidebars, $wp_widget_factory;
 
 		$L    = array();
@@ -299,7 +299,7 @@ if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
 
 		$theme     = wp_get_theme();
 		$tdir      = get_template_directory();
-		$expected  = javan_seda_expected_hashes();
+		$expected  = tara_expected_hashes();
 		$mismatch  = 0;
 
 		$line( '=== گزارش تشخیص «ابزارک / سایدبار / هدر» — لایهٔ ایمنی v3.1.4 ===' );
@@ -314,7 +314,7 @@ if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
 		$danger = array(
 			'the_content'     => 'add_filter(the_content)  ← نسخهٔ ۳.۰.۵ داشت، این نسخه ندارد',
 			'template_include'=> 'add_filter(template_include) ← نسخهٔ ۳.۰.۵ داشت، این نسخه ندارد',
-			'sidebars_widgets'=> 'add_filter(sidebars_widgets) ← فقط با JAVANSEDA_SIDEBAR_RECOVERY=true',
+			'sidebars_widgets'=> 'add_filter(sidebars_widgets) ← فقط با TARA_SIDEBAR_RECOVERY=true',
 		);
 		foreach ( $danger as $hook => $desc ) {
 			$mine = array();
@@ -329,7 +329,7 @@ if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
 				}
 				foreach ( (array) $cb as $prio => $set ) {
 					foreach ( (array) $set as $f ) {
-						if ( isset( $f['function'] ) && is_string( $f['function'] ) && 0 === strpos( $f['function'], 'javan_seda_' ) ) {
+						if ( isset( $f['function'] ) && is_string( $f['function'] ) && 0 === strpos( $f['function'], 'tara_' ) ) {
 							$mine[] = $prio . '→' . $f['function'];
 						}
 					}
@@ -337,16 +337,16 @@ if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
 			}
 			$line( sprintf( '  %-28s %s', $desc, $mine ? '⚠ فعال: ' . implode( ', ', $mine ) : '✓ ندارد' ) );
 		}
-		$line( '  JAVANSEDA_SIDE                     : ' . ( defined( 'JAVANSEDA_SIDE' ) ? var_export( JAVANSEDA_SIDE, true ) : 'تعریف‌نشده (پیش‌فرض = روشن)' ) );
-		$line( '  JAVANSEDA_SIDEBAR_RECOVERY         : ' . ( defined( 'JAVANSEDA_SIDEBAR_RECOVERY' ) ? var_export( (bool) JAVANSEDA_SIDEBAR_RECOVERY, true ) : 'پیش‌فرض = false' ) );
+		$line( '  TARA_SIDE                     : ' . ( defined( 'TARA_SIDE' ) ? var_export( TARA_SIDE, true ) : 'تعریف‌نشده (پیش‌فرض = روشن)' ) );
+		$line( '  TARA_SIDEBAR_RECOVERY         : ' . ( defined( 'TARA_SIDEBAR_RECOVERY' ) ? var_export( (bool) TARA_SIDEBAR_RECOVERY, true ) : 'پیش‌فرض = false' ) );
 		$line( '  فایل ab-sidebars.php روی هاست      : ' . ( is_readable( $tdir . '/inc/ab-sidebars.php' ) ? 'حاضر (' . size_format( (int) filesize( $tdir . '/inc/ab-sidebars.php' ) ) . '، آخرین تغییر ' . date_i18n( 'Y-m-d H:i', (int) filemtime( $tdir . '/inc/ab-sidebars.php' ) ) . ')' : 'نیست (قالب بدون آن هم کار می‌کند؛ فقط ناحیه‌ها در صورت نبود ثبت نمی‌شوند)' ) );
 		$line( '  نسخهٔ لایهٔ ایمنی (امضای داخل فایل) : ' . ( is_readable( $tdir . '/inc/ab-sidebars.php' ) && false !== strpos( (string) file_get_contents( $tdir . '/inc/ab-sidebars.php' ), '3.1.0' ) ? '3.1.0 (کمینه) ✓' : '⚠ نسخهٔ قدیمی/ناشناس — همان نسخه‌ای که صفحه را می‌شکاند' ) );
 		$line( '' );
 
 		$line( '--- ۲) بارگذاری فایل‌های مسئول ---' );
 		$line( 'myfunctions.php بارگذاری شد؟ : ' . ( function_exists( 'leftsides' ) ? 'بله' : 'نه  <<< ناحیه‌های ابزارک ثبت نشده‌اند' ) );
-		$line( 'ab-sidebars بارگذاری شد؟     : ' . ( function_exists( 'javan_seda_sidebar' ) ? 'بله' : 'نه' ) );
-		foreach ( javan_seda_widget_id_bases() as $cls ) {
+		$line( 'ab-sidebars بارگذاری شد؟     : ' . ( function_exists( 'tara_sidebar' ) ? 'بله' : 'نه' ) );
+		foreach ( tara_widget_id_bases() as $cls ) {
 			$has = class_exists( $cls, false );
 			$reg = $has && is_object( $wp_widget_factory ) && isset( $wp_widget_factory->widgets[ $cls ] );
 			$line( sprintf( 'کلاس ابزارک %-22s : class_exists=%s | register_widget=%s', $cls, $has ? 'yes' : 'NO', $reg ? 'yes' : 'NO' ) );
@@ -354,8 +354,8 @@ if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
 		$line( '' );
 
 		$line( '--- ۳) ناحیه‌های ابزارک ---' );
-		foreach ( javan_seda_sidebar_defs() as $id => $args ) {
-			$registered = javan_seda_sidebar_registered( $id );
+		foreach ( tara_sidebar_defs() as $id => $args ) {
+			$registered = tara_sidebar_registered( $id );
 			$active     = function_exists( 'is_active_sidebar' ) ? ( is_active_sidebar( $id ) ? 'بله' : 'نه' ) : '؟';
 			$line( sprintf( '  %-12s ثبت‌شده=%-5s ابزارک‌فعال=%s | نام: %s', $id, $registered ? 'بله' : 'NO', $active, $args['name'] ) );
 		}
@@ -363,14 +363,14 @@ if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
 		foreach ( array( 'left_side', 'left_side2', 'left_side1', 'wp_inactive_widgets' ) as $id ) {
 			$line( '  ' . str_pad( $id, 22 ) . ': ' . ( ! empty( $sbw[ $id ] ) ? implode( ', ', (array) $sbw[ $id ] ) : '(خالی)' ) );
 		}
-		if ( ! empty( $GLOBALS['javan_seda_sidebar_recovered'] ) ) {
-			$line( '  ⚠ بازگردانی رخ داده: ' . implode( ', ', (array) $GLOBALS['javan_seda_sidebar_recovered'] ) );
+		if ( ! empty( $GLOBALS['tara_sidebar_recovered'] ) ) {
+			$line( '  ⚠ بازگردانی رخ داده: ' . implode( ', ', (array) $GLOBALS['tara_sidebar_recovered'] ) );
 		}
 		$line( '' );
 
 		$line( '--- ۴) هم‌خوانی فایل‌های روی سرور با بستهٔ مخزن ---' );
 		foreach ( $expected as $rel => $hash ) {
-			$now = javan_seda_file_hash( $tdir . '/' . $rel );
+			$now = tara_file_hash( $tdir . '/' . $rel );
 			if ( 'MISSING' === $now ) {
 				$st = 'فایل روی سرور نیست';
 			} elseif ( 0 === strpos( $hash, '__' ) ) {
@@ -419,8 +419,8 @@ if ( ! function_exists( 'javan_seda_diag_lines' ) ) {
 		$line( '--- ۷) نتیجه‌گیری ---' );
 		if ( ! function_exists( 'leftsides' ) ) {
 			$line( '  ۱) myfunctions.php بارگذاری نمی‌شود ⇒ ناحیه‌های ابزارک ثبت نیستند (لایهٔ ایمنی جبران می‌کند اگر خودش هم بارگذاری شود).' );
-		} elseif ( ! function_exists( 'javan_seda_sidebar' ) ) {
-			$line( '  ۲) لایهٔ ایمنی نصب نیست (یا JAVANSEDA_SIDE=false). single.php به dynamic_sidebarِ اصلی برمی‌گردد؛ این حالت سالم است.' );
+		} elseif ( ! function_exists( 'tara_sidebar' ) ) {
+			$line( '  ۲) لایهٔ ایمنی نصب نیست (یا TARA_SIDE=false). single.php به dynamic_sidebarِ اصلی برمی‌گردد؛ این حالت سالم است.' );
 		} elseif ( 0 === $mismatch ) {
 			$line( '  ۳) فایل‌ها هم‌سان‌اند و لایهٔ ایمنی «کمینه» است؛ اگر ابزارک نمایش داده نمی‌شود، ناحیه در پیشخوان خالی است (بخش ۳).' );
 		} else {

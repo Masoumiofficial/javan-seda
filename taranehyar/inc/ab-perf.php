@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا — لایۀ «بایتِ سرعت» (بهینۀ بارگذاری) — نسخهٔ 3.1.3
+ * ترانه یار — لایۀ «بایتِ سرعت» (بهینۀ بارگذاری) — نسخهٔ 3.1.3
  * =============================================================================
  * درخواست مالک: «قالب رو هم از بابت سرعت بررسی کن و بهینه کن».
  * این فایل فقط کارهای «بی‌خطر و برگشت‌پذیر» می‌کند و برخلاف نسخه‌های قبلی،
@@ -20,7 +20,7 @@
  *     زودتر دیده می‌شود (جلوگیری از invisible text تا ۳ ثانیه).
  *  ۵) loading="lazy" + decoding="async" روی تصاویری که این ویژگی‌ها را ندارند
  *     (تصاویرِ چاپ‌شده با <img> در شورت‌کدها/متن نوشته). افزودن width/height به‌صورت
- *     پیش‌فرض خاموش است (JAVANSEDA_PERF_IMG_DIMS=false) چون ابعاد حدسی می‌تواند آیکن‌های
+ *     پیش‌فرض خاموش است (TARA_PERF_IMG_DIMS=false) چون ابعاد حدسی می‌تواند آیکن‌های
  *     کوچک را بزرگ کند؛ لوگو/آیکنِ هدر هرگز lazy نمی‌شوند.
  *  ۶) رپورتِ «بایتِ سرعت» برای اندازه‌گیری: ۵ فایلِ حجیمِ قالب، تعدادِ فایل‌های
  *     JS/CSS در صف، و پیشنهادها — از طریق ab-mobile-probe.php (بخش ۱۰).
@@ -28,7 +28,7 @@
  * چه نمی‌کند (عمداً): هیچ کشِ HTML نمی‌سازد، style.css را defer/async نمی‌کند
  * (چون بلوکِ حیاتیِ ما کوچک است و خطر FOUC دارد)، مینیفای نمی‌کند، و دیتابیس را
  * دست نمی‌زند. همه‌چیز با یک خط قابل خاموشی است:
- *    define( 'JAVANSEDA_PERF', false );
+ *    define( 'TARA_PERF', false );
  *
  * پالت سازمانی/تاکسونومی/هوک سراسری: دست‌نخورده. بدون گرادینت.
  */
@@ -37,31 +37,31 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( defined( 'JAVANSEDA_PERF' ) && false === JAVANSEDA_PERF ) {
+if ( defined( 'TARA_PERF' ) && false === TARA_PERF ) {
 	return;
 }
 
-if ( ! defined( 'JAVANSEDA_PERF_DEFER' ) ) {
-	define( 'JAVANSEDA_PERF_DEFER', true );
+if ( ! defined( 'TARA_PERF_DEFER' ) ) {
+	define( 'TARA_PERF_DEFER', true );
 }
-if ( ! defined( 'JAVANSEDA_PERF_PRELOAD_FONTS' ) ) {
-	define( 'JAVANSEDA_PERF_PRELOAD_FONTS', true );
+if ( ! defined( 'TARA_PERF_PRELOAD_FONTS' ) ) {
+	define( 'TARA_PERF_PRELOAD_FONTS', true );
 }
-if ( ! defined( 'JAVANSEDA_PERF_STRIP_HEAD' ) ) {
-	define( 'JAVANSEDA_PERF_STRIP_HEAD', true );
+if ( ! defined( 'TARA_PERF_STRIP_HEAD' ) ) {
+	define( 'TARA_PERF_STRIP_HEAD', true );
 }
-if ( ! defined( 'JAVANSEDA_PERF_LAZY_IMG' ) ) {
-	define( 'JAVANSEDA_PERF_LAZY_IMG', true );
+if ( ! defined( 'TARA_PERF_LAZY_IMG' ) ) {
+	define( 'TARA_PERF_LAZY_IMG', true );
 }
 /* افزودن width/height به تصاویر بی‌بعد، ابعادِ واقعی را حدسی می‌کند ⇒ می‌تواند چیدمانِ
    آیکن‌های کوچک را عوض کند. پیش‌فرض خاموش است؛ اگر در گزارش PageSpeed خطای CLS داشتید روشنش کنید. */
-if ( ! defined( 'JAVANSEDA_PERF_IMG_DIMS' ) ) {
-	define( 'JAVANSEDA_PERF_IMG_DIMS', false );
+if ( ! defined( 'TARA_PERF_IMG_DIMS' ) ) {
+	define( 'TARA_PERF_IMG_DIMS', false );
 }
 
 /** آیا در این درخواست، بهینه‌سازی‌ها باید اجرا شوند؟ (پیشخوان/REST/AJAX/لوگین: نه) */
-if ( ! function_exists( 'javan_seda_perf_active' ) ) {
-	function javan_seda_perf_active() {
+if ( ! function_exists( 'tara_perf_active' ) ) {
+	function tara_perf_active() {
 		if ( is_admin() || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) || ( defined( 'DOING_CRON' ) && DOING_CRON ) ) {
 			return false;
 		}
@@ -78,20 +78,20 @@ if ( ! function_exists( 'javan_seda_perf_active' ) ) {
 /* -------------------------------------------------------------------------
  * ۱) defer برای اسکریپت‌های غیرضروری
  * ---------------------------------------------------------------------- */
-if ( JAVANSEDA_PERF_DEFER && ! function_exists( 'javan_seda_perf_defer' ) ) {
-	function javan_seda_perf_defer( $tag, $handle, $src ) {
-		if ( ! javan_seda_perf_active() || '' === (string) $tag || false !== strpos( $tag, ' defer' ) ) {
+if ( TARA_PERF_DEFER && ! function_exists( 'tara_perf_defer' ) ) {
+	function tara_perf_defer( $tag, $handle, $src ) {
+		if ( ! tara_perf_active() || '' === (string) $tag || false !== strpos( $tag, ' defer' ) ) {
 			return $tag;
 		}
 		/* این‌ها باید اول بیایند/همگام بمانند */
-		$keep = apply_filters( 'javanseda_perf_keep_sync', array( 'jquery', 'jquery-core', 'jquery-migrate', 'javanseda-main', 'javanseda-header' ) );
+		$keep = apply_filters( 'tara_perf_keep_sync', array( 'jquery', 'jquery-core', 'jquery-migrate', 'taranehyar-main', 'taranehyar-header' ) );
 		foreach ( $keep as $k ) {
 			if ( 0 === strpos( (string) $handle, $k ) ) {
 				return $tag;
 			}
 		}
 		/* skip/exclude بر اساس نام فایل یا هاست‌نام */
-		$skip = apply_filters( 'javanseda_perf_skip_defer', array( 'html5shiv', 'mediaqueries', 'modernizr', 'swv', 'waf', 'google' ) );
+		$skip = apply_filters( 'tara_perf_skip_defer', array( 'html5shiv', 'mediaqueries', 'modernizr', 'swv', 'waf', 'google' ) );
 		$low  = strtolower( (string) $handle . ' ' . (string) $src );
 		foreach ( $skip as $s ) {
 			if ( '' !== $s && false !== strpos( $low, $s ) ) {
@@ -104,15 +104,15 @@ if ( JAVANSEDA_PERF_DEFER && ! function_exists( 'javan_seda_perf_defer' ) ) {
 		}
 		return preg_replace( '/<script\s/', '<script defer ', $tag, 1 );
 	}
-	add_filter( 'script_loader_tag', 'javan_seda_perf_defer', 20, 3 );
+	add_filter( 'script_loader_tag', 'tara_perf_defer', 20, 3 );
 }
 
 /* -------------------------------------------------------------------------
  * ۲) حذف بارِ بی‌فایده از <head>
  * ---------------------------------------------------------------------- */
-if ( JAVANSEDA_PERF_STRIP_HEAD && ! function_exists( 'javan_seda_perf_strip_head' ) ) {
-	function javan_seda_perf_strip_head() {
-		if ( ! javan_seda_perf_active() ) {
+if ( TARA_PERF_STRIP_HEAD && ! function_exists( 'tara_perf_strip_head' ) ) {
+	function tara_perf_strip_head() {
+		if ( ! tara_perf_active() ) {
 			return;
 		}
 		remove_action( 'wp_head', 'wp_generator' );
@@ -125,7 +125,7 @@ if ( JAVANSEDA_PERF_STRIP_HEAD && ! function_exists( 'javan_seda_perf_strip_head
 		remove_action( 'wp_head', 'feed_links', 2 );
 		remove_action( 'wp_head', 'feed_links_extra', 3 );
 		/* اسکریپت/استایلِ ایموجیِ وردپرس */
-		if ( ! defined( 'JAVANSEDA_PERF_KEEP_EMOJI' ) ) {
+		if ( ! defined( 'TARA_PERF_KEEP_EMOJI' ) ) {
 			remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 			remove_action( 'wp_print_styles', 'print_emoji_styles' );
 			remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
@@ -133,15 +133,15 @@ if ( JAVANSEDA_PERF_STRIP_HEAD && ! function_exists( 'javan_seda_perf_strip_head
 		}
 	}
 	/* اسکریپت oEmbedِ وردپرس (wp-embed.js) برای این سایت بی‌مصرف است */
-	if ( ! defined( 'JAVANSEDA_PERF_KEEP_EMBED' ) ) {
-		add_action( 'wp_footer', 'javan_seda_perf_drop_embed', 1 );
+	if ( ! defined( 'TARA_PERF_KEEP_EMBED' ) ) {
+		add_action( 'wp_footer', 'tara_perf_drop_embed', 1 );
 	}
-	add_action( 'init', 'javan_seda_perf_strip_head', 99 );
+	add_action( 'init', 'tara_perf_strip_head', 99 );
 }
 
-if ( ! function_exists( 'javan_seda_perf_drop_embed' ) ) {
-	function javan_seda_perf_drop_embed() {
-		if ( ! javan_seda_perf_active() ) {
+if ( ! function_exists( 'tara_perf_drop_embed' ) ) {
+	function tara_perf_drop_embed() {
+		if ( ! tara_perf_active() ) {
 			return;
 		}
 		wp_deregister_script( 'wp-embed' );
@@ -151,18 +151,18 @@ if ( ! function_exists( 'javan_seda_perf_drop_embed' ) ) {
 /* -------------------------------------------------------------------------
  * ۳) preload فونت‌ها  +  ۴) font-display: swap
  * ---------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_perf_fonts' ) ) {
-	function javan_seda_perf_fonts() {
-		if ( ! javan_seda_perf_active() ) {
+if ( ! function_exists( 'tara_perf_fonts' ) ) {
+	function tara_perf_fonts() {
+		if ( ! tara_perf_active() ) {
 			return;
 		}
 		$dir = get_stylesheet_directory_uri();
 
-		if ( JAVANSEDA_PERF_PRELOAD_FONTS ) {
+		if ( TARA_PERF_PRELOAD_FONTS ) {
 			/* v3.3.8 — اگر نسخهٔ woff2ِ همان فونت روی هاست باشد، همان preload می‌شود (≈۲۰٪ کوچک‌تر
 			   در این قالب؛ فایل‌های woff هم دست‌نخورده می‌مانند تا fallback امن باشد). */
 			$candidates = apply_filters(
-				'javanseda_perf_preload_fonts',
+				'tara_perf_preload_fonts',
 				array( $dir . '/fonts/vazir-fd.woff2', $dir . '/fonts/icofont.woff2', $dir . '/fonts/vazir-fd.woff', $dir . '/fonts/icofont.woff' )
 			);
 			$real = get_stylesheet_directory() . '/fonts/';
@@ -189,15 +189,15 @@ if ( ! function_exists( 'javan_seda_perf_fonts' ) ) {
 </style>
 		<?php
 	}
-	add_action( 'wp_head', 'javan_seda_perf_fonts', 1 );
+	add_action( 'wp_head', 'tara_perf_fonts', 1 );
 }
 
 /* -------------------------------------------------------------------------
  * ۵) lazy-load تصاویرِ چاپ‌شده در متن/شورت‌کدها
  * ---------------------------------------------------------------------- */
-if ( JAVANSEDA_PERF_LAZY_IMG && ! function_exists( 'javan_seda_perf_lazy_img' ) ) {
-	function javan_seda_perf_lazy_img( $html ) {
-		if ( ! javan_seda_perf_active() || ! is_string( $html ) || false === strpos( $html, '<img' ) ) {
+if ( TARA_PERF_LAZY_IMG && ! function_exists( 'tara_perf_lazy_img' ) ) {
+	function tara_perf_lazy_img( $html ) {
+		if ( ! tara_perf_active() || ! is_string( $html ) || false === strpos( $html, '<img' ) ) {
 			return $html;
 		}
 		$html = preg_replace_callback(
@@ -212,8 +212,8 @@ if ( JAVANSEDA_PERF_LAZY_IMG && ! function_exists( 'javan_seda_perf_lazy_img' ) 
 					return $tag;
 				}
 				$attrs = ' loading="lazy" decoding="async"';
-				if ( JAVANSEDA_PERF_IMG_DIMS && ! preg_match( '/\s(width|height)=/i', $tag ) ) {
-					$attrs .= ' width="640" height="360"'; // فقط با JAVANSEDA_PERF_IMG_DIMS=true (ریسکِ تغییر ابعاد آیکن‌ها)
+				if ( TARA_PERF_IMG_DIMS && ! preg_match( '/\s(width|height)=/i', $tag ) ) {
+					$attrs .= ' width="640" height="360"'; // فقط با TARA_PERF_IMG_DIMS=true (ریسکِ تغییر ابعاد آیکن‌ها)
 				}
 				return preg_replace( '/<img\b/i', '<img' . $attrs, $tag, 1 );
 			},
@@ -221,17 +221,17 @@ if ( JAVANSEDA_PERF_LAZY_IMG && ! function_exists( 'javan_seda_perf_lazy_img' ) 
 		);
 		return $html;
 	}
-	add_filter( 'the_content', 'javan_seda_perf_lazy_img', 50 );
-	add_filter( 'the_excerpt', 'javan_seda_perf_lazy_img', 50 );
+	add_filter( 'the_content', 'tara_perf_lazy_img', 50 );
+	add_filter( 'the_excerpt', 'tara_perf_lazy_img', 50 );
 }
 
 /* -------------------------------------------------------------------------
  * ۶) گزارش «بایتِ سرعت» — فقط‌خواندنی، بدون echo خودکار؛
  *    توسط ab-mobile-probe.php (بخش ۱۰) یا هر جای دیگری چاپ می‌شود.
  * ---------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_perf_report' ) ) {
+if ( ! function_exists( 'tara_perf_report' ) ) {
 	/** @return array خطوط گزارش */
-	function javan_seda_perf_report() {
+	function tara_perf_report() {
 		$L      = array();
 		$tdir   = get_template_directory();
 		$uri    = get_template_directory_uri();
@@ -240,8 +240,8 @@ if ( ! function_exists( 'javan_seda_perf_report' ) ) {
 		};
 
 		$line( '=== گزارش «بایتِ سرعت» — لایۀ perf v3.1.3 ===' );
-		$line( 'وضعیت لایه            : ' . ( ( defined( 'JAVANSEDA_PERF' ) && false === JAVANSEDA_PERF ) ? '✗ خاموش (JAVANSEDA_PERF=false)' : '✓ روشن' ) );
-		$line( '  defer / preload / strip / lazyIMG : ' . ( JAVANSEDA_PERF_DEFER ? 'defer✓' : 'defer✗' ) . ' / ' . ( JAVANSEDA_PERF_PRELOAD_FONTS ? 'preload✓' : 'preload✗' ) . ' / ' . ( JAVANSEDA_PERF_STRIP_HEAD ? 'strip✓' : 'strip✗' ) . ' / ' . ( JAVANSEDA_PERF_LAZY_IMG ? 'lazy✓' : 'lazy✗' ) );
+		$line( 'وضعیت لایه            : ' . ( ( defined( 'TARA_PERF' ) && false === TARA_PERF ) ? '✗ خاموش (TARA_PERF=false)' : '✓ روشن' ) );
+		$line( '  defer / preload / strip / lazyIMG : ' . ( TARA_PERF_DEFER ? 'defer✓' : 'defer✗' ) . ' / ' . ( TARA_PERF_PRELOAD_FONTS ? 'preload✓' : 'preload✗' ) . ' / ' . ( TARA_PERF_STRIP_HEAD ? 'strip✓' : 'strip✗' ) . ' / ' . ( TARA_PERF_LAZY_IMG ? 'lazy✓' : 'lazy✗' ) );
 		$opcache = 'نامعلوم';
 		if ( function_exists( 'opcache_get_status' ) ) {
 			$st = @opcache_get_status( false );
@@ -298,13 +298,13 @@ if ( ! function_exists( 'javan_seda_perf_report' ) ) {
 		if ( is_object( $wp_scripts ) && isset( $wp_scripts->queue ) ) {
 			foreach ( (array) $wp_scripts->queue as $h ) {
 				$src  = isset( $wp_scripts->registered[ $h ] ) ? (string) $wp_scripts->registered[ $h ]->src : '';
-				$js[] = $h . ( false !== strpos( $src, 'javanseda' ) ? '*' : '' );
+				$js[] = $h . ( false !== strpos( $src, 'taranehyar' ) ? '*' : '' );
 			}
 		}
 		if ( is_object( $wp_styles ) && isset( $wp_styles->queue ) ) {
 			foreach ( (array) $wp_styles->queue as $h ) {
 				$src   = isset( $wp_styles->registered[ $h ] ) ? (string) $wp_styles->registered[ $h ]->src : '';
-				$css[] = $h . ( false !== strpos( $src, 'javanseda' ) ? '*' : '' );
+				$css[] = $h . ( false !== strpos( $src, 'taranehyar' ) ? '*' : '' );
 			}
 		}
 		$line( '  JS (' . count( $js ) . ') : ' . ( $js ? implode( ', ', array_slice( $js, 0, 18 ) ) : '(خالی)' ) );

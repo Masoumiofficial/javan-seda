@@ -9,7 +9,7 @@
  * پوسته بدون هیچ !important تازه‌ای می‌نشیند.
  *
  * باز/بسته: «تنظیمات قالب ← کنترل رابط ← پوستۀ مدرِ تنظیمات» (پیش‌فرض روشن)
- *           یا define( 'JAVANSEDA_ADMIN_UI', false );  در wp-config.php
+ *           یا define( 'TARA_ADMIN_UI', false );  در wp-config.php
  * نبودن این فایل = دقیقاً همان رفتار قبلی (بدون پوسته).
  *
  * @package JavanSeda
@@ -20,18 +20,18 @@ if ( ! defined( 'ABSPATH' ) ) {
   exit;
 }
 
-if ( ! function_exists( 'javan_seda_admin_ui_on' ) ) {
+if ( ! function_exists( 'tara_admin_ui_on' ) ) {
   /**
    * آیا پوستۀ تنظیمات روشن است؟  define() → Option Tree → پیش‌فرض true
    *
    * @return bool
    */
-  function javan_seda_admin_ui_on() {
-    if ( function_exists( 'javan_seda_ui_on' ) ) {
-      return (bool) javan_seda_ui_on( 'ab_admin_ui', true, 'JAVANSEDA_ADMIN_UI' );
+  function tara_admin_ui_on() {
+    if ( function_exists( 'tara_ui_on' ) ) {
+      return (bool) tara_ui_on( 'ab_admin_ui', true, 'TARA_ADMIN_UI' );
     }
-    if ( defined( 'JAVANSEDA_ADMIN_UI' ) ) {
-      return (bool) constant( 'JAVANSEDA_ADMIN_UI' );
+    if ( defined( 'TARA_ADMIN_UI' ) ) {
+      return (bool) constant( 'TARA_ADMIN_UI' );
     }
     if ( function_exists( 'ot_get_option' ) ) {
       $v = ot_get_option( 'ab_admin_ui' );
@@ -43,13 +43,13 @@ if ( ! function_exists( 'javan_seda_admin_ui_on' ) ) {
   }
 }
 
-if ( ! function_exists( 'javan_seda_admin_ui_screens' ) ) {
+if ( ! function_exists( 'tara_admin_ui_screens' ) ) {
   /**
    * شناسۀ صفحه‌هایی که پوسته روی آن‌ها اعمال می‌شود.
    *
    * @return string[]
    */
-  function javan_seda_admin_ui_screens() {
+  function tara_admin_ui_screens() {
     return array(
       'taranehyar_page_ot-theme-options', /* ۳.۶.۰: تنظیمات زیر منوی «ترانه یار» */
       'appearance_page_ot-theme-options', /* سازگاری: اگر کسی پدر را به «نمایش» برگرداند */
@@ -59,21 +59,21 @@ if ( ! function_exists( 'javan_seda_admin_ui_screens' ) ) {
   }
 }
 
-if ( ! function_exists( 'javan_seda_admin_ui_enqueue' ) ) {
+if ( ! function_exists( 'tara_admin_ui_enqueue' ) ) {
   /**
    * enqueue پوسته، فقط روی صفحه‌های Option Tree.
    *
    * @return void
    */
-  function javan_seda_admin_ui_enqueue() {
-    if ( ! javan_seda_admin_ui_on() ) {
+  function tara_admin_ui_enqueue() {
+    if ( ! tara_admin_ui_on() ) {
       return;
     }
 
     $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
     $id     = is_object( $screen ) && isset( $screen->id ) ? (string) $screen->id : '';
 
-    if ( ! in_array( $id, javan_seda_admin_ui_screens(), true ) ) {
+    if ( ! in_array( $id, tara_admin_ui_screens(), true ) ) {
       return;
     }
 
@@ -92,7 +92,7 @@ if ( ! function_exists( 'javan_seda_admin_ui_enqueue' ) ) {
       $ver
     );
   }
-  add_action( 'ot_admin_styles_after', 'javan_seda_admin_ui_enqueue', 20 );
+  add_action( 'ot_admin_styles_after', 'tara_admin_ui_enqueue', 20 );
 }
 
 /* -------------------------------------------------------------------------
@@ -102,14 +102,14 @@ if ( ! function_exists( 'javan_seda_admin_ui_enqueue' ) ) {
  * خالی یا «همهٔ آهنگ‌ها» می‌شد. حالا هر numeric-slider پیش از ذخیره به عدد
  * لاتین تبدیل می‌شود. این بخش به پوستهٔ بصری وابسته نیست و همیشه فعال است.
  * ------------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_admin_ui_normalize_counts' ) ) {
+if ( ! function_exists( 'tara_admin_ui_normalize_counts' ) ) {
   /**
    * @param mixed  $input     مقدار خامِ فیلد.
    * @param string $type      نوع فیلد Option Tree.
    * @param string $field_id  کلید گزینه.
    * @return mixed
    */
-  function javan_seda_admin_ui_normalize_counts( $input, $type, $field_id ) {
+  function tara_admin_ui_normalize_counts( $input, $type, $field_id ) {
 
     if ( 'numeric-slider' !== $type || ! is_string( $input ) ) {
       return $input;
@@ -132,5 +132,5 @@ if ( ! function_exists( 'javan_seda_admin_ui_normalize_counts' ) ) {
 
     return (string) intval( $in );
   }
-  add_filter( 'ot_after_validate_setting', 'javan_seda_admin_ui_normalize_counts', 10, 3 );
+  add_filter( 'ot_after_validate_setting', 'tara_admin_ui_normalize_counts', 10, 3 );
 }

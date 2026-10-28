@@ -1,6 +1,6 @@
 <?php
 /**
- * جوان‌صدا — «اخبار روز» (جایگزین نوار دسترسی سریع زیر هدر) — نسخهٔ 3.1.2
+ * ترانه یار — «اخبار روز» (جایگزین نوار دسترسی سریع زیر هدر) — نسخهٔ 3.1.2
  * =========================================================================
  * این فایل تنها «تولید» می‌کند؛ هیچ هوکی ثبت نمی‌کند، چیزی ذخیره نمی‌کند و
  * در خطِ رندرِ صفحاتِ دیگر دخالت ندارد. فراخوانی آن اختیاری است:
@@ -9,9 +9,9 @@
  *
  * منبع داده: تازه‌ترین نوشته‌های «دستهٔ اخبار» با slug = news (یا id عددی).
  *   قابل تنظیم با define در wp-config.php (یا بالای functions.php):
- *     define( 'JAVANSEDA_NEWS_CATEGORY', 'news' );  // slug یا id دسته
- *     define( 'JAVANSEDA_NEWS_COUNT', 8 );          // تعداد خبر در نوار
- *     define( 'JAVANSEDA_NEWS_CACHE', 300 );        // ثانیه؛ ۰ = بدون کش
+ *     define( 'TARA_NEWS_CATEGORY', 'news' );  // slug یا id دسته
+ *     define( 'TARA_NEWS_COUNT', 8 );          // تعداد خبر در نوار
+ *     define( 'TARA_NEWS_CACHE', 300 );        // ثانیه؛ ۰ = بدون کش
  *   اگر دسته‌ای با آن slug/id پیدا نشود، به‌جای خطا، «تازه‌ترین نوشته‌ها» نمایش داده
  *   می‌شود و در کامنت HTML تذکر داده می‌شود.
  *
@@ -22,27 +22,27 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! function_exists( 'javan_seda_news_category_slugs' ) ) {
+if ( ! function_exists( 'tara_news_category_slugs' ) ) {
 	/** نامک‌هایی که به‌ترتیب برای «دستهٔ اخبار» جست‌وجو می‌شوند. */
-	function javan_seda_news_category_slugs() {
+	function tara_news_category_slugs() {
 		$slugs = array();
-		if ( defined( 'JAVANSEDA_NEWS_CATEGORY' ) ) {
-			$slugs[] = trim( (string) JAVANSEDA_NEWS_CATEGORY );
+		if ( defined( 'TARA_NEWS_CATEGORY' ) ) {
+			$slugs[] = trim( (string) TARA_NEWS_CATEGORY );
 		}
 		$slugs = array_merge( $slugs, array( 'news', 'akhbar', 'akhbar-musiqi', 'music-news', 'اخبار' ) );
 		$slugs = array_values( array_unique( array_filter( $slugs, 'strlen' ) ) );
-		return apply_filters( 'javanseda_news_category_slugs', $slugs );
+		return apply_filters( 'tara_news_category_slugs', $slugs );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_news_category_id' ) ) {
+if ( ! function_exists( 'tara_news_category_id' ) ) {
 	/** شناسهٔ دستهٔ اخبار: slug/نام در فهرست بالا (یا id عددی). ۰ = پیدا نشد. */
-	function javan_seda_news_category_id() {
+	function tara_news_category_id() {
 		static $cached = null;
 		if ( null !== $cached ) {
 			return $cached;
 		}
-		foreach ( javan_seda_news_category_slugs() as $slug ) {
+		foreach ( tara_news_category_slugs() as $slug ) {
 			if ( ctype_digit( $slug ) ) {
 				$term = get_term( (int) $slug, 'category' );
 				if ( $term && ! is_wp_error( $term ) ) {
@@ -65,18 +65,18 @@ if ( ! function_exists( 'javan_seda_news_category_id' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_news_posts' ) ) {
+if ( ! function_exists( 'tara_news_posts' ) ) {
 	/**
 	 * تازه‌ترین خبرها.
 	 * @return array list( array( 'id','title','url','date' ) ) + کلیدهای meta
 	 */
-	function javan_seda_news_posts( $limit = 0 ) {
-		$limit = $limit > 0 ? (int) $limit : ( defined( 'JAVANSEDA_NEWS_COUNT' ) ? (int) JAVANSEDA_NEWS_COUNT : 8 );
+	function tara_news_posts( $limit = 0 ) {
+		$limit = $limit > 0 ? (int) $limit : ( defined( 'TARA_NEWS_COUNT' ) ? (int) TARA_NEWS_COUNT : 8 );
 		$limit = max( 1, min( 20, $limit ) );
-		$cat   = javan_seda_news_category_id();
-		$ttl   = defined( 'JAVANSEDA_NEWS_CACHE' ) ? (int) JAVANSEDA_NEWS_CACHE : 300;
+		$cat   = tara_news_category_id();
+		$ttl   = defined( 'TARA_NEWS_CACHE' ) ? (int) TARA_NEWS_CACHE : 300;
 
-		$ck = 'javan_seda_news_' . $cat . '_' . $limit;
+		$ck = 'tara_news_' . $cat . '_' . $limit;
 		if ( $ttl > 0 ) {
 			$hit = get_transient( $ck );
 			if ( is_array( $hit ) ) {
@@ -119,8 +119,8 @@ if ( ! function_exists( 'javan_seda_news_posts' ) ) {
 
 		/* اگر دستهٔ اخبار پیدا نشد: در حالت سخت‌گیر (پیش‌فرض v3.1.3) نوار «چیزی» نمایش
 		   نمی‌دهد، چون مالک خواست فقط نوشته‌های دستهٔ news بیاید. برای بازگشت به
-		   «آخرین نوشته‌ها» :  define( 'JAVANSEDA_NEWS_STRICT', false );  */
-		if ( ! $cat && defined( 'JAVANSEDA_NEWS_STRICT' ) && false === JAVANSEDA_NEWS_STRICT ) {
+		   «آخرین نوشته‌ها» :  define( 'TARA_NEWS_STRICT', false );  */
+		if ( ! $cat && defined( 'TARA_NEWS_STRICT' ) && false === TARA_NEWS_STRICT ) {
 			$fallback = $args;
 			unset( $fallback['cat'] );
 			$q2 = new WP_Query( $fallback );
@@ -145,14 +145,14 @@ if ( ! function_exists( 'javan_seda_news_posts' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_news_ticker' ) ) {
+if ( ! function_exists( 'tara_news_ticker' ) ) {
 	/**
 	 * چاپِ نوار «اخبار روز».
 	 * @param bool $echo  false = رشته بده (برای استفاده در هر قالب/بلاک/شورت‌کد)
 	 * @return string
 	 */
-	function javan_seda_news_ticker( $echo = true, $count = 0 ) {
-		$data  = javan_seda_news_posts( $count );
+	function tara_news_ticker( $echo = true, $count = 0 ) {
+		$data  = tara_news_posts( $count );
 		$items = ! empty( $data['items'] ) ? $data['items'] : array();
 
 		if ( ! $items ) {
@@ -204,7 +204,7 @@ if ( ! function_exists( 'javan_seda_news_ticker' ) ) {
 			. '</div>'
 			. ( $more ? '<a class="ab-news-more" href="' . esc_url( $more ) . '">همهٔ اخبار <i class="icofont-arrow-left" aria-hidden="true"></i></a>' : '' )
 			. '</div>'
-			. '<!-- javan_seda: news ticker | cat=' . ( $cat_id ? $cat_id : 'NONE' ) . ' | ' . count( $items ) . ' خبر | strict=' . ( defined( 'JAVANSEDA_NEWS_STRICT' ) && false === JAVANSEDA_NEWS_STRICT ? 'off' : 'on' ) . ' -->'
+			. '<!-- javan_seda: news ticker | cat=' . ( $cat_id ? $cat_id : 'NONE' ) . ' | ' . count( $items ) . ' خبر | strict=' . ( defined( 'TARA_NEWS_STRICT' ) && false === TARA_NEWS_STRICT ? 'off' : 'on' ) . ' -->'
 			. '</nav>';
 
 		if ( $echo ) {
@@ -216,12 +216,12 @@ if ( ! function_exists( 'javan_seda_news_ticker' ) ) {
 }
 
 /** شورت‌کد اختیاری: [ab_news count="6"] — برای گذاشتن اخبار در هر برگه/ابزارک. */
-if ( ! function_exists( 'javan_seda_news_shortcode' ) ) {
-	function javan_seda_news_shortcode( $atts = array() ) {
+if ( ! function_exists( 'tara_news_shortcode' ) ) {
+	function tara_news_shortcode( $atts = array() ) {
 		$a = shortcode_atts( array( 'count' => 0 ), (array) $atts, 'ab_news' );
-		return javan_seda_news_ticker( false, (int) $a['count'] );
+		return tara_news_ticker( false, (int) $a['count'] );
 	}
 	if ( function_exists( 'add_shortcode' ) ) {
-		add_shortcode( 'ab_news', 'javan_seda_news_shortcode' );
+		add_shortcode( 'ab_news', 'tara_news_shortcode' );
 	}
 }

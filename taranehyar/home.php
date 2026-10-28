@@ -13,18 +13,18 @@ if ( get_query_var( 'paged' ) ) {
 <div id="centers_box">
 
 <!-- نوار زیر هدر — در نسخهٔ 3.1.2 به «اخبار روز» تبدیل شد (منبع: نوشته‌های دستهٔ news) -->
-<?php if ( ! function_exists( 'javan_seda_ui_on' ) || javan_seda_ui_on( 'ab_quickbar', true, 'JAVANSEDA_QUICKBAR' ) ) { ?>
+<?php if ( ! function_exists( 'tara_ui_on' ) || tara_ui_on( 'ab_quickbar', true, 'TARA_QUICKBAR' ) ) { ?>
 <?php
 /* لایهٔ سازگاری: اگر myfunctions.php اعمال نشده باشد، همین‌جا فایل اخبار را بارگذاری می‌کند */
-if ( ! function_exists( 'javan_seda_news_ticker' ) ) {
+if ( ! function_exists( 'tara_news_ticker' ) ) {
 	$_ab_news = trailingslashit( get_template_directory() ) . 'inc/ab-news-ticker.php';
 	if ( is_readable( $_ab_news ) ) {
 		require_once $_ab_news;
 	}
 	unset( $_ab_news );
 }
-if ( function_exists( 'javan_seda_news_ticker' ) ) {
-	javan_seda_news_ticker();   // خروجی: <nav class="ab-quickbar ab-news" id="ab-news">
+if ( function_exists( 'tara_news_ticker' ) ) {
+	tara_news_ticker();   // خروجی: <nav class="ab-quickbar ab-news" id="ab-news">
 } else {
 ?>
 <!-- fallback — همان نوار دسترسی سریعِ نسخهٔ 3.0.1 (اگر فایل اخبار روی هاست نبود) -->
@@ -37,7 +37,7 @@ if ( function_exists( 'javan_seda_news_ticker' ) ) {
 			</a>
 		</li>
 		<li class="ab-quickbar__item">
-			<a href="<?php echo esc_url( javan_seda_artists_index_url() ); ?>" class="ab-quickbar__link">
+			<a href="<?php echo esc_url( tara_artists_index_url() ); ?>" class="ab-quickbar__link">
 				<i class="icofont-microphone-alt"></i>
 				<span>همهٔ هنرمندان</span>
 			</a>
@@ -51,7 +51,7 @@ if ( function_exists( 'javan_seda_news_ticker' ) ) {
 	</ul>
 </nav>
 <?php } ?>
-<?php } /* JAVANSEDA_QUICKBAR / ab_quickbar */ ?>
+<?php } /* TARA_QUICKBAR / ab_quickbar */ ?>
 
 <?php get_template_part('inc/vip_slider'); ?>
 <?php get_template_part('inc/tarlanweb_player'); ?>

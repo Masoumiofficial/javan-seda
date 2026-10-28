@@ -6,7 +6,7 @@
    inc/ab-admin-ui.php ← قلاب ot_admin_styles_after ⇒ بعد از ot-admin.css، پس
    هیچ !important لازم نیست). هیچ خروجیِ سمت سایتی ندارد.
    باز/بسته: «تنظیمات قالب ← کنترل رابط ← پوستۀ مدرِ تنظیمات»
-             یا  define( 'JAVANSEDA_ADMIN_UI', false );  در wp-config.php
+             یا  define( 'TARA_ADMIN_UI', false );  در wp-config.php
    رنگ‌ها همان پالت قالب: آبی #185ADB، جوهری #111، سفید — بدون گرادینت.
    ========================================================================== */
 

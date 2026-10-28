@@ -22,16 +22,16 @@
  *   ab_footer_*      → footer.php (ستون‌ها، لینک‌های میخکوب، لینک‌های دستی، جست‌وجو)
  *
  * کلیدهای تعریف‌شدنی (معادل هر گزینه، برای wp-config.php):
- *   JAVANSEDA_GLASS_UI · JAVANSEDA_UI_GUARD · JAVANSEDA_CARD_STATS ·
- *   JAVANSEDA_STICKY_PLAYER · JAVANSEDA_SKIP_LINK · JAVANSEDA_POST_EXTRAS
+ *   TARA_GLASS_UI · TARA_UI_GUARD · TARA_CARD_STATS ·
+ *   TARA_STICKY_PLAYER · TARA_SKIP_LINK · TARA_POST_EXTRAS
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! function_exists( 'javan_seda_ui_define' ) ) {
+if ( ! function_exists( 'tara_ui_define' ) ) {
 	/** مقدار یک constantِ اختیاری به‌صورت bool/null (null = تعریف نشده). */
-	function javan_seda_ui_define( $name ) {
+	function tara_ui_define( $name ) {
 		if ( ! defined( $name ) ) {
 			return null;
 		}
@@ -43,9 +43,9 @@ if ( ! function_exists( 'javan_seda_ui_define' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_raw' ) ) {
+if ( ! function_exists( 'tara_ui_raw' ) ) {
 	/** خام‌ترین خواندن از Option Tree، بدون فرض و پیش‌فرض. */
-	function javan_seda_ui_raw( $key, $default = '' ) {
+	function tara_ui_raw( $key, $default = '' ) {
 		static $cache = array();
 		if ( isset( $cache[ $key ] ) ) {
 			return $cache[ $key ];
@@ -62,7 +62,7 @@ if ( ! function_exists( 'javan_seda_ui_raw' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_on' ) ) {
+if ( ! function_exists( 'tara_ui_on' ) ) {
 	/**
 	 * آیا یک روشن/خاموش فعال است؟
 	 *
@@ -70,14 +70,14 @@ if ( ! function_exists( 'javan_seda_ui_on' ) ) {
 	 * @param bool   $default پیش‌فرض اگر گزینه ست نشده بود.
 	 * @param string $define    نام constant اختیاری در wp-config.php.
 	 */
-	function javan_seda_ui_on( $key, $default = true, $define = '' ) {
+	function tara_ui_on( $key, $default = true, $define = '' ) {
 		if ( '' !== $define ) {
-			$d = javan_seda_ui_define( $define );
+			$d = tara_ui_define( $define );
 			if ( null !== $d ) {
 				return $d;
 			}
 		}
-		$v = javan_seda_ui_raw( $key, $default ? 'on' : 'off' );
+		$v = tara_ui_raw( $key, $default ? 'on' : 'off' );
 		if ( is_bool( $v ) ) {
 			return $v;
 		}
@@ -85,18 +85,18 @@ if ( ! function_exists( 'javan_seda_ui_on' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_choice' ) ) {
+if ( ! function_exists( 'tara_ui_choice' ) ) {
 	/** یک مقدار متنی که باید داخل فهرست مجاز باشد. */
-	function javan_seda_ui_choice( $key, $allowed, $default = '' ) {
-		$v = (string) javan_seda_ui_raw( $key, $default );
+	function tara_ui_choice( $key, $allowed, $default = '' ) {
+		$v = (string) tara_ui_raw( $key, $default );
 		return in_array( $v, $allowed, true ) ? $v : $default;
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_num' ) ) {
+if ( ! function_exists( 'tara_ui_num' ) ) {
 	/** عدد صحیح با کریدر (برای فاصله‌ها و تعدادها). */
-	function javan_seda_ui_num( $key, $default = 0, $min = 0, $max = 999 ) {
-		$raw = javan_seda_ui_raw( $key, '' );
+	function tara_ui_num( $key, $default = 0, $min = 0, $max = 999 ) {
+		$raw = tara_ui_raw( $key, '' );
 		if ( is_array( $raw ) || is_object( $raw ) ) {
 			return (int) $default;
 		}
@@ -109,9 +109,9 @@ if ( ! function_exists( 'javan_seda_ui_num' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_player_mode' ) ) {
-	function javan_seda_ui_player_mode() {
-		return javan_seda_ui_choice( 'ab_player_mode', array( 'card', 'compact', 'legacy' ), 'card' );
+if ( ! function_exists( 'tara_ui_player_mode' ) ) {
+	function tara_ui_player_mode() {
+		return tara_ui_choice( 'ab_player_mode', array( 'card', 'compact', 'legacy' ), 'card' );
 	}
 }
 
@@ -120,14 +120,14 @@ if ( ! function_exists( 'javan_seda_ui_player_mode' ) ) {
  * تنها چیزی که به بیرون داده می‌شود یک توکن (--ab-post-img-size) و یک کلاس بدنه
  * (ab-post-img-square) است؛ قواعدش در بلوک ۳۷ِ style.css است.
  */
-if ( ! function_exists( 'javan_seda_ui_post_img_size' ) ) {
+if ( ! function_exists( 'tara_ui_post_img_size' ) ) {
 	/** عدد صحیح داخل بازۀ اسلایدر (۲۴۰ تا ۹۰۰، پیش‌فرض ۵۰۰). */
-	function javan_seda_ui_post_img_size() {
-		return javan_seda_ui_num( 'ab_post_img_size', 500, 240, 900 );
+	function tara_ui_post_img_size() {
+		return tara_ui_num( 'ab_post_img_size', 500, 240, 900 );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_post_cover_size' ) ) {
+if ( ! function_exists( 'tara_post_cover_size' ) ) {
 	/**
 	 * کدام سایز وردپرس درخواست شود؟
 	 *
@@ -137,7 +137,7 @@ if ( ! function_exists( 'javan_seda_post_cover_size' ) ) {
 	 *
 	 * @return string
 	 */
-	function javan_seda_post_cover_size() {
+	function tara_post_cover_size() {
 		if ( ! function_exists( 'wp_get_attachment_image_src' ) ) {
 			return 'large';
 		}
@@ -153,15 +153,15 @@ if ( ! function_exists( 'javan_seda_post_cover_size' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_post_cover_args' ) ) {
+if ( ! function_exists( 'tara_post_cover_args' ) ) {
 	/**
 	 * alt/title + «sizes» درست: تا srcset نزدیک‌ترین فایل را به همان عرضی بردارد
 	 * که در تنظیمات انتخاب شده (بی‌این، مرورگر فایل ۱۰۲۴ پیکسلی large را می‌خواست).
 	 *
 	 * @return array
 	 */
-	function javan_seda_post_cover_args() {
-		$px = javan_seda_ui_post_img_size();
+	function tara_post_cover_args() {
+		$px = tara_ui_post_img_size();
 		return array(
 			'alt'   => get_the_title(),
 			'title' => get_the_title(),
@@ -170,26 +170,26 @@ if ( ! function_exists( 'javan_seda_post_cover_args' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_body_class' ) ) {
+if ( ! function_exists( 'tara_ui_body_class' ) ) {
 	/** کلاس‌هایی که بلوک ۳۳ِ style.css روی اساسشان کار می‌کند. */
-	function javan_seda_ui_body_class( $classes ) {
-		$mode = javan_seda_ui_player_mode();
+	function tara_ui_body_class( $classes ) {
+		$mode = tara_ui_player_mode();
 		if ( 'card' !== $mode ) {
 			$classes[] = 'ab-player-' . $mode;
 		}
-		if ( ! javan_seda_ui_on( 'ab_player_volume', true ) ) {
+		if ( ! tara_ui_on( 'ab_player_volume', true ) ) {
 			$classes[] = 'ab-player-novol';
 		}
-		if ( javan_seda_ui_on( 'ab_post_img_crop', true ) ) {
+		if ( tara_ui_on( 'ab_post_img_crop', true ) ) {
 			$classes[] = 'ab-post-img-square';
 		}
-		$list = javan_seda_ui_choice( 'ab_player_list', array( 'btn', 'open', 'hide' ), 'btn' );
+		$list = tara_ui_choice( 'ab_player_list', array( 'btn', 'open', 'hide' ), 'btn' );
 		if ( 'btn' !== $list ) {
 			$classes[] = 'ab-player-list-' . $list;
 		}
 		return $classes;
 	}
-	add_filter( 'body_class', 'javan_seda_ui_body_class' );
+	add_filter( 'body_class', 'tara_ui_body_class' );
 }
 
 /**
@@ -197,20 +197,20 @@ if ( ! function_exists( 'javan_seda_ui_body_class' ) ) {
  * حالت‌ها در بلوک ۳۴ِ style.css است؛ این تکه در انتهای wp_head چاپ می‌شود، یعنی
  * بعد از همه استایل‌های enqueue‌شده ⇒ با همان ویژگی برنده می‌شود و !important لازم نیست.
  */
-if ( ! function_exists( 'javan_seda_ui_head_css' ) ) {
-	function javan_seda_ui_head_css() {
+if ( ! function_exists( 'tara_ui_head_css' ) ) {
+	function tara_ui_head_css() {
 		if ( function_exists( 'is_admin' ) && is_admin() ) {
 			return;
 		}
-		$mode = javan_seda_ui_player_mode();
+		$mode = tara_ui_player_mode();
 		$root = array();
-		$root[] = '--ab-player-gap:' . javan_seda_ui_num( 'ab_player_gap', 30, 0, 96 ) . 'px';
-		$root[] = '--ab-player-radius:' . javan_seda_ui_num( 'ab_player_radius', 20, 0, 40 ) . 'px';
-		$root[] = '--ab-post-img-size:' . javan_seda_ui_post_img_size() . 'px';
-		if ( ! javan_seda_ui_on( 'ab_player_border', true ) ) {
+		$root[] = '--ab-player-gap:' . tara_ui_num( 'ab_player_gap', 30, 0, 96 ) . 'px';
+		$root[] = '--ab-player-radius:' . tara_ui_num( 'ab_player_radius', 20, 0, 40 ) . 'px';
+		$root[] = '--ab-post-img-size:' . tara_ui_post_img_size() . 'px';
+		if ( ! tara_ui_on( 'ab_player_border', true ) ) {
 			$root[] = '--ab-player-border:0';
 		}
-		if ( ! javan_seda_ui_on( 'ab_player_shadow', true ) ) {
+		if ( ! tara_ui_on( 'ab_player_shadow', true ) ) {
 			$root[] = '--ab-player-shadow:none';
 		}
 		if ( 'compact' === $mode ) {
@@ -232,13 +232,13 @@ if ( ! function_exists( 'javan_seda_ui_head_css' ) ) {
 		}
 		echo '<style id="ab-ui-controls">:root{' . implode( ';', $root ) . ';}</style>' . "\n";
 	}
-	add_action( 'wp_head', 'javan_seda_ui_head_css', 99 );
+	add_action( 'wp_head', 'tara_ui_head_css', 99 );
 }
 
-if ( ! function_exists( 'javan_seda_ui_footer_col' ) ) {
+if ( ! function_exists( 'tara_ui_footer_col' ) ) {
 	/** آیا یک ستون فوتر نمایش داده شود؟ (چک‌باکس ab_footer_cols) */
-	function javan_seda_ui_footer_col( $col ) {
-		$v = javan_seda_ui_raw( 'ab_footer_cols', array( 'about', 'links', 'cats', 'social' ) );
+	function tara_ui_footer_col( $col ) {
+		$v = tara_ui_raw( 'ab_footer_cols', array( 'about', 'links', 'cats', 'social' ) );
 		if ( ! is_array( $v ) ) {
 			$v = array_filter( array_map( 'trim', explode( ',', (string) $v ) ) );
 		}
@@ -249,13 +249,13 @@ if ( ! function_exists( 'javan_seda_ui_footer_col' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
+if ( ! function_exists( 'tara_ui_footer_cols_count' ) ) {
 	/** چند ستون فوتر روشن است؟ footer.php آن را در data-ab-cols می‌نویسد تا شبکه
 	   به‌جای یک‌چهارم خالی، عرض را بین ستون‌های باقی‌مانده تقسیم کند (بلوک ۳۴). */
-	function javan_seda_ui_footer_cols_count() {
+	function tara_ui_footer_cols_count() {
 		$n = 0;
 		foreach ( array( 'about', 'links', 'cats', 'social' ) as $col ) {
-			if ( javan_seda_ui_footer_col( $col ) ) {
+			if ( tara_ui_footer_col( $col ) ) {
 				$n++;
 			}
 		}
@@ -263,19 +263,19 @@ if ( ! function_exists( 'javan_seda_ui_footer_cols_count' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_footer_links' ) ) {
+if ( ! function_exists( 'tara_ui_footer_links' ) ) {
 	/**
 	 * لینک‌های ستون «لینک‌های مفید»: دو لینک پیش‌فرض (اگر روشن باشد) + لینک‌های
 	 * دستیِ مالک، هر خط به شکل  عنوان|آدرس  (یا عنوان = آدرس).
 	 *
 	 * @return array — هر آیتم = array( 'label' => …, 'url' => …, 'icon' => … )
 	 */
-	function javan_seda_ui_footer_links() {
+	function tara_ui_footer_links() {
 		$out = array();
-		if ( javan_seda_ui_on( 'ab_footer_pinned', true ) ) {
+		if ( tara_ui_on( 'ab_footer_pinned', true ) ) {
 			$out[] = array(
 				'label' => 'همهٔ هنرمندان',
-				'url'   => javan_seda_artists_index_url(),
+				'url'   => tara_artists_index_url(),
 				'icon'  => 'icofont-microphone-alt',
 			);
 			$out[] = array(
@@ -284,7 +284,7 @@ if ( ! function_exists( 'javan_seda_ui_footer_links' ) ) {
 				'icon'  => 'icofont-music-notes',
 			);
 		}
-		$raw = (string) javan_seda_ui_raw( 'ab_footer_links', '' );
+		$raw = (string) tara_ui_raw( 'ab_footer_links', '' );
 		if ( '' !== trim( $raw ) ) {
 			foreach ( preg_split( '/\r\n|\r|\n/', $raw ) as $line ) {
 				$line = trim( $line );
@@ -320,14 +320,14 @@ if ( ! function_exists( 'javan_seda_ui_footer_links' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_footer_search' ) ) {
-	function javan_seda_ui_footer_search() {
-		return javan_seda_ui_on( 'ab_footer_search', true );
+if ( ! function_exists( 'tara_ui_footer_search' ) ) {
+	function tara_ui_footer_search() {
+		return tara_ui_on( 'ab_footer_search', true );
 	}
 }
 
-if ( ! function_exists( 'javan_seda_ui_footer_cats' ) ) {
-	function javan_seda_ui_footer_cats() {
-		return javan_seda_ui_num( 'ab_footer_cats_num', 8, 0, 20 );
+if ( ! function_exists( 'tara_ui_footer_cats' ) ) {
+	function tara_ui_footer_cats() {
+		return tara_ui_num( 'ab_footer_cats_num', 8, 0, 20 );
 	}
 }

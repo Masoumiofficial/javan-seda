@@ -2,7 +2,7 @@
 /**
  * Template Name: هنرمندان
  *
- * صفحهٔ «همهٔ هنرمندان» — آدرسِ خودِ این برگه از javan_seda_artists_index_url() هم خوانده می‌شود.
+ * صفحهٔ «همهٔ هنرمندان» — آدرسِ خودِ این برگه از tara_artists_index_url() هم خوانده می‌شود.
  *
  * این فایل فقط «نمایش» است: نه تاکسونومی ثبت می‌کند، نه rewrite را تغییر می‌دهد،
  * نه در جایی از سایت دخالت می‌کند. اگر این فایل را بردارید، قالب قبلی دقیقاً مثل
@@ -17,7 +17,7 @@
  *   • تعداد آهنگ هر هنرمند روی کارت + خط آمار کل + ساختار داده ItemList برای گوگل
  *   • تصویر تنبل‌بار (lazy) با srcset، دکمهٔ «اول صفحه»، پیام حالت خالی و حالت شب
  *
- * تنظیم‌ها و همه‌چیز از طریق فیلتر «javanseda_artists_config» قابل تغییر است.
+ * تنظیم‌ها و همه‌چیز از طریق فیلتر «tara_artists_config» قابل تغییر است.
  *
  * گزارش تشخیصی (فقط مدیر): همین آدرس + ?ab_artists_diag=1
  */
@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
    ۰) تنظیم‌ها — اگر خواستید چیزی را عوض کنید، فقط همین جدول
    ================================================================================== */
 $ab_cfg = array(
-	'taxonomy'    => javan_seda_artist_tax(), // نامک فعالِ تاکسونومی هنرمند (artist یا singer)
+	'taxonomy'    => tara_artist_tax(), // نامک فعالِ تاکسونومی هنرمند (artist یا singer)
 	'hide_empty'  => true,     // هنرمندانِ بدون آهنگ پنهان بمانند
 	'max_terms'   => 1200,     // بیشتر از این تعداد → حالت صفحه‌بندی (برای امنیت سرعت)
 	'per_page'    => 60,       // فقط در حالت صفحه‌بندی
@@ -43,25 +43,25 @@ $ab_cfg = array(
 	'top_limit'   => 12,       // چند هنرمند در آن ردیف
 	'json_ld_max' => 200,      // حداکثر تعداد آیتم در داده‌ساختاریافته
 );
-$ab_cfg = apply_filters( 'javanseda_artists_config', $ab_cfg );
+$ab_cfg = apply_filters( 'tara_artists_config', $ab_cfg );
 
-$ab_taxonomy = isset( $ab_cfg['taxonomy'] ) ? (string) $ab_cfg['taxonomy'] : javan_seda_artist_tax();
+$ab_taxonomy = isset( $ab_cfg['taxonomy'] ) ? (string) $ab_cfg['taxonomy'] : tara_artist_tax();
 $ab_total    = 0;
 
 /* ==================================================================================
    ۱) توابع کمکی — نرمال‌سازی فارسی، کلید مرتب‌سازی الفبایی، تصویر کارت
    ================================================================================== */
-if ( ! function_exists( 'javanseda_artists_chars' ) ) {
+if ( ! function_exists( 'tara_artists_chars' ) ) {
 	/** رشته را به حروف تک‌تایی UTF-8 می‌شکند (بدون نیاز به mbstring) */
-	function javanseda_artists_chars( $text ) {
+	function tara_artists_chars( $text ) {
 		$chars = preg_split( '//u', (string) $text, -1, PREG_SPLIT_NO_EMPTY );
 		return is_array( $chars ) ? $chars : array();
 	}
 }
 
-if ( ! function_exists( 'javanseda_artists_normalize' ) ) {
+if ( ! function_exists( 'tara_artists_normalize' ) ) {
 	/** ي/ك عربی، ة/ۀ، آ/أ/إ، حرکات، کشیده و نیم‌فاصله را یکسان می‌کند */
-	function javanseda_artists_normalize( $text ) {
+	function tara_artists_normalize( $text ) {
 		$text = (string) $text;
 		$text = str_replace(
 			array( "\xE2\x80\x8C", "\xE2\x80\x8D", 'ي', 'ك', 'ة', 'ۀ', 'ؤ', 'أ', 'إ', 'آ', 'ٱ', 'ئ', 'ى', 'ك' ),
@@ -74,11 +74,11 @@ if ( ! function_exists( 'javanseda_artists_normalize' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javanseda_artists_sort_key' ) ) {
+if ( ! function_exists( 'tara_artists_sort_key' ) ) {
 	/** کلید مرتب‌سازی: هر حرف فارسی → شمارهٔ جای آن در الفبا */
-	function javanseda_artists_sort_key( $text, $index ) {
+	function tara_artists_sort_key( $text, $index ) {
 		$key = '';
-		foreach ( javanseda_artists_chars( javanseda_artists_normalize( $text ) ) as $char ) {
+		foreach ( tara_artists_chars( tara_artists_normalize( $text ) ) as $char ) {
 			if ( isset( $index[ $char ] ) ) {
 				$key .= sprintf( '%02d', $index[ $char ] );
 			} elseif ( preg_match( '/[0-9]/', $char ) ) {
@@ -95,16 +95,16 @@ if ( ! function_exists( 'javanseda_artists_sort_key' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javanseda_artists_image' ) ) {
+if ( ! function_exists( 'tara_artists_image' ) ) {
 	/** تصویر هنرمند از فیلد ACF «aimg2» (شناسه/آرایه/آدرس) + تصویر پیش‌فرض قالب */
-	function javanseda_artists_image( $term, $size = 'medium' ) {
+	function tara_artists_image( $term, $size = 'medium' ) {
 		/* v3.5.2 — همان ترتیبِ بقیهٔ قالب: ACF → term meta. تصویرِ ثبت‌شده در
 		   پیشخوانِ هنرمند (بدون ACF) هم همین‌جا نمایش داده می‌شود. */
 		$image = '';
-		if ( function_exists( 'javan_seda_artist_field' ) ) {
-			$image = javan_seda_artist_field( $term, 'aimg2' );
+		if ( function_exists( 'tara_artist_field' ) ) {
+			$image = tara_artist_field( $term, 'aimg2' );
 			if ( '' === $image ) {
-				$maybe_id = absint( javan_seda_artist_field( $term, 'aimg2_id' ) );
+				$maybe_id = absint( tara_artist_field( $term, 'aimg2_id' ) );
 				if ( $maybe_id ) {
 					$image = $maybe_id;
 				}
@@ -150,21 +150,21 @@ if ( ! function_exists( 'javanseda_artists_image' ) ) {
 		}
 
 		if ( '' === $url ) {
-			$url = function_exists( 'javan_seda_artist_default_image' ) ? javan_seda_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp';
+			$url = function_exists( 'tara_artist_default_image' ) ? tara_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp';
 		}
 
 		return '<img class="ab-artist__img" src="' . esc_url( $url ) . '" alt="' . esc_attr( $alt ) . '" title="' . esc_attr( $alt ) . '" loading="lazy" decoding="async" width="200" height="200">';
 	}
 }
 
-if ( ! function_exists( 'javanseda_artists_latin_name' ) ) {
+if ( ! function_exists( 'tara_artists_latin_name' ) ) {
 	/** نام لاتین هنرمند: اول فیلتر، بعد چند فیلد رایج ترم، در پایان از اسلاگ انگلیسی */
-	function javanseda_artists_latin_name( $term ) {
+	function tara_artists_latin_name( $term ) {
 		if ( ! $term instanceof WP_Term ) {
 			return '';
 		}
 
-		$custom = apply_filters( 'javanseda_artists_latin_name', '', $term );
+		$custom = apply_filters( 'tara_artists_latin_name', '', $term );
 		if ( is_string( $custom ) && '' !== trim( $custom ) ) {
 			return trim( wp_strip_all_tags( $custom ) );
 		}
@@ -193,13 +193,13 @@ if ( ! function_exists( 'javanseda_artists_latin_name' ) ) {
 $ab_alphabet = 'ابپتثجچحخدذرزژسشصضطظعغفقکگلمنوهی';
 $ab_index    = array();
 $ab_pos      = 0;
-foreach ( javanseda_artists_chars( $ab_alphabet ) as $ab_char ) {
+foreach ( tara_artists_chars( $ab_alphabet ) as $ab_char ) {
 	$ab_index[ $ab_char ] = $ab_pos;
 	$ab_pos++;
 }
 
 $ab_letter = isset( $_GET['letter'] ) ? sanitize_text_field( wp_unslash( $_GET['letter'] ) ) : '';
-$ab_letter = javanseda_artists_normalize( $ab_letter );
+$ab_letter = tara_artists_normalize( $ab_letter );
 if ( '' !== $ab_letter && ! isset( $ab_index[ $ab_letter ] ) && '#' !== $ab_letter ) {
 	$ab_letter = '';
 }
@@ -210,7 +210,7 @@ if ( ! in_array( $ab_sort, array( 'name', 'songs' ), true ) ) {
 }
 
 $ab_search      = isset( $_GET['q'] ) ? trim( sanitize_text_field( wp_unslash( $_GET['q'] ) ) ) : '';
-$ab_search_norm = javanseda_artists_normalize( $ab_search );
+$ab_search_norm = tara_artists_normalize( $ab_search );
 
 /* صفحه‌های ?sort= و ?q= ارزش ایندکس‌شدن ندارند (محتوای تکراری/نتیجهٔ جست‌وجو) */
 if ( ( '' !== $ab_sort && 'name' !== $ab_sort ) || '' !== $ab_search ) {
@@ -260,7 +260,7 @@ if ( isset( $_GET['ab_artists_diag'] ) && current_user_can( 'manage_options' ) )
 			if ( ! $ab_diag_term instanceof WP_Term ) {
 				continue;
 			}
-			$ab_chars = javanseda_artists_chars( javanseda_artists_normalize( $ab_diag_term->name ) );
+			$ab_chars = tara_artists_chars( tara_artists_normalize( $ab_diag_term->name ) );
 			$ab_first = $ab_chars ? $ab_chars[0] : '#';
 			$ab_key   = isset( $ab_index[ $ab_first ] ) ? $ab_first : '#';
 			if ( ! isset( $ab_diag_letters[ $ab_key ] ) ) {
@@ -328,19 +328,19 @@ if ( ! $ab_error && $ab_terms ) {
 		if ( is_wp_error( $ab_link ) ) {
 			continue;
 		}
-		$ab_norm  = javanseda_artists_normalize( $ab_term->name );
-		$ab_chars = javanseda_artists_chars( $ab_norm );
+		$ab_norm  = tara_artists_normalize( $ab_term->name );
+		$ab_chars = tara_artists_chars( $ab_norm );
 		$ab_first = $ab_chars ? $ab_chars[0] : '#';
 
 		$ab_items[] = array(
 			'term'   => $ab_term,
 			'name'   => $ab_term->name,
-			'latin'  => javanseda_artists_latin_name( $ab_term ),
+			'latin'  => tara_artists_latin_name( $ab_term ),
 			'norm'   => $ab_norm,
 			'link'   => $ab_link,
 			'count'  => (int) $ab_term->count,
 			'letter' => isset( $ab_index[ $ab_first ] ) ? $ab_first : '#',
-			'key'    => javanseda_artists_sort_key( $ab_term->name, $ab_index ) . '|' . $ab_norm,
+			'key'    => tara_artists_sort_key( $ab_term->name, $ab_index ) . '|' . $ab_norm,
 		);
 	}
 }
@@ -502,7 +502,7 @@ $ab_url_all    = $ab_base_url;
 $ab_url_songs  = add_query_arg( 'sort', 'songs', $ab_base_url );
 $ab_url_name   = $ab_base_url;
 $ab_url_letter = array();
-foreach ( javanseda_artists_chars( $ab_alphabet ) as $ab_char ) {
+foreach ( tara_artists_chars( $ab_alphabet ) as $ab_char ) {
 	$ab_url_letter[ $ab_char ] = add_query_arg(
 		array(
 			'letter' => $ab_char,
@@ -620,7 +620,7 @@ get_template_part( 'inc/breadcrumbs' );
 								<a class="ab-artists__chip" href="<?php echo esc_url( $ab_url_all ); ?>">همه</a>
 							<?php endif; ?>
 							<?php
-							foreach ( javanseda_artists_chars( $ab_alphabet ) as $ab_char ) :
+							foreach ( tara_artists_chars( $ab_alphabet ) as $ab_char ) :
 								$ab_char_count = isset( $ab_letter_counts[ $ab_char ] ) ? (int) $ab_letter_counts[ $ab_char ] : 0;
 								$ab_is_active  = ( $ab_char === $ab_letter );
 								?>
@@ -669,7 +669,7 @@ get_template_part( 'inc/breadcrumbs' );
 												<span class="ab-artist__thumb">
 													<?php
 												// خروجی این تابع خودمان است و داخلش همه‌چیز escape شده است.
-												echo javanseda_artists_image( $ab_term ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+												echo tara_artists_image( $ab_term ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 												?>
 													<?php if ( ! empty( $ab_cfg['show_counts'] ) && $ab_item['count'] > 0 ) : ?>
 														<span class="ab-artist__badge"><?php echo esc_html( sprintf( '%s آهنگ', number_format_i18n( $ab_item['count'] ) ) ); ?></span>

@@ -2,20 +2,20 @@
 /**
  * ab-post-extras.php — دو افزودۀ کوچک روی صفحۀ پست/آهنگ (3.2.0 · در 3.2.4 نوار پخش ارتقا یافت)
  * -----------------------------------------------------------------------------------------
- *  ۱) javan_seda_social_box() : باکس «شبکه‌های اجتماعی» (تلگرام · اینستاگرام · بله · روبیکا)
+ *  ۱) tara_social_box() : باکس «شبکه‌های اجتماعی» (تلگرام · اینستاگرام · بله · روبیکا)
  *     که در single.php دقیقاً بالای لینک‌های دانلود چاپ می‌شود. لینک‌ها و متنِ دکمه‌ها از
  *     تنظیمات قالب → بخش «شبکه‌های اجتماعی» می‌آیند. اگر هیچ لینکی پر نباشد، باکس اصلاً
  *     رندر نمی‌شود (جای خالی نمی‌ماند). با گزینهٔ «باکس شبکه‌های اجتماعی در صفحهٔ پست» هم
  *     می‌شود روشن/خاموشش کرد (کلید fixbtn).
- *  ۲) javan_seda_sticky_player() : نوارِ چسبانِ پخش در پایین صفحه که همان عنصر <audio>
+ *  ۲) tara_sticky_player() : نوارِ چسبانِ پخش در پایین صفحه که همان عنصر <audio>
  *     خودِ قالب را کنترل می‌کند (پخش/توقف، میلهٔ پیشرفت، زمان، بستن). پلیرِ قالب سرِ جایش
  *     می‌ماند؛ این فقط یک کنترلِ دوم است برای وقتی کاربر اسکرول می‌کند.
  *     از نسخۀ 3.2.4 : رنگ‌ها از متغیرهای قالب (پس در حالت شب تیره است) · ارتفاع کمتر ·
  *     دکمۀ «قبلی/بعدی» (بین قطعه‌های آلبوم، یا بین آهنگ‌های سایت) · پخش روی صفحۀ اصلی
- *     با پلیر مستقل. خاموشی‌ها: JAVANSEDA_STICKY_PLAYER=false · JAVANSEDA_STICKY_ON_HOME=false
+ *     با پلیر مستقل. خاموشی‌ها: TARA_STICKY_PLAYER=false · TARA_STICKY_ON_HOME=false
  *
- * خاموشی کامل این فایل:  define( 'JAVANSEDA_POST_EXTRAS', false );   در wp-config.php
- * خاموشی فقط نوارِ پخش :  define( 'JAVANSEDA_STICKY_PLAYER', false );
+ * خاموشی کامل این فایل:  define( 'TARA_POST_EXTRAS', false );   در wp-config.php
+ * خاموشی فقط نوارِ پخش :  define( 'TARA_STICKY_PLAYER', false );
  *
  * قاعدۀ پروژه: هیچ فیلتری روی the_content / template_include نیست. باکس اجتماعی با یک
  * فراخوانی محافظت‌شدۀ تابع در single.php چاپ می‌شود و نوارِ پخش فقط روی wp_footer می‌نشیند.
@@ -26,22 +26,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( ! defined( 'JAVANSEDA_POST_EXTRAS' ) ) {
-	define( 'JAVANSEDA_POST_EXTRAS', true );
+if ( ! defined( 'TARA_POST_EXTRAS' ) ) {
+	define( 'TARA_POST_EXTRAS', true );
 }
-if ( ! defined( 'JAVANSEDA_STICKY_PLAYER' ) ) {
-	define( 'JAVANSEDA_STICKY_PLAYER', true );
+if ( ! defined( 'TARA_STICKY_PLAYER' ) ) {
+	define( 'TARA_STICKY_PLAYER', true );
 }
 
-if ( ! function_exists( 'javan_seda_x_on' ) ) {
-	function javan_seda_x_on() {
-		return ( defined( 'JAVANSEDA_POST_EXTRAS' ) && false === JAVANSEDA_POST_EXTRAS ) ? false : true;
+if ( ! function_exists( 'tara_x_on' ) ) {
+	function tara_x_on() {
+		return ( defined( 'TARA_POST_EXTRAS' ) && false === TARA_POST_EXTRAS ) ? false : true;
 	}
 }
 
-if ( ! function_exists( 'javan_seda_x_option' ) ) {
+if ( ! function_exists( 'tara_x_option' ) ) {
 	/** ot_get_option با احتیاط (اگر option-tree جایی فعال نبود، رشتهٔ خالی می‌دهیم نه خطا) */
-	function javan_seda_x_option( $key, $default = '' ) {
+	function tara_x_option( $key, $default = '' ) {
 		static $cache = array();
 		if ( isset( $cache[ $key ] ) ) {
 			return $cache[ $key ];
@@ -62,9 +62,9 @@ if ( ! function_exists( 'javan_seda_x_option' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_x_field' ) ) {
+if ( ! function_exists( 'tara_x_field' ) ) {
 	/** فیلد ACF را به‌شکل رشتهٔ امن برمی‌گرداند (لینک دانلود/پخش) */
-	function javan_seda_x_field( $key, $post_id = 0 ) {
+	function tara_x_field( $key, $post_id = 0 ) {
 		if ( ! function_exists( 'get_field' ) ) {
 			return '';
 		}
@@ -83,18 +83,18 @@ if ( ! function_exists( 'javan_seda_x_field' ) ) {
 /* -------------------------------------------------------------------------
  * ۱) باکس شبکه‌های اجتماعی — بالای لینک‌های دانلود
  * ---------------------------------------------------------------------- */
-if ( ! function_exists( 'javan_seda_social_box' ) ) {
+if ( ! function_exists( 'tara_social_box' ) ) {
 	/**
 	 * @param int  $post_id
 	 * @param bool $echo true ⇒ چاپ کن، false ⇒ رشته برگردان
 	 * @return string
 	 */
-	function javan_seda_social_box( $post_id = 0, $echo = true ) {
+	function tara_social_box( $post_id = 0, $echo = true ) {
 		$html = '';
-		if ( ! javan_seda_x_on() ) {
+		if ( ! tara_x_on() ) {
 			return $html;
 		}
-		if ( 'off' === javan_seda_x_option( 'fixbtn', 'on' ) ) {
+		if ( 'off' === tara_x_option( 'fixbtn', 'on' ) ) {
 			return $html; /* کاربر خودش از تنظیمات قالب خاموش کرده */
 		}
 		/* ترتیب کلیدها: option لینک · option متن دکمه · متن پیش‌فرض · کلاسِ رنگ · آیکن (همه در css/icofont.min.css موجودند) */
@@ -106,11 +106,11 @@ if ( ! function_exists( 'javan_seda_social_box' ) ) {
 		);
 		$items = array();
 		foreach ( $networks as $net ) {
-			$url = javan_seda_x_option( $net[0], '' );
+			$url = tara_x_option( $net[0], '' );
 			if ( '' === $url ) {
 				continue;
 			}
-			$label = javan_seda_x_option( $net[1], '' );
+			$label = tara_x_option( $net[1], '' );
 			if ( '' === $label ) {
 				$label = $net[2];
 			}
@@ -161,22 +161,22 @@ if ( ! function_exists( 'javan_seda_social_box' ) ) {
  *     پخش/توقف، میلهٔ پیشرفت و زمان همان عنصر <audio id="audio"> قالب را کنترل می‌کند؛
  *     اگر پلیرِ صفحه نبود، نوار از پلیر مستقل خودش استفاده می‌کند.
  *
- *   خاموشی کل نوار            :  define( 'JAVANSEDA_STICKY_PLAYER', false );
- *   خاموشی فقط روی صفحۀ اصلی  :  define( 'JAVANSEDA_STICKY_ON_HOME', false );
- *   تعداد آهنگ صفحۀ اصلی      :  define( 'JAVANSEDA_STICKY_HOME_LIMIT', 8 );
+ *   خاموشی کل نوار            :  define( 'TARA_STICKY_PLAYER', false );
+ *   خاموشی فقط روی صفحۀ اصلی  :  define( 'TARA_STICKY_ON_HOME', false );
+ *   تعداد آهنگ صفحۀ اصلی      :  define( 'TARA_STICKY_HOME_LIMIT', 8 );
  * ---------------------------------------------------------------------- */
-if ( ! defined( 'JAVANSEDA_STICKY_ON_HOME' ) ) {
-	define( 'JAVANSEDA_STICKY_ON_HOME', true );
+if ( ! defined( 'TARA_STICKY_ON_HOME' ) ) {
+	define( 'TARA_STICKY_ON_HOME', true );
 }
-if ( ! defined( 'JAVANSEDA_STICKY_HOME_LIMIT' ) ) {
-	define( 'JAVANSEDA_STICKY_HOME_LIMIT', 8 );
+if ( ! defined( 'TARA_STICKY_HOME_LIMIT' ) ) {
+	define( 'TARA_STICKY_HOME_LIMIT', 8 );
 }
 
-if ( ! function_exists( 'javan_seda_sticky_player_src' ) ) {
+if ( ! function_exists( 'tara_sticky_player_src' ) ) {
 	/** نشانی فایل صوتی این نوشته (برای اینکه بدون پلیر، نوار تهی چاپ نشود) */
-	function javan_seda_sticky_player_src( $post_id = 0 ) {
+	function tara_sticky_player_src( $post_id = 0 ) {
 		foreach ( array( 'music320', 'music128', 'album320', 'album128' ) as $k ) {
-			$v = javan_seda_x_field( $k, $post_id );
+			$v = tara_x_field( $k, $post_id );
 			if ( '' !== $v ) {
 				return $v;
 			}
@@ -185,9 +185,9 @@ if ( ! function_exists( 'javan_seda_sticky_player_src' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sticky_fa_num' ) ) {
+if ( ! function_exists( 'tara_sticky_fa_num' ) ) {
 	/** رقم لاتین ⇒ رقم فارسی (برای شمارۀ قطعه) */
-	function javan_seda_sticky_fa_num( $n ) {
+	function tara_sticky_fa_num( $n ) {
 		return str_replace(
 			array( '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' ),
 			array( '۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹' ),
@@ -196,9 +196,9 @@ if ( ! function_exists( 'javan_seda_sticky_fa_num' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_x_sub' ) ) {
+if ( ! function_exists( 'tara_x_sub' ) ) {
 	/** get_sub_field با احتیاط (اگر نه ACF بود و نه لایۀ سازگاری، رشتهٔ خالی) */
-	function javan_seda_x_sub( $key ) {
+	function tara_x_sub( $key ) {
 		if ( ! function_exists( 'get_sub_field' ) ) {
 			return '';
 		}
@@ -213,16 +213,16 @@ if ( ! function_exists( 'javan_seda_x_sub' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sticky_track' ) ) {
+if ( ! function_exists( 'tara_sticky_track' ) ) {
 	/** یک «قطعه» از روی یک نوشته: عنوان · هنرمند · فایل پخش · آدرس نوشته · تصویر */
-	function javan_seda_sticky_track( $post_id = 0 ) {
+	function tara_sticky_track( $post_id = 0 ) {
 		$post_id = (int) $post_id;
-		$src     = javan_seda_sticky_player_src( $post_id );
+		$src     = tara_sticky_player_src( $post_id );
 		if ( ! $post_id || '' === $src ) {
 			return array();
 		}
-		$song   = javan_seda_x_field( 'song', $post_id );
-		$artist = javan_seda_x_field( 'artist', $post_id );
+		$song   = tara_x_field( 'song', $post_id );
+		$artist = tara_x_field( 'artist', $post_id );
 		$title  = ( '' !== $song ) ? $song : (string) get_the_title( $post_id );
 		$img    = '';
 		if ( function_exists( 'get_the_post_thumbnail_url' ) && has_post_thumbnail( $post_id ) ) {
@@ -241,9 +241,9 @@ if ( ! function_exists( 'javan_seda_sticky_track' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sticky_album_tracks' ) ) {
+if ( ! function_exists( 'tara_sticky_album_tracks' ) ) {
 	/** قطعه‌های آلبوم — همان فیلد تکرارشوندۀ `album` که single.php با آن پلیر می‌سازد */
-	function javan_seda_sticky_album_tracks( $post_id = 0 ) {
+	function tara_sticky_album_tracks( $post_id = 0 ) {
 		$tracks  = array();
 		$post_id = (int) $post_id;
 		if ( ! $post_id || ! function_exists( 'have_rows' ) || ! function_exists( 'the_row' ) ) {
@@ -253,23 +253,23 @@ if ( ! function_exists( 'javan_seda_sticky_album_tracks' ) ) {
 			return $tracks;
 		}
 		$n      = 0;
-		$artist = trim( wp_strip_all_tags( javan_seda_x_field( 'artist', $post_id ) ) );
+		$artist = trim( wp_strip_all_tags( tara_x_field( 'artist', $post_id ) ) );
 		$url    = ( function_exists( 'get_permalink' ) ) ? get_permalink( $post_id ) : '';
 		$url    = ( is_scalar( $url ) ) ? (string) $url : '';
 		while ( have_rows( 'album', $post_id ) ) {
 			the_row();
 			$n++;
-			$src = javan_seda_x_sub( 'albumlink128' );
+			$src = tara_x_sub( 'albumlink128' );
 			if ( '' === $src ) {
-				$src = javan_seda_x_sub( 'albumlink320' );
+				$src = tara_x_sub( 'albumlink320' );
 			}
 			if ( '' === $src ) {
 				continue; /* سطری که فایل پخش ندارد در فهرست نمی‌آید */
 			}
-			$name = javan_seda_x_sub( 'song_names' );
+			$name = tara_x_sub( 'song_names' );
 			$tracks[] = array(
 				'id'  => $post_id,
-				't'   => ( '' !== $name ) ? $name : ( 'قطعه ' . javan_seda_sticky_fa_num( $n ) ),
+				't'   => ( '' !== $name ) ? $name : ( 'قطعه ' . tara_sticky_fa_num( $n ) ),
 				'a'   => $artist,
 				's'   => $src,
 				'u'   => $url,
@@ -281,12 +281,12 @@ if ( ! function_exists( 'javan_seda_sticky_album_tracks' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sticky_adjacent' ) ) {
+if ( ! function_exists( 'tara_sticky_adjacent' ) ) {
 	/** آهنگ قبلی و بعدیِ همین نوشته (در همان دسته) — هرکدام پخش آنلاین داشته باشد */
-	function javan_seda_sticky_adjacent( $post_id = 0 ) {
+	function tara_sticky_adjacent( $post_id = 0 ) {
 		$out     = array( 'tracks' => array(), 'index' => 0 );
 		$post_id = (int) $post_id;
-		$cur     = javan_seda_sticky_track( $post_id );
+		$cur     = tara_sticky_track( $post_id );
 		if ( ! $cur ) {
 			return $out;
 		}
@@ -306,7 +306,7 @@ if ( ! function_exists( 'javan_seda_sticky_adjacent' ) ) {
 			}
 		}
 		if ( $prev_id ) {
-			$t = javan_seda_sticky_track( $prev_id );
+			$t = tara_sticky_track( $prev_id );
 			if ( $t ) {
 				$list[] = $t;
 			}
@@ -314,7 +314,7 @@ if ( ! function_exists( 'javan_seda_sticky_adjacent' ) ) {
 		$out['index'] = count( $list );
 		$list[]       = $cur;
 		if ( $next_id ) {
-			$t = javan_seda_sticky_track( $next_id );
+			$t = tara_sticky_track( $next_id );
 			if ( $t ) {
 				$list[] = $t;
 			}
@@ -324,9 +324,9 @@ if ( ! function_exists( 'javan_seda_sticky_adjacent' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sticky_recent' ) ) {
+if ( ! function_exists( 'tara_sticky_recent' ) ) {
 	/** تازه‌ترین آهنگ‌های دارای پخش آنلاین (برای صفحۀ اصلی) — قدیمی‌ترین در ابتدا */
-	function javan_seda_sticky_recent( $limit = 8 ) {
+	function tara_sticky_recent( $limit = 8 ) {
 		$out   = array( 'tracks' => array(), 'index' => 0 );
 		$limit = (int) $limit;
 		if ( $limit < 1 ) {
@@ -354,7 +354,7 @@ if ( ! function_exists( 'javan_seda_sticky_recent' ) ) {
 			if ( count( $list ) >= $limit ) {
 				break;
 			}
-			$t = javan_seda_sticky_track( (int) $id );
+			$t = tara_sticky_track( (int) $id );
 			if ( $t ) {
 				array_unshift( $list, $t ); /* ⇒ «بعدی» = آهنگِ تازه‌تر */
 			}
@@ -367,17 +367,17 @@ if ( ! function_exists( 'javan_seda_sticky_recent' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sticky_eq' ) ) {
+if ( ! function_exists( 'tara_sticky_eq' ) ) {
 	/** اکولایزر کوچک روی تصویر — فقط وقتی در حال پخش است دیده می‌شود (CSS) */
-	function javan_seda_sticky_eq() {
+	function tara_sticky_eq() {
 		return '<span class="ab-sp-eq" aria-hidden="true"><i></i><i></i><i></i></span>';
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sticky_thumb' ) ) {
+if ( ! function_exists( 'tara_sticky_thumb' ) ) {
 	/** تصویر بندانگشتیِ نوار (یا جاینگهدارِ آیکن) + اکولایزر */
-	function javan_seda_sticky_thumb( $post_id = 0, $img_url = '' ) {
-		$eq = javan_seda_sticky_eq();
+	function tara_sticky_thumb( $post_id = 0, $img_url = '' ) {
+		$eq = tara_sticky_eq();
 		if ( '' !== $img_url ) {
 			return '<span class="ab-sp-thumb"><img src="' . esc_url( $img_url ) . '" alt="" loading="lazy" data-ab-sp-img />' . $eq . '</span>';
 		}
@@ -388,13 +388,13 @@ if ( ! function_exists( 'javan_seda_sticky_thumb' ) ) {
 	}
 }
 
-if ( ! function_exists( 'javan_seda_sticky_player' ) ) {
-	function javan_seda_sticky_player() {
-		if ( ! javan_seda_x_on() || ! JAVANSEDA_STICKY_PLAYER ) {
+if ( ! function_exists( 'tara_sticky_player' ) ) {
+	function tara_sticky_player() {
+		if ( ! tara_x_on() || ! TARA_STICKY_PLAYER ) {
 			return;
 		}
 		/* v3.4.1 — «نوار چسبان پخش» از تنظیمات قالب؛ خاموش = هیچ DOM/اسکریپتی چاپ نمی‌شود */
-		if ( function_exists( 'javan_seda_ui_on' ) && ! javan_seda_ui_on( 'ab_sticky_player', true, 'JAVANSEDA_STICKY_PLAYER' ) ) {
+		if ( function_exists( 'tara_ui_on' ) && ! tara_ui_on( 'ab_sticky_player', true, 'TARA_STICKY_PLAYER' ) ) {
 			return;
 		}
 		if ( ! function_exists( 'is_singular' ) ) {
@@ -403,7 +403,7 @@ if ( ! function_exists( 'javan_seda_sticky_player' ) ) {
 		if ( function_exists( 'is_admin' ) && is_admin() ) {
 			return;
 		}
-		$on_home = ( defined( 'JAVANSEDA_STICKY_ON_HOME' ) && false === JAVANSEDA_STICKY_ON_HOME ) ? false : true;
+		$on_home = ( defined( 'TARA_STICKY_ON_HOME' ) && false === TARA_STICKY_ON_HOME ) ? false : true;
 		$ctx     = '';
 		if ( is_singular( 'post' ) ) {
 			$ctx = 'post';
@@ -421,18 +421,18 @@ if ( ! function_exists( 'javan_seda_sticky_player' ) ) {
 		$tracks  = array();
 		$index   = 0;
 		if ( 'post' === $ctx && $post_id ) {
-			$album = javan_seda_sticky_album_tracks( $post_id );
+			$album = tara_sticky_album_tracks( $post_id );
 			if ( count( $album ) >= 2 ) {
 				$mode   = 'album';
 				$tracks = $album;
 			} else {
-				$built  = javan_seda_sticky_adjacent( $post_id );
+				$built  = tara_sticky_adjacent( $post_id );
 				$tracks = $built['tracks'];
 				$index  = $built['index'];
 			}
 		} else {
-			$limit  = ( defined( 'JAVANSEDA_STICKY_HOME_LIMIT' ) ) ? (int) JAVANSEDA_STICKY_HOME_LIMIT : 8;
-			$built  = javan_seda_sticky_recent( $limit );
+			$limit  = ( defined( 'TARA_STICKY_HOME_LIMIT' ) ) ? (int) TARA_STICKY_HOME_LIMIT : 8;
+			$built  = tara_sticky_recent( $limit );
 			$tracks = $built['tracks'];
 			$index  = $built['index'];
 		}
@@ -446,12 +446,12 @@ if ( ! function_exists( 'javan_seda_sticky_player' ) ) {
 		$count = count( $tracks );
 		/* در آلبوم تا کاربر قطعه‌ای را انتخاب نکرده، عنوانِ خودِ آلبوم نشان داده می‌شود */
 		if ( 'album' === $mode && $post_id ) {
-			$song = javan_seda_x_field( 'song', $post_id );
+			$song = tara_x_field( 'song', $post_id );
 			if ( '' === $song ) {
 				$song = (string) get_the_title( $post_id );
 			}
 			$cur['t'] = trim( wp_strip_all_tags( $song ) );
-			$cur['a'] = trim( wp_strip_all_tags( javan_seda_x_field( 'artist', $post_id ) ) );
+			$cur['a'] = trim( wp_strip_all_tags( tara_x_field( 'artist', $post_id ) ) );
 		}
 		$nav  = ( $count >= 2 ) ? true : false;
 		$prev = ( $index > 0 ) ? $tracks[ $index - 1 ] : $tracks[ $count - 1 ];
@@ -498,12 +498,12 @@ if ( ! function_exists( 'javan_seda_sticky_player' ) ) {
 		/* در صفحۀ اصلی $post_id به آخرین نوشتهٔ حلقۀ لیست اشاره می‌کند ⇒ تصویر را
 		   فقط از همان آیتمِ انتخابی می‌گیریم، نه از global. */
 		$thumb_post = ( 'post' === $ctx ) ? $post_id : 0;
-		$html .= javan_seda_sticky_thumb( $thumb_post, $cur['img'] );
+		$html .= tara_sticky_thumb( $thumb_post, $cur['img'] );
 		$html .= $nav_prev;
 		$html .= '<button type="button" class="ab-sp-play" id="ab-sp-play" aria-label="پخش"><i class="icofont-play-alt-2" aria-hidden="true"></i></button>';
 		$html .= $nav_next;
 		if ( $nav ) {
-			$html .= '<span class="ab-sp__no" aria-hidden="true"><b class="ab-sp__now">' . esc_html( javan_seda_sticky_fa_num( $index + 1 ) ) . '</b>/' . esc_html( javan_seda_sticky_fa_num( $count ) ) . '</span>';
+			$html .= '<span class="ab-sp__no" aria-hidden="true"><b class="ab-sp__now">' . esc_html( tara_sticky_fa_num( $index + 1 ) ) . '</b>/' . esc_html( tara_sticky_fa_num( $count ) ) . '</span>';
 		}
 		$html .= '<div class="ab-sp__meta">'
 			. '<' . $tag . ' class="ab-sp__title"' . ( ( 'a' === $tag ) ? ' href="' . esc_url( $cur['u'] ) . '"' : '' ) . ' data-ab-sp-link>' . esc_html( $cur['t'] ) . '</' . $tag . '>'
@@ -720,6 +720,6 @@ if ( ! function_exists( 'javan_seda_sticky_player' ) ) {
 	}
 }
 
-if ( function_exists( 'add_action' ) && function_exists( 'javan_seda_sticky_player' ) ) {
-	add_action( 'wp_footer', 'javan_seda_sticky_player', 30 );
+if ( function_exists( 'add_action' ) && function_exists( 'tara_sticky_player' ) ) {
+	add_action( 'wp_footer', 'tara_sticky_player', 30 );
 }

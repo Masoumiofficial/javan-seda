@@ -219,9 +219,43 @@ tara_settings_shell_assets( 'taranehyar_page_ot-theme-options' );
 t( 'تنظیمات: دوباره روی صفحهٔ درست بار می‌شود', isset( $GLOBALS['__styles']['taranehyar-settings'] ) );
 t( 'تنظیمات: پیکربندی JS به صفحه تزریق شد', isset( $GLOBALS['__localized']['taranehyar-settings']['taraSettings'] ) );
 
+t( 'تنظیمات: نقشهٔ هشت بخش', 8 === count( tara_settings_shell_sections() ) );
+t( 'تنظیمات: هر بخش عنوان/آیکون/راهنما دارد', ( function () {
+	foreach ( tara_settings_shell_sections() as $id => $item ) {
+		if ( empty( $item['title'] ) || empty( $item['icon'] ) || ! isset( $item['hint'] ) ) {
+			return false;
+		}
+	}
+	return true;
+} )() );
+t( 'تنظیمات: بخش «درباره سایت» در نقشه هست', isset( tara_settings_shell_sections()['about'] ) );
+
+/* سربرگ فقط روی همان صفحه چاپ می‌شود */
+$GLOBALS['__screen_id'] = 'taranehyar_page_ot-theme-options';
+ob_start();
+tara_settings_shell_title();
+$hero = ob_get_clean();
+t( 'تنظیمات: سربرگ با کلاس پنل', false !== strpos( $hero, 'tara-settings-hero' ) );
+t( 'تنظیمات: سربرگ دکمهٔ ذخیره دارد', false !== strpos( $hero, 'data-tara-save' ) );
+t( 'تنظیمات: سربرگ لینک بازگشت به پنل', false !== strpos( $hero, 'admin.php?page=taranehyar' ) );
+
+$GLOBALS['__screen_id'] = 'edit.php';
+ob_start();
+tara_settings_shell_title();
+$hero_off = ob_get_clean();
+t( 'تنظیمات: سربرگ در صفحهٔ دیگر چاپ نمی‌شود', '' === trim( $hero_off ) );
+$GLOBALS['__screen_id'] = 'taranehyar_page_ot-theme-options';
+
 t( 'تنظیمات: فایل CSS موجود', is_readable( '/tmp/theme/css/admin-settings.css' ) );
 t( 'تنظیمات: فایل JS موجود', is_readable( '/tmp/theme/js/admin-settings.js' ) );
-t( 'تنظیمات: CSS فقط در body.tara-settings-screen', false !== strpos( (string) @file_get_contents( '/tmp/theme/css/admin-settings.css' ), 'body.tara-settings-screen' ) );
+$settings_css = (string) @file_get_contents( '/tmp/theme/css/admin-settings.css' );
+$settings_js  = (string) @file_get_contents( '/tmp/theme/js/admin-settings.js' );
+t( 'تنظیمات: CSS فقط در body.tara-settings-screen', false !== strpos( $settings_css, 'body.tara-settings-screen' ) );
+t( 'تنظیمات: چیدمان دوستونی فهرست/محتوا', false !== strpos( $settings_css, 'grid-template-columns: 252px minmax(0, 1fr)' ) );
+t( 'تنظیمات: سربرگ هم‌رنگ پنل (بنفش)', false !== strpos( $settings_css, '#4c1d95' ) && false !== strpos( $settings_css, '#6d28d9' ) );
+t( 'تنظیمات: CSS قدیمی (کارت آبی) نمانده', false === strpos( $settings_css, 'tara-settings-intro' ) );
+t( 'تنظیمات: JS دکمهٔ ذخیره و جست‌وجو', false !== strpos( $settings_js, 'data-tara-save' ) && false !== strpos( $settings_js, 'runSearch' ) );
+t( 'تنظیمات: JS بازکردن بخش با ?section=', false !== strpos( $settings_js, 'openSection' ) );
 
 /* ======================================================================
    ۶) تنظیمات «دربارهٔ سایت»

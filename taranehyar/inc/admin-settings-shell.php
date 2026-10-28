@@ -1,19 +1,20 @@
 <?php
 /**
- * پوستهٔ تازهٔ صفحهٔ «تنظیمات قالب» — نسخهٔ ۳.۷.۰
+ * پوستهٔ صفحهٔ «تنظیمات قالب» — نسخهٔ ۳.۷.۲
  * ==========================================================================
  * چه مشکلی را حل می‌کند؟
  *   صفحهٔ تنظیماتِ OptionTree با مارکاپِ ویرایشگرِ نوشته رندر می‌شود
- *   (`#poststuff` · `#post-body` · `.postbox`) و روی سایت شما «شبیه یک برگه»
- *   دیده می‌شد: کارت‌های خاکستری، تب‌های ریز، و فیلدهای روی هم.
+ *   (`#poststuff` · `#post-body` · `.postbox`) و همان‌جا هم بدون پوست، «شبیه
+ *   یک برگه» دیده می‌شد. این فایل همان یک صفحه را به یک صفحهٔ تنظیمات مدرن
+ *   تبدیل می‌کند — با همان زبان بصری پنل «ترانه یار».
  *
  * چه کاری می‌کند؟
- *   • فقط روی همان یک صفحه (`taranehyar_page_ot-theme-options`) یک فایل CSS و
- *     یک فایل JS بار می‌کند؛ هیچ صفحهٔ دیگری، هیچ تغییری.
+ *   • فقط روی همان صفحه (`taranehyar_page_ot-theme-options`) یک CSS و یک JS
+ *     بار می‌کند؛ هیچ صفحهٔ دیگری از پیشخوان تغییر نمی‌کند.
  *   • هیچ رفتاری از OptionTree عوض نمی‌شود: تب‌ها همان jQuery UI هستند، فرم
- *     همان `options.php` است و ذخیره‌سازی همان است. فقط ظاهر و مرتب‌سازی.
- *   • یک نوار جست‌وجوی فیلد + لینک «بازگشت به پنل» + پشتیبانی از
- *     `?section=ab_ui` برای بازشدن مستقیم روی یک تب اضافه می‌کند.
+ *     همان `options.php` است و ذخیره‌سازی همان است. فقط ظاهر و چیدمان.
+ *   • سربرگ گرادیانی (مثل داشبورد پنل)، ستون فهرست بخش‌ها، نوار چسبان
+ *     جست‌وجو/ذخیره و ردیف‌های فیلد خوانا اضافه می‌کند.
  *
  * خاموش‌کردن: تنظیمات قالب → کنترل رابط → «پوستۀ همین صفحه» = خاموش
  *             یا define( 'TARANEHYAR_SETTINGS_SKIN', false ); در wp-config.php
@@ -58,6 +59,29 @@ if ( ! function_exists( 'tara_settings_shell_screen' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_settings_shell_sections' ) ) {
+	/**
+	 * عنوان و آیکون هر بخش — برای ستون فهرست و سرصفحهٔ کارت.
+	 * کلیدها همان شناسهٔ بخش‌های inc/theme-options.php هستند.
+	 *
+	 * @return array
+	 */
+	function tara_settings_shell_sections() {
+		$sections = array(
+			'general' => array( 'title' => 'همگانی', 'icon' => 'dashicons-admin-generic', 'hint' => 'لوگو، نشانک، عنوان و رفتار پایهٔ سایت' ),
+			'homes'   => array( 'title' => 'صفحه اصلی', 'icon' => 'dashicons-admin-home', 'hint' => 'اسلایدر، بخش‌ها و ترتیب مطالب صفحهٔ اصلی' ),
+			'dl_pages' => array( 'title' => 'صفحه دانلود آهنگ', 'icon' => 'dashicons-download', 'hint' => 'چیدمان صفحهٔ آهنگ و دکمه‌های دانلود' ),
+			'ab_ui'   => array( 'title' => 'کنترل رابط', 'icon' => 'dashicons-admin-appearance', 'hint' => 'کلیدهای روشن/خاموش ظاهر و لایه‌های سایت' ),
+			'footer'  => array( 'title' => 'پانوشت', 'icon' => 'dashicons-editor-insertmore', 'hint' => 'متن، دسته‌ها و کپی‌رایت پایین سایت' ),
+			'socials' => array( 'title' => 'شبکه‌های اجتماعی', 'icon' => 'dashicons-share', 'hint' => 'آدرس اینستاگرام، تلگرام و بقیه' ),
+			'ads1'    => array( 'title' => 'تبلیغات', 'icon' => 'dashicons-megaphone', 'hint' => 'کدهای تبلیغاتی بالای سایت و کنار مطالب' ),
+			'about'   => array( 'title' => 'درباره سایت', 'icon' => 'dashicons-info-outline', 'hint' => 'متنی که در پانوشت و صفحهٔ هنرمند دیده می‌شود' ),
+		);
+
+		return apply_filters( 'tara_settings_shell_sections', $sections );
+	}
+}
+
 if ( ! function_exists( 'tara_settings_shell_assets' ) ) {
 	/**
 	 * بارگذاری CSS/JS — فقط روی همان صفحه.
@@ -79,25 +103,46 @@ if ( ! function_exists( 'tara_settings_shell_assets' ) ) {
 
 		if ( file_exists( $css ) ) {
 			wp_enqueue_style( 'taranehyar-settings', TARANEHYAR_URI . '/css/admin-settings.css', array(), TARANEHYAR_VERSION );
+			/* آیکون‌های پیشخوان برای فهرست بخش‌ها */
+			wp_enqueue_style( 'dashicons' );
 		}
 		if ( file_exists( $js ) ) {
-			wp_enqueue_script( 'taranehyar-settings', TARANEHYAR_URI . '/js/admin-settings.js', array( 'jquery' ), TARANEHYAR_VERSION, true );
+			wp_enqueue_script( 'taranehyar-settings', TARANEHYAR_URI . '/js/admin-settings.js', array(), TARANEHYAR_VERSION, true );
 			wp_localize_script(
 				'taranehyar-settings',
 				'taraSettings',
 				array(
 					'panelUrl' => admin_url( 'admin.php?page=taranehyar' ),
+					'siteUrl'  => home_url( '/' ),
 					'section'  => isset( $_GET['section'] ) ? sanitize_key( wp_unslash( $_GET['section'] ) ) : '',
+					'sections' => tara_settings_shell_sections(),
 					'i18n'     => array(
-						'back'  => 'بازگشت به پنل',
-						'find'  => 'جست‌وجوی تنظیم…',
-						'empty' => 'چیزی با این نام پیدا نشد.',
+						'back'    => 'بازگشت به پنل',
+						'save'    => 'ذخیرهٔ تغییرات',
+						'visit'   => 'دیدن سایت',
+						'find'    => 'جست‌وجوی تنظیم…',
+						'none'    => 'چیزی با این نام پیدا نشد. کلمهٔ کوتاه‌تری بنویسید.',
+						'found'   => 'تنظیم پیدا شد',
+						'searching' => 'جست‌وجو در همهٔ بخش‌ها',
 					),
 				)
 			);
 		}
 	}
 	add_action( 'admin_enqueue_scripts', 'tara_settings_shell_assets', 20 );
+
+	/*
+	 * OptionTree استایل خودش را روی `admin_print_styles-<screen>` چاپ می‌کند؛
+	 * اگر ما هم همان‌جا (با اولویت بالا) صدا زده نشویم، فایل OT بعد از ما چاپ
+	 * می‌شود و بعضی قاعده‌های قدیمی‌اش روی ظاهر تازه می‌نشیند. این هوک فقط
+	 * تضمین می‌کند فایل ما آخرین نفر باشد. enqueue دوبارهٔ همان handle بی‌خطر است.
+	 */
+	if ( ! function_exists( 'tara_settings_shell_late_styles' ) ) {
+		function tara_settings_shell_late_styles() {
+			tara_settings_shell_assets( tara_settings_shell_screen() );
+		}
+	}
+	add_action( 'admin_print_styles-' . tara_settings_shell_screen(), 'tara_settings_shell_late_styles', 99 );
 }
 
 if ( ! function_exists( 'tara_settings_shell_body_class' ) ) {
@@ -126,7 +171,7 @@ if ( ! function_exists( 'tara_settings_shell_body_class' ) ) {
 
 if ( ! function_exists( 'tara_settings_shell_title' ) ) {
 	/**
-	 * یک سرتیتر کوتاه و مفید بالای فرم (بدون تغییر در ساختار فرم).
+	 * سربرگ صفحه — همان زبان بصری `.ty-hero` در داشبورد پنل.
 	 */
 	function tara_settings_shell_title() {
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
@@ -135,16 +180,36 @@ if ( ! function_exists( 'tara_settings_shell_title' ) ) {
 		if ( tara_settings_shell_screen() !== $id || ! tara_settings_shell_on() ) {
 			return;
 		}
+
+		$store = function_exists( 'taranehyar_options_id' ) ? taranehyar_options_id() : 'option_tree';
 		?>
-		<div class="tara-settings-intro">
-			<div class="tara-settings-intro__text">
+		<div class="tara-settings-hero">
+			<div class="tara-settings-hero__text">
+				<span class="tara-settings-hero__badge">تنظیمات قالب</span>
 				<h1>تنظیمات ترانه یار</h1>
-				<p>هر تب یک بخش از قالب است. تغییرها با دکمهٔ «ذخیرهٔ تغییرات» ثبت می‌شوند و در همان کلید <code><?php echo esc_html( function_exists( 'taranehyar_options_id' ) ? taranehyar_options_id() : 'option_tree' ); ?></code> می‌مانند — هیچ تنظیمی جابه‌جا نمی‌شود.</p>
+				<p>
+					هر بخش در ستون کنار فهرست شده است؛ تغییرها را با «ذخیرهٔ تغییرات» ثبت کنید.
+					همهٔ گزینه‌ها در همان کلید <code><?php echo esc_html( $store ); ?></code> می‌مانند،
+					پس هیچ تنظیمی جابه‌جا نمی‌شود.
+				</p>
+				<div class="tara-settings-hero__actions">
+					<button type="button" class="tara-hero-btn tara-hero-btn--primary" data-tara-save>
+						<span class="dashicons dashicons-yes-alt"></span>
+						<?php esc_html_e( 'ذخیرهٔ تغییرات', 'taranehyar' ); ?>
+					</button>
+					<a class="tara-hero-btn" href="<?php echo esc_url( admin_url( 'admin.php?page=taranehyar' ) ); ?>">
+						<span class="dashicons dashicons-arrow-right-alt"></span>
+						<?php esc_html_e( 'بازگشت به پنل', 'taranehyar' ); ?>
+					</a>
+					<a class="tara-hero-btn" href="<?php echo esc_url( home_url( '/' ) ); ?>" target="_blank" rel="noopener">
+						<span class="dashicons dashicons-external"></span>
+						<?php esc_html_e( 'دیدن سایت', 'taranehyar' ); ?>
+					</a>
+				</div>
 			</div>
-			<a class="tara-settings-intro__back" href="<?php echo esc_url( admin_url( 'admin.php?page=taranehyar' ) ); ?>">
-				<span class="dashicons dashicons-arrow-right-alt"></span>
-				بازگشت به پنل
-			</a>
+			<span class="tara-settings-hero__art" aria-hidden="true">
+				<span class="dashicons dashicons-admin-settings"></span>
+			</span>
 		</div>
 		<?php
 	}

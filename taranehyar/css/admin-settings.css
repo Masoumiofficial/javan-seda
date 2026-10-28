@@ -1,104 +1,182 @@
 /**
- * ترانه یار — پوستهٔ صفحهٔ «تنظیمات قالب» (۳.۷.۰)
+ * ترانه یار — ظاهر صفحهٔ «تنظیمات قالب» (۳.۷.۲)
  * ===========================================================================
  * این فایل فقط روی صفحهٔ `taranehyar_page_ot-theme-options` بار می‌شود و همهٔ
- * قاعده‌هایش زیر `body.tara-settings-screen` قفل شده‌اند؛ یعنی هیچ صفحهٔ دیگری
- * از پیشخوان وردپرس — نه فهرست نوشته‌ها، نه ویرایشگر، نه بقیهٔ پلاگین‌ها —
- * حتی یک پیکسل هم تغییر نمی‌کند.
+ * قاعده‌هایش زیر `body.tara-settings-screen` قفل شده‌اند؛ هیچ صفحهٔ دیگری از
+ * پیشخوان حتی یک پیکسل تغییر نمی‌کند.
  *
- * هدف: تبدیل ظاهرِ «ویرایشگر نوشته» (postbox، #poststuff، تب‌های ریز) به یک
- * صفحهٔ تنظیمات مدرن: تب‌های قرصی چسبان، کارت بخش‌ها، ردیف‌های فیلد با برچسب
- * راست و توضیح خاکستری، و نوار ذخیرهٔ چسبان.
+ * زبان بصری، دقیقاً همان زبان پنل «ترانه یار» است (css/admin-panel.css):
+ *   بنفشِ #6d28d9 / #4c1d95، خطِ #e6e4ef، گوشهٔ ۱۴–۱۸px، آیکون‌های tile یاسی،
+ *   سربرگ گرادیانی، کارت‌های سفید و نشان‌های قرصی — تا کاربر حس نکند از یک
+ *   پنل به یک افزونهٔ بیرونی رفته است.
+ *
+ * چیدمان تازه:
+ *   ستون راست  = فهرست بخش‌ها (sticky) + جست‌وجو
+ *   ستون چپ   = کارت بخش با ردیف‌های فیلد (برچسب | کنترل | توضیح)
  *
  * @package Taranehyar
  */
 
 body.tara-settings-screen {
-	--ts-accent: #185adb;
-	--ts-accent-dark: #1246ad;
-	--ts-accent-soft: #eaf1fe;
-	--ts-ink: #1b2333;
-	--ts-muted: #5c6475;
-	--ts-line: #e3e7ef;
+	--ts-accent: #6d28d9;
+	--ts-accent-2: #db2777;
+	--ts-accent-dark: #4c1d95;
+	--ts-accent-soft: #f4f1fb;
+	--ts-ink: #1f1d2b;
+	--ts-muted: #6b6a7b;
+	--ts-line: #e6e4ef;
+	--ts-line-soft: #f1eff8;
 	--ts-surface: #ffffff;
+	--ts-bg: #f7f6fb;
 	--ts-radius: 16px;
-	background: #f6f7fb;
+	--ts-ok: #0f9d58;
+	--ts-warn: #b45309;
+	background: var(--ts-bg);
+}
+
+body.tara-settings-screen #wpcontent {
+	padding-inline-start: 20px;
+}
+
+body.tara-settings-screen #wpbody-content > .notice,
+body.tara-settings-screen #wpbody-content > .updated,
+body.tara-settings-screen #wpbody-content > .error {
+	margin-inline: 0;
 }
 
 /* =========================================================================
-   ۱) سرتیتر کوتاه بالای فرم
+   ۱) سربرگ — همان زبان .ty-hero در داشبورد
    ====================================================================== */
-body.tara-settings-screen .tara-settings-intro {
+body.tara-settings-screen .tara-settings-hero {
+	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 18px;
-	flex-wrap: wrap;
-	max-width: 1180px;
-	margin: 18px auto 10px;
-	padding: 20px 24px;
+	gap: 24px;
+	max-width: 1220px;
+	margin: 18px auto 16px;
+	padding: 26px 30px;
 	border-radius: 18px;
+	overflow: hidden;
 	color: #fff;
-	background: linear-gradient(135deg, #10203f 0%, var(--ts-accent) 62%, #6d28d9 100%);
-	box-shadow: 0 18px 38px -30px rgba(16, 32, 63, 0.9);
+	background:
+		radial-gradient(120% 160% at 100% 0%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 45%),
+		linear-gradient(135deg, #4c1d95 0%, var(--ts-accent) 45%, var(--ts-accent-2) 100%);
+	box-shadow: 0 12px 30px -18px rgba(76, 29, 149, 0.9);
 }
 
-body.tara-settings-screen .tara-settings-intro h1 {
-	margin: 0 0 6px;
-	padding: 0;
-	font-size: 22px;
-	font-weight: 800;
-	color: #fff;
+body.tara-settings-screen .tara-settings-hero__text {
+	min-width: 0;
 }
 
-body.tara-settings-screen .tara-settings-intro p {
-	margin: 0;
-	max-width: 70ch;
-	font-size: 13px;
-	line-height: 1.9;
-	color: rgba(255, 255, 255, 0.86);
-}
-
-body.tara-settings-screen .tara-settings-intro code {
-	background: rgba(255, 255, 255, 0.16);
-	color: #fff;
-	border-radius: 6px;
-	padding: 1px 6px;
-}
-
-body.tara-settings-screen .tara-settings-intro__back {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	padding: 9px 16px;
+body.tara-settings-screen .tara-settings-hero__badge {
+	display: inline-block;
+	padding: 3px 11px;
 	border-radius: 999px;
 	background: rgba(255, 255, 255, 0.16);
-	border: 1px solid rgba(255, 255, 255, 0.32);
-	color: #fff;
+	border: 1px solid rgba(255, 255, 255, 0.3);
 	font-size: 12px;
 	font-weight: 600;
-	text-decoration: none;
-	white-space: nowrap;
+	letter-spacing: 0;
 }
 
-body.tara-settings-screen .tara-settings-intro__back:hover,
-body.tara-settings-screen .tara-settings-intro__back:focus {
+body.tara-settings-screen .tara-settings-hero h1 {
+	margin: 8px 0 6px;
+	padding: 0;
+	color: #fff;
+	font-size: 28px;
+	line-height: 1.3;
+	font-weight: 800;
+	letter-spacing: -0.2px;
+}
+
+body.tara-settings-screen .tara-settings-hero p {
+	margin: 0;
+	max-width: 68ch;
+	font-size: 13.5px;
+	line-height: 1.9;
+	color: rgba(255, 255, 255, 0.88);
+}
+
+body.tara-settings-screen .tara-settings-hero code {
+	padding: 1px 7px;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, 0.18);
+	color: #fff;
+	font-size: 12px;
+}
+
+body.tara-settings-screen .tara-settings-hero__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 16px;
+}
+
+body.tara-settings-screen .tara-hero-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 9px 16px;
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, 0.4);
+	background: rgba(255, 255, 255, 0.14);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.6;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background 0.15s ease, transform 0.15s ease;
+}
+
+body.tara-settings-screen .tara-hero-btn:hover,
+body.tara-settings-screen .tara-hero-btn:focus {
+	background: rgba(255, 255, 255, 0.26);
+	color: #fff;
+	transform: translateY(-1px);
+}
+
+body.tara-settings-screen .tara-hero-btn--primary {
 	background: #fff;
+	border-color: #fff;
 	color: var(--ts-accent-dark);
 }
 
-/* =========================================================================
-   ۲) قالب کلی صفحه
-   ====================================================================== */
-body.tara-settings-screen #wpcontent { padding-inline-start: 20px; }
-
-body.tara-settings-screen .wrap.settings-wrap {
-	max-width: 1180px;
-	margin: 0 auto;
-	padding-bottom: 90px;
+body.tara-settings-screen .tara-hero-btn--primary:hover,
+body.tara-settings-screen .tara-hero-btn--primary:focus {
+	background: #f5f3ff;
+	color: var(--ts-accent-dark);
 }
 
-/* عنوان تکراری صفحه را پنهان می‌کنیم (سرتیتر خودمان بالاست) */
+body.tara-settings-screen .tara-hero-btn .dashicons {
+	width: 17px;
+	height: 17px;
+	font-size: 17px;
+	line-height: 17px;
+}
+
+body.tara-settings-screen .tara-settings-hero__art {
+	flex: 0 0 auto;
+	opacity: 0.22;
+}
+
+body.tara-settings-screen .tara-settings-hero__art .dashicons {
+	width: 86px;
+	height: 86px;
+	font-size: 86px;
+}
+
+/* =========================================================================
+   ۲) قالب صفحه
+   ====================================================================== */
+body.tara-settings-screen .wrap.settings-wrap {
+	max-width: 1220px;
+	margin: 0 auto;
+	padding-bottom: 40px;
+}
+
+/* عنوان تکراری خود وردپرس/OptionTree پنهان می‌شود؛ سربرگ ما جایش است */
 body.tara-settings-screen .wrap.settings-wrap > h2 {
 	position: absolute;
 	width: 1px;
@@ -108,108 +186,218 @@ body.tara-settings-screen .wrap.settings-wrap > h2 {
 	white-space: nowrap;
 }
 
-/* نوار سرصفحهٔ خود OptionTree را به یک نوار ابزار ساده تبدیل می‌کنیم */
-body.tara-settings-screen #option-tree-header-wrap {
-	margin: 0 0 12px;
+/* نوار قدیمیِ OptionTree بالای فرم */
+body.tara-settings-screen #option-tree-header-wrap,
+body.tara-settings-screen #option-tree-options-layouts-form {
+	display: none;
 }
-
-body.tara-settings-screen #option-tree-header {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 18px;
-	margin: 0;
-	padding: 0;
-	background: transparent;
-	border: 0;
-	border-radius: 0;
-}
-
-body.tara-settings-screen #option-tree-header li { margin: 0; }
-
-body.tara-settings-screen #option-tree-header li a {
-	color: var(--ts-muted);
-	font-size: 12px;
-	text-decoration: none;
-}
-
-body.tara-settings-screen #option-tree-header li a:hover { color: var(--ts-accent); }
 
 /* =========================================================================
-   ۳) تب‌ها (تبدیل ui-tabs به قرص‌های چسبان)
+   ۳) نوار چسبانِ جست‌وجو و ذخیره (بالای دو ستون)
+   ====================================================================== */
+body.tara-settings-screen #option-tree-sub-header {
+	position: sticky;
+	top: 32px;
+	z-index: 30;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0 0 16px;
+	padding: 10px 14px;
+	border: 1px solid var(--ts-line);
+	border-radius: 14px;
+	background: rgba(255, 255, 255, 0.94);
+	backdrop-filter: blur(10px);
+	box-shadow: 0 10px 26px -24px rgba(31, 29, 43, 0.8);
+}
+
+body.tara-settings-screen #option-tree-sub-header::after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+body.tara-settings-screen #option-tree-sub-header .option-tree-ui-button.button-primary,
+body.tara-settings-screen #option-tree-sub-header button.button-primary {
+	float: none;
+	margin: 0;
+	padding: 6px 22px;
+	min-height: 38px;
+	height: auto;
+	border: 0 !important;
+	border-radius: 10px !important;
+	background: linear-gradient(135deg, #4c1d95, var(--ts-accent)) !important;
+	color: #fff !important;
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 26px;
+	text-shadow: none;
+	box-shadow: 0 10px 22px -16px rgba(76, 29, 149, 0.9);
+}
+
+body.tara-settings-screen #option-tree-sub-header .option-tree-ui-button.button-primary:hover,
+body.tara-settings-screen #option-tree-sub-header button.button-primary:hover {
+	background: linear-gradient(135deg, #3b1673, #5b21b6) !important;
+}
+
+/* کادر جست‌وجو (ساختهٔ JS) */
+body.tara-settings-screen .tara-find {
+	position: relative;
+	display: flex;
+	align-items: center;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+body.tara-settings-screen .tara-find .dashicons {
+	position: absolute;
+	inset-inline-start: 12px;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	color: var(--ts-muted);
+	pointer-events: none;
+}
+
+body.tara-settings-screen .tara-find input[type="search"] {
+	width: 100%;
+	height: 38px;
+	padding: 4px 38px;
+	border: 1px solid var(--ts-line);
+	border-radius: 10px;
+	background: #fbfaff;
+	font-size: 13px;
+	color: var(--ts-ink);
+}
+
+body.tara-settings-screen .tara-find input[type="search"]:focus {
+	border-color: var(--ts-accent);
+	background: #fff;
+	box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.13);
+	outline: 0;
+}
+
+body.tara-settings-screen .tara-find__count {
+	flex: 0 0 auto;
+	padding: 3px 10px;
+	border-radius: 999px;
+	background: var(--ts-accent-soft);
+	color: var(--ts-accent-dark);
+	font-size: 11px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+/* =========================================================================
+   ۴) دو ستون: فهرست بخش‌ها + کارت بخش
    ====================================================================== */
 body.tara-settings-screen .ui-tabs {
+	display: grid;
+	grid-template-columns: 252px minmax(0, 1fr);
+	gap: 18px;
+	align-items: start;
 	position: static;
 	zoom: 1;
 }
 
 body.tara-settings-screen .ui-tabs .ui-tabs-nav {
 	position: sticky;
-	top: 96px; /* زیر نوار ذخیره + نوار مدیریت */
+	top: 96px;
 	z-index: 20;
 	display: flex;
-	flex-wrap: nowrap;
-	gap: 6px;
-	margin: 0 0 16px;
-	padding: 8px;
+	flex-direction: column;
+	gap: 4px;
+	float: none;
+	width: auto;
+	margin: 0;
+	padding: 10px;
 	border: 1px solid var(--ts-line);
-	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.94);
-	backdrop-filter: blur(10px);
-	box-shadow: 0 12px 30px -28px rgba(16, 32, 63, 0.9);
-	overflow-x: auto;
-	overflow-y: hidden;
-	scrollbar-width: thin;
+	border-radius: var(--ts-radius);
+	background: var(--ts-surface);
+	box-shadow: 0 12px 30px -30px rgba(31, 29, 43, 0.8);
+	overflow: visible;
 }
 
-body.tara-settings-screen .ui-tabs .ui-tabs-nav::-webkit-scrollbar { height: 6px; }
-body.tara-settings-screen .ui-tabs .ui-tabs-nav::-webkit-scrollbar-thumb {
-	background: #cfd6e4;
-	border-radius: 99px;
+body.tara-settings-screen .ui-tabs .ui-tabs-nav::after {
+	display: none;
 }
 
 body.tara-settings-screen .ui-tabs .ui-tabs-nav li {
 	float: none;
+	width: auto;
 	margin: 0;
+	padding: 0;
 	border: 0;
-	background: transparent;
-	flex: 0 0 auto;
+	background: none;
 }
 
 body.tara-settings-screen .ui-tabs .ui-tabs-nav li a {
-	display: block;
-	padding: 8px 16px;
-	border-radius: 999px;
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	padding: 10px 12px;
+	border-radius: 10px;
 	color: var(--ts-muted);
 	font-size: 13px;
 	font-weight: 600;
+	line-height: 1.6;
 	text-decoration: none;
-	white-space: nowrap;
 	transition: background 0.15s ease, color 0.15s ease;
 }
 
-body.tara-settings-screen .ui-tabs .ui-tabs-nav li a:hover {
+body.tara-settings-screen .ui-tabs .ui-tabs-nav li a .dashicons {
+	flex: 0 0 auto;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	opacity: 0.85;
+}
+
+body.tara-settings-screen .ui-tabs .ui-tabs-nav li a:hover,
+body.tara-settings-screen .ui-tabs .ui-tabs-nav li a:focus {
 	background: var(--ts-accent-soft);
 	color: var(--ts-accent-dark);
+	outline: 0;
 }
 
 body.tara-settings-screen .ui-tabs .ui-tabs-nav li.ui-tabs-active a,
 body.tara-settings-screen .ui-tabs .ui-tabs-nav li.ui-state-active a {
-	background: var(--ts-accent);
+	background: linear-gradient(135deg, #4c1d95, var(--ts-accent));
 	color: #fff;
-	box-shadow: 0 8px 18px -12px var(--ts-accent);
+	box-shadow: 0 10px 20px -16px rgba(76, 29, 149, 0.95);
 }
 
-body.tara-settings-screen .ui-tabs .ui-tabs-nav li a:focus-visible {
-	outline: 2px solid var(--ts-accent);
-	outline-offset: 2px;
+body.tara-settings-screen .ui-tabs .ui-tabs-nav li.ui-tabs-active a .dashicons {
+	opacity: 1;
+}
+
+body.tara-settings-screen .ui-tabs .ui-tabs-nav li.is-tara-dim a {
+	opacity: 0.45;
+}
+
+/* شمارندهٔ نتیجهٔ جست‌وجو روی هر بخش */
+body.tara-settings-screen .ui-tabs .ui-tabs-nav .tara-nav-count {
+	margin-inline-start: auto;
+	padding: 1px 8px;
+	border-radius: 999px;
+	background: var(--ts-accent-soft);
+	color: var(--ts-accent-dark);
+	font-size: 10.5px;
+	font-weight: 700;
+}
+
+body.tara-settings-screen .ui-tabs .ui-tabs-nav li.ui-tabs-active .tara-nav-count {
+	background: rgba(255, 255, 255, 0.22);
+	color: #fff;
 }
 
 /* =========================================================================
-   ۴) حذف ظاهر «ویرایشگر نوشته»
+   ۵) حذف ظاهر «ویرایشگر نوشته»
    ====================================================================== */
 body.tara-settings-screen #poststuff {
-	padding-top: 0;
 	min-width: 0;
+	padding-top: 0;
+	margin: 0;
 }
 
 body.tara-settings-screen #post-body {
@@ -222,26 +410,27 @@ body.tara-settings-screen #post-body-content {
 	margin: 0;
 }
 
-body.tara-settings-screen #poststuff #post-body.columns-2 { margin-inline-end: 0; }
+body.tara-settings-screen .metabox-holder {
+	padding-top: 0;
+}
 
-body.tara-settings-screen .metabox-holder { padding-top: 0; }
-
-/* =========================================================================
-   ۵) کارت هر بخش
-   ====================================================================== */
 body.tara-settings-screen .ui-tabs-panel.postbox {
 	float: none;
 	width: auto;
 	margin: 0 0 16px;
+	padding: 4px 0;
 	border: 1px solid var(--ts-line);
-	border-radius: var(--ts-radius);
+	border-radius: 18px;
 	background: var(--ts-surface);
-	box-shadow: 0 18px 40px -38px rgba(16, 32, 63, 0.8);
+	box-shadow: 0 14px 34px -32px rgba(31, 29, 43, 0.9);
 }
 
+body.tara-settings-screen .ui-tabs-panel.postbox > .postbox-header,
+body.tara-settings-screen .ui-tabs-panel.postbox > h2,
 body.tara-settings-screen .ui-tabs-panel.postbox > h3,
-body.tara-settings-screen .ui-tabs-panel.postbox .hndle,
-body.tara-settings-screen .ui-tabs-panel.postbox .handlediv { display: none; }
+body.tara-settings-screen .ui-tabs-panel.postbox > .handlediv {
+	display: none;
+}
 
 body.tara-settings-screen .ui-tabs-panel.postbox > .inside {
 	margin: 0;
@@ -249,41 +438,88 @@ body.tara-settings-screen .ui-tabs-panel.postbox > .inside {
 	border: 0;
 }
 
+/* سرصفحهٔ کوچک هر بخش (ساختهٔ JS) */
+body.tara-settings-screen .tara-section-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 18px 24px 14px;
+	border-bottom: 1px solid var(--ts-line-soft);
+}
+
+body.tara-settings-screen .tara-section-head__icon {
+	flex: 0 0 auto;
+	width: 34px;
+	height: 34px;
+	padding: 8px;
+	border-radius: 10px;
+	background: var(--ts-accent-soft);
+	color: var(--ts-accent);
+	font-size: 18px;
+}
+
+body.tara-settings-screen .tara-section-head h2 {
+	margin: 0;
+	padding: 0;
+	font-size: 16px;
+	font-weight: 800;
+	color: var(--ts-ink);
+}
+
+body.tara-settings-screen .tara-section-head p {
+	margin: 2px 0 0;
+	font-size: 12px;
+	color: var(--ts-muted);
+}
+
 /* =========================================================================
-   ۶) ردیف فیلد
+   ۶) ردیف فیلدها
    ====================================================================== */
 body.tara-settings-screen .format-settings {
+	display: block;
 	margin: 0;
-	padding: 16px 22px;
-	border-bottom: 1px solid var(--ts-line);
+	padding: 18px 24px;
+	border-bottom: 1px solid var(--ts-line-soft);
+	transition: background 0.15s ease;
 }
 
-body.tara-settings-screen .format-settings:last-child { border-bottom: 0; }
-
-body.tara-settings-screen .format-settings:hover { background: #fbfcff; }
-
+/* ردیف واقعی: برچسب در ستون باریک، کنترل و توضیح در ستون پهن */
 body.tara-settings-screen .format-settings > .format-setting-wrap {
 	display: grid;
-	grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
-	gap: 8px 26px;
+	grid-template-columns: 236px minmax(0, 1fr);
+	gap: 4px 26px;
 	align-items: start;
+	padding: 0;
+	margin: 0;
 }
 
-body.tara-settings-screen .format-settings .format-setting-label {
+body.tara-settings-screen .format-settings:last-child {
+	border-bottom: 0;
+}
+
+body.tara-settings-screen .format-settings:hover {
+	background: #fcfbff;
+}
+
+body.tara-settings-screen .format-settings.format-setting-label {
+	display: block;
+}
+
+body.tara-settings-screen .format-setting-label {
 	float: none;
 	width: auto;
 	margin: 0;
 	padding: 0;
 }
 
-body.tara-settings-screen .format-settings .format-setting-label .label,
-body.tara-settings-screen .format-settings .format-setting-label h3 {
+body.tara-settings-screen .format-setting-label .label {
+	display: block;
 	margin: 0;
 	padding: 0;
-	font-size: 13px;
+	font-size: 13.5px;
 	font-weight: 700;
+	line-height: 1.8;
 	color: var(--ts-ink);
-	line-height: 1.7;
 }
 
 body.tara-settings-screen .format-setting {
@@ -293,41 +529,48 @@ body.tara-settings-screen .format-setting {
 	min-height: 0;
 }
 
-body.tara-settings-screen .format-setting-inner { margin: 0; }
+body.tara-settings-screen .format-setting-inner {
+	margin: 0;
+}
 
 body.tara-settings-screen .format-setting .description {
-	margin: 6px 0 0;
+	margin: 7px 0 0;
 	font-size: 12px;
-	line-height: 1.9;
+	line-height: 1.95;
 	color: var(--ts-muted);
 }
 
-/* بلوک توضیحی (textblock): تک‌ستونی و بدون برچسب */
-body.tara-settings-screen .format-settings:has(.type-textblock) > .format-setting-wrap {
-	grid-template-columns: 1fr;
-}
-
+/* بلوک راهنما (textblock) — تمام‌عرض و آرام */
 body.tara-settings-screen .format-settings:has(.type-textblock) {
-	padding: 10px 18px;
+	padding: 16px 24px;
 	border-bottom: 0;
 }
 
-body.tara-settings-screen .format-settings:has(.type-textblock):hover { background: transparent; }
-
-body.tara-settings-screen .format-settings .type-textblock {
-	background: var(--ts-accent-soft);
-	border-radius: 12px;
-	padding: 14px 18px;
+body.tara-settings-screen .format-settings > .format-setting-wrap:has(.type-textblock) {
+	grid-template-columns: 1fr;
 }
 
-body.tara-settings-screen .format-settings .type-textblock .description {
+body.tara-settings-screen .format-settings:has(.type-textblock):hover {
+	background: transparent;
+}
+
+body.tara-settings-screen .type-textblock {
+	padding: 14px 16px;
+	border-radius: 12px;
+	background: var(--ts-accent-soft);
+	border: 1px solid #e7e0fa;
+}
+
+body.tara-settings-screen .type-textblock .description {
 	margin: 0;
-	color: #2c3c5c;
+	color: #3f3357;
 	font-size: 12.5px;
 	line-height: 2;
 }
 
-body.tara-settings-screen .format-settings .type-textblock .description strong { color: var(--ts-accent-dark); }
+body.tara-settings-screen .type-textblock strong {
+	color: var(--ts-accent-dark);
+}
 
 /* =========================================================================
    ۷) کنترل‌ها
@@ -336,24 +579,26 @@ body.tara-settings-screen .format-setting-inner input[type="text"],
 body.tara-settings-screen .format-setting-inner input[type="url"],
 body.tara-settings-screen .format-setting-inner input[type="number"],
 body.tara-settings-screen .format-setting-inner input[type="email"],
+body.tara-settings-screen .format-setting-inner input[type="search"],
+body.tara-settings-screen .format-setting-inner input[type="password"],
 body.tara-settings-screen .format-setting-inner textarea,
 body.tara-settings-screen .format-setting-inner select {
 	width: 100%;
-	max-width: 640px;
+	max-width: 620px;
 	min-height: 38px;
-	padding: 6px 12px;
+	padding: 7px 12px;
 	border: 1px solid var(--ts-line);
 	border-radius: 10px;
-	background: #fbfcff;
+	background: #fbfaff;
 	box-shadow: none;
 	font-size: 13px;
+	line-height: 1.7;
 	color: var(--ts-ink);
-	transition: border-color 0.15s ease, background 0.15s ease;
+	transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 body.tara-settings-screen .format-setting-inner textarea {
-	min-height: 108px;
-	line-height: 1.9;
+	min-height: 110px;
 }
 
 body.tara-settings-screen .format-setting-inner input:focus,
@@ -361,162 +606,240 @@ body.tara-settings-screen .format-setting-inner textarea:focus,
 body.tara-settings-screen .format-setting-inner select:focus {
 	border-color: var(--ts-accent);
 	background: #fff;
-	box-shadow: 0 0 0 3px rgba(24, 90, 219, 0.12);
+	box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.13);
 	outline: 0;
 }
 
+/* جدول‌های OptionTree (لیست آیتم‌ها) */
+body.tara-settings-screen .format-setting-inner .option-tree-setting-wrap {
+	margin: 0;
+	padding: 0;
+}
+
+body.tara-settings-screen .format-setting-inner .option-tree-setting {
+	margin-bottom: 8px;
+	border: 1px solid var(--ts-line);
+	border-radius: 12px;
+	background: #fbfaff;
+}
+
+body.tara-settings-screen .format-setting-inner .option-tree-setting .open,
+body.tara-settings-screen .format-setting-inner .option-tree-setting .button-section {
+	background: transparent;
+}
+
 /* دکمه‌ها */
-body.tara-settings-screen .format-setting-inner .button,
+body.tara-settings-screen .button,
 body.tara-settings-screen .option-tree-ui-button {
 	border-radius: 10px !important;
 	min-height: 34px;
 	padding: 4px 14px;
 	line-height: 26px;
+	font-weight: 600;
+	box-shadow: none;
+}
+
+body.tara-settings-screen .option-tree-ui-button.button-primary {
+	background: var(--ts-accent) !important;
+	border-color: var(--ts-accent) !important;
 }
 
 /* کلید روشن/خاموش */
-body.tara-settings-screen .format-setting-inner .on-off-switch {
-	position: relative;
+body.tara-settings-screen .on-off-switch {
 	display: inline-flex;
+	gap: 2px;
+	padding: 2px;
 	border: 1px solid var(--ts-line);
 	border-radius: 999px;
-	background: #eef1f7;
-	padding: 2px;
-	gap: 2px;
+	background: #f1eff8;
+	width: auto !important;
 }
 
-body.tara-settings-screen .format-setting-inner .on-off-switch label {
+body.tara-settings-screen .on-off-switch label {
 	float: none;
 	margin: 0;
-	padding: 5px 14px;
+	padding: 6px 16px;
 	border-radius: 999px;
 	font-size: 12px;
 	font-weight: 600;
+	line-height: 1.5;
 	color: var(--ts-muted);
 	cursor: pointer;
+	background: transparent;
 }
 
-body.tara-settings-screen .format-setting-inner .on-off-switch .on-off-switch-on.selected,
-body.tara-settings-screen .format-setting-inner .on-off-switch .on-off-switch-off.selected {
-	background: var(--ts-accent);
+body.tara-settings-screen .on-off-switch .on-off-switch-on.selected,
+body.tara-settings-screen .on-off-switch .on-off-switch-off.selected {
+	background: linear-gradient(135deg, #4c1d95, var(--ts-accent));
 	color: #fff;
 }
 
 /* اسلایدر عددی */
-body.tara-settings-screen .format-setting-inner .ot-numeric-slider-wrap { margin: 0 0 0 0; }
-body.tara-settings-screen .format-setting-inner .ui-slider { background: var(--ts-line); border: 0; height: 6px; border-radius: 99px; }
-body.tara-settings-screen .format-setting-inner .ui-slider .ui-slider-handle {
-	border: 2px solid var(--ts-accent);
-	background: #fff;
-	border-radius: 50%;
+body.tara-settings-screen .ot-numeric-slider-wrap {
+	margin: 0;
+	max-width: 420px;
+}
+
+body.tara-settings-screen .ot-numeric-slider-wrap .ui-slider {
+	height: 6px;
+	border: 0;
+	border-radius: 99px;
+	background: #e9e5f5;
+}
+
+body.tara-settings-screen .ot-numeric-slider-wrap .ui-slider .ui-slider-handle {
+	top: -5px;
 	width: 16px;
 	height: 16px;
-	top: -5px;
+	border: 2px solid var(--ts-accent);
+	border-radius: 50%;
+	background: #fff;
 	cursor: grab;
 }
 
-/* پیش‌نمایش تصویر */
-body.tara-settings-screen .format-setting-inner .option-tree-ui-media-wrap img {
+/* تصویر/آپلود */
+body.tara-settings-screen .option-tree-ui-media-wrap img {
+	max-width: 160px;
+	height: auto;
 	border-radius: 12px;
-	max-width: 180px;
-	height: auto;
+	border: 1px solid var(--ts-line);
+}
+
+body.tara-settings-screen .option-tree-ui-upload {
+	margin-top: 6px;
 }
 
 /* =========================================================================
-   ۸) نوار ذخیرهٔ چسبان
+   ۸) دکمه‌های تکراری و «بازیابی تنظیمات»
    ====================================================================== */
-body.tara-settings-screen #option-tree-sub-header {
-	position: sticky;
-	top: 32px; /* ارتفاع نوار مدیریت وردپرس */
-	z-index: 25;
-	display: flex;
-	align-items: center;
-	justify-content: flex-start;
-	gap: 10px;
-	margin: 0 0 12px;
-	padding: 10px 14px;
-	border: 1px solid var(--ts-line);
-	border-radius: 14px;
-	background: rgba(255, 255, 255, 0.96);
-	backdrop-filter: blur(10px);
-	box-shadow: 0 14px 30px -30px rgba(16, 32, 63, 0.9);
+/* دکمهٔ ذخیرهٔ تکراریِ پایین فرم پنهان می‌شود؛ همان دکمه در نوار چسبان و
+   سربرگ هست و هر دو همان submit اصلی را می‌زنند. */
+body.tara-settings-screen .option-tree-ui-buttons {
+	display: none;
 }
 
-body.tara-settings-screen #option-tree-sub-header .option-tree-ui-button.button-primary,
-body.tara-settings-screen #option-tree-sub-header button.button-primary {
-	background: var(--ts-accent) !important;
-	border-color: var(--ts-accent) !important;
-	border-radius: 999px !important;
-	padding: 4px 22px !important;
-	height: auto;
-	min-height: 36px;
-	line-height: 28px;
-	font-size: 13px;
-	font-weight: 700;
-	box-shadow: 0 10px 20px -16px var(--ts-accent);
+body.tara-settings-screen .ui-tabs > .clear {
+	display: none;
 }
 
-body.tara-settings-screen #option-tree-sub-header .option-tree-ui-button.button-primary:hover {
-	background: var(--ts-accent-dark) !important;
-	border-color: var(--ts-accent-dark) !important;
+/* فرم «بازیابی تنظیمات» یک لینک کم‌رنگ و دور از دست می‌شود */
+body.tara-settings-screen .wrap.settings-wrap form:has(.reset-settings) {
+	margin: 22px 0 0;
+	text-align: center;
 }
 
-/* =========================================================================
-   ۹) جست‌وجوی فیلد (ساختهٔ JS)
-   ====================================================================== */
-body.tara-settings-screen .tara-find {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	flex: 1 1 260px;
-	margin-inline-start: 8px;
-}
-
-body.tara-settings-screen .tara-find input {
-	flex: 1 1 auto;
-	min-width: 120px;
-	height: 34px;
-	padding: 4px 14px;
-	border: 1px solid var(--ts-line);
-	border-radius: 999px;
-	background: #fbfcff;
-	font-size: 12.5px;
-}
-
-body.tara-settings-screen .tara-find input:focus {
-	border-color: var(--ts-accent);
-	background: #fff;
-	box-shadow: 0 0 0 3px rgba(24, 90, 219, 0.12);
-	outline: 0;
-}
-
-body.tara-settings-screen .format-settings.is-tara-hidden { display: none; }
-
-body.tara-settings-screen .tara-find-empty {
-	flex-basis: 100%;
-	margin: 4px 0 0;
+body.tara-settings-screen .reset-settings {
+	float: none;
+	padding: 4px 10px;
+	border: 0 !important;
+	border-radius: 8px !important;
+	background: transparent !important;
+	color: #a33a5b !important;
 	font-size: 12px;
+	font-weight: 600;
+	box-shadow: none !important;
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+body.tara-settings-screen .reset-settings:hover,
+body.tara-settings-screen .reset-settings:focus {
+	background: #fdeef3 !important;
+	color: #8b1e3f !important;
+}
+
+/* =========================================================================
+   ۹) جست‌وجو: وقتی کلمه‌ای نوشته شده، همهٔ بخش‌ها باز می‌شوند
+   ====================================================================== */
+body.tara-settings-screen .ui-tabs.is-tara-searching .ui-tabs-panel {
+	display: block !important;
+}
+
+body.tara-settings-screen .ui-tabs.is-tara-searching .ui-tabs-nav {
+	opacity: 0.9;
+}
+
+body.tara-settings-screen .format-settings.is-tara-hidden {
+	display: none !important;
+}
+
+body.tara-settings-screen .tara-empty {
+	display: none;
+	margin: 0;
+	padding: 42px 24px;
+	text-align: center;
 	color: var(--ts-muted);
+	font-size: 13px;
+}
+
+body.tara-settings-screen .tara-empty.is-on {
+	display: block;
 }
 
 /* =========================================================================
    ۱۰) موبایل
    ====================================================================== */
-@media (max-width: 782px) {
-	body.tara-settings-screen .tara-settings-intro { padding: 16px; }
+@media (max-width: 960px) {
+	body.tara-settings-screen .ui-tabs {
+		grid-template-columns: 1fr;
+	}
 
-	body.tara-settings-screen .format-settings { padding: 14px 16px; }
+	body.tara-settings-screen .ui-tabs .ui-tabs-nav {
+		position: static;
+		flex-direction: row;
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		padding: 8px;
+		border-radius: 14px;
+		scrollbar-width: thin;
+	}
+
+	body.tara-settings-screen .ui-tabs .ui-tabs-nav li {
+		flex: 0 0 auto;
+	}
+
+	body.tara-settings-screen .ui-tabs .ui-tabs-nav li a {
+		white-space: nowrap;
+	}
+}
+
+@media (max-width: 782px) {
+	body.tara-settings-screen .tara-settings-hero {
+		padding: 20px;
+	}
+
+	body.tara-settings-screen .tara-settings-hero__art {
+		display: none;
+	}
+
+	body.tara-settings-screen #option-tree-sub-header {
+		top: 46px;
+		flex-wrap: wrap;
+	}
+
+	body.tara-settings-screen .tara-find {
+		flex-basis: 100%;
+	}
+
+	body.tara-settings-screen .format-settings {
+		padding: 16px 18px;
+	}
 
 	body.tara-settings-screen .format-settings > .format-setting-wrap {
 		grid-template-columns: 1fr;
 		gap: 6px;
 	}
+}
 
+/* چاپ: بدون نوار چسبان و بدون ستون فهرست */
+@media print {
+	body.tara-settings-screen #option-tree-sub-header,
+	body.tara-settings-screen .tara-settings-hero__actions,
 	body.tara-settings-screen .ui-tabs .ui-tabs-nav {
-		top: 104px;
-		border-radius: 14px;
-		padding: 6px;
+		display: none !important;
 	}
 
-	body.tara-settings-screen #option-tree-sub-header { top: 46px; border-radius: 12px; }
+	body.tara-settings-screen .ui-tabs {
+		display: block;
+	}
 }

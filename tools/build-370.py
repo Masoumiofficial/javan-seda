@@ -9,14 +9,14 @@ build-370.py — بستهٔ کاملِ نسخهٔ ۳.۷.x «ترانه یار»
     روی پوشهٔ قالب Overwrite می‌کند.
   • فایل README داخل بسته، نسخه و مسیرها را از همان آرگومان می‌خواند.
 
-خروجی: artifacts/taranehyar-<version>.zip  (پیش‌فرض 3.7.1)
+خروجی: artifacts/taranehyar-<version>.zip  (پیش‌فرض 3.7.2)
 
 بررسی‌های خودکار پیش از بستن:
   • هیچ فایل آزمون/ابزار/مستندات/لایسنس/رمزگذاری‌شده داخل بسته نباشد
   • هیچ ارجاعی به نام‌های قدیمی در فایل‌های متنی نمانده باشد
   • CRC هر ورودی سالم باشد
 
-استفاده: python3 tools/build-370.py [--version 3.7.1]
+استفاده: python3 tools/build-370.py [--version 3.7.2]
 """
 
 import argparse
@@ -110,7 +110,7 @@ def scan_brand(entries):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--version', default='3.7.1')
+    ap.add_argument('--version', default='3.7.2')
     args = ap.parse_args()
     ver = args.version
 

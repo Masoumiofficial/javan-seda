@@ -246,6 +246,18 @@ function wp_get_theme() {
 function wp_strip_all_tags( $s ) {
 	return trim( strip_tags( (string) $s ) );
 }
+function esc_html_e( $text, $domain = 'default' ) {
+	echo esc_html( $text );
+}
+function esc_html__( $text, $domain = 'default' ) {
+	return esc_html( $text );
+}
+function esc_attr_e( $text, $domain = 'default' ) {
+	echo esc_attr( $text );
+}
+function esc_attr__( $text, $domain = 'default' ) {
+	return esc_attr( $text );
+}
 function esc_html( $s ) {
 	return htmlspecialchars( (string) $s, ENT_QUOTES, 'UTF-8' );
 }

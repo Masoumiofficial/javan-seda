@@ -81,9 +81,23 @@ foreach ( array( 'tara_genre', 'tara_mood', 'tara_songwriter', 'tara_composer', 
 t( 'تاکسونومی: ژانر درختی است', ! empty( $taxes['tara_genre']->args['hierarchical'] ) );
 t( 'تاکسونومی: حال‌وهوا غیردرختی است', empty( $taxes['tara_mood']->args['hierarchical'] ) );
 t( 'تاکسونومی: آدرس ژانر = genre', 'genre' === $taxes['tara_genre']->args['rewrite']['slug'] );
-t( 'تاکسونومی: آدرس ترانه‌سرا = tarane-sara', 'tarane-sara' === $taxes['tara_songwriter']->args['rewrite']['slug'] );
-t( 'تاکسونومی: آدرس آهنگساز = ahangsaz', 'ahangsaz' === $taxes['tara_composer']->args['rewrite']['slug'] );
-t( 'تاکسونومی: آدرس تنظیم = tanjim', 'tanjim' === $taxes['tara_arranger']->args['rewrite']['slug'] );
+t( 'تاکسونومی: آدرس حال‌وهوا = mood', 'mood' === $taxes['tara_mood']->args['rewrite']['slug'] );
+t( 'تاکسونومی: آدرس ترانه‌سرا = songwriter', 'songwriter' === $taxes['tara_songwriter']->args['rewrite']['slug'] );
+t( 'تاکسونومی: آدرس آهنگساز = composer', 'composer' === $taxes['tara_composer']->args['rewrite']['slug'] );
+t( 'تاکسونومی: آدرس تنظیم = arranger', 'arranger' === $taxes['tara_arranger']->args['rewrite']['slug'] );
+t( 'تاکسونومی: REST base همان نامک انگلیسی', 'songwriter' === $taxes['tara_songwriter']->args['rest_base'] );
+t( 'تاکسونومی: مهر بازسازی پیوند یکتا ثبت شد', function_exists( 'tara_music_taxonomies_stamp' ) );
+
+/* مهر: بار اول بازسازی می‌کند، بار دوم نه */
+unset( $GLOBALS['__options']['taranehyar_music_rewrite_stamp'] );
+$GLOBALS['__flushed'] = 0;
+tara_music_taxonomies_stamp();
+t( 'تاکسونومی: بار اول مهر، قوانین بازسازی شد', 1 === $GLOBALS['__flushed'], (string) $GLOBALS['__flushed'] );
+tara_music_taxonomies_stamp();
+t( 'تاکسونومی: بار دوم مهر، دیگر بازسازی نمی‌کند', 1 === $GLOBALS['__flushed'], (string) $GLOBALS['__flushed'] );
+$GLOBALS['__options']['taranehyar_music_rewrite_stamp'] = 'قدیمی';
+tara_music_taxonomies_stamp();
+t( 'تاکسونومی: مهر عوض‌شده دوباره بازسازی می‌کند', 2 === $GLOBALS['__flushed'], (string) $GLOBALS['__flushed'] );
 t( 'تاکسونومی: در REST دیده می‌شوند', ! empty( $taxes['tara_genre']->args['show_in_rest'] ) );
 t( 'تاکسونومی: ستون پیشخوان دارد', ! empty( $taxes['tara_mood']->args['show_admin_column'] ) );
 t( 'تاکسونومی: برچسب مفرد فارسی', 'ژانر' === tara_music_taxonomy_label( 'tara_genre' ) );

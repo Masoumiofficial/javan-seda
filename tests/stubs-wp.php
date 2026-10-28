@@ -317,6 +317,10 @@ if ( ! extension_loaded( 'mbstring' ) ) {
 }
 
 /* ---------- گزینه/ترنزینت ---------- */
+function flush_rewrite_rules( $hard = true ) {
+	$GLOBALS['__flushed'] = isset( $GLOBALS['__flushed'] ) ? $GLOBALS['__flushed'] + 1 : 1;
+	return true;
+}
 function get_option( $k, $d = false ) {
 	return array_key_exists( $k, $GLOBALS['__options'] ) ? $GLOBALS['__options'][ $k ] : $d;
 }

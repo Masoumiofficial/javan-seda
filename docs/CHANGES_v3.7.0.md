@@ -56,9 +56,12 @@
 | --- | --- | --- |
 | `tara_genre` — ژانر | `/genre/…` | بله |
 | `tara_mood` — حال‌وهوا | `/mood/…` | نه |
-| `tara_songwriter` — ترانه‌سرا | `/tarane-sara/…` | نه |
-| `tara_composer` — آهنگساز | `/ahangsaz/…` | نه |
-| `tara_arranger` — تنظیم | `/tanjim/…` | نه |
+| `tara_songwriter` — ترانه‌سرا | `/songwriter/…` * | نه |
+| `tara_composer` — آهنگساز | `/composer/…` * | نه |
+| `tara_arranger` — تنظیم | `/arranger/…` * | نه |
+
+\* در ۳.۷.۰ این سه آدرس `tarane-sara`/`ahangsaz`/`tanjim` بودند؛ در **۳.۷.۱** به
+نامک انگلیسی تغییر کردند. جزئیات: `docs/CHANGES_v3.7.1.md`.
 
 - روی «نوشته» ثبت می‌شوند (همان جایی که آهنگ‌ها هستند) و در ویرایشگر بلوکی و
   کلاسیک هر دو دیده می‌شوند (`show_in_rest`).

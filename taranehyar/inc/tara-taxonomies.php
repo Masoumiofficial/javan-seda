@@ -4,7 +4,7 @@
  * ==========================================================================
  * چرا تاکسونومی و نه فیلد متنی؟
  *   • «ترانه‌سرا» و «آهنگساز» در سایت‌های موسیقی معمولاً چند آهنگ دارند؛ با
- *     تاکسونومی می‌شود صفحهٔ هر کدام را داشت (`/tarane-sara/...`).
+ *     تاکسونومی می‌شود صفحهٔ هر کدام را داشت (`/songwriter/...`).
  *   • «ژانر» درختی است (پاپ ← پاپ ایرانی) و برای فیلتر و سئو لازم است.
  *   • با `show_in_rest` همه در ویرایشگر بلوک و REST API هم دیده می‌شوند.
  *
@@ -53,7 +53,7 @@ if ( ! function_exists( 'tara_music_taxonomies' ) ) {
 			),
 			'songwriter' => array(
 				'taxonomy'    => 'tara_songwriter',
-				'slug'        => 'tarane-sara',
+				'slug'        => 'songwriter',
 				'singular'    => 'ترانه‌سرا',
 				'plural'      => 'ترانه‌سراها',
 				'hierarchical' => false,
@@ -62,7 +62,7 @@ if ( ! function_exists( 'tara_music_taxonomies' ) ) {
 			),
 			'composer'   => array(
 				'taxonomy'    => 'tara_composer',
-				'slug'        => 'ahangsaz',
+				'slug'        => 'composer',
 				'singular'    => 'آهنگساز',
 				'plural'      => 'آهنگسازها',
 				'hierarchical' => false,
@@ -71,7 +71,7 @@ if ( ! function_exists( 'tara_music_taxonomies' ) ) {
 			),
 			'arranger'   => array(
 				'taxonomy'    => 'tara_arranger',
-				'slug'        => 'tanjim',
+				'slug'        => 'arranger',
 				'singular'    => 'تنظیم‌کننده',
 				'plural'      => 'تنظیم‌کننده‌ها',
 				'hierarchical' => false,
@@ -175,6 +175,35 @@ if ( ! function_exists( 'tara_music_taxonomies_flush' ) ) {
 	}
 }
 add_action( 'after_switch_theme', 'tara_music_taxonomies_flush' );
+
+if ( ! function_exists( 'tara_music_taxonomies_stamp' ) ) {
+	/**
+	 * مهرِ نسخهٔ پیوند یکتا.
+	 *
+	 * چرا لازم است؟ اگر فقط به `after_switch_theme` تکیه کنیم، سایتی که قالب
+	 * از قبل روشن است هیچ‌وقت قوانین تازه را نمی‌گیرد و آدرس‌های
+	 * `/songwriter/...` تا «ذخیرهٔ پیوندهای یکتا» ۴۰۴ می‌دهند. این تابع
+	 * یک مهر در دیتابیس نگه می‌دارد؛ هر بار مقدار مهر عوض شود (مثل تغییر
+	 * نامک آرشیو در ۳.۷.۱)، یک‌بار قوانین نرم بازسازی می‌شوند.
+	 *
+	 * فقط یک گزینهٔ سبک اضافه می‌کند و هیچ داده‌ای را جابه‌جا نمی‌کند.
+	 */
+	function tara_music_taxonomies_stamp() {
+		$stamp = (string) apply_filters( 'tara_music_rewrite_stamp', '2026-10-28-english-slugs' );
+
+		if ( get_option( 'taranehyar_music_rewrite_stamp' ) === $stamp ) {
+			return;
+		}
+
+		update_option( 'taranehyar_music_rewrite_stamp', $stamp, false );
+
+		/* ثبت تاکسونومی‌ها روی init(12) انجام شده؛ حالا قوانین را بازچین. */
+		if ( function_exists( 'flush_rewrite_rules' ) ) {
+			flush_rewrite_rules( false );
+		}
+	}
+}
+add_action( 'init', 'tara_music_taxonomies_stamp', 13 );
 
 /* -------------------------------------------------------------------------
  * ستون‌های پیشخوان: دیدن ژانر/حال‌وهوا در فهرست نوشته‌ها

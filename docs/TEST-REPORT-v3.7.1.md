@@ -1,4 +1,4 @@
-# گزارش آزمون نسخهٔ ۳.۷.۰
+# گزارش آزمون نسخهٔ ۳.۷.۱
 
 تاریخ اجرا: ۲۰۲۶‑۱۰‑۲۸ · PHP **8.4.1** (php-wasm) · وردپرس شبیه‌سازی‌شده با استابِ تست
 
@@ -11,17 +11,17 @@
 | `tests/run-354.php` | ۵۰ | **pass=50 fail=0** |
 | `tests/run-360.php` | ۳۴ | **pass=34 fail=0** |
 | `tests/run-360-panel.php` | ۶۷ | **pass=67 fail=0** |
-| `tests/run-370.php` | ۷۷ | **pass=77 fail=0** |
+| `tests/run-370.php` | ۸۳ | **pass=83 fail=0** |
 | `node tools/php-lint.mjs taranehyar` | ۷۵ فایل | **files=75 ok=75 bad=0** |
 | `python3 tools/expected-hashes.py --check` | ۲۱ کلید | **21 مطابق، 0 نیازمند بازنویسی** |
 | `node -e "new Function(...scripts.js)"` | – | **JS syntax OK** |
 
-جمع سنجه‌های رفتاری: **۳۴۳ pass / ۰ fail**.
+جمع سنجه‌های رفتاری: **۳۴۶ pass / ۰ fail**.
 
 ## چه چیزی در `run-370.php` پوشش داده شد
 
 - **تاکسونومی‌ها**: ثبت پنج تاکسونومی، درختی‌بودن ژانر، نامک آرشیو
-  (`genre`/`mood`/`tarane-sara`/`ahangsaz`/`tanjim`)، `show_in_rest`،
+  (`genre`/`mood`/`songwriter`/`composer`/`arranger`)، `show_in_rest`،
   `show_admin_column`، برچسب مفرد/جمع فارسی و idempotent بودن ثبت.
 - **دادهٔ آهنگ**: ترجیح ۳۲۰ بر ۱۲۸، آهنگ بدون فایل، کاور سفارشی و پیش‌فرض،
   ساختار کامل فهرست پخش.
@@ -47,10 +47,10 @@
 ## بستهٔ تحویلی
 
 ```text
-artifacts/taranehyar-3.7.0.zip
+artifacts/taranehyar-3.7.1.zip
   فایل‌ها : 147 + README-3.7.0.txt
-  حجم     : 1,976,342 بایت
-  sha256  : 3d592d1c138968199282f5f46761b55781d1a425d46a2e6891ca38b27233acdd
+  حجم     : 1,976,754 بایت
+  sha256  : 03992e951915fe631daee0eb704303a340b34d1bf74f0650027fddf8056e05d9
 ```
 
 بسته **بازتولیدپذیر** است (مهر زمانی ثابت؛ دو بار ساخت ⇒ همان sha256).

@@ -16,7 +16,7 @@
 | `python3 tools/expected-hashes.py --check` | ۲۱ کلید | **21 مطابق، 0 نیازمند بازنویسی** |
 | `node -e "new Function(...scripts.js)"` | – | **JS syntax OK** |
 
-جمع سنجه‌های رفتاری: **۳۴۶ pass / ۰ fail**.
+جمع سنجه‌های رفتاری: **۳۴۹ pass / ۰ fail**.
 
 ## چه چیزی در `run-370.php` پوشش داده شد
 

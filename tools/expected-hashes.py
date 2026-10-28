@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""javanseda/inc/ab-sidebars.php → javan_seda_expected_hashes() را با disk هم‌سازی می‌کند.
+"""javanseda/inc/ab-sidebars.php → tara_expected_hashes() را با disk هم‌سازی می‌کند.
 
 چرا این اسکریپت هست: مقدار هر کلید = sha256 محتوای فایل **بعد از** نرمال‌سازی
 \r\n و \r به \n — دقیقاً همان کاری که javan_seda_file_hash() در PHP می‌کند.
@@ -23,7 +23,7 @@ def disk_hash(rel):
 
 src = io.open(php, encoding='utf-8', newline='').read()
 EOL = '\r\n' if '\r\n' in src else '\n'
-start = src.find('function javan_seda_expected_hashes')
+start = src.find('function tara_expected_hashes')
 end = src.find("\n}\n", start)
 assert start > 0 and end > start, 'بلوک expected_hashes پیدا نشد'
 block = src[start:end]

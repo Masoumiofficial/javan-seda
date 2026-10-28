@@ -294,6 +294,9 @@ if ( ! function_exists( 'tara_player' ) ) {
 	 * @return string
 	 */
 	function tara_player( $args = array() ) {
+		/* نوار چسبان فقط یک‌بار در هر صفحه رندر می‌شود. */
+		static $tara_dock_done = false;
+
 		$args = wp_parse_args(
 			$args,
 			array(
@@ -387,6 +390,8 @@ if ( ! function_exists( 'tara_player' ) ) {
 			<?php endif; ?>
 		</section>
 
+		<?php if ( ! $tara_dock_done ) : ?>
+		<?php $tara_dock_done = true; ?>
 		<div class="ty-dock" data-tara-dock hidden>
 			<img class="ty-dock__img" src="<?php echo esc_url( $first['cover'] ); ?>" width="44" height="44" alt="" data-tara-dock-art>
 			<div class="ty-dock__meta">
@@ -401,6 +406,7 @@ if ( ! function_exists( 'tara_player' ) ) {
 			<button type="button" class="ty-dock__btn" data-tara-dock-next aria-label="قطعهٔ بعد"><span class="ty-icon-next"></span></button>
 			<a class="ty-dock__link" href="<?php echo esc_url( $first['link'] ); ?>" data-tara-dock-link aria-label="صفحهٔ آهنگ"><span class="ty-icon-external"></span></a>
 		</div>
+		<?php endif; ?>
 		<?php
 
 		return trim( (string) ob_get_clean() );

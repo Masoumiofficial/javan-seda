@@ -770,6 +770,30 @@ body.has-tara-dock { padding-bottom: 72px; }
 /* =========================================================================
    ۷) موبایل
    ====================================================================== */
+/* دسکتاپ: پلیر بزرگ‌تر و «چسبیده» به عرض محتوا */
+@media (min-width: 783px) {
+	.ty-player {
+		padding: 24px 26px;
+		gap: 24px;
+	}
+
+	.ty-player__art {
+		width: 168px;
+		height: 168px;
+	}
+
+	.ty-player__img { border-radius: 16px; }
+
+	.ty-player__song { font-size: 24px; }
+
+	.ty-player__btn--main {
+		width: 54px;
+		height: 54px;
+	}
+
+	.ty-player__seek { height: 8px; }
+}
+
 @media (max-width: 782px) {
 	.ty-player {
 		grid-template-columns: 1fr;

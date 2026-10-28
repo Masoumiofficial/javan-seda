@@ -17,6 +17,10 @@
 	var ICON_PLAY = 'ty-icon-play';
 	var ICON_PAUSE = 'ty-icon-pause';
 
+	/* همهٔ نمونه‌های صفحه — برای اینکه فقط یکی در هر لحظه پخش شود */
+	var registry = [];
+	var dockOwner = null;
+
 	function formatTime(seconds) {
 		if (!isFinite(seconds) || seconds < 0) {
 			return '۰۰:۰۰';
@@ -65,6 +69,11 @@
 		var items = root.querySelectorAll('[data-tara-item]');
 
 		var dock = document.querySelector('[data-tara-dock]');
+		var ownsDock = false; /* اولین نمونهٔ صفحه صاحب نوار می‌شود */
+		if (dock && !dockOwner) {
+			dockOwner = root;
+			ownsDock = true;
+		}
 		var dockToggle = dock ? dock.querySelector('[data-tara-dock-toggle]') : null;
 		var dockPrev = dock ? dock.querySelector('[data-tara-dock-prev]') : null;
 		var dockNext = dock ? dock.querySelector('[data-tara-dock-next]') : null;
@@ -95,16 +104,16 @@
 			if (art && t.cover) {
 				art.setAttribute('src', t.cover);
 			}
-			if (dockTitle) {
+			if (dockTitle && dockOwner === root) {
 				dockTitle.textContent = t.title;
 			}
-			if (dockArtist) {
+			if (dockArtist && dockOwner === root) {
 				dockArtist.textContent = t.artist;
 			}
-			if (dockArt && t.cover) {
+			if (dockArt && t.cover && dockOwner === root) {
 				dockArt.setAttribute('src', t.cover);
 			}
-			if (dockLink && t.link) {
+			if (dockLink && t.link && dockOwner === root) {
 				dockLink.setAttribute('href', t.link);
 			}
 
@@ -132,6 +141,12 @@
 		}
 
 		function play() {
+			/* فقط یک نمونه در هر لحظه: بقیه خاموش می‌شوند */
+			for (var p = 0; p < registry.length; p++) {
+				if (registry[p] !== api) {
+					registry[p].silence();
+				}
+			}
 			root.classList.add('is-loading');
 			var promise = audio.play();
 			started = true;
@@ -250,12 +265,18 @@
 			});
 		}
 
-		/* دکمه‌های پخشِ بیرون از کارت */
+		/* دکمه‌های پخشِ بیرون از کارت.
+		   اگر صفحه چند پلیر داشته باشد، اولین شنونده رویداد را برمی‌دارد تا
+		   یک کلیک باعث پخشِ هم‌زمان در همه نشود. */
 		document.addEventListener('click', function (event) {
+			if (event.taraRowHandled) {
+				return;
+			}
 			var button = event.target.closest('[data-tara-play]');
 			if (!button || root.contains(button)) {
 				return;
 			}
+			event.taraRowHandled = true;
 			var index = Number(button.getAttribute('data-tara-play'));
 			if (isNaN(index)) {
 				return;
@@ -268,7 +289,7 @@
 		});
 
 		/* نوار چسبان */
-		if (dock) {
+		if (dock && ownsDock) {
 			if (dockToggle) {
 				dockToggle.addEventListener('click', function () {
 					if (audio.paused) {
@@ -305,7 +326,7 @@
 		audio.addEventListener('playing', function () {
 			root.classList.remove('is-loading');
 			setPlaying(true);
-			if (dock) {
+			if (dock && (ownsDock || dockOwner === root)) {
 				dock.hidden = false;
 				window.requestAnimationFrame(function () {
 					dock.classList.add('is-visible');
@@ -358,6 +379,20 @@
 				});
 			}
 		}
+
+		var api = {
+			root: root,
+			silence: function () {
+				if (!audio.paused || audio.src) {
+					audio.pause();
+				}
+				root.classList.remove('is-playing');
+				if (dock && dockOwner === root) {
+					dock.classList.remove('is-playing');
+				}
+			}
+		};
+		registry.push(api);
 
 		paint();
 	}

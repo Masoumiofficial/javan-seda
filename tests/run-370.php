@@ -160,6 +160,13 @@ t( 'پلیر: کنتر‌های اصلی', false !== strpos( $html, 'data-tara-t
 t( 'پلیر: فهرست پخش', 2 === substr_count( $html, 'data-tara-play=' ), (string) substr_count( $html, 'data-tara-play=' ) );
 t( 'پلیر: نوار چسبان', false !== strpos( $html, 'data-tara-dock' ) && false !== strpos( $html, 'hidden' ) );
 t( 'پلیر: اعداد فارسی در شمارش', false !== strpos( $html, '۲ قطعه' ) );
+
+/* دو پلیر در یک صفحه: نوار چسبان نباید دوباره رندر شود */
+$second = tara_player( array( 'tracks' => $playlist, 'title' => 'دوم', 'context' => 'archive' ) );
+t( 'پلیر: پلیر دوم هم کامل ساخته می‌شود', false !== strpos( $second, 'data-tara-player="archive"' ) );
+t( 'پلیر: نوار چسبان فقط یک‌بار در صفحه',
+	1 === substr_count( $html, 'class="ty-dock"' ) && 0 === substr_count( $second, 'class="ty-dock"' ),
+	substr_count( $html, 'class="ty-dock"' ) . '/' . substr_count( $second, 'class="ty-dock"' ) );
 t( 'پلیر: RTL', false !== strpos( $html, 'dir="rtl"' ) );
 t( 'پلیر: بدون فهرست خالی', '' === tara_player( array( 'tracks' => array() ) ) );
 
@@ -188,9 +195,15 @@ tara_settings_shell_assets( 'taranehyar_page_ot-theme-options' );
 t( 'تنظیمات: CSS پوسته بار شد', isset( $GLOBALS['__styles']['taranehyar-settings'] ) );
 t( 'تنظیمات: JS پوسته بار شد', isset( $GLOBALS['__scripts']['taranehyar-settings'] ) );
 
-$before = array_keys( $GLOBALS['__styles'] );
+$GLOBALS['__styles']  = array();
+$GLOBALS['__scripts'] = array();
 tara_settings_shell_assets( 'edit.php' );
-t( 'تنظیمات: در صفحهٔ دیگر بار نمی‌شود', array_keys( $GLOBALS['__styles'] ) === $before );
+t( 'تنظیمات: در صفحهٔ دیگر CSS بار نمی‌شود', array() === $GLOBALS['__styles'] );
+t( 'تنظیمات: در صفحهٔ دیگر JS بار نمی‌شود', array() === $GLOBALS['__scripts'] );
+
+tara_settings_shell_assets( 'taranehyar_page_ot-theme-options' );
+t( 'تنظیمات: دوباره روی صفحهٔ درست بار می‌شود', isset( $GLOBALS['__styles']['taranehyar-settings'] ) );
+t( 'تنظیمات: پیکربندی JS به صفحه تزریق شد', isset( $GLOBALS['__localized']['taranehyar-settings']['taraSettings'] ) );
 
 t( 'تنظیمات: فایل CSS موجود', is_readable( '/tmp/theme/css/admin-settings.css' ) );
 t( 'تنظیمات: فایل JS موجود', is_readable( '/tmp/theme/js/admin-settings.js' ) );

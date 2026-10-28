@@ -65,7 +65,8 @@ if ( ! function_exists( 'tara_settings_shell_assets' ) ) {
 	 * @param string $hook شناسهٔ صفحهٔ جاری.
 	 */
 	function tara_settings_shell_assets( $hook ) {
-		if ( 'admin_enqueue_scripts' === current_action() && tara_settings_shell_screen() !== $hook ) {
+		/* فقط همان یک صفحه — مستقل از اینکه از کدام هوک صدا زده شود. */
+		if ( tara_settings_shell_screen() !== $hook ) {
 			return;
 		}
 

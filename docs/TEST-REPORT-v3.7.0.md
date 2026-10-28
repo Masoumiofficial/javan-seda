@@ -11,12 +11,12 @@
 | `tests/run-354.php` | ۵۰ | **pass=50 fail=0** |
 | `tests/run-360.php` | ۳۴ | **pass=34 fail=0** |
 | `tests/run-360-panel.php` | ۶۷ | **pass=67 fail=0** |
-| `tests/run-370.php` | ۷۲ | **pass=72 fail=0** |
+| `tests/run-370.php` | ۷۷ | **pass=77 fail=0** |
 | `node tools/php-lint.mjs taranehyar` | ۷۵ فایل | **files=75 ok=75 bad=0** |
 | `python3 tools/expected-hashes.py --check` | ۲۱ کلید | **21 مطابق، 0 نیازمند بازنویسی** |
 | `node -e "new Function(...scripts.js)"` | – | **JS syntax OK** |
 
-جمع سنجه‌های رفتاری: **۳۳۸ pass / ۰ fail**.
+جمع سنجه‌های رفتاری: **۳۴۳ pass / ۰ fail**.
 
 ## چه چیزی در `run-370.php` پوشش داده شد
 
@@ -49,8 +49,8 @@
 ```text
 artifacts/taranehyar-3.7.0.zip
   فایل‌ها : 147 + README-3.7.0.txt
-  حجم     : 1,975,465 بایت
-  sha256  : 6c024432d46015fd9fec8c91dd0ccb67eb78bf170062813c0cac194fccf60931
+  حجم     : 1,976,186 بایت
+  sha256  : 1324ce32b690bae4747cb864767a8615fabfb7b3dcca1004af7e6005446526d9
 ```
 
 بسته **بازتولیدپذیر** است (مهر زمانی ثابت؛ دو بار ساخت ⇒ همان sha256).

@@ -61,7 +61,15 @@ if ( has_post_thumbnail() ) { /* v3.3.8 — دو سایز به WP بدهید ت�
    رشتهٔ خالی است، پس هیچ کلاس/فاصلهٔ اضافه‌ای ساخته نمی‌شود. */
 if ( function_exists( 'tara_media_badge' ) ) { echo tara_media_badge( get_the_ID(), 'card' ); }
 ?><?php if ( ! empty( $GLOBALS['tara_card_play'] ) && function_exists( 'tara_card_play' ) ) { echo tara_card_play(); /* escape شده در تابع */ } ?><?php tara_card_stats(); ?></figure>
-<h2><a href="<?php echo esc_url( get_permalink() ); ?>"><?php if(get_field('artist') || get_field('song')){ ?> <?php echo esc_html( get_field('artist') ); ?><span><?php echo esc_html( get_field('song') ); ?></span><?php } else{ the_title(''); } ?></a></h2>
+<?php
+/* v3.8.1 — تیتر کارت دیگر چهار بار `get_field()` خام صدا نمی‌زند:
+   بدون ACF کل صفحه با خطای کشنده می‌افتاد و در هر کارت هم چهار فراخوانی
+   جدا بود. `tara_music_field()` هم ACF و هم متای خام را می‌خواند و رشتهٔ
+   امن برمی‌گرداند؛ اگر «آهنگ» خالی باشد، <span> خالی هم چاپ نمی‌شود. */
+$ab_card_artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'artist' ) : '';
+$ab_card_song   = function_exists( 'tara_music_field' ) ? tara_music_field( 'song' ) : '';
+?>
+<h2><a href="<?php echo esc_url( get_permalink() ); ?>"><?php if ( '' !== $ab_card_artist || '' !== $ab_card_song ) { ?> <?php echo esc_html( $ab_card_artist ); ?><?php if ( '' !== $ab_card_song ) { ?><span><?php echo esc_html( $ab_card_song ); ?></span><?php } ?><?php } else { the_title( '' ); } ?></a></h2>
 </header>
 <?php
 /* v3.7.8 — «mp3/mp4» روی کارت‌ها حذف شد (درخواست صریح) و خودِ <footer> هم

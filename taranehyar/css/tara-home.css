@@ -58,6 +58,25 @@
 
 .ty-hero-track::-webkit-scrollbar { display: none; width: 0; height: 0; }
 
+/* v3.8.1 — کشیدنِ اسلایدر با ماوس.
+   -------------------------------------------------------------------------
+   کاربر گفت اسلایدر روی دسکتاپ «حرمت نمی‌کند»: با چرخِ ماوس هیچ اتفاقی
+   نمی‌افتاد و تنها راه، شیفت+چرخ یا ترک‌پد بود. حالا می‌شود کارت را با
+   ماوس گرفت و کشید (کلاس `is-dragging` را JS می‌گذارد؛ در حین کشیدن
+   snap خاموش می‌شود تا حرکت نرم باشد و بعد دوباره روشن می‌شود). */
+@media (hover: hover) and (pointer: fine) {
+	.ty-hero-track { cursor: grab; }
+}
+
+.ty-hero-track.is-dragging {
+	scroll-snap-type: none;
+	cursor: grabbing;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.ty-hero-track.is-dragging .ty-hero-slide__img { transition: none; }
+
 .ty-hero-slide {
 	position: relative;
 	flex: 0 0 100%;
@@ -68,7 +87,6 @@
 	padding: 0;
 	direction: rtl;
 	scroll-snap-align: start;
-	scroll-snap-stop: always;
 	overflow: hidden;
 	border-radius: var(--ty-hs-radius);
 	background: #10172a;
@@ -179,6 +197,66 @@
 	outline-offset: 1px;
 }
 
+/* فلش‌های چپ/راست — v3.8.1
+   -------------------------------------------------------------------------
+   روی دسکتاپ، اسلایدر فقط با کشیدن عوض می‌شد و کاربر گفت «فلش بذار».
+   دو دکمهٔ شیشه‌ای در دو طرف کارت؛ روی گوشی پنهان‌اند (سوایپ و نقطه‌ها
+   کافی است و عرض کم را هم شلوغ نمی‌کنند). */
+.ty-hero-nav {
+	position: absolute;
+	inset-inline: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	display: none;
+	align-items: center;
+	justify-content: space-between;
+	pointer-events: none;
+	z-index: 5;
+}
+
+.ty-hero-arrow {
+	pointer-events: auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 1px solid rgba(255, 255, 255, .26);
+	border-radius: 50%;
+	background: rgba(10, 15, 30, .38);
+	color: #fff;
+	cursor: pointer;
+	backdrop-filter: blur(8px) saturate(1.1);
+	box-shadow: 0 8px 22px -14px rgba(0, 0, 0, .9);
+	transition: background .18s ease, transform .18s ease, border-color .18s ease;
+}
+
+.ty-hero-arrow:hover {
+	background: rgba(10, 15, 30, .72);
+	border-color: rgba(255, 255, 255, .48);
+	transform: scale(1.06);
+}
+
+.ty-hero-arrow:active { transform: scale(.97); }
+
+.ty-hero-arrow:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 2px;
+}
+
+@media (min-width: 783px) {
+	.ty-hero-nav { display: flex; }
+}
+
+@media (hover: none) {
+	.ty-hero-arrow:hover { transform: none; background: rgba(10, 15, 30, .38); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ty-hero-arrow { transition: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.ty-hero-track { scroll-behavior: auto; }
 	.ty-hero-slide__img { transition: none; }
@@ -197,9 +275,14 @@
 	   پس تقریباً هیچ برشی هم لازم نیست (و هر چه بود با contain حل شده). */
 	.ty-hero-slide__media { aspect-ratio: 16 / 9; }
 
-	.ty-hero-dots { bottom: 8px; }
+	/* v3.8.1 — نقطه‌های اسلایدر در گوشی «کار نمی‌کردند»: هر نقطه فقط
+	   ۱۸px ناحیهٔ لمس داشت و انگشت اغلب به لینکِ اسلایدِ زیرش می‌خورد و
+	   کاربر با صفحهٔ آهنگ روبه‌رو می‌شد. حالا هر نقطه ۳۰px است (بالای
+	   کمینهٔ ۲۴px و نزدیک ۴۴px) و خودِ ریل هم snap-stop ندارد تا پرشِ
+	   چند اسلایدی با یک کلیک انجام شود. */
+	.ty-hero-dots { bottom: 10px; gap: 0; padding: 3px 6px; }
 
-	.ty-hero-dot { width: 18px; height: 18px; padding: 5px; }
+	.ty-hero-dot { width: 30px; height: 30px; padding: 11px; }
 }
 
 @media (max-width: 480px) {

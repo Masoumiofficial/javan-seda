@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.8.0
+Version: 3.8.1
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -1518,7 +1518,7 @@ box-shadow: 0 6px 20px rgba(17,17,17,.08);border-radius: 5px;}
 .night{background: var(--ab-page);color: var(--ab-text);}
 .night #header{background: var(--ab-charcoal);color: var(--ab-text);}
 .night a{color: #ddd;}
-.night #header{background: var(--ab-glass-bg-strong, var(--ab-charcoal)) !important;-webkit-box-shadow: 0 8px 3px -5px #000;-moz-box-shadow: 0 8px 3px -5px #000;box-shadow: 0 8px 3px -5px #000;}
+.night #header{background: var(--ab-head-bg, var(--ab-charcoal)) !important;-webkit-box-shadow: 0 8px 3px -5px #000;-moz-box-shadow: 0 8px 3px -5px #000;box-shadow: 0 8px 3px -5px #000;}
 .night .menu_right .menu-item-has-children:hover::after{color: #fff;}
 .night .music_box_player{background: var(--ab-charcoal);color: #fff;box-shadow: unset;}
 .night .disabled{color: #666;}
@@ -2665,9 +2665,6 @@ body.ab-has-mh{padding-top:90px;}
 	background:#FFFFFF;border:1px solid var(--ab-line);border-radius:999px;
 }
 .ab-404-links a:hover{background:#185ADB;color:#FFFFFF;border-color:#185ADB;}
-.ab-404-art{
-	display:block;max-width:100%;height:auto;margin:0 auto 22px;border-radius:10px;
-}
 /* شمارش نتیجۀ جست‌وجو (search.php) */
 .ab-search-count{margin:2px 0 0;font-size:13px;color:#111111;}
 .ab-search-count a{color:#185ADB;font-weight:700;text-decoration:none;}
@@ -2681,7 +2678,6 @@ body.ab-has-mh{padding-top:90px;}
 	.ab-404-search{flex-direction:column;}
 	.ab-404-search button{justify-content:center;height:40px;}
 	.ab-404-links a{font-size:12.5px;padding:6px 12px;}
-	.ab-404-art{margin-bottom:16px;}
 }
 /* --- انتهای بلوک ۲۳ (v3.1.4) --- */
 
@@ -2931,23 +2927,23 @@ html{-webkit-text-size-adjust: 100%;text-size-adjust: 100%}
 #commentform input[type="submit"]{padding: 9px 18px;border: 0;border-radius: var(--ab-radius-pill);background: var(--ab-blue);color: #fff;font-size: 13px;cursor:pointer}
 
 /* ۷) صفحۀ ۴۰۴ (ساختار؛ شیشه در ab-glass.css) */
-.ab-404-hero{display: grid;grid-template-columns: auto 1fr;gap: var(--ab-space-5);align-items: center;padding: var(--ab-space-6);margin: var(--ab-space-6) 0}
-.ab-404-badge{grid-column: 1;font-size: clamp(44px, 9vw, 76px);line-height: .95;font-weight: 800;color: var(--ab-blue);letter-spacing: -2px;text-align: center;direction: ltr}
-.ab-404-hero__body{grid-column: 2;min-width: 0}
-.ab-404-hero__body h1{margin: 0 0 var(--ab-space-2);font-size: 21px;line-height: 1.6}
+.ab-404-hero{display: grid;grid-template-columns: minmax(0,1fr);gap: var(--ab-space-3);align-items: center;justify-items: center;text-align: center;padding: var(--ab-space-6);margin: var(--ab-space-6) 0}
+.ab-404-badge{grid-column: 1;font-size: clamp(52px, 11vw, 92px);line-height: .95;font-weight: 800;color: var(--ab-blue);letter-spacing: -2px;text-align: center;direction: ltr}
+.ab-404-hero__body{grid-column: 1;min-width: 0;max-width: 640px;margin-inline: auto}
+.ab-404-hero__body h1{margin: 0 0 var(--ab-space-2);font-size: clamp(19px, 2.4vw, 23px);line-height: 1.6}
 .ab-404-hero__body p{margin: 0;font-size: 13.5px;line-height: 2}
-.ab-404-actions{display: flex;flex-wrap: wrap;gap: var(--ab-space-3);align-items: center;margin: var(--ab-space-5) 0 0}
+.ab-404-hero__body .archive_txt_box{text-align: center}
+.ab-404-actions{display: flex;flex-wrap: wrap;gap: var(--ab-space-3);align-items: center;justify-content: center;margin: var(--ab-space-5) 0 0}
 /* جست‌وجو/لینک‌ها/تصویر ۴۰۴ از قبل در «بلوک ۲۱» همین فایل است؛ اینجا فقط شعاع‌ها و
    فاصله‌ها با توکن هماهنگ می‌شوند (تکرار قواعدِ قبلی را اضافه نکردم). */
-.ab-404-search{margin: var(--ab-space-5) 0 0}
-.ab-404-links{margin: var(--ab-space-4) 0 0;padding: 0;list-style: none}
-.ab-404-links li{list-style: none}
+.ab-404-search{margin: var(--ab-space-5) 0 0;justify-content: center}
+.ab-404-links{margin: var(--ab-space-4) 0 0;padding: 0;list-style: none;display: flex;flex-wrap: wrap;gap: 8px;justify-content: center}
+.ab-404-links li{list-style: none;margin: 0}
 .ab-404-search input,.ab-404-search button,.ab-404-links a{border-radius: var(--ab-radius-pill)}
 .ab-404-links a{display: inline-flex;align-items: center}
 .ab-404-links a i{margin-left: 6px;color: var(--ab-blue);font-size: 15px}
 .ab-404-home{display: inline-flex;align-items:center;padding: 10px 20px;background: var(--ab-blue);color: #fff;font-size: 13px;line-height: 1.6;text-decoration:none}
 .ab-404-home i{margin-left: 7px}
-.ab-404-art{display: block;width: 100%;max-width: 560px;height: auto;margin: var(--ab-space-5) auto 0;border-radius: var(--ab-radius-l)}
 .ab-404 .songs_title_box h3,.ab-404 .songs_title_box h1{max-width: none}
 @media (max-width: 700px){
 	.ab-404-hero{grid-template-columns: 1fr;gap: var(--ab-space-3);text-align: center;justify-items: center}

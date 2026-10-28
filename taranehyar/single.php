@@ -322,7 +322,8 @@ if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw 
 			$taranehyar_permalink = get_permalink();
 			$taranehyar_audio     = '';
 			foreach ( array( 'music320', 'music128' ) as $taranehyar_audio_key ) {
-				$taranehyar_audio_val = get_field( $taranehyar_audio_key );
+				/* v3.8.1 — باز هم بدون `get_field` خام: بدون ACF نباید فاتال شود. */
+				$taranehyar_audio_val = function_exists( 'tara_music_value' ) ? tara_music_value( $taranehyar_audio_key ) : '';
 				if ( is_string( $taranehyar_audio_val ) && '' !== trim( $taranehyar_audio_val ) ) {
 					$taranehyar_audio = $taranehyar_audio_val;
 					break;
@@ -423,8 +424,10 @@ if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
 if ( function_exists( 'tara_video' ) ) {
 	$tara_video_sources = array();
 	foreach ( array( '1080' => 'video1080', '720' => 'video720', '480' => 'video480' ) as $tara_q => $tara_f ) {
-		$tara_v = get_field( $tara_f );
-		if ( ! empty( $tara_v ) ) {
+		/* v3.8.1 — از `get_field()` خام به تابعِ قالب: اگر ACF نصب/فعال نباشد
+		   یا فیلد «فایل» به شکل array برگردد، این‌جا امن است. */
+		$tara_v = function_exists( 'tara_music_value' ) ? tara_music_value( $tara_f ) : '';
+		if ( '' !== $tara_v ) {
 			$tara_video_sources[ $tara_q ] = $tara_v;
 		}
 	}
@@ -449,10 +452,44 @@ if ( function_exists( 'tara_video' ) ) {
 /* ---------- تیتر بخش دانلود (هدف جست‌وجوی «دانلود آهنگ X از Y») ----------
    برای خاموش کردن این تیتر، خط زیر را false کنید. */
 $taranehyar_download_title = true;
-if ( $taranehyar_download_title && (
-	get_field( 'music128' ) || get_field( 'music320' ) || get_field( 'album128' ) || get_field( 'album320' ) ||
-	get_field( 'video480' ) || get_field( 'video720' ) || get_field( 'video1080' )
-) ) {
+
+/* v3.8.1 — جعبهٔ دانلود دیگر `get_field()` خام صدا نمی‌زند.
+   ------------------------------------------------------------------
+   دو مشکلِ واقعی داشت:
+     ۱) اگر افزونهٔ ACF خاموش/حذف شود، `get_field` تابعِ تعریف‌نشده است و
+        صفحهٔ آهنگ با خطای کشنده سفید می‌شود.
+     ۲) اگر فیلدِ «فایل» با فرمتِ array برگردد (`get_field` پیش‌فرض همین
+        است)، `esc_url( array )` هشدار PHP می‌دهد و لینک خالی چاپ می‌شود.
+   حالا از `tara_music_value()` استفاده می‌شود که ACF و متای خام را می‌خواند
+   و همه‌چیز را به یک آدرسِ رشته‌ایِ امن تبدیل می‌کند. مارک‌آپ و کلاس‌ها
+   (`dl_link_128`، `dl_links_320`) دقیقاً همان قبلی است. */
+$tara_dl_audio_meta = array(
+	'music128' => array( 'دانلود  آهنگ با کیفیت 128', 'dl_link_128' ),
+	'music320' => array( ' دانلود آهنگ با کیفیت 320', 'dl_links_320' ),
+	'album128' => array( 'دانلود  آلبوم با کیفیت 128', 'dl_link_128' ),
+	'album320' => array( ' دانلود  آلبوم با کیفیت 320', 'dl_links_320' ),
+);
+$tara_dl_video_meta = array(
+	'video1080' => 'دانلود  موزیک ویدیو با کیفیت  1080',
+	'video720'  => 'دانلود  موزیک ویدیو با کیفیت  720',
+	'video480'  => 'دانلود  موزیک ویدیو با کیفیت  480',
+);
+$tara_dl_audio = array();
+$tara_dl_video = array();
+foreach ( $tara_dl_audio_meta as $tara_dl_key => $tara_dl_meta ) {
+	$tara_dl_url = function_exists( 'tara_music_value' ) ? tara_music_value( $tara_dl_key ) : '';
+	if ( '' !== $tara_dl_url ) {
+		$tara_dl_audio[ $tara_dl_key ] = array( $tara_dl_url, $tara_dl_meta[0], $tara_dl_meta[1] );
+	}
+}
+foreach ( $tara_dl_video_meta as $tara_dl_key => $tara_dl_label ) {
+	$tara_dl_url = function_exists( 'tara_music_value' ) ? tara_music_value( $tara_dl_key ) : '';
+	if ( '' !== $tara_dl_url ) {
+		$tara_dl_video[ $tara_dl_key ] = array( $tara_dl_url, $tara_dl_label );
+	}
+}
+
+if ( $taranehyar_download_title && ( $tara_dl_audio || $tara_dl_video ) ) {
 	?>
 	<h2 class="dl_title">
 		<i class="icofont-download" aria-hidden="true"></i>دانلود <span class="dl_title_type"><?php echo esc_html( $taranehyar_type ); ?></span> <span class="dl_title_song"><?php echo esc_html( $taranehyar_song ); ?></span><?php if ( '' !== $taranehyar_artist ) { ?> از <span class="dl_title_artist"><?php echo esc_html( $taranehyar_artist ); ?></span><?php } ?>
@@ -461,24 +498,21 @@ if ( $taranehyar_download_title && (
 }
 ?>
 <div class="dl_links_box">
-<?php if(get_field('music128')){ ?> 
-<a class="dl_link_128" href="<?php echo esc_url( get_field('music128') ); ?>" target="_blank" rel="noopener">> <i class="icofont-download"></i>دانلود  آهنگ با کیفیت 128 </a><?php } if(get_field('music320')){ ?>
-<a class="dl_links_320" href="<?php echo esc_url( get_field('music320') ); ?>" target="_blank" rel="noopener">> <i class="icofont-download"></i> دانلود آهنگ با کیفیت 320 </a><?php } if(get_field('album128')){ ?>	
-<a class="dl_link_128" href="<?php echo esc_url( get_field('album128') ); ?>" target="_blank" rel="noopener">> <i class="icofont-download"></i>دانلود  آلبوم با کیفیت 128 </a><?php } if(get_field('album320')){ ?>
-<a class="dl_links_320" href="<?php echo esc_url( get_field('album320') ); ?>" target="_blank" rel="noopener">> <i class="icofont-download"></i> دانلود  آلبوم با کیفیت 320 </a>	<?php } ?>
+<?php foreach ( $tara_dl_audio as $tara_dl_row ) : ?>
+<a class="<?php echo esc_attr( $tara_dl_row[2] ); ?>" href="<?php echo esc_url( $tara_dl_row[0] ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i><?php echo esc_html( $tara_dl_row[1] ); ?></a>
+<?php endforeach; ?>
 <div class="clear"></div>
 </div>
-<?php if((get_field('video1080')) || (get_field('video720')) || (get_field('video480'))){ ?>
+<?php if ( $tara_dl_video ) : ?>
 <div class="dl_linksv_box">
 <ul>
-<?php if(get_field('video1080')){ ?> 
-<li><a href="<?php echo esc_url( get_field('video1080') ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  1080 </a></li><?php } if(get_field('video720')){ ?>
-<li><a href="<?php echo esc_url( get_field('video720') ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  720 </a></li><?php } if(get_field('video480')){ ?>
-<li><a href="<?php echo esc_url( get_field('video480') ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i>دانلود  موزیک ویدیو با کیفیت  480 </a></li><?php } ?>
+<?php foreach ( $tara_dl_video as $tara_dl_row ) : ?>
+<li><a href="<?php echo esc_url( $tara_dl_row[0] ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i><?php echo esc_html( $tara_dl_row[1] ); ?></a></li>
+<?php endforeach; ?>
 </ul>
 <div class="clear"></div>
 </div>
-<?php } ?>
+<?php endif; ?>
 <?php
 /* v3.7.9 — «مشخصات اثر» رفت پایینِ لینک‌های دانلود (درخواست صریح).
    ترتیب نهایی صفحه: پلیر → ما را دنبال کنید → توضیحات → ویدیو →
@@ -538,7 +572,7 @@ $ab_share_title = rawurlencode( get_the_title() );
 	
 <?php $reltag1 = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag1', false ) : ( 'off' != ot_get_option( 'reltag1' ) ); if ( $reltag1 ) {
 $reltag = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag', false ) : ( 'off' != ot_get_option( 'reltag' ) ); if ( $reltag ) { ?>	
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist=get_field('artist');
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'artist' ) : (string) get_post_meta( get_the_ID(), 'artist', true );
 $my_custom_query= new WP_Query(
 array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,
 'meta_query'=>array(array('key'=>'artist','value'=>$artist,'compare'=>'LIKE')), ));
@@ -652,7 +686,7 @@ if ( function_exists( 'tara_sidebar' ) ) {
 ?>
 <?php $reltag1 = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag1', false ) : ( 'off' != ot_get_option( 'reltag1' ) ); if ( ! $reltag1 ) {
 $reltag = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag', false ) : ( 'off' != ot_get_option( 'reltag' ) ); if ( $reltag ) { ?>	
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist=get_field('artist');
+<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'artist' ) : (string) get_post_meta( get_the_ID(), 'artist', true );
 $my_custom_query= new WP_Query(
 array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,
 'meta_query'=>array(array('key'=>'artist','value'=>$artist,'compare'=>'LIKE')), ));

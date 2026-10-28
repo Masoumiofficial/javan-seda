@@ -53,6 +53,30 @@ if ( ! $ab_mm_done ) {
 	echo '</ul></div>';
 }
 ?>
+<?php
+/* v3.8.1 — کلید شب/روز به شکل اموجی داخل کشوی موبایل.
+   ------------------------------------------------------------------
+   کاربر گفت دکمهٔ دارک/نایت‌مود در گوشی «اموجی زیبا» باشد و اگر در نوارِ
+   بالا جا نشد، داخل خودِ منو بیاید. نوار بالا دو دکمهٔ ۴۶px و لوگو دارد؛
+   دکمهٔ سوم آن را شلوغ می‌کرد، پس داخل منو نشسته است.
+   کلاس عمداً همان `dark_light_mode` است: اسکریپتِ درون‌خطیِ قالب هر
+   `.dark_light_mode` را پیدا می‌کند، کلاس `dark_active` و `aria-checked` را
+   هم‌گام نگه می‌دارد و Enter/Space هم از قبل پوشش داده شده است.
+   همان گزینهٔ مدیریتی (`sun_moon`) که کلید دسکتاپ را نشان می‌دهد، اینجا هم
+   تصمیم می‌گیرد؛ اگر خاموش باشد هیچ مارک‌آپی چاپ نمی‌شود. */
+$ab_night_on = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'sun_moon' ) : ( 'off' != ot_get_option( 'sun_moon' ) );
+if ( $ab_night_on ) :
+	$ab_dark_on = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'dark_modes', false ) : ( 'off' != ot_get_option( 'dark_modes' ) );
+	?>
+<button type="button" class="dark_light_mode ty-night-toggle<?php echo $ab_dark_on ? ' dark_active' : ''; ?>" role="switch" aria-checked="<?php echo $ab_dark_on ? 'true' : 'false'; ?>" aria-label="حالت شب" title="روشن / شب">
+<span class="ty-night-toggle__face" aria-hidden="true">
+<span class="ty-night-toggle__emoji ty-night-toggle__emoji--sun">☀️</span>
+<span class="ty-night-toggle__emoji ty-night-toggle__emoji--moon">🌙</span>
+</span>
+<span class="ty-night-toggle__text">حالت شب</span>
+<span class="ty-night-toggle__state" aria-hidden="true"></span>
+</button>
+<?php endif; ?>
 <div class="clear"></div>
 <div class="socials_box">
 <?php if(ot_get_option('facebook') !=""){ ?>

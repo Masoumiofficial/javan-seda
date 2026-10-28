@@ -1171,6 +1171,258 @@ body.has-tara-dock { padding-bottom: 76px; }
 
 #mobiles_header .navicon { position: relative; }
 
+/* =========================================================================
+   v3.8.1 — سربرگ موبایل: دکمه‌های «واقعی»، درشت‌تر و وسط‌چین
+   ---------------------------------------------------------------------
+   کاربر (با اسکرین‌شات) گفت دکمهٔ منو و جست‌وجو «خیلی کوچک‌اند و افتاده‌اند
+   در گوشهٔ بالا». پیش از این دو مربع ۴۰×۴۰ با گوشهٔ ۴px و چسبیده به لبهٔ
+   بالا بودند (margin-top ثابت ۱۲px روی هدر ۷۰px ⇒ نامتوازن). حالا:
+     • ۴۶×۴۶ (ناحیهٔ لمس استاندارد) با گوشهٔ ۱۵px و گرادیانِ تیره
+     • دقیقاً وسطِ عمودیِ نوار (absolute + translateY)
+     • فاصلهٔ ۱۰px از لبه و ۶۴px از هم ⇒ دیگر «افتاده در گوشه» نیستند
+     • آیکون ۲۱px، خط‌های همبرگر ۲۲px و روشن‌تر
+   روی دستگاه لمسی hover بی‌معناست، پس فقط :active کوچک می‌شود. */
+@media (max-width: 800px) {
+	#mobiles_header .navicon,
+	#mobiles_header .search_mobile_box {
+		position: absolute;
+		top: 50%;
+		left: 10px;
+		transform: translateY(-50%);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 46px;
+		height: 46px;
+		margin: 0;
+		float: none;
+		border-radius: 15px;
+		border: 1px solid rgba(255, 255, 255, .14);
+		background: linear-gradient(160deg, #191c24 0%, #0b0d12 100%);
+		color: #fff;
+		font-size: 21px;
+		line-height: 1;
+		box-shadow: 0 8px 18px -12px rgba(0, 0, 0, .95), inset 0 1px 0 rgba(255, 255, 255, .09);
+		-webkit-tap-highlight-color: transparent;
+		transition: transform .16s ease, box-shadow .16s ease;
+	}
+
+	#mobiles_header .search_mobile_box { left: 64px; }
+
+	/* در شب همان دکمه، یک پله روشن‌تر تا از پس‌زمینهٔ تیره جدا شود */
+	.night #mobiles_header .navicon,
+	.night #mobiles_header .search_mobile_box {
+		background: linear-gradient(160deg, #262a35 0%, #12141b 100%);
+		border-color: rgba(255, 255, 255, .20);
+	}
+
+	#mobiles_header .navicon:active,
+	#mobiles_header .search_mobile_box:active {
+		transform: translateY(-50%) scale(.95);
+	}
+
+	#mobiles_header .navicon:focus-visible,
+	#mobiles_header .search_mobile_box:focus-visible {
+		outline: 2px solid #fff;
+		outline-offset: 2px;
+	}
+
+	/* خط‌های همبرگر: وسطِ دکمه، روشن و ۲۲px */
+	#mobiles_header .responsive-menu-button-inner,
+	#mobiles_header .responsive-menu-button-inner::before,
+	#mobiles_header .responsive-menu-button-inner::after {
+		width: 22px;
+		height: 2px;
+		border-radius: 2px;
+		background: #f4f6fa;
+	}
+
+	#mobiles_header .responsive-menu-button-inner {
+		top: 50%;
+		left: 50%;
+		margin: -1px 0 0 -11px;
+	}
+
+	#mobiles_header .responsive-menu-button-inner::before { bottom: -6px; }
+	#mobiles_header .responsive-menu-button-inner::after { top: -6px; }
+
+	/* نوار جست‌وجوی کشویی هم دقیقاً به ارتفاع نوار باشد؛ پیش از این ۶۵px
+	   روی هدرِ ۷۰px بود و یک نوار ۵ پیکسلیِ خالی زیرش می‌ماند. */
+	#mobiles_header .searches_mobile { height: 100%; }
+
+	/* لوگو هم وسطِ عمودی؛ وگرنه با دکمه‌ها هم‌تراز نیست */
+	#mobiles_header .logo_mobiles {
+		position: absolute;
+		top: 50%;
+		right: 14px;
+		transform: translateY(-50%);
+		margin: 0;
+		float: none;
+		height: auto;
+	}
+
+	#mobiles_header .logo_mobiles figure { width: auto; height: auto; }
+
+	#mobiles_header .logo_mobiles img {
+		width: auto;
+		height: auto;
+		max-width: 150px;
+		max-height: 40px;
+	}
+}
+
+/* =========================================================================
+   v3.8.1 — منوی موبایل: از «تیرهٔ زغالی» به «شیشهٔ روشن»
+   ---------------------------------------------------------------------
+   کاربر گفت منو از حالت تیره دربیاید و شیشه‌ای شود. سطح از توکن‌های لایهٔ
+   شیشه می‌آید؛ رنگ متن/آیکون هم به‌همان اندازه روشن می‌شود (وگرنه سفید روی
+   سفید می‌شد). اگر مرورگر backdrop-filter نداشته باشد، توکنِ جامدِ
+   `--ab-glass-bg-strong` می‌نشیند و همان سطح سفیدِ مات می‌ماند — خوانا.
+   ===================================================================== */
+.mobiles_menu {
+	overscroll-behavior: contain;
+	background: var(--ab-glass-bg-strong, #fff);
+	-webkit-backdrop-filter: blur(18px) saturate(1.35);
+	backdrop-filter: blur(18px) saturate(1.35);
+	border-inline-start: 1px solid var(--ab-glass-border-2, rgba(17, 17, 17, .12));
+	box-shadow: -14px 0 44px rgba(17, 17, 17, .22), var(--ab-glass-hl);
+	color: var(--ab-text, #222);
+}
+
+.mobiles_menu .top_logo_title { border-bottom: 1px solid var(--ab-glass-border, rgba(17, 17, 17, .08)); }
+
+#cssmenu > ul > li > a,
+.ab-mobile-menu-fallback li a {
+	color: var(--ab-text, #222);
+}
+
+#cssmenu > ul > li > a:hover,
+#cssmenu > ul > li.active > a,
+#cssmenu > ul > li.open > a {
+	color: var(--ab-blue-accent, var(--ab-blue));
+	background: var(--ab-blue-soft, rgba(24, 90, 219, .08));
+}
+
+#cssmenu ul ul { background: rgba(17, 17, 17, .04); }
+
+#cssmenu ul ul li a { color: var(--ab-muted, #555); }
+
+#cssmenu ul ul li a:hover { background: rgba(17, 17, 17, .06); color: var(--ab-blue-accent, var(--ab-blue)); }
+
+.ab-mobile-menu-fallback li + li { border-top: 1px solid var(--ab-glass-border, rgba(17, 17, 17, .08)); }
+
+.mobiles_menu .socials_box { border-top: 1px solid var(--ab-glass-border, rgba(17, 17, 17, .08)); }
+
+.mobiles_menu .socials_box a {
+	color: var(--ab-text, #222);
+	background: rgba(17, 17, 17, .06);
+}
+
+.mobiles_menu .socials_box a:hover { color: #fff; background: var(--ab-blue); }
+
+.night .mobiles_menu { color: var(--ab-text, #eee); }
+.night #cssmenu ul ul { background: rgba(255, 255, 255, .04); }
+.night #cssmenu ul ul li a:hover { background: rgba(255, 255, 255, .07); }
+.night .mobiles_menu .socials_box a { background: rgba(255, 255, 255, .08); }
+
+/* =========================================================================
+   v3.8.1 — کلید شب/روز به شکل اموجی، داخل کشوی منوی موبایل
+   ---------------------------------------------------------------------
+   همان کلاس `.dark_light_mode` است تا اسکریپتِ درون‌خطیِ قالب (که هر
+   `.dark_light_mode` را می‌شناسد و `aria-checked` را هم‌گام می‌کند) بدون
+   هیچ کد تازه‌ای کار کند. فقط ظاهر عوض شده: خورشید/ماه اموجی + برچسب +
+   وضعیتِ «روشن/خاموش».
+   ===================================================================== */
+#mobiles_header .ty-night-toggle,
+.ty-night-toggle {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: auto;
+	height: auto;
+	float: none;
+	margin: 8px 12px 12px;
+	padding: 9px 12px;
+	border: 1px solid var(--ab-glass-border-2, rgba(17, 17, 17, .12));
+	border-radius: 14px;
+	background: var(--ab-glass-bg, #fff);
+	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
+	color: var(--ab-text, #222);
+	font: inherit;
+	font-size: 13.5px;
+	font-weight: 600;
+	line-height: 1.6;
+	text-align: start;
+	cursor: pointer;
+}
+
+#mobiles_header .ty-night-toggle { margin-top: 8px; }
+
+.ty-night-toggle__face {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	background: rgba(24, 90, 219, .10);
+	font-size: 19px;
+	line-height: 1;
+}
+
+.ty-night-toggle__emoji {
+	position: absolute;
+	transition: opacity .18s ease, transform .18s ease;
+}
+
+.ty-night-toggle__emoji--moon {
+	opacity: 0;
+	transform: scale(.55) rotate(-28deg);
+}
+
+.ty-night-toggle.dark_active .ty-night-toggle__emoji--sun {
+	opacity: 0;
+	transform: scale(.55) rotate(28deg);
+}
+
+.ty-night-toggle.dark_active .ty-night-toggle__emoji--moon {
+	opacity: 1;
+	transform: none;
+}
+
+.ty-night-toggle__text { flex: 1 1 auto; }
+
+.ty-night-toggle__state {
+	flex: 0 0 auto;
+	padding: 3px 10px;
+	border-radius: 999px;
+	background: rgba(17, 17, 17, .06);
+	color: var(--ab-muted, #555);
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.ty-night-toggle__state::before { content: "خاموش"; }
+
+.ty-night-toggle.dark_active .ty-night-toggle__state {
+	background: rgba(255, 255, 255, .12);
+	color: #fff;
+}
+
+.ty-night-toggle.dark_active .ty-night-toggle__state::before { content: "روشن"; }
+
+.ty-night-toggle:focus-visible {
+	outline: 2px solid var(--ab-blue, #185ADB);
+	outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ty-night-toggle__emoji { transition: none; }
+}
+
 /* فیلد جست‌وجو حالا type="search" است (کیبورد گوشی دکمهٔ «جست‌وجو»
    می‌دهد). دکمهٔ پاک‌کردنِ خودِ WebKit روی آیکون ذره‌بین می‌افتاد؛
    خاموشش می‌کنیم تا ظاهر همان کپسول قبلی بماند. */
@@ -1224,7 +1476,7 @@ body.has-tara-dock { padding-bottom: 76px; }
 		   ۷۶px به ۱۰۴px رسید (+۳۷٪). در عوض برچسب‌ها تمام عرضِ ستونِ متن را
 		   گرفتند و ابزارها به ردیف دوم رفتند، پس نام آهنگ جای بیشتری از
 		   قبل دارد (نه کمتر). */
-		grid-template-columns: 104px minmax(0, 1fr);
+		grid-template-columns: 120px minmax(0, 1fr);
 		grid-template-areas:
 			"art head"
 			"transport transport";
@@ -2793,12 +3045,12 @@ body.tara-dock-open .top_page { bottom: 92px; }
 
 	/* گوشی‌های باریک: کاور یک پله کوچک‌تر، بدون شکستن خط */
 	.ty-player {
-		grid-template-columns: 88px minmax(0, 1fr);
+		grid-template-columns: 104px minmax(0, 1fr);
 		gap: 8px 10px;
 		padding: 10px;
 	}
 
-	.ty-player__art { width: 88px; height: 88px; }
+	.ty-player__art { width: 104px; height: 104px; }
 
 	.ty-player__song { font-size: 15px; }
 

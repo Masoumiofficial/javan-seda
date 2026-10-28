@@ -47,8 +47,6 @@ get_header('');
 <li><a href="<?php echo esc_url( javan_seda_artists_index_url() ); ?>"><i class="icofont-microphone-alt" aria-hidden="true"></i> همهٔ هنرمندان</a></li>
 </ul>
 
-<img class="ab-404-art" src="<?php echo esc_url( get_template_directory_uri() . '/images/error404.jpg' ); ?>" width="626" height="496" alt="صفحه پیدا نشد" loading="lazy" decoding="async">
-
 <?php
 $ab_latest = new WP_Query( array( 'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => 6, 'ignore_sticky_posts' => true ) );
 if ( $ab_latest->have_posts() ) : ?>

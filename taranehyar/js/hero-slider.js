@@ -53,13 +53,22 @@
 
 		var rtlNegative = false;
 		if (rtl) {
+			/* v3.8.1 — این‌جا یک تله بود: CSS ریل `scroll-behavior: smooth` دارد،
+			   پس نوشتن ‎scrollLeft = -1‎ فقط یک انیمیشن شروع می‌کرد و خواندنِ
+			   فوریِ همان مقدار، هنوز ۰ برمی‌گشت ⇒ مدل اشتباه تشخیص داده می‌شد،
+			   فلش‌ها و نقطه‌ها به جایِ درست نمی‌رفتند و چرخش خودکار هم گیر
+			   می‌کرد. حالا موقعِ آزمون، رفتار اسکرول موقتاً «auto» می‌شود. */
 			var probe = root.scrollLeft;
+			var prevBehavior = root.style.scrollBehavior;
 			try {
+				root.style.scrollBehavior = 'auto';
 				root.scrollLeft = -1;
 				rtlNegative = root.scrollLeft < 0;
 				root.scrollLeft = probe;
 			} catch (error) {
 				rtlNegative = false;
+			} finally {
+				root.style.scrollBehavior = prevBehavior;
 			}
 		}
 
@@ -95,23 +104,36 @@
 			return raw;
 		}
 
-		function scrollToIndex(i, smooth) {
+		function positionFor(i) {
 			var w = width();
-			var left;
 
 			if (!rtl) {
-				left = i * w;
-			} else if (rtlNegative) {
-				left = -i * w;
-			} else {
-				left = (total - 1 - i) * w;
+				return i * w;
+			}
+			return rtlNegative ? -i * w : (total - 1 - i) * w;
+		}
+
+		function scrollToIndex(i, smooth) {
+			if (i < 0) {
+				i = 0;
+			}
+			if (i > total - 1) {
+				i = total - 1;
 			}
 
-			if (smooth && typeof root.scrollTo === 'function') {
+			var left = positionFor(i);
+
+			if (smooth && !reduce && typeof root.scrollTo === 'function') {
 				root.scrollTo({ left: left, behavior: 'smooth' });
-			} else {
-				root.scrollLeft = left;
+				return;
 			}
+
+			/* بدون انیمیشن: رفتار نرمِ CSS را لحظه‌ای خاموش می‌کنیم تا پرش
+			   با یک انیمیشنِ طولانی انجام نشود. */
+			var prev = root.style.scrollBehavior;
+			root.style.scrollBehavior = 'auto';
+			root.scrollLeft = left;
+			root.style.scrollBehavior = prev;
 		}
 
 		/* نشانگرها ------------------------------------------------------- */
@@ -135,7 +157,10 @@
 				/* بستن حلقه با closure — بدون آن همه به آخرین عدد اشاره می‌کردند */
 				(function (target) {
 					dot.addEventListener('click', function () {
-						scrollToIndex(target, true);
+						/* v3.8.1 — پرشِ چند اسلایدی با انیمیشنِ نرم می‌توانست
+						   بین راه به snap بچسبد و «کار نکردنِ نقطه‌ها» شود؛
+						   برای فاصلهٔ بیش از یک اسلاید، بی‌انیمیشن می‌رویم. */
+						scrollToIndex(target, Math.abs(target - index()) < 2);
 						restart();
 					});
 				})(i);
@@ -145,6 +170,123 @@
 
 			wrap.appendChild(dots);
 		}
+
+		/* فلش‌های چپ/راست — v3.8.1
+		   ------------------------------------------------------------------
+		   کاربر گفت اسلایدر روی دسکتاپ «فلش» ندارد و فقط با کشیدنِ ماوس
+		   عوض می‌شود. حالا دو دکمهٔ شیشه‌ای در دو طرف کارت هست (فقط ≥۷۸۳px؛
+		   روی گوشی، سوایپ و نقطه‌ها کافی‌اند). جهت‌شان هم با RTL هم‌خوان است:
+		   دکمهٔ راست = اسلاید قبلی، دکمهٔ چپ = اسلاید بعدی. */
+		var prevBtn = null;
+		var nextBtn = null;
+
+		if (total > 1) {
+			var nav = document.createElement('div');
+			nav.className = 'ty-hero-nav';
+
+			var chevronRight = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+			var chevronLeft = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+			prevBtn = document.createElement('button');
+			prevBtn.type = 'button';
+			prevBtn.className = 'ty-hero-arrow ty-hero-arrow--prev';
+			prevBtn.setAttribute('aria-label', 'اسلاید قبلی');
+			prevBtn.innerHTML = chevronRight;
+
+			nextBtn = document.createElement('button');
+			nextBtn.type = 'button';
+			nextBtn.className = 'ty-hero-arrow ty-hero-arrow--next';
+			nextBtn.setAttribute('aria-label', 'اسلاید بعدی');
+			nextBtn.innerHTML = chevronLeft;
+
+			prevBtn.addEventListener('click', function () {
+				var target = index() - 1;
+				if (target < 0) { target = total - 1; }
+				scrollToIndex(target, true);
+				restart();
+			});
+
+			nextBtn.addEventListener('click', function () {
+				var target = index() + 1;
+				if (target > total - 1) { target = 0; }
+				scrollToIndex(target, true);
+				restart();
+			});
+
+			nav.appendChild(prevBtn);
+			nav.appendChild(nextBtn);
+			wrap.appendChild(nav);
+		}
+
+		/* کشیدن با ماوس — v3.8.1
+		   ------------------------------------------------------------------
+		   تا امروز روی دسکتاپ فقط با شیفت+چرخ یا ترک‌پد می‌شد اسلاید را عوض
+		   کرد و کاربر می‌گفت «حرمت نمی‌کند». حالا می‌شود کارت را گرفت و کشید؛
+		   در حین کشیدن `scroll-snap` خاموش می‌شود (کلاس is-dragging) و بعد از
+		   رها کردن، نزدیک‌ترین اسلاید می‌چسبد. کلیکِ ناخواستهٔ بعد از کشیدن هم
+		   مسدود می‌شود تا صفحهٔ آهنگ باز نشود. */
+		var drag = null;
+		var suppressClick = false;
+
+		function isUiTarget(node) {
+			return !!(node && node.closest && node.closest('.ty-hero-dot, .ty-hero-arrow'));
+		}
+
+		root.addEventListener('pointerdown', function (event) {
+			if (event.pointerType !== 'mouse' || event.button !== 0 || isUiTarget(event.target)) {
+				return;
+			}
+			drag = { x: event.clientX, start: root.scrollLeft, moved: false, id: event.pointerId };
+			root.classList.add('is-dragging');
+			try { root.setPointerCapture(event.pointerId); } catch (error) {}
+		});
+
+		root.addEventListener('pointermove', function (event) {
+			if (!drag || event.pointerId !== drag.id) {
+				return;
+			}
+			var dx = event.clientX - drag.x;
+			if (!drag.moved && Math.abs(dx) > 6) {
+				drag.moved = true;
+			}
+			if (!drag.moved) {
+				return;
+			}
+			event.preventDefault();
+			root.scrollLeft = drag.start - dx;
+		});
+
+		function endDrag() {
+			if (!drag) {
+				return;
+			}
+			var moved = drag.moved;
+			var id = drag.id;
+			drag = null;
+			root.classList.remove('is-dragging');
+			try { root.releasePointerCapture(id); } catch (error) {}
+			if (!moved) {
+				return;
+			}
+			suppressClick = true;
+			window.setTimeout(function () { suppressClick = false; }, 80);
+			scrollToIndex(index(), false);
+			restart();
+		}
+
+		root.addEventListener('pointerup', endDrag);
+		root.addEventListener('pointercancel', endDrag);
+		root.addEventListener('lostpointercapture', endDrag);
+
+		/* بعد از کشیدن، کلیکِ روی لینکِ اسلاید نباید اجرا شود */
+		root.addEventListener('click', function (event) {
+			if (!suppressClick) {
+				return;
+			}
+			event.preventDefault();
+			event.stopPropagation();
+			suppressClick = false;
+		}, true);
 
 		/* هم‌گام‌سازی وضعیت --------------------------------------------- */
 		var lastIndex = -1;
@@ -269,6 +411,9 @@
 		});
 
 		root.classList.add('is-ready');
+		/* همیشه از اسلاید اول شروع کن (بعضی مرورگرها در RTL از انتها باز می‌کنند) */
+		lastIndex = -1;
+		scrollToIndex(0, false);
 		sync();
 		start();
 	}

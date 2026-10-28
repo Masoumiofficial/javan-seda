@@ -260,23 +260,29 @@ html{-webkit-text-size-adjust: 100%;text-size-adjust: 100%}
 #commentform input[type="submit"]{padding: 9px 18px;border: 0;border-radius: var(--ab-radius-pill);background: var(--ab-blue);color: #fff;font-size: 13px;cursor:pointer}
 
 /* ۷) صفحۀ ۴۰۴ (ساختار؛ شیشه در ab-glass.css) */
-.ab-404-hero{display: grid;grid-template-columns: auto 1fr;gap: var(--ab-space-5);align-items: center;padding: var(--ab-space-6);margin: var(--ab-space-6) 0}
-.ab-404-badge{grid-column: 1;font-size: clamp(44px, 9vw, 76px);line-height: .95;font-weight: 800;color: var(--ab-blue);letter-spacing: -2px;text-align: center;direction: ltr}
-.ab-404-hero__body{grid-column: 2;min-width: 0}
-.ab-404-hero__body h1{margin: 0 0 var(--ab-space-2);font-size: 21px;line-height: 1.6}
+/* v3.8.1 — صفحۀ ۴۰۴ تمام‌وسط‌چین شد.
+   -------------------------------------------------------------------------
+   پیش از این در دسکتاپ یک گریدِ دوستونه بود (۴۰۴ چپ، متن راست) و کنارش یک
+   تصویر ۶۲۶×۴۹۶ می‌نشست. کاربر گفت «وسط‌چین باشد و آن عکس یا بهتر شود یا
+   کلاً حذف»؛ تصویر برداشته شد و همه‌چیز در یک ستونِ وسط‌چین با عرض خوانا
+   (۶۴۰px) می‌نشیند. حالا در هر عرضی یک شکل است، نه دو چیدمانِ متفاوت. */
+.ab-404-hero{display: grid;grid-template-columns: minmax(0,1fr);gap: var(--ab-space-3);align-items: center;justify-items: center;text-align: center;padding: var(--ab-space-6);margin: var(--ab-space-6) 0}
+.ab-404-badge{grid-column: 1;font-size: clamp(52px, 11vw, 92px);line-height: .95;font-weight: 800;color: var(--ab-blue);letter-spacing: -2px;text-align: center;direction: ltr}
+.ab-404-hero__body{grid-column: 1;min-width: 0;max-width: 640px;margin-inline: auto}
+.ab-404-hero__body h1{margin: 0 0 var(--ab-space-2);font-size: clamp(19px, 2.4vw, 23px);line-height: 1.6}
 .ab-404-hero__body p{margin: 0;font-size: 13.5px;line-height: 2}
-.ab-404-actions{display: flex;flex-wrap: wrap;gap: var(--ab-space-3);align-items: center;margin: var(--ab-space-5) 0 0}
+.ab-404-hero__body .archive_txt_box{text-align: center}
+.ab-404-actions{display: flex;flex-wrap: wrap;gap: var(--ab-space-3);align-items: center;justify-content: center;margin: var(--ab-space-5) 0 0}
 /* جست‌وجو/لینک‌ها/تصویر ۴۰۴ از قبل در «بلوک ۲۱» همین فایل است؛ اینجا فقط شعاع‌ها و
    فاصله‌ها با توکن هماهنگ می‌شوند (تکرار قواعدِ قبلی را اضافه نکردم). */
-.ab-404-search{margin: var(--ab-space-5) 0 0}
-.ab-404-links{margin: var(--ab-space-4) 0 0;padding: 0;list-style: none}
-.ab-404-links li{list-style: none}
+.ab-404-search{margin: var(--ab-space-5) 0 0;justify-content: center}
+.ab-404-links{margin: var(--ab-space-4) 0 0;padding: 0;list-style: none;display: flex;flex-wrap: wrap;gap: 8px;justify-content: center}
+.ab-404-links li{list-style: none;margin: 0}
 .ab-404-search input,.ab-404-search button,.ab-404-links a{border-radius: var(--ab-radius-pill)}
 .ab-404-links a{display: inline-flex;align-items: center}
 .ab-404-links a i{margin-left: 6px;color: var(--ab-blue);font-size: 15px}
 .ab-404-home{display: inline-flex;align-items:center;padding: 10px 20px;background: var(--ab-blue);color: #fff;font-size: 13px;line-height: 1.6;text-decoration:none}
 .ab-404-home i{margin-left: 7px}
-.ab-404-art{display: block;width: 100%;max-width: 560px;height: auto;margin: var(--ab-space-5) auto 0;border-radius: var(--ab-radius-l)}
 .ab-404 .songs_title_box h3,.ab-404 .songs_title_box h1{max-width: none}
 @media (max-width: 700px){
 	.ab-404-hero{grid-template-columns: 1fr;gap: var(--ab-space-3);text-align: center;justify-items: center}

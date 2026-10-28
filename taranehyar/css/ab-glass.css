@@ -79,14 +79,30 @@
 
 /* ------------------------------------------------------------------------- هدر --- */
 /* هدر در حالت عادی روی پس‌زمینۀ خودش است ⇒ blur لازم نیست؛ فقط سطح + مرز نازک */
+/* v3.8.1 — شفافیت هدر هم‌ردهٔ «نوار چسبانِ پایین» شد.
+   -------------------------------------------------------------------------
+   کاربر گفت هدر «خیلی شفاف» است و باید مثل پلیرِ چسبیده به پایین صفحه باشد.
+   نوار پایین با آلفای ۰٫۷۲ + بلور کار می‌کند، ولی همان عدد روی هدر که زیرش
+   کاورِ رنگیِ اسلایدر می‌رود کافی نبود و متنِ محتوا از پشتش دیده می‌شد.
+   حالا یک توکن مشترک داریم (`--ab-head-bg`) با آلفای بالاتر و همان مرز/سایهٔ
+   نوار پایین؛ هدر و نوار پایین یک خانواده‌اند، فقط هدر مات‌تر است.
+   بلور روی خودِ #header گذاشته نمی‌شود (فرزندانِ fixed می‌شکنند)؛ این کار را
+   ::before هدر موبایل و حالتِ چسبان انجام می‌دهند. */
+:root{ --ab-head-bg: rgba(255, 255, 255, .92); }
+.night{ --ab-head-bg: rgba(30, 30, 32, .92); }
+@supports (backdrop-filter: blur(2px)) {
+	:root{ --ab-head-bg: rgba(255, 255, 255, .86) }
+	.night{ --ab-head-bg: rgba(30, 30, 32, .88) }
+}
+
 #header{
-	background: var(--ab-glass-bg-strong);
-	border-bottom: 1px solid var(--ab-glass-border);
-	box-shadow: var(--ab-glass-hl);
+	background: var(--ab-head-bg);
+	border-bottom: 1px solid var(--ab-glass-border-2);
+	box-shadow: var(--ab-glass-hl), 0 8px 24px -20px rgba(17, 17, 17, .45);
 }
 /* حالت چسبان (با اسکرول اضافه می‌شود) ⇒ اینجا شیشه واقعی و مفید است */
 #header.darkHeader{
-	background: var(--ab-glass-bg);
+	background: var(--ab-head-bg);
 	-webkit-backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
 	backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
 	box-shadow: var(--ab-glass-hl), var(--ab-depth-2);
@@ -94,9 +110,9 @@
 }
 /* در شب هم همان سطح (نه charcoalِ بی‌مرز) تا لایه یکدست بماند */
 .night #header{
-	background: var(--ab-glass-bg-strong);
-	border-bottom: 1px solid var(--ab-glass-border);
-	box-shadow: var(--ab-glass-hl);
+	background: var(--ab-head-bg);
+	border-bottom: 1px solid var(--ab-glass-border-2);
+	box-shadow: var(--ab-glass-hl), 0 8px 24px -20px rgba(0, 0, 0, .8);
 }
 /* هدر موبایل: شیشه روی ::before، نه خودِ المنت.
    چرا؟ `backdrop-filter` (مثل filter/transform) «جرم مرجع» فرزندانه با
@@ -104,21 +120,25 @@
    داخل همین هدر fixed هستند و با فیلتر روی والد، ارتفاعشان به ۶۵px هدر گیر می‌کرد
    ⇒ در 3.3.0 تا 3.3.2 کشی منو عملاً ناپدید می‌شد. با ::before هیچ فرزندی درگیر نمی‌شود. */
 #mobiles_header{background: transparent;border-bottom: 0;box-shadow: none}
-.night #mobiles_header{background: transparent}
+.night #mobiles_header{background: transparent !important}
 #mobiles_header::before{
 	content: "";
 	position: absolute;
 	top: 0; right: 0; left: 0; bottom: 0;
 	z-index: -1;
-	background: var(--ab-glass-bg);
+	background: var(--ab-head-bg);
 	-webkit-backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
 	backdrop-filter: blur(var(--ab-glass-blur)) saturate(var(--ab-glass-saturate));
-	border-bottom: 1px solid var(--ab-glass-border);
-	box-shadow: var(--ab-glass-hl), var(--ab-depth-1);
+	border-bottom: 1px solid var(--ab-glass-border-2);
+	box-shadow: var(--ab-glass-hl), 0 8px 22px -20px rgba(17, 17, 17, .55);
 }
+/* v3.8.1 — این‌جا فقط z-index می‌دهیم، نه position.
+   پیش از این `position: relative` هم ست می‌شد و چون این فایل بعد از
+   `tara-ui.css` بار می‌شود، `position: absolute` دکمه‌های تازهٔ نوار موبایل
+   را باطل می‌کرد (دکمه‌ها به جریانِ float برمی‌گشتند). */
 #mobiles_header .navicon,
 #mobiles_header .circle_hlink,
-#mobiles_header .logo_mobiles{position: relative;z-index: 1}
+#mobiles_header .logo_mobiles{z-index: 1}
 /* زیرمنوها شناورند ⇒ شیشه + سایه */
 .menu_right li ul.sub-menu{
 	background: var(--ab-glass-bg-strong);

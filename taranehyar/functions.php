@@ -345,13 +345,19 @@ if ( is_readable( $taranehyar_widgets ) ) {
 }
 unset( $taranehyar_widgets );
 
-/* ۶-ج) فهرست تنظیمات (فقط در پیشخوان لازم است) */
+/* ۶-ج) فهرست تنظیمات و پنل مدیریت (فقط در پیشخوان لازم است) */
 if ( is_admin() ) {
 	$taranehyar_options = TARANEHYAR_DIR . '/inc/theme-options.php';
 	if ( is_readable( $taranehyar_options ) ) {
 		require_once $taranehyar_options;
 	}
 	unset( $taranehyar_options );
+
+	$taranehyar_panel = TARANEHYAR_DIR . '/inc/admin-panel.php';
+	if ( is_readable( $taranehyar_panel ) ) {
+		require_once $taranehyar_panel;
+	}
+	unset( $taranehyar_panel );
 }
 
 /* ۶-د) لایهٔ اصلیِ قالب (سی‌اس‌اس/ابزارک/سئو/دیدگاه‌ها…). آخر از همه می‌آید

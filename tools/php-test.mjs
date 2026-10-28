@@ -37,6 +37,15 @@ for (const js of ['owl.carousel.js', 'scripts.js']) {
   files.push({ parent: '/tmp/theme/js', name: js, url: 'file://' + path.join(theme, 'js', js) });
 }
 files.push({ parent: '/tmp/theme/inc', name: 'widgets.php', url: 'file://' + path.join(theme, 'inc', 'widgets.php') });
+for (const name of ['admin-panel.php', 'admin-panel-views.php', 'ab-admin-ui.php']) {
+  files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
+}
+for (const css of ['admin-panel.css']) {
+  files.push({ parent: '/tmp/theme/css', name: css, url: 'file://' + path.join(theme, 'css', css) });
+}
+for (const js of ['admin-panel.js']) {
+  files.push({ parent: '/tmp/theme/js', name: js, url: 'file://' + path.join(theme, 'js', js) });
+}
 files.push({ parent: '/preload/tests', name: 'stubs-wp.php', url: 'file://' + path.join(root, 'tests', 'stubs-wp.php') });
 files.push({ parent: '/preload/tests', name: path.basename(file), url: 'file://' + path.resolve(file) });
 

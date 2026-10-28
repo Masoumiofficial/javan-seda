@@ -441,8 +441,67 @@ function wp_verify_nonce( $nonce, $action ) {
 function check_ajax_referer( $action, $name ) {
 	return true;
 }
-function wp_nonce_field( $action, $name ) {
+function wp_nonce_field( $action, $name = '_wpnonce' ) {
 	echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="good">';
+}
+
+/* ---------- پیشخوان (منو، آمار، ابزارک) ---------- */
+function add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $callback = '', $icon_url = '', $position = null ) {
+	$GLOBALS['__admin_menus'][ $menu_slug ] = array(
+		'page_title' => $page_title,
+		'menu_title' => $menu_title,
+		'capability' => $capability,
+		'callback'   => $callback,
+		'icon'       => $icon_url,
+		'position'   => $position,
+	);
+	return 'toplevel_page_' . $menu_slug;
+}
+function add_submenu_page( $parent, $page_title, $menu_title, $capability, $menu_slug, $callback = '' ) {
+	$GLOBALS['__admin_submenus'][ $parent ][ $menu_slug ] = array(
+		'page_title' => $page_title,
+		'menu_title' => $menu_title,
+		'capability' => $capability,
+		'callback'   => $callback,
+	);
+	$GLOBALS['submenu'][ $parent ][] = array( $menu_title, $capability, $menu_slug, $page_title );
+	return ( $parent === $menu_slug ) ? 'toplevel_page_' . $parent : $parent . '_page_' . $menu_slug;
+}
+function admin_url( $path = '', $scheme = 'admin' ) {
+	return 'https://ex/wp-admin/' . ltrim( (string) $path, '/' );
+}
+function home_url( $path = '' ) {
+	return 'https://ex/' . ltrim( (string) $path, '/' );
+}
+function is_rtl() {
+	return true;
+}
+function has_nav_menu( $location ) {
+	return ! empty( $GLOBALS['__nav_menu_locations'][ $location ] );
+}
+function is_admin_bar_showing() {
+	return true;
+}
+function wp_add_dashboard_widget( $widget_id, $widget_name, $callback ) {
+	$GLOBALS['__dashboard_widgets'][ $widget_id ] = array( 'name' => $widget_name, 'callback' => $callback );
+}
+function wp_count_posts( $type = 'post' ) {
+	return (object) array( 'publish' => isset( $GLOBALS['__count_posts'] ) ? (int) $GLOBALS['__count_posts'] : 0 );
+}
+function wp_count_comments( $post_id = 0 ) {
+	return (object) array( 'approved' => isset( $GLOBALS['__count_comments'] ) ? (int) $GLOBALS['__count_comments'] : 0 );
+}
+function count_users() {
+	return array( 'total_users' => isset( $GLOBALS['__count_users'] ) ? (int) $GLOBALS['__count_users'] : 0 );
+}
+function get_current_screen() {
+	return (object) array( 'id' => isset( $GLOBALS['__screen_id'] ) ? (string) $GLOBALS['__screen_id'] : '' );
+}
+function wp_safe_redirect( $url ) {
+	$GLOBALS['__redirect'] = $url;
+}
+function check_admin_referer( $action, $name = '_wpnonce' ) {
+	return true;
 }
 
 /* ---------- وضعیت صفحه ---------- */

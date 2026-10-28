@@ -51,7 +51,8 @@ if ( ! function_exists( 'javan_seda_admin_ui_screens' ) ) {
    */
   function javan_seda_admin_ui_screens() {
     return array(
-      'appearance_page_ot-theme-options', /* تنظیمات پوسته = تب‌های بخش‌ها */
+      'taranehyar_page_ot-theme-options', /* ۳.۶.۰: تنظیمات زیر منوی «ترانه یار» */
+      'appearance_page_ot-theme-options', /* سازگاری: اگر کسی پدر را به «نمایش» برگرداند */
       'toplevel_page_ot-settings',        /* ویرایشگر تنظیمات + چیدمان‌ها */
       'optiontree_page_ot-documentation',  /* مستندات */
     );

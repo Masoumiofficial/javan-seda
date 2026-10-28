@@ -1,0 +1,487 @@
+/**
+ * پنل «ترانه یار» — استایل پیشخوان
+ * فقط در صفحه‌های همین پنل بارگذاری می‌شود (inc/admin-panel.php).
+ * همهٔ چیزها زیر `.ty-panel` قفل شده‌اند تا به بقیهٔ پیشخوان دست نزنند.
+ */
+
+.ty-panel {
+	--ty-ink: #1f1d2b;
+	--ty-muted: #6b6a7b;
+	--ty-line: #e6e4ef;
+	--ty-surface: #ffffff;
+	--ty-accent: #6d28d9;
+	--ty-accent-2: #db2777;
+	--ty-ok: #0f9d58;
+	--ty-warn: #b45309;
+	--ty-radius: 14px;
+	max-width: 1180px;
+	color: var(--ty-ink);
+	font-family: inherit;
+}
+
+.ty-panel * {
+	box-sizing: border-box;
+}
+
+/* سربرگ -------------------------------------------------------------- */
+.ty-hero {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 24px;
+	padding: 28px 32px;
+	margin: 16px 0 22px;
+	border-radius: 18px;
+	color: #fff;
+	background:
+		radial-gradient(120% 160% at 100% 0%, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, 0) 45%),
+		linear-gradient(135deg, #4c1d95 0%, var(--ty-accent) 45%, var(--ty-accent-2) 100%);
+	box-shadow: 0 12px 30px -18px rgba(76, 29, 149, .9);
+}
+
+.ty-hero--slim {
+	padding: 22px 28px;
+}
+
+.ty-hero h1 {
+	margin: 6px 0 8px;
+	padding: 0;
+	color: #fff;
+	font-size: 30px;
+	line-height: 1.3;
+	font-weight: 800;
+	letter-spacing: -.2px;
+}
+
+.ty-hero p {
+	margin: 0;
+	max-width: 62ch;
+	font-size: 14px;
+	line-height: 1.9;
+	color: rgba(255, 255, 255, .88);
+}
+
+.ty-badge {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, .16);
+	border: 1px solid rgba(255, 255, 255, .28);
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.ty-hero__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 18px;
+}
+
+.ty-hero__art {
+	flex: 0 0 auto;
+	font-size: 74px;
+	line-height: 1;
+	opacity: .22;
+}
+
+.ty-hero__art .dashicons {
+	width: 92px;
+	height: 92px;
+	font-size: 92px;
+}
+
+/* دکمه‌ها ------------------------------------------------------------ */
+.ty-panel .ty-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 9px 16px;
+	border-radius: 10px;
+	border: 1px solid rgba(255, 255, 255, .4);
+	background: rgba(255, 255, 255, .14);
+	color: #fff;
+	font-size: 13px;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	transition: background .15s ease, transform .15s ease;
+}
+
+.ty-panel .ty-btn:hover,
+.ty-panel .ty-btn:focus {
+	background: rgba(255, 255, 255, .26);
+	color: #fff;
+	transform: translateY(-1px);
+}
+
+.ty-panel .ty-btn .dashicons {
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+}
+
+.ty-panel .ty-btn--primary {
+	background: #fff;
+	border-color: #fff;
+	color: #4c1d95;
+}
+
+.ty-panel .ty-btn--primary:hover,
+.ty-panel .ty-btn--primary:focus {
+	background: #f5f3ff;
+	color: #4c1d95;
+}
+
+/* کارت‌های آمار ------------------------------------------------------ */
+.ty-stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+	gap: 14px;
+	margin-bottom: 26px;
+}
+
+.ty-stat {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto auto;
+	align-items: center;
+	gap: 2px 12px;
+	padding: 16px 18px;
+	background: var(--ty-surface);
+	border: 1px solid var(--ty-line);
+	border-radius: var(--ty-radius);
+}
+
+.ty-stat .dashicons {
+	grid-row: 1 / span 2;
+	width: 34px;
+	height: 34px;
+	padding: 7px;
+	border-radius: 10px;
+	background: #f4f1fb;
+	color: var(--ty-accent);
+	font-size: 20px;
+}
+
+.ty-stat strong {
+	font-size: 22px;
+	font-weight: 800;
+	line-height: 1.2;
+}
+
+.ty-stat span:last-child {
+	font-size: 12px;
+	color: var(--ty-muted);
+}
+
+/* تیتر بخش ---------------------------------------------------------- */
+.ty-heading {
+	display: flex;
+	align-items: baseline;
+	gap: 10px;
+	margin: 0 0 12px;
+	font-size: 17px;
+	font-weight: 700;
+}
+
+.ty-heading__hint {
+	font-size: 12px;
+	font-weight: 400;
+	color: var(--ty-muted);
+}
+
+/* شبکهٔ کارت‌های تنظیمات ---------------------------------------------- */
+.ty-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 14px;
+	margin-bottom: 26px;
+}
+
+.ty-card {
+	background: var(--ty-surface);
+	border: 1px solid var(--ty-line);
+	border-radius: var(--ty-radius);
+	padding: 18px 20px;
+}
+
+.ty-card h3 {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin: 0 0 12px;
+	font-size: 15px;
+	font-weight: 700;
+}
+
+.ty-card--link {
+	display: flex;
+	align-items: flex-start;
+	gap: 12px;
+	text-decoration: none;
+	color: var(--ty-ink);
+	transition: border-color .15s ease, box-shadow .15s ease, transform .15s ease;
+}
+
+.ty-card--link:hover,
+.ty-card--link:focus {
+	border-color: #cdbff5;
+	box-shadow: 0 10px 24px -18px rgba(76, 29, 149, .8);
+	transform: translateY(-1px);
+	color: var(--ty-ink);
+}
+
+.ty-card--link:focus {
+	outline: 2px solid var(--ty-accent);
+	outline-offset: 2px;
+}
+
+.ty-card__icon {
+	flex: 0 0 auto;
+	width: 36px;
+	height: 36px;
+	padding: 8px;
+	border-radius: 10px;
+	background: #f4f1fb;
+	color: var(--ty-accent);
+	font-size: 20px;
+}
+
+.ty-card__body {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.ty-card__title {
+	font-size: 14px;
+	font-weight: 700;
+}
+
+.ty-card__desc {
+	font-size: 12px;
+	line-height: 1.8;
+	color: var(--ty-muted);
+}
+
+.ty-card__meta {
+	flex: 0 0 auto;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: #f4f1fb;
+	color: var(--ty-accent);
+	font-size: 11px;
+	white-space: nowrap;
+}
+
+/* دو ستون ------------------------------------------------------------ */
+.ty-columns {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+	gap: 14px;
+	align-items: start;
+}
+
+.ty-card--wide {
+	padding: 20px 22px;
+}
+
+/* چک‌لیست سلامت ------------------------------------------------------ */
+.ty-pill {
+	padding: 2px 9px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.ty-pill--ok {
+	background: #e7f6ee;
+	color: var(--ty-ok);
+}
+
+.ty-pill--warn {
+	background: #fdf3e6;
+	color: var(--ty-warn);
+}
+
+.ty-checklist {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 10px;
+}
+
+.ty-checklist li {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	font-size: 12px;
+	line-height: 1.8;
+}
+
+.ty-checklist .dashicons {
+	flex: 0 0 auto;
+	width: 18px;
+	height: 18px;
+	font-size: 18px;
+	margin-top: 2px;
+}
+
+.ty-checklist .is-ok .dashicons {
+	color: var(--ty-ok);
+}
+
+.ty-checklist .is-warn .dashicons {
+	color: var(--ty-warn);
+}
+
+.ty-checklist strong {
+	display: block;
+	font-size: 13px;
+	font-weight: 700;
+}
+
+.ty-checklist em {
+	display: block;
+	font-style: normal;
+	color: var(--ty-muted);
+}
+
+/* فهرست‌ها ----------------------------------------------------------- */
+.ty-links,
+.ty-bullets {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	display: grid;
+	gap: 8px;
+	font-size: 13px;
+}
+
+.ty-links {
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.ty-links a {
+	display: flex;
+	align-items: center;
+	gap: 7px;
+	padding: 9px 11px;
+	border: 1px solid var(--ty-line);
+	border-radius: 10px;
+	text-decoration: none;
+	color: var(--ty-ink);
+	background: #fbfaff;
+	transition: border-color .15s ease, background .15s ease;
+}
+
+.ty-links a:hover,
+.ty-links a:focus {
+	border-color: #cdbff5;
+	background: #f4f1fb;
+	color: var(--ty-accent);
+}
+
+.ty-links .dashicons {
+	color: var(--ty-accent);
+}
+
+.ty-bullets li {
+	position: relative;
+	padding-inline-start: 16px;
+	line-height: 1.9;
+}
+
+.ty-bullets li::before {
+	content: "";
+	position: absolute;
+	inset-inline-start: 2px;
+	top: 10px;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--ty-accent);
+}
+
+.ty-note {
+	margin: 14px 0 0;
+	font-size: 12px;
+	line-height: 1.9;
+	color: var(--ty-muted);
+}
+
+.ty-panel code {
+	background: #f4f1fb;
+	color: #4c1d95;
+	padding: 1px 5px;
+	border-radius: 5px;
+	font-size: 12px;
+}
+
+/* گزارش سیستم -------------------------------------------------------- */
+.ty-panel .ty-report {
+	width: 100%;
+	min-height: 260px;
+	padding: 14px;
+	border: 1px solid var(--ty-line);
+	border-radius: 12px;
+	background: #fbfaff;
+	color: var(--ty-ink);
+	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-size: 12px;
+	line-height: 1.8;
+	direction: ltr;
+	text-align: left;
+	resize: vertical;
+}
+
+/* ابزارک پیشخوان ----------------------------------------------------- */
+.ty-widget__stats {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 18px;
+	margin: 0 0 10px;
+	padding: 0;
+	list-style: none;
+	font-size: 12px;
+	color: #50575e;
+}
+
+.ty-widget__stats strong {
+	display: block;
+	font-size: 18px;
+	line-height: 1.3;
+	color: var(--ty-accent);
+}
+
+.ty-widget__links {
+	margin: 0;
+	font-size: 12px;
+}
+
+/* حالت باریک --------------------------------------------------------- */
+@media screen and (max-width: 782px) {
+	.ty-hero {
+		padding: 22px;
+	}
+
+	.ty-hero h1 {
+		font-size: 24px;
+	}
+
+	.ty-hero__art {
+		display: none;
+	}
+
+	.ty-grid,
+	.ty-columns,
+	.ty-stats {
+		grid-template-columns: 1fr;
+	}
+}

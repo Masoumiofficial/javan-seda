@@ -82,7 +82,18 @@ if ( $tara_fixbvip ) {
 						aria-label="<?php echo esc_attr( $tara_slide . ' از ' . $tara_slide_total ); ?>"
 						aria-hidden="<?php echo ( 1 === $tara_slide ) ? 'false' : 'true'; ?>">
 						<a class="ty-hero-slide__media" href="<?php the_permalink(); ?>">
-							<img src="<?php echo esc_url( $tara_image ); ?>"
+							<?php
+							/* v3.7.10 — دو لایهٔ تصویر، بدون درخواست اضافه (همان آدرس، از کش):
+							   ۱) لایهٔ پشت: همان تصویر با `cover` و بلورِ تیره ⇒ پس‌زمینهٔ
+							      تمام‌قاب که هیچ ناحیهٔ خالی/سفیدی نمی‌گذارد.
+							   ۲) لایهٔ رو: تصویر با `contain` ⇒ هیچ متنی از کاور مدیر بریده
+							      نمی‌شود. پیش از این `cover` روی کاورهای پهن، «MEGA MIX» را از
+							      دو طرف می‌برید (در اسکرین‌شاتِ کاربر دیده می‌شد).
+							   لایهٔ پشت aria-hidden و alt خالی است تا صفحه‌خوان دوبار نخواند. */
+							?>
+							<img class="ty-hero-slide__bg" src="<?php echo esc_url( $tara_image ); ?>"
+								alt="" aria-hidden="true" loading="lazy" decoding="async" draggable="false">
+							<img class="ty-hero-slide__img" src="<?php echo esc_url( $tara_image ); ?>"
 								width="1280" height="620"
 								alt="<?php echo esc_attr( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?>"
 								loading="<?php echo esc_attr( $tara_loading ); ?>"

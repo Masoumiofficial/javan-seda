@@ -1178,79 +1178,119 @@ body.has-tara-dock { padding-bottom: 76px; }
 	.ty-player__seek { height: 8px; }
 }
 
-/* v3.7.8 — پلیر موبایل: جمع‌وجور و خوانا.
+/* v3.7.10 — پلیر موبایل: کارتِ جمع‌وجور با سه ناحیهٔ روشن.
    ------------------------------------------------------------------------
-   پیش از این، کاور روی گوشی تمام‌عرض و ۱۹۰px بلند می‌شد و کل کارت را
-   «بزرگ و بهم‌ریخته» می‌کرد. حالا کاور ۸۴px در کنار نام آهنگ می‌نشیند،
-   «main» با display:contents از حالت جعبه بیرون می‌آید تا سرتیتر کنار
-   کاور و نوار ترابری تمام‌عرض زیرِ هر دو قرار بگیرد؛ دسکتاپ دست‌نخورده
-   می‌ماند چون همهٔ این‌ها فقط زیر ۷۸۳px اعمال می‌شود. */
+   نسخهٔ قبل «display:contents» را روی main می‌گذاشت ولی ردیف سرتیتر را با
+   flex و space-between می‌چید؛ نتیجه روی گوشی این بود که دو دکمهٔ ابزار
+   (فهرست/صفحهٔ آهنگ) وسطِ کارت شناور می‌ماندند، بین نام خواننده و دکمهٔ پخش
+   یک فضای خالی بزرگ می‌افتاد و ردیفِ زمان/نوار پیشرفت به خط سوم می‌رفت و
+   از کادر بیرون می‌زد. در اسکرین‌شاتِ کاربر همین دیده می‌شد.
+
+   چیدمان تازه (شبکهٔ صریح، بدون شناوری):
+     ردیف ۱: [کاور ۷۶] [سرتیتر: برچسب / نام آهنگ / خواننده / ابزارها]
+     ردیف ۲: [نوار پیشرفت تمام‌عرض با زمانِ دو سر]
+     ردیف ۳: [قبلی] [پخش] [بعدی]  … زمان و آیکون بی‌صدا
+   ===================================================================== */
 @media (max-width: 782px) {
 	.ty-player {
-		grid-template-columns: 84px minmax(0, 1fr);
-		align-items: center;
-		gap: 10px 12px;
+		grid-template-columns: 76px minmax(0, 1fr);
+		grid-template-areas:
+			"art head"
+			"transport transport";
+		align-items: start;
+		gap: 8px 12px;
 		padding: 12px;
-		margin: 16px 0;
+		margin: 14px 0;
 		border-radius: 16px;
 	}
 
 	.ty-player__main { display: contents; }
 
 	.ty-player__art {
-		width: 84px;
-		height: 84px;
-		grid-column: 1;
-		grid-row: 1;
+		grid-area: art;
+		width: 76px;
+		height: 76px;
 		align-self: start;
 	}
 
 	.ty-player__img { border-radius: 12px; }
 
+	/* کاور روی گوشی ۷۶px است؛ دکمهٔ دوربین ۲۸px نصف آن را می‌پوشاند */
+	.ty-player__zoom {
+		width: 22px;
+		height: 22px;
+		font-size: 10px;
+		inset-inline-start: 4px;
+		bottom: 4px;
+	}
+
 	.ty-player__pulse { display: none; }
 
 	.ty-player__head {
-		grid-column: 2;
-		grid-row: 1;
+		grid-area: head;
+		align-items: flex-start;
 		gap: 8px;
-		align-items: center;
 	}
 
-	.ty-player__labels { gap: 1px; }
+	/* برچسب‌ها تمام عرض ستون را می‌گیرند تا دکمه‌های ابزار به لبهٔ چپ بچسبند
+	   و «وسطِ کارت شناور» نمانند (ایرادِ اسکرین‌شات). */
+	.ty-player__labels { flex: 1 1 auto; gap: 1px; }
 
-	.ty-player__eyebrow { font-size: 10px; }
+	.ty-player__eyebrow { font-size: 10.5px; }
 
+	/* نام آهنگ: حداکثر دو خط با «…» — یک خطِ بریده اطلاعات را از بین می‌برد */
 	.ty-player__song {
-		font-size: 16px;
-		line-height: 1.45;
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+		overflow: hidden;
+		white-space: normal;
+		font-size: 15.5px;
+		line-height: 1.5;
 	}
 
 	.ty-player__artist { font-size: 12px; }
 
 	.ty-player__count { display: none; }
 
-	.ty-player__tools { gap: 6px; }
+	.ty-player__tools {
+		gap: 6px;
+		align-self: flex-start;
+		padding-top: 1px;
+	}
 
 	.ty-player__tool { padding: 6px 9px; font-size: 11px; }
 
+	/* ترابری: دو خط، نه سه خط */
 	.ty-player__transport {
-		grid-column: 1 / -1;
-		grid-row: 2;
-		gap: 6px;
+		grid-area: transport;
+		flex-wrap: wrap;
+		gap: 4px 10px;
 		padding-top: 2px;
 	}
 
-	.ty-player__btn--main { width: 44px; height: 44px; }
+	.ty-player__transport [data-tara-prev] { order: 1; width: 34px; height: 34px; }
+	.ty-player__btn--main { order: 2; width: 46px; height: 46px; }
+	.ty-player__transport [data-tara-next] { order: 3; width: 34px; height: 34px; }
 
-	.ty-player__btn--skip { width: 32px; height: 32px; }
+	.ty-player__time {
+		order: 4;
+		margin-inline-start: auto;
+		font-size: 10.5px;
+		min-width: 0;
+	}
 
-	.ty-player__timeline { flex-basis: 100%; order: 5; height: 6px; }
+	.ty-player__vol { order: 5; gap: 0; }
+	.ty-player__vol input[type="range"] { display: none; }
+	.ty-player__vol-btn { width: 32px; height: 32px; }
 
-	.ty-player__time { order: 6; min-width: 0; font-size: 10px; }
-
-	.ty-player__vol { order: 4; margin-inline-start: auto; gap: 2px; }
-
-	.ty-player__vol input[type="range"] { width: 54px; }
+	.ty-player__timeline {
+		order: 6;
+		flex-basis: 100%;
+		height: 5px;
+		margin-top: 2px;
+	}
 
 	.ty-player__error {
 		grid-column: 1 / -1;
@@ -1267,10 +1307,7 @@ body.has-tara-dock { padding-bottom: 76px; }
 		clip-path: inset(50%);
 	}
 
-	.ty-player__item-btn {
-		grid-template-columns: 24px minmax(0, 1fr) 18px;
-	}
-
+	.ty-player__item-btn { grid-template-columns: 24px minmax(0, 1fr) 18px; }
 	.ty-player__item-artist { display: none; }
 
 	.ty-track {
@@ -1282,29 +1319,65 @@ body.has-tara-dock { padding-bottom: 76px; }
 
 	.ty-track__date,
 	.ty-track__badge { display: none; }
+}
 
-	/* v3.7.9 — این‌جا فقط تعداد ستون‌ها عوض شده بود و `grid-template-areas`
-	   (۹ ناحیه) سر جایش مانده بود؛ در CSS اگر تعداد ستون‌های صریح با ناحیه‌ها
-	   نخواند، **کل ناحیه‌ها باطل** می‌شود و `grid-area: art/prev/...` هم
-	   بی‌اثر می‌ماند ⇒ همهٔ دکمه‌ها با چیدمان خودکار روی هم می‌ریختند. همان
-	   «پلیر بهم‌ریخته» در تبلت و گوشی بزرگ.
-	   حالا یک الگوی کاملِ دو ردیفه: ردیف اول کاور+نام+فهرست+بستن، ردیف دوم
-	   ترابری (قبلی/پخش/بعدی). */
+/* =========================================================================
+   ۷.۴) نوار چسبانِ گوشی — v3.7.10 (فلکس با شکست خط)
+   ---------------------------------------------------------------------
+   چرا از شبکه درآمد؟ در شبکه، سه دکمهٔ ترابری مجبور بودند در ناحیه‌های
+   انتهایی جا شوند و نیمهٔ چپ نوار خالی می‌ماند. با `display:flex` و یک
+   شکست‌خطِ نامرئی (`::after` با عرض ۱۰۰٪):
+     ردیف ۱ → کاور | عنوان و هنرمند | فهرست پخش | بستن   (فهرست کنار بستن)
+     ردیف ۲ → قبلی ......... پخش ......... بعدی          (space-between)
+   ارتفاع هم از ۱۵۸px به حدود ۱۰۰px رسید.
+   ===================================================================== */
+@media (max-width: 782px) {
 	.ty-dock {
-		grid-template-columns: 40px minmax(0, 1fr) 34px 34px;
-		grid-template-areas:
-			"art meta list close"
-			"prev toggle next next";
-		row-gap: 4px;
-		column-gap: 8px;
-		padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 6px 10px;
+		padding: 7px 12px calc(7px + env(safe-area-inset-bottom));
 	}
 
-	/* بدون ناحیه در شبکه نباید بمانند؛ وگرنه خودکار به ردیف تازه می‌پرند */
-	.ty-dock__bars,
-	.ty-dock__vol { display: none; }
+	/* شکست خط بین ردیف اطلاعات و ردیف کنترل‌ها — ترتیبِ ۵ و ترابری ۶/۷/۸.
+	   (اگر این عدد از ترابری بزرگ‌تر باشد، شکست به آخر می‌رود و همهٔ هفت
+	   عنصر در یک ردیف فشرده می‌شوند.) */
+	.ty-dock::after {
+		content: "";
+		order: 5;
+		flex: 0 0 100%;
+		height: 0;
+	}
 
+	.ty-dock__bars,
+	.ty-dock__vol,
 	.ty-dock__link { display: none; }
+
+	.ty-dock__art { order: 1; }
+	.ty-dock__img { width: 40px; height: 40px; border-radius: 10px; }
+
+	.ty-dock__meta { order: 2; flex: 1 1 0; min-width: 0; }
+	.ty-dock__title { font-size: 12.5px; line-height: 1.5; }
+	.ty-dock__artist { font-size: 10.5px; line-height: 1.5; }
+	.ty-dock__rail { margin-top: 3px; height: 3px; }
+
+	.ty-dock [data-tara-dock-list] { order: 3; }
+	.ty-dock [data-tara-dock-close] { order: 4; }
+
+	.ty-dock [data-tara-dock-prev] { order: 6; }
+	.ty-dock [data-tara-dock-toggle] { order: 7; }
+	.ty-dock [data-tara-dock-next] { order: 8; }
+
+	.ty-dock [data-tara-dock-prev],
+	.ty-dock [data-tara-dock-next],
+	.ty-dock [data-tara-dock-list],
+	.ty-dock [data-tara-dock-close] { width: 34px; height: 34px; }
+
+	.ty-dock__btn--main { width: 46px; height: 46px; }
+
+	body.has-tara-dock { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
 }
 
 /* =========================================================================
@@ -2640,95 +2713,20 @@ body.tara-dock-open .top_page { bottom: 92px; }
    ۳.۷.۷ — لایهٔ تکمیلی: موبایلِ نوار چسبان، تمام‌صفحهٔ ویدیو، کاور پلیر
    ====================================================================== */
 
-/* ---- نوار چسبان در گوشی: دو ردیف ----
-   در یک ردیف، ۹ ستون در عرض ۳۶۰px جا نمی‌شود و عنوان آهنگ کاملاً حذف
-   می‌شد. حالا کاور+عنوان در ردیف اول و کنترل‌ها (قبلی/پخش/بعدی + صدا +
-   فهرست) در ردیف دوم می‌نشینند؛ همه‌چیز بزرگ و قابل لمس می‌ماند. */
-@media (max-width: 640px) {
-	/* v3.7.9 — درخواست صریح: کنترلِ صدا از نوار چسبانِ گوشی برداشته شود
-	   (صدای گوشی با دکمه‌های سخت‌افزاری تنظیم می‌شود) و دکمهٔ «فهرست پخش»
-	   کنار «بستن» بنشیند. سه ردیفِ قبلی هم به دو ردیف کم شد. */
-	.ty-dock {
-		grid-template-columns: 40px minmax(0, 1fr) 34px 34px;
-		grid-template-areas:
-			"art meta list close"
-			"prev toggle next next";
-		row-gap: 4px;
-		column-gap: 8px;
-		padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
-	}
-
-	.ty-dock__bars,
-	.ty-dock__vol { display: none; }
-
-	.ty-dock__img { width: 40px; height: 40px; border-radius: 9px; }
-	.ty-dock__title { font-size: 12.5px; }
-	.ty-dock__artist { font-size: 10.5px; }
-	.ty-dock__rail { margin-top: 3px; }
-
-	.ty-dock [data-tara-dock-prev],
-	.ty-dock__btn--main { width: 44px; height: 44px; }
-
-	.ty-dock [data-tara-dock-next] { width: 40px; height: 40px; }
-
-	.ty-dock [data-tara-dock-list],
-	.ty-dock [data-tara-dock-close] { width: 34px; height: 34px; }
-
-	.ty-dock [data-tara-dock-close] { justify-self: end; }
-
-	body.has-tara-dock { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
-}
-
-/* v3.7.9 — ترابریِ پلیر در گوشی: دو ردیفِ تمیز، نه سه ردیفِ درهم.
-   ردیف اول: قبلی / پخش / بعدی و در انتها زمان و آیکون بی‌صدا؛
-   ردیف دوم: نوار پیشرفتِ تمام‌عرض. اسلایدر صدا هم برداشته شد تا هم جا
-   باز شود و هم کاربر با دکمه‌های سخت‌افزاری گوشی تنظیم کند (درخواست صریح
-   برای نوار چسبان، این‌جا هم همان منطق برای هم‌خوانی). */
-@media (max-width: 640px) {
-	.ty-player__transport {
-		flex-wrap: wrap;
-		gap: 2px 8px;
-	}
-
-	.ty-player__btn--skip,
-	.ty-player__btn--main { order: 1; }
-
-	.ty-player__time {
-		order: 2;
-		margin-inline-start: auto;
-		font-size: 10.5px;
-		min-width: 0;
-	}
-
-	.ty-player__vol { order: 3; margin-inline-start: 0; gap: 0; }
-
-	.ty-player__vol input[type="range"] { display: none; }
-
-	.ty-player__vol-btn { width: 32px; height: 32px; }
-
-	.ty-player__timeline {
-		order: 4;
-		flex-basis: 100%;
-		height: 6px;
-		margin-top: 2px;
-	}
-}
-
-/* گوشی‌های باریک: دکمه‌های پلیر فقط آیکون می‌شوند تا نام آهنگ جا داشته باشد
-   (نام دسترس‌پذیر با aria-label روی خود دکمه‌ها می‌ماند). */
-@media (max-width: 420px) {
-	.ty-player__tool { padding: 7px; }
-	.ty-player__tool-label { display: none; }
-	.ty-player__tool .ty-icon-list,
-	.ty-player__tool .ty-icon-note { margin: 0; width: 15px; height: 15px; }
-}
-
 @media (max-width: 380px) {
 	.ty-dock {
-		grid-template-columns: 36px 38px minmax(0, 1fr) 36px;
-		column-gap: 4px;
 		padding-inline: 8px;
+		gap: 4px 6px;
 	}
+
+	.ty-dock__img { width: 36px; height: 36px; }
+
+	.ty-dock [data-tara-dock-prev],
+	.ty-dock [data-tara-dock-next],
+	.ty-dock [data-tara-dock-list],
+	.ty-dock [data-tara-dock-close] { width: 32px; height: 32px; }
+
+	.ty-dock__btn--main { width: 42px; height: 42px; }
 
 	/* گوشی‌های باریک: کاور و سرتیتر یک پله کوچک‌تر، بدون شکستن خط */
 	.ty-player {
@@ -2753,7 +2751,7 @@ body.has-tara-dock .top_page {
 	bottom: calc(84px + env(safe-area-inset-bottom)) !important;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 782px) {
 	body.has-tara-dock .top_page {
 		bottom: calc(122px + env(safe-area-inset-bottom)) !important;
 		width: 40px;

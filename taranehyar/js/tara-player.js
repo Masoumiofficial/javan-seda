@@ -1545,7 +1545,7 @@
 
 		/* نشانهٔ سلامت برای عیب‌یابی: اگر این صفت روی <html> نبود، یعنی همین فایل
 		   اجرا نشده است (کش/CDN/خطای اسکریپت). */
-		document.documentElement.setAttribute('data-tara-ready', '3.7.9');
+		document.documentElement.setAttribute('data-tara-ready', '3.7.10');
 
 		/* v3.7.7 — وقتی کاربر با دکمهٔ Esc یا ژست بومی از تمام‌صفحه بیرون
 		   می‌آید، کلاس‌ها و قفل چرخش باید پاک شوند؛ وگرنه صفحه سیاه/

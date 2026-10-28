@@ -498,7 +498,7 @@ t( 'تاکسونومی: قالب مشترک آرشیو موجود', is_readable(
 /* ======================================================================
    v3.7.7 — بازبینی خرابی‌های گزارش‌شده و تنظیمات تازه
    ====================================================================== */
-t( 'نسخه: style.css روی ۳.۷.۹ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.7.9' ) );
+t( 'نسخه: style.css روی ۳.۷.۱۰ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.7.10' ) );
 
 $opts = (string) @file_get_contents( '/tmp/theme/inc/theme-options.php' );
 t( 'تنظیمات: بخش رنگ‌ها اضافه شده', false !== strpos( $opts, "'id'=>'brand'" ) );
@@ -514,12 +514,15 @@ t( 'کارت‌پخش: translateY سرگردان حذف شده', false === strpo
 	transform: translateY(6px);" ) );
 t( 'نوار چسبان: شبکهٔ نه‌ستونه با نام ناحیه‌ها', false !== strpos( $ui_css2, 'grid-template-areas: "bars art meta prev toggle next vol list close"' ) );
 t( 'نوار چسبان: کنترل صدا استایل دارد', false !== strpos( $ui_css2, '.ty-dock__volrange' ) && false !== strpos( $ui_css2, '.ty-dock__btn--vol' ) );
-/* v3.7.9 — چیدمان تازهٔ گوشی: دو ردیف، بدون کنترل صدا، «فهرست» کنار «بستن» */
+/* v3.7.10 — چیدمان تازهٔ گوشی: فلکس با شکست خط، بدون کنترل صدا، فهرست کنار بستن */
 t(
-	'نوار چسبان: گوشی دو ردیفی و بدون کنترل صدا',
-	false !== strpos( $ui_css2, '"art meta list close"' )
-		&& false !== strpos( $ui_css2, '"prev toggle next next"' )
-		&& (bool) preg_match( '/\.ty-dock__bars,\s*\n?\t?\.ty-dock__vol \{ display: none; \}/', $ui_css2 )
+	'نوار چسبان: گوشی فلکس دو ردیفی با ترتیب صریح',
+	false !== strpos( $ui_css2, '.ty-dock::after {' )
+		&& false !== strpos( $ui_css2, 'flex: 0 0 100%;' )
+		&& (bool) preg_match( '/\[data-tara-dock-list\] \{ order: 3; \}/', $ui_css2 )
+		&& (bool) preg_match( '/\[data-tara-dock-close\] \{ order: 4; \}/', $ui_css2 )
+		&& (bool) preg_match( '/\[data-tara-dock-toggle\] \{ order: 7; \}/', $ui_css2 )
+		&& (bool) preg_match( '/order: 5;\n\t\tflex: 0 0 100%;/', $ui_css2 )
 );
 t( 'دکمهٔ بالا: با نوار چسبان جابه‌جا می‌شود', false !== strpos( $ui_css2, 'body.has-tara-dock .top_page' ) );
 t( 'ویدیو: حالت شبه‌تمام‌صفحه و چرخش دارد', false !== strpos( $ui_css2, '.ty-video.is-pseudofs' ) && false !== strpos( $ui_css2, 'is-rotated' ) );
@@ -534,7 +537,7 @@ $artist_css = (string) @file_get_contents( '/tmp/theme/css/tara-artist.css' );
 t( 'هنرمند: فهرست آهنگ‌ها چندستونه شده', false !== strpos( $artist_css, 'repeat(3, minmax(0, 1fr))' ) && false !== strpos( $artist_css, 'repeat(4, minmax(0, 1fr))' ) );
 
 $home_css = (string) @file_get_contents( '/tmp/theme/css/tara-home.css' );
-t( 'بنر: زوم نرم‌تر شده', false !== strpos( $home_css, 'scale(1.025)' ) && false === strpos( $home_css, 'scale(1.05)' ) );
+t( 'بنر: زوم نرم و کوتاه (بدون جهش)', false === strpos( $home_css, 'scale(1.05)' ) && false !== strpos( $home_css, 'scale(1.012)' ) );
 t( 'بنر: نشانگرهای تازهٔ اسلایدر', false !== strpos( $home_css, '.ty-hero-dots' ) && false !== strpos( $home_css, '.ty-hero-dot.is-active' ) );
 
 $shell = (string) @file_get_contents( '/tmp/theme/inc/admin-settings-shell.php' );
@@ -548,7 +551,7 @@ $dock_php = (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' );
 t( 'نوار چسبان: مارکاپ صدا دارد', false !== strpos( $dock_php, 'data-tara-dock-vol' ) && false !== strpos( $dock_php, 'data-tara-dock-mute' ) );
 $player_js2 = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
 t( 'ویدیو: خروج با Esc و تغییر جهت', false !== strpos( $player_js2, "'orientationchange'" ) && false !== strpos( $player_js2, "e.key !== 'Escape'" ) );
-t( 'پلیر: نشانهٔ نسخه ۳.۷.۹', false !== strpos( $player_js2, "'data-tara-ready', '3.7.9'" ) );
+t( 'پلیر: نشانهٔ نسخه ۳.۷.۱۰', false !== strpos( $player_js2, "'data-tara-ready', '3.7.10'" ) );
 
 /* ======================================================================
    ۳.۷.۸ — دور ۶۶: ترتیب صفحهٔ آهنگ، اسلایدر تازه، سربرگ سه‌ستونهٔ هنرمند،
@@ -661,7 +664,7 @@ t( 'ویدیو: استایل نشانه', false !== strpos( $ui78, '.ab-card-vid
 /* نوار چسبان گوشی */
 t(
 	'نوار چسبان: کنترل صدا در گوشی پنهان است',
-	(bool) preg_match( '/\.ty-dock__bars,\s*\n?\t?\.ty-dock__vol \{ display: none; \}/', $ui_css2 )
+	(bool) preg_match( '/\.ty-dock__bars,\s*\n\t\.ty-dock__vol,\s*\n\t\.ty-dock__link \{ display: none; \}/', $ui_css2 )
 );
 t( 'نوار چسبان: ارتفاع رزروشده با دو ردیف هم‌خوان است', false !== strpos( $ui_css2, 'calc(112px + env(safe-area-inset-bottom))' ) );
 t( 'پلیر: ترابری گوشی دو ردیفی', false !== strpos( $ui_css2, '.ty-player__vol input[type="range"] { display: none; }' ) );
@@ -679,6 +682,48 @@ t( 'تنظیمات: نوار ابزار بالای محتوا', false !== strpos
 t(
 	'هدر: padding تبلیغ یک‌دست ۱۲px',
 	1 === substr_count( $style79, '#ads_top,#ads_top_dl{width: 100%;height: auto;padding: 12px 0;text-align: center;}' )
+);
+
+/* ======================================================================
+   ۳.۷.۱۰ — کاور اسلاید بدون برش، بازچینش پلیر گوشی، برچسب نوع اثر
+   ====================================================================== */
+$home710  = (string) @file_get_contents( '/tmp/theme/css/tara-home.css' );
+$vip710   = (string) @file_get_contents( '/tmp/theme/inc/vip_slider.php' );
+$ui710    = (string) @file_get_contents( '/tmp/theme/css/tara-ui.css' );
+$single710 = (string) @file_get_contents( '/tmp/theme/single.php' );
+$shell710 = (string) @file_get_contents( '/tmp/theme/inc/admin-settings-shell.php' );
+
+t(
+	'اسلایدر: دو لایهٔ تصویر (پس‌زمینهٔ بلور + تصویر کامل)',
+	false !== strpos( $vip710, 'ty-hero-slide__bg' )
+		&& false !== strpos( $vip710, 'ty-hero-slide__img' )
+		&& false !== strpos( $home710, 'object-fit: contain' )
+		&& false !== strpos( $home710, 'filter: blur(18px)' )
+);
+t( 'اسلایدر: لایهٔ پشت برای صفحه‌خوان پنهان است', false !== strpos( $vip710, 'aria-hidden="true" loading="lazy"' ) );
+t( 'اسلایدر: نسبت گوشی ۱۶:۹ (بدون برش)', false !== strpos( $home710, '.ty-hero-slide__media { aspect-ratio: 16 / 9; }' ) && false === strpos( $home710, 'aspect-ratio: 5 / 4' ) );
+t( 'اسلایدر: نشانگرها در گوشی ریزتر', false !== strpos( $home710, '.ty-hero-dot { width: 18px; height: 18px; padding: 5px; }' ) );
+
+t(
+	'پلیر: چیدمان شبکه‌ای صریح در گوشی (کاور+سرتیتر / ترابری)',
+	false !== strpos( $ui710, '"art head"' )
+		&& false !== strpos( $ui710, '"transport transport"' )
+);
+t( 'پلیر: ترابری دو خط با ترتیب صریح', false !== strpos( $ui710, '.ty-player__transport [data-tara-prev] { order: 1;' ) && false !== strpos( $ui710, '.ty-player__timeline {' ) );
+t( 'پلیر: اسلایدر صدا در گوشی پنهان (دکمهٔ بی‌صدا می‌ماند)', false !== strpos( $ui710, '.ty-player__vol input[type="range"] { display: none; }' ) );
+t( 'پلیر: نام آهنگ حداکثر دو خط', false !== strpos( $ui710, '-webkit-line-clamp: 2' ) );
+
+t(
+	'صفحهٔ آهنگ: برچسب فرمت (mp3) به «پخش آنلاین» تبدیل می‌شود',
+	false !== strpos( $single710, '$tara_type_label' )
+		&& false !== strpos( $single710, "\$tara_type_label = 'پخش آنلاین';" )
+		&& false !== strpos( $single710, 'mp3|mp4|m4a' )
+);
+
+t(
+	'تنظیمات: پشتیبان CSS برای بسته‌بودن آیتم‌های فهرستی',
+	false !== strpos( $shell710, '.option-tree-setting:not(.tara-li-open) > .option-tree-setting-body { display: none; }' )
+		&& false !== strpos( $shell710, 'مورد بدون عنوان' )
 );
 
 /* ======================================================================

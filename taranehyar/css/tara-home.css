@@ -75,25 +75,53 @@
    پنهان نمی‌کند (برخلاف نسخهٔ قبل). */
 .ty-hero-slide.is-active { z-index: 1; }
 
+/* v3.7.10 — کاورِ اسلاید دیگر بریده نمی‌شود.
+   -------------------------------------------------------------------------
+   پیش از این یک <img> با `object-fit: cover` بود؛ روی کاورهای پهن (بنر
+   ۲:۱ مدیر) تصویر را از دو طرف می‌برید و متنِ اثر (مثل «MEGA MIX») از
+   لبه‌ها بیرون می‌زد. حالا دو لایه:
+     • `__bg`  : همان تصویر، تمام‌قاب، بلور خورده و تیره‌تر ⇒ نواحی خالی
+                 هیچ‌وقت سفید/سیاهِ تخت نیست.
+     • `__img` : `object-fit: contain` ⇒ کل تصویر دیده می‌شود.
+   هیچ درخواست اضافه‌ای هم نیست: هر دو <img> یک آدرس دارند و از کش می‌آید. */
 .ty-hero-slide__media {
+	position: relative;
 	display: block;
 	line-height: 0;
 	aspect-ratio: 16 / 7;
+	overflow: hidden;
+	background: #10172a;
+	isolation: isolate;
 }
 
-.ty-hero-slide__media img {
+.ty-hero-slide__bg {
+	position: absolute;
+	inset: -14px;
+	width: calc(100% + 28px);
+	height: calc(100% + 28px);
+	max-width: none;
+	object-fit: cover;
+	object-position: center;
+	filter: blur(18px) saturate(1.1) brightness(.55);
+	transform: scale(1.02);
+	z-index: 0;
+	pointer-events: none;
+}
+
+.ty-hero-slide__img {
+	position: relative;
+	z-index: 1;
 	width: 100%;
 	height: 100%;
 	max-width: 100%;
-	object-fit: cover;
+	object-fit: contain;
 	object-position: center;
 	display: block;
-	transform: scale(1.005);
 	transition: transform 1.1s cubic-bezier(.22, .61, .36, 1);
 }
 
-.ty-hero-slide:hover .ty-hero-slide__media img {
-	transform: scale(1.025);
+.ty-hero-slide:hover .ty-hero-slide__img {
+	transform: scale(1.012);
 }
 
 /* نشانگرها ------------------------------------------------------------ */
@@ -150,7 +178,7 @@
 
 @media (prefers-reduced-motion: reduce) {
 	.ty-hero-track { scroll-behavior: auto; }
-	.ty-hero-slide__media img { transition: none; }
+	.ty-hero-slide__img { transition: none; }
 }
 
 /* پلیر صفحهٔ اصلی ------------------------------------------------------ */
@@ -159,21 +187,28 @@
 @media (max-width: 782px) {
 	.ty-hero-slider {
 		--ty-hs-radius: 16px;
-		margin: 12px 0 18px;
+		margin: 10px 0 16px;
 	}
 
-	/* نسبت کوتاه‌تر تا اسلایدر روی گوشی نصف صفحه را نگیرد */
-	.ty-hero-slide__media { aspect-ratio: 16 / 10; }
+	/* نسبتِ ۱۶:۹ روی گوشی: کوتاه‌تر از قبل و همان نسبتِ طبیعی بنرهای سایت،
+	   پس تقریباً هیچ برشی هم لازم نیست (و هر چه بود با contain حل شده). */
+	.ty-hero-slide__media { aspect-ratio: 16 / 9; }
 
 	.ty-hero-dots { bottom: 8px; }
+
+	.ty-hero-dot { width: 18px; height: 18px; padding: 5px; }
 }
 
 @media (max-width: 480px) {
-	.ty-hero-slide__media { aspect-ratio: 5 / 4; }
-	.ty-hero-slide__media img { object-position: center 32%; }
+	.ty-hero-slide__media { aspect-ratio: 16 / 9; }
+}
+
+/* دستگاه‌های ضعیف: بلور پرهزینه است، فقط تیره‌کردن */
+@media (prefers-reduced-motion: reduce) {
+	.ty-hero-slide__bg { filter: brightness(.5); }
 }
 
 /* دستگاه‌های لمسی: زوم هاور بی‌معناست و فقط «جهش» می‌سازد */
 @media (hover: none) {
-	.ty-hero-slide:hover .ty-hero-slide__media img { transform: scale(1.005); }
+	.ty-hero-slide:hover .ty-hero-slide__img { transform: none; }
 }

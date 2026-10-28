@@ -245,16 +245,16 @@ if ( ! function_exists( 'tara_sidebar' ) ) {
 if ( ! function_exists( 'tara_expected_hashes' ) ) {
 	function tara_expected_hashes() {
 	return array(
-		'single.php'                => 'eecf202c837c2d492d2905500ca6cd699fb10b0e8be1b6d07d4b0b2dab9fcc0c',
+		'single.php'                => '52d4f84d65ee1834b1c057d8a254cb467100af1c54ad7af156ebe234da1339c8',
 		'page.php'                  => 'eed2370a3205d53f58bf0d5721275ae8896daf6c32e862403d9fe3a2982aac50',
 		'myfunctions.php'           => '96312a49c0ceec52ae659282f63d51c8c04f8c25a78829d7478fe7c141e672a9',
-		'style.css'                 => '492200783c8154c742eb3073d92079f21afa768c7bb34de3ec71a30c6d5d9fdb',
+		'style.css'                 => 'b6e039da04ce5117c5054910eb393edeaf99c6d6d16ce46c79b6ae2f1d799bf9',
 		'footer.php'                => '504028e8c50795974d855ffd42b5ac6c8ff952958d466aaf82cc46707cf00c56',
 		'header.php'                => '7fcc07844102ca92c04fab1c60105b878c08ecb67ac552e9838f400de4538f49',
 		'home.php'                  => 'a8280d8c5be6580c49fc174dc9e21a9451c91f989381a10f2b66c5607a733f47',
 		'404.php'                   => '41762e52e2282ae06d2facf64ab04633cc61faaf802745f385f1e0fa59a07afe',
 		'search.php'                => 'fd1fe11640f8fcb7544a5d362dea37cfd1fdb4df1390bd4fb7f29d34979853b2',
-		'inc/vip_slider.php'        => '4e0277fdfa418bc1e84607088cfa8dedc2dce729e0f5394a27efb9bc0039834c',
+		'inc/vip_slider.php'        => '0445fd0a2f687618086ff911cfc245023f55740a281b96fb1621c122eabc75fa',
 		'inc/songs_post.php'        => '1863cb35808b0915c52553a411be994ffc64cefdf6586deae3a8e4f0a46f430f',
 		'inc/tarlanweb_player.php'  => 'b255117a82a5bea5e59c2cf06ddd72b2884044042538084388d56c3195adfe14',
 		'inc/ab-news-ticker.php'    => 'e75c2a1dd86cc632c01d253a6f199935c8fb674b508c3986ba1855ae751a15fc',

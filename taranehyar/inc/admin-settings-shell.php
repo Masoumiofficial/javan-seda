@@ -587,6 +587,9 @@ if ( ! function_exists( 'tara_settings_shell_core_ui' ) ) {
 		#option-tree-settings-api .option-tree-setting.tara-li-open > .open::after { content: "▴"; }
 		#option-tree-settings-api .option-tree-setting .button-section { padding: 0 14px 8px; background: transparent; }
 		#option-tree-settings-api .option-tree-setting .option-tree-setting-body { padding: 4px 14px 12px; }
+		/* پشتیبانِ CSS برای همان باز/بستن: تا وقتی اسکریپت آماده نشده، همه بازند
+		   (تا هیچ گزینه‌ای پنهان نماند)؛ بعد از آماده‌شدن، فقط آیتم باز دیده می‌شود. */
+		#option-tree-settings-api.tara-tabs-ready .option-tree-setting:not(.tara-li-open) > .option-tree-setting-body { display: none; }
 		#option-tree-settings-api .option-tree-setting .option-tree-setting-body .format-setting { border: 0; background: transparent; padding: 6px 0; }
 		/* نوار ابزار بالای محتوا، نه زیر فهرست بخش‌ها */
 		#option-tree-settings-api #poststuff > .tara-settings-toolbar {
@@ -754,6 +757,12 @@ if ( ! function_exists( 'tara_settings_shell_core_ui' ) ) {
 						}
 						head.setAttribute('role', 'button');
 						head.setAttribute('tabindex', '0');
+						/* سرتیترِ خالی (وقتی مدیر عنوان آیتم را ننوشته) بی‌معنا و
+						   «بی‌دکمه» دیده می‌شد؛ یک برچسب خنثی می‌گذاریم. */
+						if (!head.textContent.replace(/\s+/g, '')) {
+							head.textContent = 'مورد بدون عنوان';
+							head.setAttribute('data-empty', '1');
+						}
 						var body = itemBody(box);
 						setItem(box, !!body && body.offsetParent !== null);
 					}

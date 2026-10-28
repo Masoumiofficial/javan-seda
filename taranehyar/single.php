@@ -207,11 +207,21 @@ if ( empty( $tara_tracks ) && function_exists( 'tara_track_src' ) ) {
 	}
 }
 
+/* v3.7.10 — برچسب بالای پلیر: مقدار فیلد «نوع اثر» گاهی نامِ فرمت است
+   (mp3/mp4) و بالای پلیر مثل یک کد خام دیده می‌شد. حالا نام فرمت به
+   «پخش آنلاین» تبدیل می‌شود و بقیه (آهنگ/آلبوم/موزیک ویدیو) دست‌نخورده
+   می‌ماند. تیتر بخش دانلود عمداً همان مقدار خام را نگه می‌دارد چون عبارت
+   «دانلود mp3 …» هدف جست‌وجوی کاربر است. */
+$tara_type_label = $taranehyar_type;
+if ( preg_match( '/^(mp3|mp4|m4a|wav|flac|ogg|3gp|webm|mkv|aac)$/i', $taranehyar_type ) ) {
+	$tara_type_label = 'پخش آنلاین';
+}
+
 if ( ! empty( $tara_tracks ) && function_exists( 'tara_player' ) ) {
 	echo tara_player( // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین قالب
 		array(
 			'tracks'  => $tara_tracks,
-			'title'   => ( count( $tara_tracks ) > 1 ) ? 'آلبوم · ' . $tara_song_big : $taranehyar_type,
+			'title'   => ( count( $tara_tracks ) > 1 ) ? 'آلبوم · ' . $tara_song_big : $tara_type_label,
 			'cover'   => $tara_cover_big,
 			'zoom'    => $tara_cover_full,
 			'context' => 'single',

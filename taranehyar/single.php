@@ -39,12 +39,12 @@ if ( function_exists( 'is_plugin_active' ) && is_plugin_active( 'kk-star-ratings
    ژانر · حال‌وهوا · ترانه‌سرا · آهنگساز · تنظیم. همه از تاکسونومی‌های تازه
    می‌آیند و هر چیپ به آرشیو همان ترم لینک است. اگر ترمی ثبت نشده باشد،
    چیزی چاپ نمی‌شود (بدون ردیف خالی). */
+/* v3.7.3 — ترانه‌سرا / آهنگساز / تنظیم از این نوار حذف شدند: این سه فقط
+   در «شناسنامهٔ اثر» می‌آیند (درخواست صریح: یک‌جا، نه دو جا). ژانر و حال‌وهوا
+   در شناسنامه نیستند، پس همان‌جا می‌مانند. */
 $tara_meta_rows = array(
-	'tara_songwriter' => array( 'label' => 'ترانه‌سرا' ),
-	'tara_composer'   => array( 'label' => 'آهنگساز' ),
-	'tara_arranger'   => array( 'label' => 'تنظیم' ),
-	'tara_genre'      => array( 'label' => 'ژانر' ),
-	'tara_mood'       => array( 'label' => 'حال‌وهوا' ),
+	'tara_genre' => array( 'label' => 'ژانر' ),
+	'tara_mood'  => array( 'label' => 'حال‌وهوا' ),
 );
 $tara_meta_html = '';
 foreach ( $tara_meta_rows as $tara_tax => $tara_conf ) {
@@ -326,14 +326,29 @@ if ( function_exists( 'tara_social_box' ) ) { tara_social_box( get_the_ID() ); }
 if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID(), 'before_player' ); }
 ?>
 
-<?php if(get_field('video720') || get_field('video1080') || get_field('video480')){ ?> 
-<div class="video_player">
-<video width="640" height="360" controls>
-<source src="<?php if(get_field('video480')){the_field('video480');} elseif(get_field('video720')){the_field('video720');} else{the_field('video1080');} ?>" type="video/mp4">
-مرورگر شما قدیمی است و از پخش آنلاین پشتیبانی نمیکند. بروز باش عزیز من
-</video> 
-</div>
-<?php } ?>
+<?php
+/* v3.7.3 — پلیر ویدیوی تازه (inc/tara-ui.php → tara_video): کاور، دکمهٔ بزرگ،
+   نوار زمان، سرعت پخش، انتخاب کیفیت، Picture-in-Picture و تمام‌صفحه.
+   اگر هیچ‌کدام از فیلدها ست نشده باشد، خروجی صفر است. */
+if ( function_exists( 'tara_video' ) ) {
+	$tara_video_sources = array();
+	foreach ( array( '1080' => 'video1080', '720' => 'video720', '480' => 'video480' ) as $tara_q => $tara_f ) {
+		$tara_v = get_field( $tara_f );
+		if ( ! empty( $tara_v ) ) {
+			$tara_video_sources[ $tara_q ] = $tara_v;
+		}
+	}
+	if ( $tara_video_sources ) {
+		echo tara_video( // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین قالب
+			array(
+				'sources' => $tara_video_sources,
+				'poster'  => get_the_post_thumbnail_url( get_the_ID(), 'large' ),
+				'title'   => get_the_title(),
+			)
+		);
+	}
+}
+?>
 
 <?php if((ot_get_option('ads_sg') !="") || (ot_get_option('adsjs_sg') !="")){ ?>
 <div id="ads_top_dl"><?php echo ot_get_option('ads_sg'); ?><?php echo ot_get_option('adsjs_sg'); ?><div class="clear"></div></div>

@@ -15,10 +15,16 @@ $the_query = new WP_Query( $arms ); ?>
 <div class="liner"></div>
 </div>
 <div class="song_boxs_posts">
-<ul>
+<?php
+$tara_mv_tracks = function_exists( 'tara_track_playlist' ) ? tara_track_playlist( $the_query->posts ) : array();
+?>
+<ul<?php echo function_exists( 'tara_queue_attrs' ) ? tara_queue_attrs( $tara_mv_tracks, ot_get_option( 'index_pt' ) ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+<?php $GLOBALS['tara_card_play'] = true; ?>
 <?php while($the_query->have_posts()) : $the_query->the_post(); ?>
 <li><?php get_template_part('inc/songs_post'); ?></li>
-<?php endwhile; wp_reset_postdata(); ?>
+<?php endwhile; ?>
+<?php $GLOBALS['tara_card_play'] = false; ?>
+<?php wp_reset_postdata(); ?>
 </ul>
 <div class="clear"></div>
 </div>

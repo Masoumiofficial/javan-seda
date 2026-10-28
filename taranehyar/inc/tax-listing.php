@@ -47,6 +47,16 @@ if ( '' !== $tara_tax && function_exists( 'tara_music_taxonomies' ) ) {
 	</header>
 
 	<?php
+	/* v3.7.3 — «کارت شخص»: همین نام در نقش‌های دیگر (SEO: ادغام موجودیت) */
+	if ( function_exists( 'tara_person_role_taxes' ) ) {
+		$tara_roles = tara_person_role_taxes();
+		if ( isset( $tara_roles[ $tara_tax ] ) && function_exists( 'tara_person_card' ) ) {
+			tara_person_card( $tara_term );
+		}
+	}
+	?>
+
+	<?php
 	if ( function_exists( 'tara_player' ) && have_posts() ) {
 		$tara_archive_tracks = tara_track_playlist( $GLOBALS['wp_query']->posts );
 		if ( ! empty( $tara_archive_tracks ) ) {

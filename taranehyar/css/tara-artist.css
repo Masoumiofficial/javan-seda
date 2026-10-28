@@ -537,3 +537,30 @@
 	--ty-a-text: #e9e9ee;
 	--ty-a-muted: #9aa0aa;
 }
+
+/* v3.7.3 — نوار «ترتیب» داخل سربرگ هر بخش می‌نشیند (نه پایین صفحه) */
+.ty-artist__section-head {
+	flex-wrap: wrap;
+	row-gap: 8px;
+}
+
+.ty-artist__section-head .ty-artist__sort {
+	margin: 0;
+	margin-inline-start: auto;
+	font-size: 11.5px;
+	gap: 6px;
+}
+
+.ty-artist__section-head .ty-artist__sort > span:first-child {
+	color: var(--ty-a-muted);
+}
+
+.ty-artist__section-head .ty-artist__sort a,
+.ty-artist__section-head .ty-artist__sort .is-active {
+	padding: 4px 10px;
+	font-size: 11.5px;
+}
+
+@media (max-width: 640px) {
+	.ty-artist__section-head .ty-artist__sort { margin-inline-start: 0; width: 100%; }
+}

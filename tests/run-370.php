@@ -17,7 +17,7 @@
 
 require __DIR__ . '/stubs-wp.php';
 
-define( 'TARANEHYAR_VERSION', '3.7.0' );
+define( 'TARANEHYAR_VERSION', '3.7.3' );
 define( 'TARANEHYAR_DIR', '/tmp/theme' );
 define( 'TARANEHYAR_URI', 'https://ex/theme' );
 define( 'ABSPATH', '/tmp/wp/' );
@@ -171,7 +171,10 @@ preg_match( '#<script type="application/json" class="ty-player__data">(.*?)</scr
 $data_ok = isset( $m[1] ) && is_array( json_decode( $m[1], true ) ) && 2 === count( json_decode( $m[1], true ) );
 t( 'پلیر: JSON فهرست پخش معتبر است', $data_ok );
 t( 'پلیر: کنتر‌های اصلی', false !== strpos( $html, 'data-tara-toggle' ) && false !== strpos( $html, 'data-tara-seek' ) && false !== strpos( $html, 'data-tara-volume' ) );
-t( 'پلیر: فهرست پخش', 2 === substr_count( $html, 'data-tara-play=' ), (string) substr_count( $html, 'data-tara-play=' ) );
+t( 'پلیر: فهرست پخش داخل کارت نیست', false === strpos( $html, 'ty-player__playlist' ) );
+t( 'پلیر: دکمهٔ بازکردن پاپ‌آپ فهرست', false !== strpos( $html, 'data-tara-list' ) && false !== strpos( $html, 'aria-controls="tara-playlist-modal"' ) );
+t( 'پلیر: پاپ‌آپ فهرست یک‌بار در صفحه', 1 === substr_count( $html, 'id="tara-playlist-modal"' ) );
+t( 'پلیر: پیام خطای صوتی (hidden) داریم', false !== strpos( $html, 'data-tara-error' ) );
 t( 'پلیر: نوار چسبان', false !== strpos( $html, 'data-tara-dock' ) && false !== strpos( $html, 'hidden' ) );
 t( 'پلیر: اعداد فارسی در شمارش', false !== strpos( $html, '۲ قطعه' ) );
 
@@ -183,6 +186,50 @@ t( 'پلیر: نوار چسبان فقط یک‌بار در صفحه',
 	substr_count( $html, 'class="ty-dock"' ) . '/' . substr_count( $second, 'class="ty-dock"' ) );
 t( 'پلیر: RTL', false !== strpos( $html, 'dir="rtl"' ) );
 t( 'پلیر: بدون فهرست خالی', '' === tara_player( array( 'tracks' => array() ) ) );
+
+/* ---------- صف بخش‌ها، دکمهٔ کارت و ردیف فهرست (v3.7.3) ---------- */
+$qattrs = tara_queue_attrs( $playlist, 'بخش تست' );
+t( 'صف: data-tara-queue ساخته شد', false !== strpos( $qattrs, 'data-tara-queue=' ) && false !== strpos( $qattrs, '&quot;' ) );
+t( 'صف: عنوان بخش همراه صف است', false !== strpos( $qattrs, 'data-tara-title="بخش تست"' ) );
+t( 'صف: فهرست خالی، صفر خروجی', '' === tara_queue_attrs( array(), 'x' ) );
+preg_match( '/data-tara-queue="([^"]+)"/', $qattrs, $qm );
+$decoded = isset( $qm[1] ) ? json_decode( html_entity_decode( $qm[1], ENT_QUOTES, 'UTF-8' ), true ) : null;
+t( 'صف: JSON قابل‌خواندن و شامل شناسه', is_array( $decoded ) && 2 === count( $decoded ) && 501 === (int) $decoded[0]['id'] );
+
+$cardplay = tara_card_play( 501 );
+t( 'کارت: دکمهٔ پخش با شناسهٔ نوشته', false !== strpos( $cardplay, 'data-tara-track="501"' ) );
+t( 'کارت: آرایهٔ صوتی، دکمه', '' === tara_card_play( 503 ) );
+
+$list = tara_track_list( array( 501, 502, 503 ), array( 'title' => 'فهرست تست' ) );
+t( 'فهرست: صف روی خودِ ul', false !== strpos( $list, '<ul class="ty-tracklist" data-tara-queue=' ) );
+t( 'فهرست: سه ردیف', 3 === substr_count( $list, '<li>' ) );
+t( 'فهرست: ردیف بدون فایل هم می‌آید', false !== strpos( $list, 'بی‌صدا' ) && 2 === substr_count( $list, 'data-tara-play=' ) );
+t( 'فهرست: خالی ⇒ رشته خالی', '' === tara_track_list( array() ) );
+
+/* ======================================================================
+   ۴.۵) شناسنامه و کارت شخص (v3.7.3)
+   ====================================================================== */
+require_once '/tmp/theme/inc/ab-credits.php';
+
+$GLOBALS['__terms'][77] = new WP_Term( 77, 'حامد برادران', 'tara_songwriter', 'hamed-b' );
+$GLOBALS['__terms'][78] = new WP_Term( 78, 'حامد برادران', 'tara_arranger', 'hamed-b', 3 );
+$GLOBALS['__terms'][79] = new WP_Term( 79, 'هنرمند دیگر', 'artist', 'other-artist' );
+
+$roles = tara_person_roles( $GLOBALS['__terms'][77] );
+t( 'شخص: نقش تکراری پیدا شد', count( $roles ) >= 2 );
+t( 'شخص: نقش جاری علامت می‌خورد', ! empty( $roles[0]['current'] ) && 'tara_songwriter' === $roles[0]['tax'] );
+
+ob_start();
+tara_person_card( $GLOBALS['__terms'][77] );
+$person = ob_get_clean();
+t( 'شخص: کارت رندر شد', false !== strpos( $person, 'class="ty-person"' ) );
+t( 'شخص: لینک rel=me به نقش دیگر', false !== strpos( $person, 'rel="me"' ) && false !== strpos( $person, 'hamed-b' ) );
+t( 'شخص: داده‌ساختاریافتهٔ Person', false !== strpos( $person, '"@type":"Person"' ) && false !== strpos( $person, '"sameAs"' ) );
+
+$solo = new WP_Term( 90, 'تنها', 'tara_songwriter', 'solo' );
+t( 'شخص: یک نقش ⇒ کارت خالی', '' === tara_person_card( $solo, false ) );
+
+t( 'شناسنامه: ترتیب فیلدها پابرجاست', in_array( 'lyricist', array_keys( tara_credits_fields() ), true ) );
 
 /* ======================================================================
    ۵) پوستهٔ صفحهٔ تنظیمات
@@ -295,7 +342,10 @@ t( 'پلیر: هیچ ردی از پلیر قدیمی نمانده', empty( $lega
 
 $single = (string) @file_get_contents( '/tmp/theme/single.php' );
 t( 'صفحهٔ آهنگ: از پلیر تازه استفاده می‌کند', false !== strpos( $single, 'tara_player(' ) );
-t( 'صفحهٔ آهنگ: نوار شناسه (ژانر/ترانه‌سرا) دارد', false !== strpos( $single, 'tara_term_chips' ) );
+t( 'صفحهٔ آهنگ: نوار شناسه (ژانر/حال‌وهوا) دارد', false !== strpos( $single, 'tara_term_chips' ) );
+t( 'صفحهٔ آهنگ: ترانه‌سرا/آهنگساز/تنظیم از نوار بالا حذف شد', false === strpos( $single, "'tara_songwriter' => array( 'label' => 'ترانه‌سرا' )" ) );
+t( 'صفحهٔ آهنگ: ویدیو با پلیر تازه (tara_video)', false !== strpos( $single, 'tara_video(' ) );
+t( 'صفحهٔ آهنگ: بلوک ویدیوی قدیمی نماند', false === strpos( $single, '<video width="640"' ) );
 
 $scripts = (string) @file_get_contents( '/tmp/theme/js/scripts.js' );
 t( 'اسلایدر: تک‌اسلاید شده', false !== strpos( $scripts, "0:{items:1}" ) && false === strpos( $scripts, '700:{items:2}' ) );

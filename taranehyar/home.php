@@ -70,7 +70,9 @@ if ( function_exists( 'tara_news_ticker' ) ) {
 <div class="liner"></div>
 </div>
 <div class="song_boxs_posts">
-<ul>
+<?php /* صف پخش همین بخش — تابع در inc/tara-ui.php */ ?>
+<?php $tara_hty_tracks = function_exists( 'tara_track_playlist' ) ? tara_track_playlist( $my_custom_query->posts ) : array(); ?>
+<ul<?php echo function_exists( 'tara_queue_attrs' ) ? tara_queue_attrs( $tara_hty_tracks, $artise['title'] ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 <?php $cat_ft1=$artise['hty-cat']; $num_ft1=$artise['hty-t'];
 $my_custom_query= new WP_Query(array(
 'post_type' => 'post',
@@ -80,9 +82,12 @@ $my_custom_query= new WP_Query(array(
 'posts_per_page' =>$num_ft1,
 'no_found_rows'=>true,'ignore_sticky_posts'=>true,'update_post_term_cache'=>false
 )); if($my_custom_query->have_posts()) : ?>
+<?php $GLOBALS['tara_card_play'] = true; ?>
 <?php while($my_custom_query->have_posts()) : $my_custom_query->the_post(); $post_id=get_the_ID(); ?>
 <li><?php get_template_part('inc/songs_post'); ?></li>
-<?php endwhile; endif; wp_reset_postdata(); ?>
+<?php endwhile; endif; ?>
+<?php $GLOBALS['tara_card_play'] = false; ?>
+<?php wp_reset_postdata(); ?>
 </ul>
 <div class="clear"></div>
 </div>

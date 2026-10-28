@@ -83,6 +83,33 @@ if ( ! function_exists( 'tara_artist_normalize' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_artist_sort_nav' ) ) {
+	/**
+	 * نوار «ترتیب» یک بخش؛ هر بخش پارامتر خودش را دارد تا روی همان بخش اثر کند.
+	 *
+	 * @param string $bucket  audio|album|video|other
+	 * @param string $current new|old|title
+	 * @param array  $labels  برچسب‌ها
+	 * @param string $anchor  لنگر بازگشت
+	 * @return string
+	 */
+	function tara_artist_sort_nav( $bucket, $current, $labels, $anchor = '' ) {
+		$base = remove_query_arg( array( 'sort_' . $bucket ) );
+		$out  = '<nav class="ty-artist__sort" aria-label="ترتیب نمایش ' . esc_attr( $bucket ) . '">';
+		$out .= '<span>ترتیب:</span>';
+		foreach ( (array) $labels as $key => $label ) {
+			if ( $key === $current ) {
+				$out .= '<span class="is-active" aria-current="true">' . esc_html( $label ) . '</span>';
+				continue;
+			}
+			$url  = ( 'new' === $key ) ? $base : add_query_arg( 'sort_' . $bucket, $key, $base );
+			$out .= '<a href="' . esc_url( $url . $anchor ) . '">' . esc_html( $label ) . '</a>';
+		}
+		$out .= '</nav>';
+		return $out;
+	}
+}
+
 if ( ! function_exists( 'tara_artist_sort_key' ) ) {
 	/** کلید مرتب‌سازی الفبایی فارسی (هر حرف → شمارهٔ جای آن در الفبا) */
 	function tara_artist_sort_key( $text ) {
@@ -150,8 +177,27 @@ if ( ! in_array( $taranehyar_sort, array( 'new', 'old', 'title' ), true ) ) {
 	$taranehyar_sort = 'new';
 }
 
+/* v3.7.3 — ترتیبِ مستقل برای هر بخش (آهنگ‌ها / آلبوم‌ها / موزیک‌ویدیوها / سایر).
+   ?sort_audio=title  ?sort_album=old  ?sort_video=...  ?sort_other=...
+   پارامتر سراسریِ ?sort= برای سازگاری با لینک‌های قدیمی و به‌عنوان مقدار
+   پیش‌فرضِ بخش «آهنگ‌ها» باقی مانده است. */
+$taranehyar_bucket_keys  = array( 'audio', 'album', 'video', 'other' );
+$taranehyar_sorts        = array();
+$taranehyar_sort_choices = array( 'new', 'old', 'title' );
+foreach ( $taranehyar_bucket_keys as $taranehyar_bk ) {
+	$taranehyar_val = 'new';
+	$taranehyar_get = isset( $_GET[ 'sort_' . $taranehyar_bk ] ) ? sanitize_key( wp_unslash( $_GET[ 'sort_' . $taranehyar_bk ] ) ) : '';
+	if ( in_array( $taranehyar_get, $taranehyar_sort_choices, true ) ) {
+		$taranehyar_val = $taranehyar_get;
+	} elseif ( 'audio' === $taranehyar_bk ) {
+		$taranehyar_val = $taranehyar_sort;
+	}
+	$taranehyar_sorts[ $taranehyar_bk ] = $taranehyar_val;
+}
+$taranehyar_any_sort = ( 'new' !== $taranehyar_sort ) || in_array( 'old', $taranehyar_sorts, true ) || in_array( 'title', $taranehyar_sorts, true );
+
 /* صفحه‌های مرتب‌شده محتوای تکراری‌اند → noindex (باید قبل از get_header ثبت شود) */
-if ( 'new' !== $taranehyar_sort ) {
+if ( $taranehyar_any_sort ) {
 	add_filter(
 		'wp_robots',
 		function ( $robots ) {
@@ -381,6 +427,8 @@ if ( $taranehyar_query->have_posts() ) {
 		);
 	}
 
+	/* v3.7.3 — سبدها همیشه به ترتیب تاریخ ساخته می‌شوند و بعد، جداگانه،
+	   بر اساس انتخاب همان بخش مرتب می‌شوند (title = نام آهنگ). */
 	foreach ( $taranehyar_query->posts as $taranehyar_post ) {
 		$taranehyar_raw = get_post_meta( $taranehyar_post->ID, 'musics_type', true );
 		if ( ! is_scalar( $taranehyar_raw ) ) {
@@ -398,6 +446,35 @@ if ( $taranehyar_query->have_posts() ) {
 			}
 		}
 		$taranehyar_buckets[ $taranehyar_bucket ][] = $taranehyar_post;
+	}
+
+	/* مرتب‌سازی مستقلِ هر سبد (v3.7.3) */
+	foreach ( $taranehyar_buckets as $taranehyar_bkey => $taranehyar_bitems ) {
+		if ( count( $taranehyar_bitems ) < 2 ) {
+			continue;
+		}
+		$taranehyar_mode = isset( $taranehyar_sorts[ $taranehyar_bkey ] ) ? $taranehyar_sorts[ $taranehyar_bkey ] : 'new';
+		usort(
+			$taranehyar_bitems,
+			function ( $a, $b ) use ( $taranehyar_mode ) {
+				if ( 'title' === $taranehyar_mode ) {
+					$ta = (string) get_post_meta( $a->ID, 'song', true );
+					$tb = (string) get_post_meta( $b->ID, 'song', true );
+					if ( '' === $ta ) {
+						$ta = $a->post_title;
+					}
+					if ( '' === $tb ) {
+						$tb = $b->post_title;
+					}
+					$cmp = strcmp( tara_artist_sort_key( $ta ), tara_artist_sort_key( $tb ) );
+					return ( 0 !== $cmp ) ? $cmp : strcmp( (string) $a->post_date, (string) $b->post_date );
+				}
+				$da = (int) strtotime( (string) $a->post_date );
+				$db = (int) strtotime( (string) $b->post_date );
+				return ( 'old' === $taranehyar_mode ) ? ( $da - $db ) : ( $db - $da );
+			}
+		);
+		$taranehyar_buckets[ $taranehyar_bkey ] = $taranehyar_bitems;
 	}
 }
 wp_reset_postdata();
@@ -648,6 +725,27 @@ $taranehyar_social_icons = array(
 		?>
 	<?php endif; ?>
 
+	<!-- ۲٫۵) فهرست آهنگ‌ها با ترتیب مستقل ------------------------------ -->
+	<?php if ( ! empty( $taranehyar_buckets['audio'] ) ) : ?>
+		<section class="ty-artist__section" id="artist-audio">
+			<header class="ty-artist__section-head">
+				<h2><?php echo esc_html( $taranehyar_labels['audio'] ); ?></h2>
+				<span class="ty-artist__section-count"><?php echo esc_html( tara_number_fa( count( $taranehyar_buckets['audio'] ) ) ); ?></span>
+				<?php
+				/* نوار «ترتیب» همین بخش — با پارامتر sort_audio، مستقل از بخش‌های دیگر */
+				if ( ! empty( $taranehyar_cfg['show_sort'] ) && count( $taranehyar_buckets['audio'] ) > 1 ) {
+					echo tara_artist_sort_nav( 'audio', $taranehyar_sorts['audio'], $taranehyar_sort_labels, '#artist-audio' ); // phpcs:ignore WordPress.Security.EscapeOutput
+				}
+				?>
+			</header>
+			<ul class="ty-tracklist">
+				<?php foreach ( $taranehyar_buckets['audio'] as $taranehyar_post ) : ?>
+					<li><?php echo tara_track_row( $taranehyar_post->ID, array( 'badge' => isset( $taranehyar_resume_labels['audio'] ) ? $taranehyar_resume_labels['audio'] : '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></li>
+				<?php endforeach; ?>
+			</ul>
+		</section>
+	<?php endif; ?>
+
 	<!-- ۳) آلبوم/ویدیو (غیرقابل پخش در پلیر) -------------------------- -->
 	<?php
 	$taranehyar_visual_buckets = array(
@@ -660,10 +758,15 @@ $taranehyar_social_icons = array(
 			continue;
 		endif;
 		?>
-		<section class="ty-artist__section">
+		<section class="ty-artist__section" id="artist-<?php echo esc_attr( $taranehyar_key ); ?>">
 			<header class="ty-artist__section-head">
 				<h2><?php echo esc_html( $taranehyar_title ); ?></h2>
 				<span class="ty-artist__section-count"><?php echo esc_html( tara_number_fa( count( $taranehyar_buckets[ $taranehyar_key ] ) ) ); ?></span>
+				<?php
+				if ( ! empty( $taranehyar_cfg['show_sort'] ) && count( $taranehyar_buckets[ $taranehyar_key ] ) > 1 ) {
+					echo tara_artist_sort_nav( $taranehyar_key, $taranehyar_sorts[ $taranehyar_key ], $taranehyar_sort_labels, '#artist-' . $taranehyar_key ); // phpcs:ignore WordPress.Security.EscapeOutput
+				}
+				?>
 			</header>
 			<ul class="ty-tracklist">
 				<?php foreach ( $taranehyar_buckets[ $taranehyar_key ] as $taranehyar_post ) : ?>
@@ -717,19 +820,6 @@ $taranehyar_social_icons = array(
 			</section>
 		<?php endif; ?>
 	</div>
-
-	<?php if ( ! empty( $taranehyar_cfg['show_sort'] ) && $taranehyar_found > 1 ) : ?>
-		<nav class="ty-artist__sort" aria-label="ترتیب نمایش آثار">
-			<span>ترتیب:</span>
-			<?php foreach ( $taranehyar_sort_labels as $taranehyar_sort_key => $taranehyar_sort_label ) : ?>
-				<?php if ( $taranehyar_sort_key === $taranehyar_sort ) : ?>
-					<span class="is-active" aria-current="true"><?php echo esc_html( $taranehyar_sort_label ); ?></span>
-				<?php else : ?>
-					<a href="<?php echo esc_url( $taranehyar_sort_urls[ $taranehyar_sort_key ] ); ?>"><?php echo esc_html( $taranehyar_sort_label ); ?></a>
-				<?php endif; ?>
-			<?php endforeach; ?>
-		</nav>
-	<?php endif; ?>
 
 </div>
 

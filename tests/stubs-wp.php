@@ -484,6 +484,9 @@ function get_permalink( $post ) {
 function get_the_date( $fmt, $post = null ) {
 	return '2026-01-01';
 }
+function get_post_time( $fmt = 'U', $gmt = false, $post = null, $translate = false ) {
+	return '2026-01-01 10:00:00';
+}
 function get_post_meta( $id, $key, $single = false ) {
 	return isset( $GLOBALS['__postmeta'][ (int) $id ][ $key ] ) ? $GLOBALS['__postmeta'][ (int) $id ][ $key ] : '';
 }

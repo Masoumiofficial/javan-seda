@@ -775,3 +775,164 @@ if ( function_exists( 'tara_credits_save' ) ) {
 if ( function_exists( 'tara_music_schema_head' ) ) {
 	add_action( 'wp_head', 'tara_music_schema_head', 6 );
 }
+
+/* ==========================================================================
+   ۸) «صفحهٔ شخص» — اتصال نقش‌های گوناگونِ یک نفر (v3.7.3)
+   --------------------------------------------------------------------------
+   مسئله: کسی که هم ترانه‌سراست و هم تنظیم‌کننده، دو آرشیو جدا می‌گیرد
+   (/songwriter/نام/ و /arranger/نام/). گوگل این دو را «دو موجودیت» می‌بیند.
+
+   چرا ادغام/ریدایرکت نمی‌کنیم؟ چون محتوای دو صفحه یکی نیست: در یکی آهنگ‌هایی
+   است که در آن نقش بوده و در دیگری آهنگ‌های نقشِ دیگر. ریدایرکت ۳۰۱ یعنی
+   حذف یک دستهٔ واقعی از فهرست آهنگ‌ها و شکستن لینک‌های ورودی.
+
+   راه‌حل (همان کاری که سایت‌های مرجع موسیقی می‌کنند):
+     ۱) هر آرشیو نقش، محتوای یکتای خودش را دارد و self-canonical می‌ماند.
+     ۲) در بالای هر آرشیو، «کارت شخص» می‌آید: همهٔ نقش‌ها + لینک صفحهٔ هنرمند
+        با rel="me" ⇒ گوگل می‌فهمد این URLها یک موجودیت‌اند.
+     ۳) داده‌ساختاریافتهٔ Person با sameAs همهٔ همان URLها ⇒ ادغام موجودیت
+        بدون از دست دادن صفحه.
+     ۴) صفحات مرتب‌شده (?sort_…) هنوز noindex هستند (محتوای تکراری واقعی).
+   ========================================================================== */
+if ( ! function_exists( 'tara_person_role_taxes' ) ) {
+	/** نقش‌های «شخص»: تاکسونومی ⇒ برچسب */
+	function tara_person_role_taxes() {
+		return (array) apply_filters(
+			'tara_person_role_taxes',
+			array(
+				'tara_songwriter' => 'ترانه‌سرا',
+				'tara_composer'   => 'آهنگساز',
+				'tara_arranger'   => 'تنظیم‌کننده',
+			)
+		);
+	}
+}
+
+if ( ! function_exists( 'tara_person_roles' ) ) {
+	/**
+	 * همهٔ نقش‌های همین نام (بر پایهٔ نامک) + صفحهٔ هنرمند.
+	 *
+	 * @param WP_Term $term ترم جاری.
+	 * @return array فهرست [ 'label', 'tax', 'url', 'count', 'current' ]
+	 */
+	function tara_person_roles( $term ) {
+		$out = array();
+		if ( ! ( $term instanceof WP_Term ) ) {
+			return $out;
+		}
+		foreach ( tara_person_role_taxes() as $tax => $label ) {
+			if ( ! taxonomy_exists( $tax ) ) {
+				continue;
+			}
+			$found = get_term_by( 'slug', $term->slug, $tax );
+			if ( ! $found || is_wp_error( $found ) ) {
+				continue;
+			}
+			$url = get_term_link( $found );
+			if ( is_wp_error( $url ) ) {
+				continue;
+			}
+			$out[] = array(
+				'label'   => $label,
+				'tax'     => $tax,
+				'url'     => $url,
+				'count'   => (int) $found->count,
+				'current' => ( $tax === $term->taxonomy ),
+			);
+		}
+
+		if ( function_exists( 'tara_artist_tax' ) ) {
+			$artist_tax = tara_artist_tax();
+			if ( taxonomy_exists( $artist_tax ) ) {
+				$artist = get_term_by( 'slug', $term->slug, $artist_tax );
+				if ( $artist && ! is_wp_error( $artist ) ) {
+					$url = get_term_link( $artist );
+					if ( ! is_wp_error( $url ) ) {
+						$out[] = array(
+							'label'   => 'صفحهٔ هنرمند',
+							'tax'     => $artist_tax,
+							'url'     => $url,
+							'count'   => (int) $artist->count,
+							'current' => false,
+						);
+					}
+				}
+			}
+		}
+		return $out;
+	}
+}
+
+if ( ! function_exists( 'tara_person_card' ) ) {
+	/**
+	 * کارت شخص برای بالای آرشیو نقش‌ها.
+	 *
+	 * @param WP_Term $term ترم جاری.
+	 * @param bool    $echo چاپ.
+	 * @return string
+	 */
+	function tara_person_card( $term, $echo = true ) {
+		$roles = tara_person_roles( $term );
+		if ( count( $roles ) < 2 ) {
+			return '';
+		}
+
+		$html = '<section class="ty-person" aria-label="نقش‌های ' . esc_attr( $term->name ) . '">';
+		$html .= '<div class="ty-person__avatar" aria-hidden="true">' . esc_html( mb_substr( trim( (string) $term->name ), 0, 1 ) ) . '</div>';
+		$html .= '<div class="ty-person__body">';
+		$html .= '<span class="ty-person__eyebrow">همین نام در نقش‌های دیگر</span>';
+		$html .= '<ul class="ty-person__roles">';
+		foreach ( $roles as $role ) {
+			$count = function_exists( 'tara_fa_number' ) ? tara_fa_number( $role['count'] ) : (string) $role['count'];
+			$label = '<span class="ty-person__role">' . esc_html( $role['label'] ) . '</span>'
+				. '<span class="ty-person__count">' . esc_html( $count ) . '</span>';
+			if ( $role['current'] ) {
+				$html .= '<li><span class="ty-person__chip is-active" aria-current="true">' . $label . '</span></li>';
+			} else {
+				$html .= '<li><a class="ty-person__chip" rel="me" href="' . esc_url( $role['url'] ) . '">' . $label . '</a></li>';
+			}
+		}
+		$html .= '</ul></div></section>';
+
+		/* داده‌ساختاریافته: یک Person با sameAs همهٔ نقش‌ها */
+		$same = array();
+		foreach ( $roles as $role ) {
+			$same[] = $role['url'];
+		}
+		$schema = array(
+			'@context' => 'https://schema.org',
+			'@type'    => 'Person',
+			'name'     => $term->name,
+			'url'      => get_term_link( $term ),
+			'sameAs'   => array_values( array_unique( $same ) ),
+		);
+		$json   = wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		if ( is_string( $json ) ) {
+			$html .= '<script type="application/ld+json">' . $json . '</script>';
+		}
+
+		if ( $echo ) {
+			echo $html; // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در همین تابع
+		}
+		return $html;
+	}
+}
+
+if ( ! function_exists( 'tara_person_title_parts' ) ) {
+	/** عنوان صفحهٔ نقش: «حامد برادران — ترانه‌سرا» (تفکیک سه آرشیو در نتایج گوگل) */
+	function tara_person_title_parts( $parts ) {
+		if ( ! is_tax( array_keys( tara_person_role_taxes() ) ) ) {
+			return $parts;
+		}
+		$term = get_queried_object();
+		if ( ! $term instanceof WP_Term ) {
+			return $parts;
+		}
+		$roles = tara_person_role_taxes();
+		if ( isset( $roles[ $term->taxonomy ] ) && ! empty( $parts['title'] ) ) {
+			$parts['title'] = $parts['title'] . ' — ' . $roles[ $term->taxonomy ];
+		}
+		return $parts;
+	}
+	add_filter( 'document_title_parts', 'tara_person_title_parts' );
+}

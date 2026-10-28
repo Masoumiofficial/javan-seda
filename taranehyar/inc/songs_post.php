@@ -55,7 +55,7 @@ if ( ! function_exists( 'tara_card_stats' ) ) {
       rel="nofollow" هم از لینکِ داخلی برداشته شد؛ این ویژگی فقط برای لینک خروجی لازم است. */
 $ab_img_attr = array( 'alt' => get_the_title(), 'title' => get_the_title(), 'loading' => 'lazy', 'decoding' => 'async' );
 if ( has_post_thumbnail() ) { /* v3.3.8 — دو سایز به WP بدهید تا خودکار srcset/sizes بسازد (۱۹۰ و ۳۸۰ ⇒ شارپ روی DPR2) */ the_post_thumbnail( array( 'thumb2', 'thumb2x' ), $ab_img_attr ); } else { ?>
-<img src="<?php echo esc_url( get_template_directory_uri() . '/images/nomusics.jpg' ); ?>" width="190" height="190" alt="<?php echo esc_attr( get_the_title() ); ?>" title="<?php echo esc_attr( get_the_title() ); ?>" loading="lazy" decoding="async"><?php } ?></a><?php tara_card_stats(); ?></figure>
+<img src="<?php echo esc_url( get_template_directory_uri() . '/images/nomusics.jpg' ); ?>" width="190" height="190" alt="<?php echo esc_attr( get_the_title() ); ?>" title="<?php echo esc_attr( get_the_title() ); ?>" loading="lazy" decoding="async"><?php } ?></a><?php if ( ! empty( $GLOBALS['tara_card_play'] ) && function_exists( 'tara_card_play' ) ) { echo tara_card_play(); /* escape شده در تابع */ } ?><?php tara_card_stats(); ?></figure>
 <h2><a href="<?php echo esc_url( get_permalink() ); ?>"><?php if(get_field('artist') || get_field('song')){ ?> <?php echo esc_html( get_field('artist') ); ?><span><?php echo esc_html( get_field('song') ); ?></span><?php } else{ the_title(''); } ?></a></h2>
 </header>
 <footer>

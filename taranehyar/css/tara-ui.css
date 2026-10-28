@@ -234,7 +234,13 @@
 .ty-icon-next,
 .ty-icon-vol,
 .ty-icon-note,
-.ty-icon-external {
+.ty-icon-external,
+.ty-icon-list,
+.ty-icon-close,
+.ty-icon-search,
+.ty-icon-caret,
+.ty-icon-expand,
+.ty-icon-pip {
 	display: inline-block;
 	position: relative;
 	width: 18px;
@@ -339,6 +345,101 @@
 	border-inline-end: 2px solid currentColor;
 }
 
+
+/* آیکون‌های تازهٔ ۳.۸.۰ ------------------------------------------------ */
+.ty-icon-list::before,
+.ty-icon-list::after {
+	content: "";
+	position: absolute;
+	inset-inline-start: 2px;
+	width: 14px;
+	height: 2px;
+	border-radius: 2px;
+	background: currentColor;
+	box-shadow: 0 5px 0 currentColor, 0 10px 0 currentColor;
+}
+
+.ty-icon-list::before { top: 3px; }
+
+.ty-icon-close::before,
+.ty-icon-close::after {
+	content: "";
+	position: absolute;
+	inset-inline-start: 2px;
+	top: 8px;
+	width: 14px;
+	height: 2px;
+	border-radius: 2px;
+	background: currentColor;
+}
+
+.ty-icon-close::before { transform: rotate(45deg); }
+.ty-icon-close::after { transform: rotate(-45deg); }
+
+.ty-icon-search::before {
+	content: "";
+	position: absolute;
+	inset-inline-start: 2px;
+	top: 2px;
+	width: 10px;
+	height: 10px;
+	border: 2px solid currentColor;
+	border-radius: 50%;
+}
+
+.ty-icon-search::after {
+	content: "";
+	position: absolute;
+	inset-inline-start: 12px;
+	top: 12px;
+	width: 6px;
+	height: 2px;
+	border-radius: 2px;
+	background: currentColor;
+	transform: rotate(45deg);
+}
+
+.ty-icon-caret::before {
+	content: "";
+	position: absolute;
+	inset-inline-start: 4px;
+	top: 6px;
+	border-style: solid;
+	border-width: 6px 5px 0 5px;
+	border-color: currentColor transparent transparent transparent;
+}
+
+.ty-icon-expand::before,
+.ty-icon-expand::after {
+	content: "";
+	position: absolute;
+	width: 8px;
+	height: 8px;
+	border: 2px solid currentColor;
+}
+
+.ty-icon-expand::before { inset-inline-start: 1px; top: 1px; border-width: 2px 0 0 2px; }
+.ty-icon-expand::after { inset-inline-end: 1px; bottom: 1px; border-width: 0 2px 2px 0; }
+
+.ty-icon-pip::before {
+	content: "";
+	position: absolute;
+	inset: 2px;
+	border: 2px solid currentColor;
+	border-radius: 3px;
+}
+
+.ty-icon-pip::after {
+	content: "";
+	position: absolute;
+	inset-inline-end: 2px;
+	bottom: 2px;
+	width: 7px;
+	height: 5px;
+	background: currentColor;
+	border-radius: 1px;
+}
+
 /* حالت پخش/توقف: فقط یکی از دو آیکون دیده شود -------------------------- */
 .ty-player .ty-icon-pause,
 .ty-player .ty-icon-play,
@@ -440,68 +541,60 @@
 	accent-color: var(--ty-accent);
 }
 
-/* فهرست پخش ---------------------------------------------------------- */
-.ty-player__playlist {
-	grid-column: 1 / -1;
-	margin: 4px 0 0;
-	padding: 0;
-	list-style: none;
-	max-height: 262px;
-	overflow: auto;
-	border-top: 1px solid var(--ty-line);
-	padding-top: 8px;
-	scrollbar-width: thin;
+/* دکمه‌های ابزار کارت (فهرست پخش / لینک) ----------------------------- */
+.ty-player__tools {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex: 0 0 auto;
 }
 
-.ty-player__item-btn {
+.ty-player__tool {
 	appearance: none;
-	width: 100%;
-	border: 0;
-	background: transparent;
-	display: grid;
-	grid-template-columns: 30px minmax(0, 1fr) auto 22px;
+	display: inline-flex;
 	align-items: center;
-	gap: 10px;
-	padding: 9px 10px;
-	border-radius: 10px;
-	cursor: pointer;
-	text-align: right;
+	gap: 6px;
+	padding: 7px 12px;
+	border: 1px solid var(--ty-line);
+	border-radius: 999px;
+	background: var(--ty-surface);
 	color: var(--ty-text);
 	font: inherit;
-}
-
-.ty-player__item-btn:hover,
-.ty-player__item-btn:focus-visible {
-	background: var(--ty-accent-soft);
-}
-
-.ty-player__item.is-active .ty-player__item-btn {
-	background: color-mix(in srgb, var(--ty-accent) 10%, transparent);
-}
-
-.ty-player__item-num {
 	font-size: 12px;
-	color: var(--ty-muted);
-	text-align: center;
-}
-
-.ty-player__item-title {
-	font-size: 13px;
 	font-weight: 600;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	cursor: pointer;
+	text-decoration: none;
+	transition: border-color .15s ease, background .15s ease, color .15s ease;
 }
 
-.ty-player__item-artist {
-	font-size: 11px;
-	color: var(--ty-muted);
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	max-width: 40vw;
+.ty-player__tool:hover,
+.ty-player__tool:focus-visible {
+	border-color: var(--ty-accent);
+	background: var(--ty-accent-soft);
+	color: var(--ty-accent-dark);
 }
 
+.ty-player__tool--link { padding: 7px 9px; }
+
+.ty-player__tool .ty-icon-list,
+.ty-player__tool .ty-icon-external {
+	width: 16px;
+	height: 16px;
+}
+
+.ty-player__error {
+	margin: 8px 0 0;
+	padding: 8px 12px;
+	border-radius: 10px;
+	background: #fdeef3;
+	color: #8b1e3f;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+.ty-player.is-error .ty-player__art { opacity: .55; }
+
+/* آیکون اکولایزر ------------------------------------------------------ */
 .ty-icon-eq {
 	display: none;
 	gap: 2px;
@@ -521,8 +614,6 @@
 .ty-icon-eq i:nth-child(2) { animation-delay: 0.15s; }
 .ty-icon-eq i:nth-child(3) { animation-delay: 0.3s; }
 
-.ty-player__item.is-active .ty-icon-eq { display: flex; }
-
 /* =========================================================================
    ۳) نوار چسبان پایین (Dock)
    ====================================================================== */
@@ -532,7 +623,7 @@
 	bottom: 0;
 	z-index: 9990;
 	display: grid;
-	grid-template-columns: 44px minmax(0, 1fr) auto auto auto auto;
+	grid-template-columns: 34px 44px minmax(0, 1fr) auto auto auto auto auto;
 	align-items: center;
 	gap: 10px;
 	padding: 8px 14px calc(8px + env(safe-area-inset-bottom));
@@ -630,6 +721,40 @@ body.has-tara-dock { padding-bottom: 72px; }
 }
 
 .ty-dock__link:hover { color: var(--ty-accent); }
+
+/* اکولایزر کوچک سمت راست نوار ---------------------------------------- */
+.ty-dock__bars {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 2px;
+	height: 18px;
+}
+
+.ty-dock__bars i {
+	display: block;
+	width: 3px;
+	height: 26%;
+	border-radius: 2px;
+	background: var(--ty-accent);
+	opacity: .5;
+}
+
+.ty-dock.is-playing .ty-dock__bars i {
+	opacity: 1;
+	animation: ty-bounce 0.9s ease-in-out infinite;
+}
+
+.ty-dock.is-playing .ty-dock__bars i:nth-child(2) { animation-delay: .12s; }
+.ty-dock.is-playing .ty-dock__bars i:nth-child(3) { animation-delay: .24s; }
+.ty-dock.is-playing .ty-dock__bars i:nth-child(4) { animation-delay: .36s; }
+
+.ty-dock__art { display: block; line-height: 0; }
+
+.ty-dock__btn--list,
+.ty-dock__btn--close { width: 34px; height: 34px; color: var(--ty-muted); }
+
+.ty-dock__btn--close:hover { background: #fdeef3; color: #8b1e3f; }
 
 /* =========================================================================
    ۴) ردیف آهنگ (فهرست‌های عمومی)
@@ -876,4 +1001,904 @@ body.has-tara-dock { padding-bottom: 72px; }
 .night .ty-single-meta {
 	--ty-surface: var(--ab-charcoal, #222222);
 	--ty-line: #33333a;
+}
+
+/* =========================================================================
+   ۹) کادر فهرست پخش (پاپ‌آپ) — نسخهٔ ۳.۷.۳
+   ====================================================================== */
+.ty-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	direction: rtl;
+}
+
+.ty-modal[hidden] { display: none; }
+
+.ty-modal__backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(15, 12, 30, 0.55);
+	backdrop-filter: blur(6px);
+	opacity: 0;
+	transition: opacity .22s ease;
+}
+
+.ty-modal.is-open .ty-modal__backdrop { opacity: 1; }
+
+.ty-modal__panel {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	width: min(560px, 100%);
+	max-height: min(82vh, 720px);
+	border-radius: 22px;
+	background: var(--ty-surface, #fff);
+	border: 1px solid var(--ty-line, #e6e8ee);
+	box-shadow: 0 40px 90px -40px rgba(15, 12, 30, .75);
+	transform: translateY(18px) scale(.98);
+	opacity: 0;
+	transition: transform .22s cubic-bezier(.2, .8, .3, 1), opacity .22s ease;
+	overflow: hidden;
+}
+
+.ty-modal.is-open .ty-modal__panel { transform: none; opacity: 1; }
+
+.ty-modal__head {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 18px 20px 14px;
+	border-bottom: 1px solid var(--ty-line, #e6e8ee);
+	background:
+		radial-gradient(120% 160% at 100% 0%, rgba(109, 40, 217, .10) 0%, rgba(109, 40, 217, 0) 60%),
+		transparent;
+}
+
+.ty-modal__heading { flex: 1 1 auto; min-width: 0; }
+
+.ty-modal__eyebrow {
+	display: block;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--ty-muted, #6b7280);
+}
+
+.ty-modal__title {
+	margin: 2px 0 0;
+	padding: 0;
+	font-size: 16px;
+	font-weight: 800;
+	color: var(--ty-ink, #111);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ty-modal__count {
+	flex: 0 0 auto;
+	padding: 3px 10px;
+	border-radius: 999px;
+	background: var(--ty-accent-soft, #eaf1fe);
+	color: var(--ty-accent-dark, #1246ad);
+	font-size: 11px;
+	font-weight: 700;
+}
+
+.ty-modal__close {
+	appearance: none;
+	flex: 0 0 auto;
+	width: 36px;
+	height: 36px;
+	border: 0;
+	border-radius: 50%;
+	background: rgba(17, 24, 39, .06);
+	color: var(--ty-text, #2a2a2a);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+
+.ty-modal__close:hover { background: #fdeef3; color: #8b1e3f; }
+
+.ty-modal__search {
+	position: relative;
+	display: flex;
+	align-items: center;
+	padding: 12px 20px 8px;
+}
+
+.ty-modal__search .ty-icon-search {
+	position: absolute;
+	inset-inline-start: 32px;
+	width: 18px;
+	height: 18px;
+	color: var(--ty-muted, #6b7280);
+	pointer-events: none;
+}
+
+.ty-modal__search input[type="search"] {
+	width: 100%;
+	height: 40px;
+	padding: 4px 40px;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	border-radius: 12px;
+	background: #fbfaff;
+	font: inherit;
+	font-size: 13px;
+	color: var(--ty-ink, #111);
+}
+
+.ty-modal__search input[type="search"]:focus {
+	border-color: var(--ty-accent, #185adb);
+	background: #fff;
+	box-shadow: 0 0 0 3px rgba(24, 90, 219, .12);
+	outline: 0;
+}
+
+.ty-modal__list {
+	flex: 1 1 auto;
+	margin: 0;
+	padding: 6px 12px 10px;
+	list-style: none;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
+}
+
+.ty-modal__row { margin: 0; }
+
+.ty-modal__row-btn {
+	appearance: none;
+	width: 100%;
+	display: grid;
+	grid-template-columns: 26px 40px minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 10px;
+	border: 0;
+	border-radius: 12px;
+	background: transparent;
+	color: var(--ty-text, #2a2a2a);
+	font: inherit;
+	text-align: right;
+	cursor: pointer;
+	transition: background .12s ease;
+}
+
+.ty-modal__row-btn:hover,
+.ty-modal__row-btn:focus-visible {
+	background: var(--ty-accent-soft, #eaf1fe);
+	outline: 0;
+}
+
+.ty-modal__row.is-current .ty-modal__row-btn {
+	background: color-mix(in srgb, var(--ty-accent, #185adb) 12%, transparent);
+}
+
+.ty-modal__row-num {
+	font-size: 12px;
+	color: var(--ty-muted, #6b7280);
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+}
+
+.ty-modal__row.is-current .ty-modal__row-num .ty-icon-eq { display: flex; }
+
+.ty-modal__row-cover {
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
+	object-fit: cover;
+	background: var(--ty-accent-soft, #eaf1fe);
+}
+
+.ty-modal__row-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+
+.ty-modal__row-title {
+	font-size: 13px;
+	font-weight: 700;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ty-modal__row-artist {
+	font-size: 11px;
+	color: var(--ty-muted, #6b7280);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.ty-modal__row-state {
+	font-size: 10.5px;
+	font-weight: 700;
+	color: var(--ty-muted, #6b7280);
+	white-space: nowrap;
+}
+
+.ty-modal__row.is-current .ty-modal__row-state { color: var(--ty-accent, #185adb); }
+
+.ty-modal__empty {
+	margin: 8px 20px 20px;
+	padding: 18px;
+	border: 1px dashed var(--ty-line, #e6e8ee);
+	border-radius: 14px;
+	text-align: center;
+	font-size: 12.5px;
+	color: var(--ty-muted, #6b7280);
+}
+
+.ty-modal__foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 10px 20px;
+	border-top: 1px solid var(--ty-line, #e6e8ee);
+	background: rgba(17, 24, 39, .02);
+	font-size: 11.5px;
+	color: var(--ty-muted, #6b7280);
+}
+
+.ty-modal__foot kbd {
+	padding: 1px 6px;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	border-bottom-width: 2px;
+	border-radius: 5px;
+	background: #fff;
+	font-size: 10.5px;
+}
+
+body.has-tara-modal { overflow: hidden; }
+
+/* =========================================================================
+   ۱۰) پلیر ویدیو — نسخهٔ ۳.۷.۳
+   ====================================================================== */
+.ty-video {
+	margin: 22px 0;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	border-radius: 18px;
+	background: #0d0b16;
+	overflow: hidden;
+	box-shadow: 0 20px 44px -34px rgba(15, 12, 30, .9);
+	direction: rtl;
+}
+
+.ty-video__stage {
+	position: relative;
+	aspect-ratio: 16 / 9;
+	background: #000;
+	overflow: hidden;
+}
+
+.ty-video__el {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: contain;
+	background: #000;
+}
+
+.ty-video__cover {
+	position: absolute;
+	inset: 0;
+	appearance: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	padding: 0;
+	background: #0d0b16;
+	cursor: pointer;
+	text-align: center;
+	transition: opacity .25s ease;
+}
+
+.ty-video__cover.is-hidden { opacity: 0; pointer-events: none; }
+
+.ty-video__poster {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	opacity: .72;
+}
+
+.ty-video__cover::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(180deg, rgba(13, 11, 22, .10) 0%, rgba(13, 11, 22, .72) 100%);
+}
+
+.ty-video__bigplay {
+	position: relative;
+	z-index: 2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 74px;
+	height: 74px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .94);
+	color: #4c1d95;
+	box-shadow: 0 18px 40px -18px rgba(0, 0, 0, .8);
+	transition: transform .18s ease;
+}
+
+.ty-video__bigplay .ty-icon-play { width: 26px; height: 26px; }
+.ty-video__bigplay .ty-icon-play::before { border-width: 10px 0 10px 16px; }
+
+.ty-video__cover:hover .ty-video__bigplay,
+.ty-video__cover:focus-visible .ty-video__bigplay { transform: scale(1.06); }
+
+.ty-video__caption {
+	position: absolute;
+	z-index: 2;
+	inset-inline: 20px;
+	bottom: 16px;
+	color: #fff;
+	font-size: 13px;
+	font-weight: 700;
+	text-shadow: 0 2px 10px rgba(0, 0, 0, .6);
+}
+
+.ty-video__bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 14px;
+	background: #16121f;
+	color: #fff;
+}
+
+.ty-video__btn {
+	appearance: none;
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	width: 36px;
+	height: 36px;
+	border: 0;
+	border-radius: 50%;
+	background: transparent;
+	color: #f2f0fb;
+	cursor: pointer;
+}
+
+.ty-video__btn:hover,
+.ty-video__btn:focus-visible { background: rgba(255, 255, 255, .12); outline: 0; }
+
+.ty-video__btn.is-muted { color: #f0a8bd; }
+
+.ty-video__btn--text {
+	width: auto;
+	padding: 0 12px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 700;
+	background: rgba(255, 255, 255, .10);
+}
+
+.ty-video__btn--text .ty-icon-caret { width: 12px; height: 12px; }
+
+.ty-video__rail {
+	position: relative;
+	flex: 1 1 auto;
+	height: 6px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, .18);
+}
+
+.ty-video__loaded,
+.ty-video__played {
+	position: absolute;
+	inset-inline-start: 0;
+	top: 0;
+	height: 100%;
+	border-radius: 999px;
+	pointer-events: none;
+}
+
+.ty-video__loaded { background: rgba(255, 255, 255, .26); width: 0; }
+.ty-video__played { background: linear-gradient(90deg, #a855f7, #db2777); width: 0; }
+
+.ty-video__seek {
+	position: absolute;
+	inset-inline: 0;
+	top: -7px;
+	width: 100%;
+	height: 20px;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+}
+
+.ty-video__time {
+	font-size: 11px;
+	font-variant-numeric: tabular-nums;
+	color: rgba(255, 255, 255, .78);
+	white-space: nowrap;
+}
+
+.ty-video__menu { position: relative; }
+
+.ty-video__pop {
+	position: absolute;
+	bottom: calc(100% + 10px);
+	inset-inline-end: 0;
+	z-index: 5;
+	width: 210px;
+	padding: 12px;
+	border-radius: 14px;
+	background: #221c31;
+	border: 1px solid rgba(255, 255, 255, .12);
+	box-shadow: 0 24px 50px -24px rgba(0, 0, 0, .9);
+}
+
+.ty-video__pop[hidden] { display: none; }
+
+.ty-video__pop-title {
+	display: block;
+	margin: 2px 0 6px;
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: .3px;
+	color: rgba(255, 255, 255, .55);
+}
+
+.ty-video__qualities,
+.ty-video__rates { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+
+.ty-video__quality,
+.ty-video__rate {
+	appearance: none;
+	padding: 5px 10px;
+	border: 1px solid rgba(255, 255, 255, .16);
+	border-radius: 999px;
+	background: transparent;
+	color: #eee;
+	font: inherit;
+	font-size: 11.5px;
+	cursor: pointer;
+}
+
+.ty-video__quality.is-active,
+.ty-video__rate.is-active {
+	background: #a855f7;
+	border-color: #a855f7;
+	color: #fff;
+	font-weight: 700;
+}
+
+.ty-video__pip {
+	appearance: none;
+	width: 100%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 7px 10px;
+	border: 1px solid rgba(255, 255, 255, .16);
+	border-radius: 10px;
+	background: rgba(255, 255, 255, .06);
+	color: #eee;
+	font: inherit;
+	font-size: 11.5px;
+	cursor: pointer;
+}
+
+.ty-video__pip:hover { background: rgba(255, 255, 255, .14); }
+.ty-video__pip .ty-icon-pip { width: 16px; height: 16px; }
+
+.ty-video .ty-icon-play,
+.ty-video .ty-icon-pause { display: none; }
+
+.ty-video:not(.is-playing) .ty-icon-play { display: inline-block; }
+.ty-video.is-playing .ty-icon-pause { display: inline-block; }
+
+@media (max-width: 782px) {
+	.ty-modal { padding: 12px; align-items: flex-end; }
+	.ty-modal__panel { max-height: 86vh; border-radius: 18px; }
+	.ty-modal__row-btn { grid-template-columns: 22px 36px minmax(0, 1fr); }
+	.ty-modal__row-state { display: none; }
+	.ty-video__bar { gap: 6px; padding: 8px 10px; }
+	.ty-video__time { display: none; }
+	.ty-video__bigplay { width: 60px; height: 60px; }
+}
+
+/* =========================================================================
+   ۱۱) دکمهٔ پخش روی کارت آهنگ (صفحهٔ اصلی و بخش‌ها)
+   ====================================================================== */
+.songs_post header figure { position: relative; }
+
+.ty-cardplay {
+	position: absolute;
+	inset-inline-start: 10px;
+	bottom: 10px;
+	z-index: 3;
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border: 0;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, .94);
+	color: #4c1d95;
+	box-shadow: 0 8px 20px -8px rgba(0, 0, 0, .65);
+	cursor: pointer;
+	opacity: 0;
+	transform: translateY(6px);
+	transition: opacity .18s ease, transform .18s ease, background .18s ease;
+}
+
+.songs_post:hover .ty-cardplay,
+.songs_post:focus-within .ty-cardplay,
+.ty-cardplay:focus-visible,
+.ty-cardplay.is-playing {
+	opacity: 1;
+	transform: none;
+}
+
+.ty-cardplay:hover { background: #fff; }
+
+.ty-cardplay .ty-icon-play,
+.ty-cardplay .ty-icon-pause {
+	display: none;
+	width: 16px;
+	height: 16px;
+}
+
+.ty-cardplay .ty-icon-play::before { border-width: 6px 0 6px 10px; inset-inline-start: 4px; }
+
+.ty-cardplay:not(.is-playing) .ty-icon-play { display: inline-block; }
+.ty-cardplay.is-playing .ty-icon-pause { display: inline-block; }
+.ty-cardplay.is-playing { background: #4c1d95; color: #fff; }
+
+@media (hover: none) {
+	.ty-cardplay { opacity: 1; transform: none; }
+}
+
+/* =========================================================================
+   ۱۲) شناسنامهٔ اثر — نسخهٔ ۳.۷.۳ (تفکیک‌شده و شیک‌تر)
+   ====================================================================== */
+.single_content_box .ab-credits.ab-credits,
+.ab-credits.ab-credits {
+	margin: 22px 0;
+	padding: 0;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	border-radius: 18px;
+	background:
+		radial-gradient(120% 150% at 100% 0%, rgba(109, 40, 217, .07) 0%, rgba(109, 40, 217, 0) 58%),
+		var(--ty-surface, #fff);
+	overflow: hidden;
+}
+
+.ab-credits.ab-credits .ab-credits__title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	padding: 13px 18px;
+	border-bottom: 1px solid var(--ty-line, #e6e8ee);
+	font-size: 13.5px;
+	font-weight: 800;
+	letter-spacing: .2px;
+	color: var(--ty-ink, #111);
+	background: rgba(17, 24, 39, .02);
+}
+
+.ab-credits.ab-credits .ab-credits__title i { color: #6d28d9; font-size: 15px; }
+
+.ab-credits.ab-credits .ab-credits__row {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 1px;
+	background: var(--ty-line, #e6e8ee);
+}
+
+.ab-credits.ab-credits .ab-credit {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	padding: 13px 16px;
+	background: var(--ty-surface, #fff);
+	position: relative;
+}
+
+.ab-credits.ab-credits .ab-credit::before {
+	content: "";
+	position: absolute;
+	inset-inline-start: 0;
+	top: 12px;
+	bottom: 12px;
+	width: 3px;
+	border-radius: 3px;
+	background: #6d28d9;
+	opacity: .18;
+}
+
+.ab-credits.ab-credits .ab-credit > i {
+	display: none !important;
+}
+
+.ab-credits.ab-credits .ab-credit__k {
+	display: block;
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--ty-muted, #6b7280);
+}
+
+.ab-credits.ab-credits .ab-credit__v {
+	font-size: 13.5px;
+	font-weight: 700;
+	color: var(--ty-ink, #111);
+	line-height: 1.6;
+}
+
+.ab-credits.ab-credits .ab-credit__v a {
+	color: #4c1d95;
+	text-decoration: none;
+	border-bottom: 1px solid rgba(109, 40, 217, .25);
+}
+
+.ab-credits.ab-credits .ab-credit__v a:hover { border-bottom-color: #4c1d95; }
+
+.ab-credits.ab-credits .ab-credit__sep { color: var(--ty-muted, #9ca3af); }
+
+@media (max-width: 782px) {
+	.ab-credits.ab-credits .ab-credits__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.ab-credits.ab-credits .ab-credit { padding: 11px 12px; }
+}
+
+/* =========================================================================
+   ۱۳) کارت «شخص» در آرشیو نقش‌ها (ترانه‌سرا/آهنگساز/تنظیم)
+   ====================================================================== */
+.ty-person {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+	margin: 16px 0 4px;
+	padding: 14px 16px;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	border-radius: 16px;
+	background: var(--ty-surface, #fff);
+}
+
+.ty-person__avatar {
+	flex: 0 0 auto;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 46px;
+	height: 46px;
+	border-radius: 14px;
+	background: linear-gradient(135deg, #4c1d95, #6d28d9);
+	color: #fff;
+	font-size: 20px;
+	font-weight: 800;
+}
+
+.ty-person__body { min-width: 0; }
+
+.ty-person__eyebrow {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--ty-muted, #6b7280);
+}
+
+.ty-person__roles {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ty-person__chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 5px 11px;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	border-radius: 999px;
+	background: #fbfaff;
+	color: var(--ty-text, #2a2a2a);
+	font-size: 12px;
+	font-weight: 600;
+	text-decoration: none;
+	transition: border-color .15s ease, background .15s ease, color .15s ease;
+}
+
+a.ty-person__chip:hover {
+	border-color: #6d28d9;
+	background: #f5f0ff;
+	color: #4c1d95;
+}
+
+.ty-person__chip.is-active {
+	border-color: #6d28d9;
+	background: #6d28d9;
+	color: #fff;
+}
+
+.ty-person__count {
+	font-size: 10.5px;
+	opacity: .72;
+}
+
+@media (max-width: 640px) {
+	.ty-person { align-items: flex-start; }
+	.ty-person__avatar { width: 38px; height: 38px; font-size: 17px; }
+}
+
+/* =========================================================================
+   ۱۴) پوستهٔ سایت — هدر و فوتر جذاب‌تر (v3.7.3)
+   ====================================================================== */
+@media (min-width: 801px) {
+	#header {
+		position: sticky;
+		top: 0;
+		z-index: 88888;
+		padding-top: 18px;
+		padding-bottom: 18px;
+		background: color-mix(in srgb, var(--ab-charcoal, #16121f) 86%, transparent);
+		-webkit-backdrop-filter: saturate(140%) blur(12px);
+		backdrop-filter: saturate(140%) blur(12px);
+		border-bottom: 1px solid rgba(255, 255, 255, .08);
+		transition: padding .2s ease, box-shadow .2s ease, background .2s ease;
+	}
+
+	#header.is-stuck {
+		padding-top: 10px;
+		padding-bottom: 10px;
+		box-shadow: 0 14px 30px -22px rgba(0, 0, 0, .9);
+		background: color-mix(in srgb, var(--ab-charcoal, #16121f) 96%, transparent);
+	}
+
+	#header .logo_top img {
+		transition: max-height .2s ease, transform .2s ease;
+		max-height: 46px;
+		width: auto;
+	}
+
+	#header.is-stuck .logo_top img { max-height: 34px; }
+
+	#header .menu_right > ul > li > a {
+		position: relative;
+		transition: color .16s ease;
+	}
+
+	#header .menu_right > ul > li > a::after {
+		content: "";
+		position: absolute;
+		inset-inline: 12px;
+		bottom: 2px;
+		height: 2px;
+		border-radius: 2px;
+		background: linear-gradient(90deg, #a855f7, #db2777);
+		transform: scaleX(0);
+		transform-origin: center;
+		transition: transform .18s ease;
+	}
+
+	#header .menu_right > ul > li:hover > a::after,
+	#header .menu_right > ul > li.current-menu-item > a::after { transform: scaleX(1); }
+
+	#header #searches {
+		border-radius: 999px;
+		overflow: hidden;
+		border: 1px solid rgba(255, 255, 255, .14);
+		background: rgba(255, 255, 255, .07);
+		transition: border-color .16s ease, background .16s ease;
+	}
+
+	#header #searches:focus-within {
+		border-color: #a855f7;
+		background: rgba(255, 255, 255, .12);
+	}
+
+	#header #searches .searchfield {
+		background: transparent;
+		border: 0;
+		color: #fff;
+	}
+
+	#header #searches .searchfield::placeholder { color: rgba(255, 255, 255, .6); }
+	#header #searches button { color: #fff; }
+}
+
+/* فوتر --------------------------------------------------------------- */
+.ab-footer {
+	position: relative;
+	margin-top: 40px;
+	padding-top: 34px;
+	border-top: 1px solid rgba(255, 255, 255, .10);
+	background:
+		radial-gradient(90% 140% at 85% 0%, rgba(109, 40, 217, .22) 0%, rgba(109, 40, 217, 0) 62%),
+		radial-gradient(70% 120% at 10% 100%, rgba(219, 39, 119, .12) 0%, rgba(219, 39, 119, 0) 60%);
+}
+
+.ab-footer::before {
+	content: "";
+	position: absolute;
+	inset-inline: 0;
+	top: -1px;
+	height: 2px;
+	background: linear-gradient(90deg, transparent, #a855f7, #db2777, transparent);
+	opacity: .75;
+}
+
+.ab-footer__title {
+	position: relative;
+	padding-bottom: 8px;
+}
+
+.ab-footer__title::after {
+	content: "";
+	position: absolute;
+	inset-inline-start: 0;
+	bottom: 0;
+	width: 26px;
+	height: 2px;
+	border-radius: 2px;
+	background: linear-gradient(90deg, #a855f7, #db2777);
+}
+
+.ab-footer__col a {
+	transition: color .15s ease, padding-inline-start .15s ease;
+}
+
+.ab-footer__col a:hover { color: #c4b5fd; }
+
+.ab-footer__bottom {
+	margin-top: 22px;
+	padding-top: 14px;
+	border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+/* دکمهٔ «بالا» ------------------------------------------------------- */
+.top_page {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #4c1d95, #6d28d9);
+	color: #fff;
+	box-shadow: 0 14px 30px -14px rgba(76, 29, 149, .9);
+	transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.top_page:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 18px 34px -14px rgba(76, 29, 149, 1);
+}
+
+.ty-modal__row-cover--empty {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: #f1ecff;
+	color: #6d28d9;
+	font-size: 15px;
 }

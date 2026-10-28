@@ -1,27 +1,37 @@
 /**
- * ترانه یار — پلیر «رادیو» (بدون وابستگی)
- * ---------------------------------------------------------------------------
- * یک نمونه در هر صفحه. سه چیز را مدیریت می‌کند:
- *   ۱) کارت بزرگ پلیر (پخش، توقف، بعدی/قبلی، جابه‌جایی، صدا، فهرست پخش)
- *   ۲) نوار چسبانِ پایین صفحه که با اسکرول ظاهر می‌شود و همان صدا را کنترل می‌کند
- *   ۳) دکمه‌های «پخش» بیرون از کارت (ردیف‌های آهنگ) که با data-tara-play کار می‌کنند
+ * ترانه یار — موتور پخش «رادیو» + نوار چسبان + کادر فهرست + ویدیو
+ * ==========================================================================
+ * چرا از نو نوشته شد؟
+ *   ۱) نسخهٔ قبل برای هر کارت یک <audio> می‌ساخت و دکمه‌ها را تک‌تک bind می‌کرد؛
+ *      اگر مارکاپ جابه‌جا می‌شد (کش صفحه، افزونهٔ بهینه‌ساز، تبِ پویا) دکمه‌ها
+ *      مرده می‌ماندند و کاربر می‌گفت «پلیر کار نمی‌کند».
+ *   ۲) فهرست پخش داخل خود کارت بود و صفحهٔ اصلی را بلند می‌کرد.
  *
- * چرا بدون jQuery: قالب در صفحات مختلف jQuery را دیر یا اصلاً بار نمی‌کند و
- * پلیر نباید به آن وابسته باشد. هیچ کد دیگری را دست نمی‌زند.
+ * معماری تازه:
+ *   • یک موتور و یک <audio> برای تمام صفحه.
+ *   • همهٔ کلیک‌ها با delegation روی document گرفته می‌شوند ⇒ هر المانی که
+ *     بعداً به صفحه اضافه شود هم کار می‌کند.
+ *   • کارت، نوار چسبان و کادر فهرست فقط «نمایش» هستند و از یک وضعیت مشترک
+ *     (same state) تغذیه می‌شوند ⇒ همیشه با هم هماهنگ‌اند.
+ *   • صف پخش از `[data-tara-queue]` هر فهرست خوانده می‌شود، پس هر بخش صفحه
+ *     (آهنگ‌ها، آلبوم‌ها، آرشیو) صف خودش را دارد.
+ *
+ * بدون jQuery و بدون وابستگی.
  *
  * @package Taranehyar
  */
 (function () {
 	'use strict';
 
-	var ICON_PLAY = 'ty-icon-play';
-	var ICON_PAUSE = 'ty-icon-pause';
+	var FA = '۰۱۲۳۴۵۶۷۸۹';
 
-	/* همهٔ نمونه‌های صفحه — برای اینکه فقط یکی در هر لحظه پخش شود */
-	var registry = [];
-	var dockOwner = null;
+	function toFa(value) {
+		return String(value).replace(/[0-9]/g, function (d) {
+			return FA.charAt(Number(d));
+		});
+	}
 
-	function formatTime(seconds) {
+	function fmt(seconds) {
 		if (!isFinite(seconds) || seconds < 0) {
 			return '۰۰:۰۰';
 		}
@@ -30,110 +40,124 @@
 		return toFa((m < 10 ? '0' : '') + m) + ':' + toFa((s < 10 ? '0' : '') + s);
 	}
 
-	function toFa(value) {
-		return String(value).replace(/[0-9]/g, function (d) {
-			return '۰۱۲۳۴۵۶۷۸۹'.charAt(Number(d));
-		});
+	function clamp(n, min, max) {
+		return Math.min(max, Math.max(min, n));
 	}
 
-	function initPlayer(root) {
-		var dataEl = root.querySelector('.ty-player__data');
-		if (!dataEl) {
-			return;
+	function readJSON(node, attr) {
+		if (!node) {
+			return null;
 		}
-
-		var tracks = [];
+		var raw = node.getAttribute(attr);
+		if (!raw) {
+			return null;
+		}
 		try {
-			tracks = JSON.parse(dataEl.textContent || '[]');
+			return JSON.parse(raw);
 		} catch (error) {
-			return;
+			return null;
 		}
-		if (!tracks.length) {
-			return;
-		}
+	}
 
-		var audio = root.querySelector('[data-tara-audio]');
-		var toggle = root.querySelector('[data-tara-toggle]');
-		var prev = root.querySelector('[data-tara-prev]');
-		var next = root.querySelector('[data-tara-next]');
-		var seek = root.querySelector('[data-tara-seek]');
-		var fill = root.querySelector('[data-tara-fill]');
-		var buffer = root.querySelector('[data-tara-buffer]');
-		var time = root.querySelector('[data-tara-time]');
-		var volume = root.querySelector('[data-tara-volume]');
-		var mute = root.querySelector('[data-tara-mute]');
-		var art = root.querySelector('[data-tara-art]');
-		var titleEl = root.querySelector('[data-tara-title]');
-		var artistEl = root.querySelector('[data-tara-artist]');
-		var titleLink = root.querySelector('[data-tara-title-link]');
-		var items = root.querySelectorAll('[data-tara-item]');
-
-		var dock = document.querySelector('[data-tara-dock]');
-		var ownsDock = false; /* اولین نمونهٔ صفحه صاحب نوار می‌شود */
-		if (dock && !dockOwner) {
-			dockOwner = root;
-			ownsDock = true;
-		}
-		var dockToggle = dock ? dock.querySelector('[data-tara-dock-toggle]') : null;
-		var dockPrev = dock ? dock.querySelector('[data-tara-dock-prev]') : null;
-		var dockNext = dock ? dock.querySelector('[data-tara-dock-next]') : null;
-		var dockFill = dock ? dock.querySelector('[data-tara-dock-fill]') : null;
-		var dockTitle = dock ? dock.querySelector('[data-tara-dock-title]') : null;
-		var dockArtist = dock ? dock.querySelector('[data-tara-dock-artist]') : null;
-		var dockArt = dock ? dock.querySelector('[data-tara-dock-art]') : null;
-		var dockLink = dock ? dock.querySelector('[data-tara-dock-link]') : null;
-
-		var current = 0;
+	/* ==================================================================
+	 * ۱) موتور پخش
+	 * ================================================================== */
+	var Engine = (function () {
+		var audio = null;
+		var queue = [];
+		var index = 0;
+		var owner = null;      /* کارتی که صف را شروع کرده */
+		var listeners = [];
 		var started = false;
+		var lastVolume = 1;
+
+		function emit(type, data) {
+			for (var i = 0; i < listeners.length; i++) {
+				try {
+					listeners[i](type, data || {});
+				} catch (error) {
+					/* یک شنوندهٔ خراب نباید بقیه را بخواباند */
+				}
+			}
+		}
+
+		function ensure() {
+			if (audio) {
+				return audio;
+			}
+
+			audio = document.querySelector('audio[data-tara-audio]');
+
+			if (!audio) {
+				audio = document.createElement('audio');
+				audio.setAttribute('data-tara-audio', '');
+				audio.setAttribute('preload', 'none');
+				audio.setAttribute('playsinline', '');
+				audio.className = 'ty-player__audio';
+				document.body.appendChild(audio);
+			}
+
+			audio.addEventListener('loadstart', function () {
+				emit('loading');
+			});
+			audio.addEventListener('canplay', function () {
+				emit('ready');
+			});
+			audio.addEventListener('playing', function () {
+				started = true;
+				emit('playing');
+				syncMediaSession();
+			});
+			audio.addEventListener('pause', function () {
+				emit('paused');
+			});
+			audio.addEventListener('timeupdate', function () {
+				emit('time', { position: audio.currentTime || 0, duration: audio.duration || 0 });
+			});
+			audio.addEventListener('durationchange', function () {
+				emit('time', { position: audio.currentTime || 0, duration: audio.duration || 0 });
+			});
+			audio.addEventListener('progress', function () {
+				var buffered = 0;
+				if (audio.buffered && audio.buffered.length && audio.duration) {
+					buffered = (audio.buffered.end(audio.buffered.length - 1) / audio.duration) * 100;
+				}
+				emit('buffer', { percent: buffered });
+			});
+			audio.addEventListener('ended', function () {
+				if (queue.length > 1) {
+					next();
+				} else {
+					emit('paused');
+				}
+			});
+			audio.addEventListener('error', function () {
+				emit('error', { src: audio && audio.src ? audio.src : '' });
+			});
+
+			return audio;
+		}
 
 		function track() {
-			return tracks[current] || tracks[0];
+			return queue[index] || null;
 		}
 
-		function paint() {
-			var t = track();
-			if (titleEl) {
-				titleEl.textContent = t.title;
-			}
-			if (artistEl) {
-				artistEl.textContent = t.artist;
-			}
-			if (titleLink && t.link) {
-				titleLink.setAttribute('href', t.link);
-			}
-			if (art && t.cover) {
-				art.setAttribute('src', t.cover);
-			}
-			if (dockTitle && dockOwner === root) {
-				dockTitle.textContent = t.title;
-			}
-			if (dockArtist && dockOwner === root) {
-				dockArtist.textContent = t.artist;
-			}
-			if (dockArt && t.cover && dockOwner === root) {
-				dockArt.setAttribute('src', t.cover);
-			}
-			if (dockLink && t.link && dockOwner === root) {
-				dockLink.setAttribute('href', t.link);
+		function load(list, start, ownerNode, autoplay) {
+			queue = (list || []).slice();
+			if (!queue.length) {
+				return;
 			}
 
-			for (var i = 0; i < items.length; i++) {
-				var index = Number(items[i].getAttribute('data-tara-item'));
-				items[i].classList.toggle('is-active', index === current);
-			}
+			index = clamp(Number(start) || 0, 0, queue.length - 1);
+			owner = ownerNode || null;
 
-			if (document.title && started) {
-				document.querySelectorAll('.ty-track.is-playing').forEach(function (row) {
-					row.classList.remove('is-playing');
-				});
-			}
-		}
+			var el = ensure();
+			var item = track();
 
-		function load(index, autoplay) {
-			current = (index + tracks.length) % tracks.length;
-			var t = track();
-			audio.src = t.src;
-			paint();
+			el.src = item.src;
+			el.load();
+
+			emit('load', { track: item, index: index, owner: owner });
 
 			if (autoplay) {
 				play();
@@ -141,267 +165,967 @@
 		}
 
 		function play() {
-			/* فقط یک نمونه در هر لحظه: بقیه خاموش می‌شوند */
-			for (var p = 0; p < registry.length; p++) {
-				if (registry[p] !== api) {
-					registry[p].silence();
-				}
+			if (!queue.length) {
+				return;
 			}
-			root.classList.add('is-loading');
-			var promise = audio.play();
-			started = true;
+
+			var el = ensure();
+			if (!el.src) {
+				load(queue, index, owner, false);
+			}
+
+			var promise = el.play();
 			if (promise && typeof promise.catch === 'function') {
 				promise.catch(function () {
-					root.classList.remove('is-loading', 'is-playing');
+					emit('blocked');
 				});
 			}
 		}
 
 		function pause() {
-			audio.pause();
-		}
-
-		function setPlaying(state) {
-			root.classList.toggle('is-playing', state);
-			if (dock) {
-				dock.classList.toggle('is-playing', state);
-			}
-			var label = state ? 'توقف' : 'پخش';
-			if (toggle) {
-				toggle.setAttribute('aria-label', label);
-			}
-			if (dockToggle) {
-				dockToggle.setAttribute('aria-label', label);
+			if (audio) {
+				audio.pause();
 			}
 		}
 
-		function updateTime() {
-			var duration = audio.duration || 0;
-			var position = audio.currentTime || 0;
-			var percent = duration > 0 ? (position / duration) * 100 : 0;
-
-			if (fill) {
-				fill.style.width = percent + '%';
-			}
-			if (dockFill) {
-				dockFill.style.width = percent + '%';
-			}
-			if (seek && duration > 0) {
-				seek.value = String(percent);
-				seek.setAttribute('aria-valuetext', Math.floor(position) + ' ثانیه از ' + Math.floor(duration));
-			}
-			if (time) {
-				time.textContent = formatTime(position) + ' / ' + formatTime(duration);
-			}
-		}
-
-		/* ---------- کنترل‌ها ---------- */
-
-		if (toggle) {
-			toggle.addEventListener('click', function () {
-				if (audio.paused) {
-					if (!audio.src) {
-						load(current, true);
-					} else {
-						play();
-					}
-				} else {
-					pause();
-				}
-			});
-		}
-
-		if (prev) {
-			prev.addEventListener('click', function () {
-				load(current - 1, !audio.paused || started);
-			});
-		}
-
-		if (next) {
-			next.addEventListener('click', function () {
-				load(current + 1, !audio.paused || started);
-			});
-		}
-
-		if (seek) {
-			seek.addEventListener('input', function () {
-				var duration = audio.duration || 0;
-				if (duration > 0) {
-					audio.currentTime = (Number(seek.value) / 100) * duration;
-				}
-			});
-		}
-
-		if (volume) {
-			volume.addEventListener('input', function () {
-				audio.volume = Number(volume.value);
-				audio.muted = audio.volume === 0;
-			});
-		}
-
-		if (mute) {
-			mute.addEventListener('click', function () {
-				audio.muted = !audio.muted;
-				mute.classList.toggle('is-muted', audio.muted);
-			});
-		}
-
-		for (var i = 0; i < items.length; i++) {
-			items[i].addEventListener('click', function (event) {
-				var button = event.target.closest('[data-tara-play]');
-				if (!button) {
-					return;
-				}
-				var index = Number(button.getAttribute('data-tara-play'));
-				if (index === current && audio.src) {
-					if (audio.paused) {
-						play();
-					} else {
-						pause();
-					}
-					return;
-				}
-				load(index, true);
-			});
-		}
-
-		/* دکمه‌های پخشِ بیرون از کارت.
-		   اگر صفحه چند پلیر داشته باشد، اولین شنونده رویداد را برمی‌دارد تا
-		   یک کلیک باعث پخشِ هم‌زمان در همه نشود. */
-		document.addEventListener('click', function (event) {
-			if (event.taraRowHandled) {
-				return;
-			}
-			var button = event.target.closest('[data-tara-play]');
-			if (!button || root.contains(button)) {
-				return;
-			}
-			event.taraRowHandled = true;
-			var index = Number(button.getAttribute('data-tara-play'));
-			if (isNaN(index)) {
-				return;
-			}
-			if (index === current && audio.src && !audio.paused) {
+		function toggle() {
+			if (!audio || audio.paused) {
+				play();
+			} else {
 				pause();
-				return;
-			}
-			load(index, true);
-		});
-
-		/* نوار چسبان */
-		if (dock && ownsDock) {
-			if (dockToggle) {
-				dockToggle.addEventListener('click', function () {
-					if (audio.paused) {
-						if (!audio.src) {
-							load(current, true);
-						} else {
-							play();
-						}
-					} else {
-						pause();
-					}
-				});
-			}
-			if (dockPrev) {
-				dockPrev.addEventListener('click', function () {
-					load(current - 1, true);
-				});
-			}
-			if (dockNext) {
-				dockNext.addEventListener('click', function () {
-					load(current + 1, true);
-				});
 			}
 		}
 
-		/* ---------- رویدادهای صدا ---------- */
+		function next() {
+			if (!queue.length) {
+				return;
+			}
+			index = (index + 1) % queue.length;
+			load(queue, index, owner, true);
+		}
 
-		audio.addEventListener('loadstart', function () {
-			root.classList.add('is-loading');
+		function prev() {
+			if (!queue.length) {
+				return;
+			}
+			/* رفتار استاندارد: اگر بیش از ۳ ثانیه گذشته، برگرد به اول همین قطعه */
+			if (audio && audio.currentTime > 3) {
+				audio.currentTime = 0;
+				return;
+			}
+			index = (index - 1 + queue.length) % queue.length;
+			load(queue, index, owner, true);
+		}
+
+		function seekPercent(percent) {
+			var el = ensure();
+			if (!el.duration) {
+				return;
+			}
+			el.currentTime = (clamp(percent, 0, 100) / 100) * el.duration;
+		}
+
+		function volume(value) {
+			var el = ensure();
+			el.volume = clamp(value, 0, 1);
+			el.muted = el.volume === 0;
+			if (el.volume > 0) {
+				lastVolume = el.volume;
+			}
+			emit('volume', { volume: el.volume, muted: el.muted });
+		}
+
+		function mute() {
+			var el = ensure();
+			el.muted = !el.muted;
+			emit('volume', { volume: el.volume, muted: el.muted });
+		}
+
+		function stop() {
+			if (audio) {
+				audio.pause();
+				audio.removeAttribute('src');
+				audio.load();
+			}
+			queue = [];
+			index = 0;
+			owner = null;
+			emit('stop');
+		}
+
+		function syncMediaSession() {
+			if (!('mediaSession' in navigator) || !window.MediaMetadata) {
+				return;
+			}
+			var item = track();
+			if (!item) {
+				return;
+			}
+			try {
+				navigator.mediaSession.metadata = new window.MediaMetadata({
+					title: item.title || '',
+					artist: item.artist || '',
+					album: document.title,
+					artwork: item.cover ? [{ src: item.cover, sizes: '256x256', type: 'image/jpeg' }] : []
+				});
+				if (navigator.mediaSession.setActionHandler) {
+					navigator.mediaSession.setActionHandler('play', play);
+					navigator.mediaSession.setActionHandler('pause', pause);
+					navigator.mediaSession.setActionHandler('previoustrack', prev);
+					navigator.mediaSession.setActionHandler('nexttrack', next);
+				}
+			} catch (error) {
+				/* مرورگرهای قدیمی */
+			}
+		}
+
+		return {
+			subscribe: function (fn) {
+				listeners.push(fn);
+			},
+			load: load,
+			play: play,
+			pause: pause,
+			toggle: toggle,
+			next: next,
+			prev: prev,
+			seekPercent: seekPercent,
+			volume: volume,
+			mute: mute,
+			stop: stop,
+			on: ensure,
+			state: function () {
+				return {
+					queue: queue,
+					index: index,
+					owner: owner,
+					track: track(),
+					playing: !!(audio && !audio.paused && started),
+					audio: audio
+				};
+			}
+		};
+	})();
+
+	/* ==================================================================
+	 * ۲) کارت پلیر
+	 * ================================================================== */
+	function PlayerCard(root) {
+		var tracks = [];
+
+		try {
+			tracks = JSON.parse((root.querySelector('.ty-player__data') || {}).textContent || '[]');
+		} catch (error) {
+			tracks = [];
+		}
+
+		if (!tracks || !tracks.length) {
+			return;
+		}
+
+		var refs = {
+			art: root.querySelector('[data-tara-art]'),
+			title: root.querySelector('[data-tara-title]'),
+			artist: root.querySelector('[data-tara-artist]'),
+			link: root.querySelector('[data-tara-title-link]'),
+			time: root.querySelector('[data-tara-time]'),
+			fill: root.querySelector('[data-tara-fill]'),
+			buffer: root.querySelector('[data-tara-buffer]'),
+			seek: root.querySelector('[data-tara-seek]'),
+			volume: root.querySelector('[data-tara-volume]'),
+			count: root.querySelector('[data-tara-count]'),
+			eyebrow: root.querySelector('.ty-player__eyebrow'),
+			mute: root.querySelector('[data-tara-mute]'),
+			error: root.querySelector('[data-tara-error]')
+		};
+
+		var isOwner = function () {
+			return Engine.state().owner === root;
+		};
+
+		function paintTrack(item) {
+			if (!item) {
+				return;
+			}
+			if (refs.title) {
+				refs.title.textContent = item.title || '';
+			}
+			if (refs.artist) {
+				refs.artist.textContent = item.artist || '';
+			}
+			if (refs.art && item.cover) {
+				refs.art.setAttribute('src', item.cover);
+			}
+			var links = root.querySelectorAll('[data-tara-title-link]');
+			for (var i = 0; i < links.length; i++) {
+				if (item.link) {
+					links[i].setAttribute('href', item.link);
+				}
+			}
+		}
+
+		function paintProgress(position, duration) {
+			var percent = duration > 0 ? (position / duration) * 100 : 0;
+			if (refs.fill) {
+				refs.fill.style.width = percent + '%';
+			}
+			if (refs.time) {
+				refs.time.textContent = fmt(position) + ' / ' + fmt(duration);
+			}
+			if (refs.seek && duration > 0 && document.activeElement !== refs.seek) {
+				refs.seek.value = String(percent);
+			}
+		}
+
+		Engine.subscribe(function (type, data) {
+			if (!isOwner()) {
+				root.classList.remove('is-playing', 'is-loading');
+				return;
+			}
+
+			if (type === 'load') {
+				paintTrack(data.track);
+				if (refs.count) {
+					var total = (Engine.state().queue || []).length;
+					if (total > 0) {
+						refs.count.textContent = toFa(total) + ' قطعه';
+					}
+				}
+				root.classList.remove('is-error');
+				if (refs.error) {
+					refs.error.hidden = true;
+				}
+			}
+
+			if (type === 'loading') {
+				root.classList.add('is-loading');
+			}
+
+			if (type === 'ready' || type === 'playing') {
+				root.classList.remove('is-loading');
+			}
+
+			root.classList.toggle('is-playing', type === 'playing' ? true : (type === 'paused' ? false : root.classList.contains('is-playing')));
+
+			if (type === 'time') {
+				paintProgress(data.position, data.duration);
+			}
+
+			if (type === 'buffer' && refs.buffer) {
+				refs.buffer.style.width = (data.percent || 0) + '%';
+			}
+
+			if (type === 'volume') {
+				root.classList.toggle('is-muted', !!data.muted);
+				if (refs.volume) {
+					refs.volume.value = String(data.muted ? 0 : data.volume);
+				}
+			}
+
+			if (type === 'error') {
+				root.classList.remove('is-loading', 'is-playing');
+				root.classList.add('is-error');
+				if (refs.error) {
+					refs.error.hidden = false;
+				}
+			}
 		});
-		audio.addEventListener('canplay', function () {
-			root.classList.remove('is-loading');
+
+		/* مقدار اولیه */
+		paintTrack(tracks[0]);
+
+		/* دکمه‌های همین کارت — با delegation، پس اگر مارکاپ دوباره ساخته شود هم کار می‌کند */
+		root.addEventListener('click', function (event) {
+			var button = event.target.closest ? event.target.closest('[data-tara-toggle], [data-tara-prev], [data-tara-next], [data-tara-mute]') : null;
+			if (!button) {
+				return;
+			}
+
+			event.preventDefault();
+
+			if (button.hasAttribute('data-tara-toggle')) {
+				if (isOwner() && Engine.state().track) {
+					Engine.toggle();
+				} else {
+					Engine.load(root.__taraTracks || tracks, 0, root, true);
+				}
+				return;
+			}
+
+			if (!isOwner()) {
+				Engine.load(root.__taraTracks || tracks, 0, root, false);
+			}
+
+			if (button.hasAttribute('data-tara-prev')) {
+				Engine.prev();
+			} else if (button.hasAttribute('data-tara-next')) {
+				Engine.next();
+			} else if (button.hasAttribute('data-tara-mute')) {
+				Engine.mute();
+			}
 		});
-		audio.addEventListener('playing', function () {
-			root.classList.remove('is-loading');
-			setPlaying(true);
-			if (dock && (ownsDock || dockOwner === root)) {
+
+		if (refs.seek) {
+			refs.seek.addEventListener('input', function () {
+				if (isOwner()) {
+					Engine.seekPercent(Number(refs.seek.value));
+				}
+			});
+		}
+
+		if (refs.volume) {
+			refs.volume.addEventListener('input', function () {
+				Engine.volume(Number(refs.volume.value));
+			});
+		}
+
+		root.__taraTracks = tracks;
+		root.__taraTitle = (root.querySelector('.ty-player__eyebrow') || {}).textContent || 'فهرست پخش';
+	}
+
+	/* ==================================================================
+	 * ۳) نوار چسبان
+	 * ================================================================== */
+	function Dock(dock) {
+		if (!dock) {
+			return;
+		}
+
+		var refs = {
+			title: dock.querySelector('[data-tara-dock-title]'),
+			artist: dock.querySelector('[data-tara-dock-artist]'),
+			art: dock.querySelector('[data-tara-dock-art]'),
+			link: dock.querySelector('[data-tara-dock-link]'),
+			fill: dock.querySelector('[data-tara-dock-fill]')
+		};
+
+		function show() {
+			if (dock.hidden) {
 				dock.hidden = false;
 				window.requestAnimationFrame(function () {
 					dock.classList.add('is-visible');
 					document.body.classList.add('has-tara-dock');
 				});
 			}
-		});
-		audio.addEventListener('pause', function () {
-			setPlaying(false);
-		});
-		audio.addEventListener('timeupdate', updateTime);
-		audio.addEventListener('durationchange', updateTime);
-		audio.addEventListener('progress', function () {
-			if (buffer && audio.buffered.length && audio.duration) {
-				buffer.style.width = (audio.buffered.end(audio.buffered.length - 1) / audio.duration) * 100 + '%';
+		}
+
+		function hide() {
+			dock.classList.remove('is-visible');
+			document.body.classList.remove('has-tara-dock');
+			window.setTimeout(function () {
+				if (!dock.classList.contains('is-visible')) {
+					dock.hidden = true;
+				}
+			}, 260);
+		}
+
+		Engine.subscribe(function (type, data) {
+			if (type === 'load' && data.track) {
+				if (refs.title) {
+					refs.title.textContent = data.track.title || '';
+				}
+				if (refs.artist) {
+					refs.artist.textContent = data.track.artist || '';
+				}
+				if (refs.art && data.track.cover) {
+					refs.art.setAttribute('src', data.track.cover);
+				}
+				if (refs.link) {
+					refs.link.setAttribute('href', data.track.link || '#');
+				}
+				if (refs.fill) {
+					refs.fill.style.width = '0%';
+				}
 			}
-		});
-		audio.addEventListener('ended', function () {
-			if (tracks.length > 1) {
-				load(current + 1, true);
-			} else {
-				setPlaying(false);
+
+			if (type === 'playing') {
+				dock.classList.add('is-playing');
+				show();
 			}
-		});
-		audio.addEventListener('error', function () {
-			root.classList.remove('is-loading');
-			root.classList.add('is-error');
+
+			if (type === 'paused') {
+				dock.classList.remove('is-playing');
+			}
+
+			if (type === 'time' && refs.fill && data.duration > 0) {
+				refs.fill.style.width = (data.position / data.duration) * 100 + '%';
+			}
+
+			if (type === 'stop') {
+				dock.classList.remove('is-playing');
+				hide();
+			}
 		});
 
-		/* رسانه در نوار سیستم (موبایل) */
-		if ('mediaSession' in navigator && window.MediaMetadata) {
-			var syncMediaSession = function () {
-				var t = track();
-				navigator.mediaSession.metadata = new window.MediaMetadata({
-					title: t.title,
-					artist: t.artist,
-					album: document.title,
-					artwork: t.cover ? [{ src: t.cover, sizes: '190x190', type: 'image/jpeg' }] : []
-				});
-			};
-			audio.addEventListener('playing', syncMediaSession);
-			if (navigator.mediaSession.setActionHandler) {
-				navigator.mediaSession.setActionHandler('play', play);
-				navigator.mediaSession.setActionHandler('pause', pause);
-				navigator.mediaSession.setActionHandler('previoustrack', function () {
-					load(current - 1, true);
-				});
-				navigator.mediaSession.setActionHandler('nexttrack', function () {
-					load(current + 1, true);
-				});
+		dock.addEventListener('click', function (event) {
+			var target = event.target.closest ? event.target.closest('[data-tara-dock-toggle], [data-tara-dock-prev], [data-tara-dock-next], [data-tara-dock-close], [data-tara-dock-list]') : null;
+			if (!target) {
+				return;
+			}
+
+			if (target.hasAttribute('data-tara-dock-toggle')) {
+				Engine.toggle();
+			} else if (target.hasAttribute('data-tara-dock-prev')) {
+				Engine.prev();
+			} else if (target.hasAttribute('data-tara-dock-next')) {
+				Engine.next();
+			} else if (target.hasAttribute('data-tara-dock-list')) {
+				Modal.open();
+			} else if (target.hasAttribute('data-tara-dock-close')) {
+				Engine.stop();
+			}
+		});
+	}
+
+	/* ==================================================================
+	 * ۴) کادر فهرست پخش
+	 * ================================================================== */
+	var Modal = (function () {
+		var node = null;
+		var listNode = null;
+		var searchNode = null;
+		var emptyNode = null;
+		var titleNode = null;
+		var countNode = null;
+		var metaNode = null;
+		var lastFocus = null;
+		var queue = [];
+		var owner = null;
+
+		function ensureNode() {
+			if (node) {
+				return node;
+			}
+			node = document.querySelector('[data-tara-modal]');
+			return node;
+		}
+
+		function rowsFor(term) {
+			var state = Engine.state();
+			var currentQueue = owner && owner.__taraTracks ? owner.__taraTracks : state.queue;
+			var currentIndex = (owner === state.owner) ? state.index : -1;
+			var out = [];
+			var needle = String(term || '').trim().toLowerCase();
+
+			for (var i = 0; i < currentQueue.length; i++) {
+				var item = currentQueue[i] || {};
+				var haystack = (item.title || '') + ' ' + (item.artist || '');
+				if (needle && haystack.toLowerCase().indexOf(needle) === -1) {
+					continue;
+				}
+				out.push({ index: i, item: item, current: i === currentIndex });
+			}
+
+			return { rows: out, total: currentQueue.length, currentIndex: currentIndex };
+		}
+
+		function render(term) {
+			if (!listNode) {
+				return;
+			}
+
+			var data = rowsFor(term);
+			listNode.innerHTML = '';
+
+			for (var i = 0; i < data.rows.length; i++) {
+				var row = data.rows[i];
+				var li = document.createElement('li');
+				li.className = 'ty-modal__row' + (row.current ? ' is-current' : '');
+
+				var btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'ty-modal__row-btn';
+				btn.setAttribute('data-tara-modal-play', String(row.index));
+				if (row.current) {
+					btn.setAttribute('aria-current', 'true');
+				}
+
+				var num = document.createElement('span');
+				num.className = 'ty-modal__row-num';
+				num.innerHTML = row.current
+					? '<span class="ty-icon-eq" aria-hidden="true"><i></i><i></i><i></i></span>'
+					: toFa(row.index + 1);
+				btn.appendChild(num);
+
+				if (row.item.cover) {
+					var cover = document.createElement('img');
+					cover.className = 'ty-modal__row-cover';
+					cover.src = row.item.cover;
+					cover.alt = '';
+					cover.loading = 'lazy';
+					cover.width = 40;
+					cover.height = 40;
+					btn.appendChild(cover);
+				} else {
+					var blank = document.createElement('span');
+					blank.className = 'ty-modal__row-cover ty-modal__row-cover--empty';
+					blank.setAttribute('aria-hidden', 'true');
+					blank.textContent = '♪';
+					btn.appendChild(blank);
+				}
+
+				var body = document.createElement('span');
+				body.className = 'ty-modal__row-body';
+				var title = document.createElement('span');
+				title.className = 'ty-modal__row-title';
+				title.textContent = row.item.title || '';
+				var artist = document.createElement('span');
+				artist.className = 'ty-modal__row-artist';
+				artist.textContent = row.item.artist || '';
+				body.appendChild(title);
+				body.appendChild(artist);
+				btn.appendChild(body);
+
+				var dur = document.createElement('span');
+				dur.className = 'ty-modal__row-state';
+				dur.textContent = row.current ? 'در حال پخش' : 'پخش';
+				btn.appendChild(dur);
+
+				li.appendChild(btn);
+				listNode.appendChild(li);
+			}
+
+			if (emptyNode) {
+				emptyNode.hidden = data.rows.length > 0;
+			}
+
+			if (countNode) {
+				countNode.textContent = toFa(data.total) + ' قطعه';
+			}
+
+			if (metaNode) {
+				metaNode.textContent = toFa(data.rows.length) + ' از ' + toFa(data.total) + ' قطعه';
+			}
+
+			var current = listNode.querySelector('.ty-modal__row.is-current');
+			if (current) {
+				window.setTimeout(function () {
+					if (current.scrollIntoView) {
+						current.scrollIntoView({ block: 'nearest' });
+					}
+				}, 40);
 			}
 		}
 
-		var api = {
-			root: root,
-			silence: function () {
-				if (!audio.paused || audio.src) {
-					audio.pause();
+		function open(card) {
+			if (!ensureNode()) {
+				return;
+			}
+
+			owner = card || Engine.state().owner || null;
+			queue = owner && owner.__taraTracks ? owner.__taraTracks : Engine.state().queue;
+
+			if (!queue || !queue.length) {
+				return;
+			}
+
+			lastFocus = document.activeElement;
+			node.hidden = false;
+			document.body.classList.add('has-tara-modal');
+			window.requestAnimationFrame(function () {
+				node.classList.add('is-open');
+			});
+
+			if (titleNode) {
+				titleNode.textContent = (owner && owner.__taraTitle) ? owner.__taraTitle : 'فهرست پخش';
+			}
+
+			if (searchNode) {
+				searchNode.value = '';
+			}
+
+			render('');
+
+			var listButtons = document.querySelectorAll('[data-tara-list]');
+			for (var i = 0; i < listButtons.length; i++) {
+				listButtons[i].setAttribute('aria-expanded', 'true');
+			}
+
+			window.setTimeout(function () {
+				if (searchNode) {
+					searchNode.focus({ preventScroll: true });
 				}
-				root.classList.remove('is-playing');
-				if (dock && dockOwner === root) {
-					dock.classList.remove('is-playing');
+			}, 120);
+		}
+
+		function close() {
+			if (!node || node.hidden) {
+				return;
+			}
+
+			node.classList.remove('is-open');
+			document.body.classList.remove('has-tara-modal');
+
+			window.setTimeout(function () {
+				if (!node.classList.contains('is-open')) {
+					node.hidden = true;
+				}
+			}, 220);
+
+			var listButtons = document.querySelectorAll('[data-tara-list]');
+			for (var i = 0; i < listButtons.length; i++) {
+				listButtons[i].setAttribute('aria-expanded', 'false');
+			}
+
+			if (lastFocus && lastFocus.focus) {
+				lastFocus.focus({ preventScroll: true });
+			}
+		}
+
+		function init() {
+			if (!ensureNode()) {
+				return;
+			}
+
+			listNode = node.querySelector('[data-tara-modal-list]');
+			searchNode = node.querySelector('[data-tara-modal-search]');
+			emptyNode = node.querySelector('[data-tara-modal-empty]');
+			titleNode = node.querySelector('[data-tara-modal-title]');
+			countNode = node.querySelector('[data-tara-modal-count]');
+			metaNode = node.querySelector('[data-tara-modal-meta]');
+
+			node.addEventListener('click', function (event) {
+				var closer = event.target.closest ? event.target.closest('[data-tara-modal-close]') : null;
+				if (closer) {
+					close();
+					return;
+				}
+
+				var playBtn = event.target.closest ? event.target.closest('[data-tara-modal-play]') : null;
+				if (playBtn) {
+					var index = Number(playBtn.getAttribute('data-tara-modal-play'));
+					var card = owner || Engine.state().owner;
+					var list = card && card.__taraTracks ? card.__taraTracks : queue;
+					Engine.load(list, index, card, true);
+					window.setTimeout(function () {
+						render(searchNode ? searchNode.value : '');
+					}, 80);
+				}
+			});
+
+			if (searchNode) {
+				searchNode.addEventListener('input', function () {
+					render(searchNode.value);
+				});
+			}
+
+			document.addEventListener('keydown', function (event) {
+				if (event.key === 'Escape' && node && !node.hidden) {
+					close();
+				}
+			});
+
+			/* با تغییر قطعه از هر جای دیگری، ردیف فعال کادر هم به‌روز شود */
+			Engine.subscribe(function (type) {
+				if (!node || node.hidden) {
+					return;
+				}
+				if (type === 'load' || type === 'playing') {
+					render(searchNode ? searchNode.value : '');
+				}
+			});
+		}
+
+		return { init: init, open: open, close: close, render: render };
+	})();
+
+	/* ==================================================================
+	 * ۵) کلیک‌های عمومی: صف‌های صفحه، دکمهٔ فهرست، ردیف‌های آهنگ
+	 * ================================================================== */
+	function bindGlobalClicks() {
+		document.addEventListener('click', function (event) {
+			if (!event.target.closest) {
+				return;
+			}
+
+			/* دکمهٔ «فهرست پخش» روی کارت یا نوار چسبان */
+			var listBtn = event.target.closest('[data-tara-list]');
+			if (listBtn) {
+				event.preventDefault();
+				var card = listBtn.closest('[data-tara-player]');
+				Modal.open(card);
+				return;
+			}
+
+			/* ردیف‌های آهنگ: صف از نزدیک‌ترین [data-tara-queue]، وگرنه اولین کارت */
+			var playBtn = event.target.closest('[data-tara-play], [data-tara-track]');
+			if (!playBtn || playBtn.closest('[data-tara-player]')) {
+				return;
+			}
+
+			var index = playBtn.hasAttribute('data-tara-play') ? Number(playBtn.getAttribute('data-tara-play')) : -1;
+
+			var holder = playBtn.closest('[data-tara-queue]');
+			var queue = readJSON(holder, 'data-tara-queue');
+			var owner = holder ? null : document.querySelector('[data-tara-player]');
+
+			if (!queue || !queue.length) {
+				queue = owner && owner.__taraTracks ? owner.__taraTracks : null;
+			}
+
+			if (index < 0 && playBtn.hasAttribute('data-tara-track')) {
+				var want = String(playBtn.getAttribute('data-tara-track'));
+				index = -1;
+				for (var q = 0; queue && q < queue.length; q++) {
+					if (String((queue[q] || {}).id) === want) {
+						index = q;
+						break;
+					}
 				}
 			}
+
+			if (isNaN(index) || index < 0) {
+				return;
+			}
+
+			if (!queue || !queue.length) {
+				return;
+			}
+
+			event.preventDefault();
+
+			var title = holder ? (holder.getAttribute('data-tara-title') || 'فهرست پخش') : '';
+
+			if (holder) {
+				holder.__taraTitle = title;
+			}
+
+			/* کارت روی صفحه «مالک» می‌شود تا کارت و نوار چسبان هم‌زمان همان
+			   قطعه را نشان دهند؛ صفِ فهرست هم داخل کارت می‌نشیند. */
+			var cardNode = document.querySelector('[data-tara-player]');
+			if (cardNode && cardNode.__taraTracks) {
+				cardNode.__taraTracks = queue;
+				cardNode.__taraTitle = title || cardNode.__taraTitle;
+				Engine.load(queue, index, cardNode, true);
+				return;
+			}
+
+			Engine.load(queue, index, holder || owner, true);
+		});
+	}
+
+	/* ==================================================================
+	 * ۶) پلیر ویدیو
+	 * ================================================================== */
+	function Video(root) {
+		var video = root.querySelector('[data-tara-video-el]');
+		if (!video) {
+			return;
+		}
+
+		var refs = {
+			cover: root.querySelector('[data-tara-video-toggle]'),
+			played: root.querySelector('[data-tara-video-played]'),
+			loaded: root.querySelector('[data-tara-video-loaded]'),
+			seek: root.querySelector('[data-tara-video-seek]'),
+			time: root.querySelector('[data-tara-video-time]'),
+			qualityLabel: root.querySelector('[data-tara-video-quality]'),
+			pop: root.querySelector('[data-tara-video-pop]'),
+			settings: root.querySelector('[data-tara-video-settings]')
 		};
-		registry.push(api);
+
+		function paint() {
+			var duration = video.duration || 0;
+			var percent = duration > 0 ? (video.currentTime / duration) * 100 : 0;
+
+			if (refs.played) {
+				refs.played.style.width = percent + '%';
+			}
+			if (refs.seek && duration > 0 && document.activeElement !== refs.seek) {
+				refs.seek.value = String(percent);
+			}
+			if (refs.time) {
+				refs.time.textContent = fmt(video.currentTime) + ' / ' + fmt(duration);
+			}
+			if (refs.loaded && video.buffered && video.buffered.length && duration) {
+				refs.loaded.style.width = (video.buffered.end(video.buffered.length - 1) / duration) * 100 + '%';
+			}
+		}
+
+		function hideCover() {
+			if (refs.cover) {
+				refs.cover.classList.add('is-hidden');
+			}
+		}
+
+		function showCover() {
+			if (refs.cover) {
+				refs.cover.classList.remove('is-hidden');
+			}
+		}
+
+		video.addEventListener('timeupdate', paint);
+		video.addEventListener('durationchange', paint);
+		video.addEventListener('progress', paint);
+		video.addEventListener('play', function () {
+			root.classList.add('is-playing');
+			hideCover();
+		});
+		video.addEventListener('pause', function () {
+			root.classList.remove('is-playing');
+		});
+		video.addEventListener('ended', function () {
+			root.classList.remove('is-playing');
+			showCover();
+		});
+
+		root.addEventListener('click', function (event) {
+			var target = event.target.closest ? event.target.closest('[data-tara-video-toggle], [data-tara-video-play], [data-tara-video-mute], [data-tara-video-fs], [data-tara-video-settings], [data-tara-video-src], [data-tara-video-rate], [data-tara-video-pip]') : null;
+			if (!target) {
+				return;
+			}
+
+			if (target.hasAttribute('data-tara-video-toggle') || target.hasAttribute('data-tara-video-play')) {
+				if (video.paused) {
+					var promise = video.play();
+					if (promise && promise.catch) {
+						promise.catch(function () {});
+					}
+				} else {
+					video.pause();
+				}
+			} else if (target.hasAttribute('data-tara-video-mute')) {
+				video.muted = !video.muted;
+				target.classList.toggle('is-muted', video.muted);
+			} else if (target.hasAttribute('data-tara-video-fs')) {
+				if (root.requestFullscreen) {
+					root.requestFullscreen();
+				} else if (video.webkitEnterFullscreen) {
+					video.webkitEnterFullscreen();
+				}
+			} else if (target.hasAttribute('data-tara-video-settings')) {
+				if (refs.pop) {
+					refs.pop.hidden = !refs.pop.hidden;
+					target.setAttribute('aria-expanded', refs.pop.hidden ? 'false' : 'true');
+				}
+			} else if (target.hasAttribute('data-tara-video-src')) {
+				var wasPlaying = !video.paused;
+				var at = video.currentTime || 0;
+				var source = video.querySelector('source');
+				var resume = function () {
+					video.removeEventListener('loadedmetadata', resume);
+					try {
+						if (at > 0) {
+							video.currentTime = at;
+						}
+					} catch (error) {}
+					if (wasPlaying) {
+						var p2 = video.play();
+						if (p2 && p2.catch) {
+							p2.catch(function () {});
+						}
+					}
+				};
+				if (source) {
+					source.src = target.getAttribute('data-tara-video-src');
+				} else {
+					video.src = target.getAttribute('data-tara-video-src');
+				}
+				video.addEventListener('loadedmetadata', resume);
+				video.load();
+				if (refs.qualityLabel) {
+					refs.qualityLabel.textContent = target.getAttribute('data-tara-video-q') + 'p';
+				}
+				var qualities = root.querySelectorAll('[data-tara-video-src]');
+				for (var i = 0; i < qualities.length; i++) {
+					qualities[i].classList.toggle('is-active', qualities[i] === target);
+				}
+			} else if (target.hasAttribute('data-tara-video-rate')) {
+				video.playbackRate = Number(target.getAttribute('data-tara-video-rate'));
+				var rates = root.querySelectorAll('[data-tara-video-rate]');
+				for (var r = 0; r < rates.length; r++) {
+					rates[r].classList.toggle('is-active', rates[r] === target);
+				}
+			} else if (target.hasAttribute('data-tara-video-pip')) {
+				if (document.pictureInPictureElement) {
+					document.exitPictureInPicture();
+				} else if (video.requestPictureInPicture) {
+					video.requestPictureInPicture();
+				}
+			}
+		});
+
+		if (refs.seek) {
+			refs.seek.addEventListener('input', function () {
+				if (video.duration) {
+					video.currentTime = (Number(refs.seek.value) / 100) * video.duration;
+				}
+			});
+		}
+
+		/* کلیک بیرون منوی کیفیت آن را می‌بندد */
+		document.addEventListener('click', function (event) {
+			if (!refs.pop || refs.pop.hidden) {
+				return;
+			}
+			if (!refs.pop.contains(event.target) && !(refs.settings && refs.settings.contains(event.target))) {
+				refs.pop.hidden = true;
+				if (refs.settings) {
+					refs.settings.setAttribute('aria-expanded', 'false');
+				}
+			}
+		});
 
 		paint();
 	}
 
-	function boot() {
-		var players = document.querySelectorAll('[data-tara-player]');
-		for (var i = 0; i < players.length; i++) {
-			initPlayer(players[i]);
+	/* ==================================================================
+	 * ۶.۵) پوستهٔ سایت: هدر چسبان + دکمهٔ «بالا»
+	 * ================================================================== */
+	function Chrome() {
+		var header = document.getElementById('header');
+		if (header) {
+			var onChange = function () {
+				header.classList.toggle('is-stuck', window.scrollY > 40);
+			};
+			onChange();
+			window.addEventListener('scroll', onChange, { passive: true });
 		}
+
+		var top = document.querySelector('.top_page');
+		if (top) {
+			top.setAttribute('role', 'button');
+			top.setAttribute('tabindex', '0');
+			top.setAttribute('aria-label', 'بازگشت به بالای صفحه');
+			var goTop = function (event) {
+				if (event) {
+					event.preventDefault();
+				}
+				window.scrollTo({ top: 0, behavior: 'smooth' });
+			};
+			top.addEventListener('click', goTop);
+			top.addEventListener('keydown', function (event) {
+				if (event.key === 'Enter' || event.key === ' ') {
+					goTop(event);
+				}
+			});
+		}
+	}
+
+	/* ==================================================================
+	 * ۷) راه‌اندازی
+	 * ================================================================== */
+	function boot() {
+		Chrome();
+
+		var cards = document.querySelectorAll('[data-tara-player]');
+		for (var i = 0; i < cards.length; i++) {
+			PlayerCard(cards[i]);
+		}
+
+		var dock = document.querySelector('[data-tara-dock]');
+		if (dock) {
+			Dock(dock);
+		}
+
+		var videos = document.querySelectorAll('[data-tara-video]');
+		for (var v = 0; v < videos.length; v++) {
+			Video(videos[v]);
+		}
+
+		Modal.init();
+		bindGlobalClicks();
+		Engine.on();
 	}
 
 	if (document.readyState === 'loading') {

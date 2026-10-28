@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.7.8
+Version: 3.7.9
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -287,7 +287,11 @@ border-radius: 5px;}
 
 
 
-#ads_top,#ads_top_dl{width: 100%;height: auto;padding: 15px 0;text-align: center;}
+/* v3.7.9 — padding این‌جا هم ۱۲px شد؛ قاعدهٔ ۳.۷.۸ (خط ~۱۲۶) با همین
+   سلکتور و padding:15px بود و نمی‌توانست این یکی را باطل کند (هر دو
+   یک وزن و این یکی دیرتر می‌آید) ⇒ فاصلهٔ هدر تا محتوا بی‌اثر می‌ماند. */
+#ads_top,#ads_top_dl{width: 100%;height: auto;padding: 12px 0;text-align: center;}
+#ads_top:empty,#ads_top_dl:empty{padding: 0;margin: 0;}
 
 
 #breadcrumbs_container {
@@ -1643,7 +1647,11 @@ body{padding-top:0;}
 .artist_det_tarlanweb .socials_box {margin: 0 auto;float: none;clear: both;text-align: center;}
 .artist_det_tarlanweb .socials_box a{float:none;display:inline-block;}
 #artist_image_box{height:350px;}
-#breadcrumbs{overflow-x: scroll;white-space: nowrap;padding-bottom:12px;}
+/* v3.7.9 — نوار مسیر (breadcrumb) در گوشی: اسکرول افقیِ بی‌نوار.
+   قبلاً `overflow-x: scroll` بود و یک نوار اسکرول زشتِ همیشه‌روشن زیر مسیر
+   می‌کشید؛ حالا فقط با انگشت جابه‌جا می‌شود و هیچ ارتفاعی هم نمی‌گیرد. */
+#breadcrumbs{overflow-x: auto;overflow-y: hidden;white-space: nowrap;padding-bottom: 4px;scrollbar-width: none;-ms-overflow-style: none;}
+#breadcrumbs::-webkit-scrollbar{display: none;height: 0;}
 }
 @media (max-width: 450px){
 .tarlanweb_center{width: 350px;overflow-x:hidden;}
@@ -3097,9 +3105,13 @@ ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);paddi
    اگر جااسکریپت کلاً خاموش باشد، کاربر همین آیند اول را می‌بیند (و لینک «مشاهده بیشتر» پایین
    همان بخش، بقیه را دارد) — یعنی هیچ محتوایی از دسترس/Crawl خارج نمی‌شود.
    ========================================================================================== */
-.vip_top_slider:not(.owl-loaded),
+/* v3.7.9 — اسلایدر ویژه از این گارد بیرون آمد.
+   این قاعده برای روزهای owl نوشته شده بود و «تا init شدن owl فقط اسلاید اول
+   دیده شود». از ۳.۷.۸ که اسلایدر خانه بدون owl شد، کلاس `.owl-loaded` هرگز
+   اضافه نمی‌شد ⇒ `>:nth-child(n+2){display:none}` همهٔ اسلایدها جز اولی را
+   برای همیشه پنهان می‌کرد. همان «فقط یکی می‌آید بالا و بقیه کلا محو می‌شود».
+   حالا فقط ریل هنرمندان (که واقعاً owl است) این گارد را دارد. */
 .artists_slider:not(.owl-loaded){display:block;overflow:hidden}
-.vip_top_slider:not(.owl-loaded)>:nth-child(n+2),
 .artists_slider:not(.owl-loaded)>:nth-child(n+2){display:none}
 /* انتهای بلوک ۲۸ (v3.3.4) */
 

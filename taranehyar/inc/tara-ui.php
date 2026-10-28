@@ -162,6 +162,75 @@ if ( ! function_exists( 'tara_track_src' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_post_has_video' ) ) {
+	/**
+	 * آیا این اثر «موزیک ویدیو» دارد؟ (v3.7.9)
+	 * ------------------------------------------------------------------
+	 * تا امروز تنها راهِ فهمیدنش این بود که کاربر روی کارت کلیک کند و در
+	 * صفحهٔ آهنگ پلیر ویدیو را ببیند. حالا کارت‌ها یک نشانهٔ کوچک ویدیو
+	 * می‌گیرند تا از فهرست هم معلوم باشد.
+	 *
+	 * فقط `get_post_meta` خوانده می‌شود (بدون `get_field`) تا روی فهرست‌های
+	 * ۲۰تایی صفحهٔ هنرمند هم هزینهٔ اضافه نداشته باشد؛ متای نوشته‌های داخل
+	 * حلقه از قبل در کشِ وردپرس هست. نتیجه هم در همان درخواست memo می‌شود.
+	 *
+	 * @param int $post_id شناسهٔ نوشته (۰ = نوشتهٔ جاری).
+	 * @return bool
+	 */
+	function tara_post_has_video( $post_id = 0 ) {
+		static $cache = array();
+
+		$id = $post_id ? (int) $post_id : (int) get_the_ID();
+		if ( ! $id ) {
+			return false;
+		}
+		if ( isset( $cache[ $id ] ) ) {
+			return $cache[ $id ];
+		}
+
+		$has = false;
+		foreach ( array( 'video1080', 'video720', 'video480' ) as $key ) {
+			$value = get_post_meta( $id, $key, true );
+			if ( is_scalar( $value ) && '' !== trim( (string) $value ) ) {
+				$has = true;
+				break;
+			}
+		}
+
+		/* فیلدها ممکن است فقط در ACF ذخیره شده باشند (نام فیلد متفاوت) */
+		if ( ! $has && function_exists( 'get_field' ) ) {
+			$value = get_field( 'video720', $id );
+			$has   = is_scalar( $value ) && '' !== trim( (string) $value );
+		}
+
+		$cache[ $id ] = (bool) apply_filters( 'tara_post_has_video', $has, $id );
+
+		return $cache[ $id ];
+	}
+}
+
+if ( ! function_exists( 'tara_video_badge' ) ) {
+	/**
+	 * نشانهٔ «موزیک ویدیو» روی کارت/ردیف. خروجی رشتهٔ خالی برای آثار صوتی.
+	 *
+	 * @param int    $post_id شناسهٔ نوشته.
+	 * @param string $variant 'card' (روی کاور) یا 'row' (کنار تیتر).
+	 * @return string
+	 */
+	function tara_video_badge( $post_id = 0, $variant = 'card' ) {
+		if ( ! tara_post_has_video( $post_id ) ) {
+			return '';
+		}
+
+		if ( 'row' === $variant ) {
+			return '<span class="ty-track__vid" aria-label="موزیک ویدیو" title="موزیک ویدیو"><i class="icofont-play-alt-2" aria-hidden="true"></i></span>';
+		}
+
+		return '<span class="ab-card-video" aria-label="موزیک ویدیو" title="موزیک ویدیو">'
+			. '<i class="icofont-play-alt-2" aria-hidden="true"></i><em>ویدیو</em></span>';
+	}
+}
+
 if ( ! function_exists( 'tara_music_value' ) ) {
 	/**
 	 * مقدارِ خامِ یک فیلد موسیقی (ACF → متا) و بعد نرمال‌سازی به آدرس/رشته.
@@ -365,7 +434,7 @@ if ( ! function_exists( 'tara_track_row' ) ) {
 			<?php endif; ?>
 
 			<div class="ty-track__body">
-				<a class="ty-track__title" href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $title ); ?></a>
+				<a class="ty-track__title" href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $title ); ?><?php echo tara_video_badge( $post_id, 'row' ); // خروجی escape شده در تابع ?></a>
 				<span class="ty-track__artist"><?php echo esc_html( $artist ); ?></span>
 			</div>
 
@@ -883,7 +952,7 @@ if ( ! function_exists( 'tara_player' ) ) {
 					<div class="ty-player__tools">
 						<span class="ty-player__count" data-tara-count><?php echo esc_html( tara_fa_number( count( $tracks ) ) ); ?> قطعه</span>
 						<?php if ( $tara_total > 1 ) : ?>
-						<button type="button" class="ty-player__tool" data-tara-list aria-haspopup="dialog" aria-expanded="false" aria-controls="tara-playlist-modal">
+						<button type="button" class="ty-player__tool" data-tara-list aria-haspopup="dialog" aria-expanded="false" aria-controls="tara-playlist-modal" aria-label="فهرست پخش">
 							<span class="ty-icon-list" aria-hidden="true"></span>
 							<span class="ty-player__tool-label">فهرست پخش</span>
 						</button>

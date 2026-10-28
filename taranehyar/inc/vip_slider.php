@@ -55,6 +55,8 @@ if ( $tara_fixbvip ) {
 			<div class="vip_top_slider ty-hero-track" data-ty-hero data-interval="5200" role="region" aria-roledescription="carousel" aria-label="آثار ویژه">
 				<?php
 				$tara_slide = 0;
+				/* v3.7.9 — عدد کل برای برچسب «n از m» روی هر اسلاید (دسترس‌پذیری). */
+				$tara_slide_total = (int) $tara_vip_query->post_count;
 				while ( $tara_vip_query->have_posts() ) :
 					$tara_vip_query->the_post();
 					$tara_slide++;
@@ -74,20 +76,26 @@ if ( $tara_fixbvip ) {
 					$tara_priority   = ( 1 === $tara_slide ) ? 'high' : 'auto';
 					$tara_loading    = ( 1 === $tara_slide ) ? 'eager' : 'lazy';
 					?>
-					<article class="ty-hero-slide<?php echo ( 1 === $tara_slide ) ? ' is-active' : ''; ?>" data-ty-slide aria-hidden="<?php echo ( 1 === $tara_slide ) ? 'false' : 'true'; ?>">
+					<article class="ty-hero-slide<?php echo ( 1 === $tara_slide ) ? ' is-active' : ''; ?>"
+						data-ty-slide
+						aria-roledescription="slide"
+						aria-label="<?php echo esc_attr( $tara_slide . ' از ' . $tara_slide_total ); ?>"
+						aria-hidden="<?php echo ( 1 === $tara_slide ) ? 'false' : 'true'; ?>">
 						<a class="ty-hero-slide__media" href="<?php the_permalink(); ?>">
 							<img src="<?php echo esc_url( $tara_image ); ?>"
 								width="1280" height="620"
 								alt="<?php echo esc_attr( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?>"
 								loading="<?php echo esc_attr( $tara_loading ); ?>"
+								decoding="async"
+								draggable="false"
 								fetchpriority="<?php echo esc_attr( $tara_priority ); ?>">
 						</a>
 
 						<?php
-						/* v3.7.5 — به درخواست کاربر، تمام متن‌های روی اسلاید حذف شد:
-						   برچسب «پیشنهاد ویژه»، عنوان/نام خواننده و دکمهٔ «شنیدن و دانلود».
-						   اسلاید حالا فقط کاورِ تمام‌عرض است و کل کارت را می‌پوشاند؛
-						   کلیک روی تصویر همان لینک صفحهٔ آهنگ است. */
+						/* v3.7.5 — به درخواست کاربر، همهٔ متن‌های روی اسلاید (برچسبِ بالای
+						   کارت، عنوان/نام خواننده و دکمهٔ شنیدن) حذف شد. اسلاید حالا فقط
+						   کاورِ تمام‌عرض است و کل کارت را می‌پوشاند؛ کلیک روی تصویر همان
+						   لینک صفحهٔ آهنگ است. */
 						?>
 					</article>
 					<?php

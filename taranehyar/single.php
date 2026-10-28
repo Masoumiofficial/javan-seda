@@ -248,12 +248,6 @@ if ( function_exists( 'tara_social_box' ) ) { tara_social_box( get_the_ID() ); }
 
 <?php the_content(''); ?>
 
-<?php
-/* v3.7.8 — «مشخصات اثر» دقیقاً یک‌جا و بعد از توضیحات می‌آید.
-   خودِ پلیر بالای صفحه است، پس تنظیم قدیمی «شناسنامه بالای پلیر» دیگر
-   کاربردی ندارد؛ جای دیگر با فیلتر tara_credits_position ممکن است. */
-if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID() ); }
-?>
 
 <?php
 /* ============================ باکس «متن ترانه» (متن آهنگ) ============================
@@ -475,8 +469,15 @@ if ( $taranehyar_download_title && (
 <div class="clear"></div>
 </div>
 <?php } ?>
+<?php
+/* v3.7.9 — «مشخصات اثر» رفت پایینِ لینک‌های دانلود (درخواست صریح).
+   ترتیب نهایی صفحه: پلیر → ما را دنبال کنید → توضیحات → ویدیو →
+   لینک‌های دانلود → مشخصات اثر → متن ترانه.
+   چرا؟ چون بازدیدکننده اول می‌خواهد بشنود/دانلود کند؛ شناسنامه کارتِ
+   اطلاعاتی است و بعد از آن طبیعی‌تر می‌نشیند و بالای صفحه هم شلوغی کم می‌شود. */
+if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID() ); }
+?>
 <?php if ( '' !== $taranehyar_lyrics_box && 'end' === $taranehyar_lyrics_position ) { echo $taranehyar_lyrics_box; } ?>
-<?php /* v3.7.8 — «مشخصات اثر» بالاتر و بعد از توضیحات چاپ می‌شود، نه این‌جا. */ ?>
 <div class="clear"></div>
 </div>
 

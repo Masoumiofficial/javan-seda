@@ -1283,10 +1283,26 @@ body.has-tara-dock { padding-bottom: 76px; }
 	.ty-track__date,
 	.ty-track__badge { display: none; }
 
+	/* v3.7.9 — این‌جا فقط تعداد ستون‌ها عوض شده بود و `grid-template-areas`
+	   (۹ ناحیه) سر جایش مانده بود؛ در CSS اگر تعداد ستون‌های صریح با ناحیه‌ها
+	   نخواند، **کل ناحیه‌ها باطل** می‌شود و `grid-area: art/prev/...` هم
+	   بی‌اثر می‌ماند ⇒ همهٔ دکمه‌ها با چیدمان خودکار روی هم می‌ریختند. همان
+	   «پلیر بهم‌ریخته» در تبلت و گوشی بزرگ.
+	   حالا یک الگوی کاملِ دو ردیفه: ردیف اول کاور+نام+فهرست+بستن، ردیف دوم
+	   ترابری (قبلی/پخش/بعدی). */
 	.ty-dock {
-		grid-template-columns: 40px minmax(0, 1fr) auto auto auto;
+		grid-template-columns: 40px minmax(0, 1fr) 34px 34px;
+		grid-template-areas:
+			"art meta list close"
+			"prev toggle next next";
+		row-gap: 4px;
+		column-gap: 8px;
 		padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
 	}
+
+	/* بدون ناحیه در شبکه نباید بمانند؛ وگرنه خودکار به ردیف تازه می‌پرند */
+	.ty-dock__bars,
+	.ty-dock__vol { display: none; }
 
 	.ty-dock__link { display: none; }
 }
@@ -1476,6 +1492,7 @@ body.tara-lb-open { overflow: hidden; }
 	flex-direction: column;
 	width: min(560px, 100%);
 	max-height: min(82vh, 720px);
+	max-height: min(82dvh, 720px); /* ارتفاع واقعیِ گوشی، بدون نوار آدرس */
 	border-radius: 22px;
 	background: var(--ty-surface, #fff);
 	border: 1px solid var(--ty-line, #e6e8ee);
@@ -2042,6 +2059,70 @@ body.has-tara-modal { overflow: hidden; }
 }
 
 /* =========================================================================
+   ۱۱.۵) نشانهٔ «موزیک ویدیو» روی کارت و ردیف — v3.7.9
+   -------------------------------------------------------------------------
+   چون برچسبِ متنیِ فرمت (mp3/mp4) از کارت‌ها حذف شد، راهی لازم بود که از
+   فهرست معلوم شود کدام اثر ویدیو دارد. این نشانه فقط با آیکون کار می‌کند تا
+   روی کاورهای ۱۹۰ پیکسلی شلوغی نسازد.
+   ====================================================================== */
+.ab-card-video {
+	position: absolute;
+	top: 7px;
+	inset-inline-end: 7px; /* گوشهٔ «شروع» در RTL = راست-بالا */
+	z-index: 3;
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	height: 20px;
+	padding: 0 6px 0 5px;
+	border-radius: 999px;
+	background: rgba(12, 18, 32, 0.72);
+	color: #fff;
+	font-size: 9.5px;
+	font-weight: 700;
+	line-height: 1;
+	letter-spacing: 0;
+	backdrop-filter: blur(6px);
+	box-shadow: 0 3px 10px -6px rgba(0, 0, 0, .9);
+	pointer-events: none;
+	white-space: nowrap;
+}
+
+.ab-card-video i {
+	font-size: 10px;
+	line-height: 1;
+}
+
+.ab-card-video em {
+	font-style: normal;
+}
+
+/* روی کارت‌های ریز (بخش‌های سه‌ستونهٔ گوشی) فقط آیکون بماند */
+@media (max-width: 480px) {
+	.ab-card-video { padding: 0 5px; height: 18px; top: 5px; inset-inline-end: 5px; }
+	.ab-card-video em { display: none; }
+}
+
+/* ردیف فهرست آهنگ: آیکون کوچک کنار تیتر، هم‌رنگ متنِ کم‌رنگ */
+.ty-track__vid {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 16px;
+	height: 16px;
+	margin-inline-start: 5px;
+	border-radius: 4px;
+	background: var(--ty-accent-soft, rgba(76, 29, 149, .09));
+	color: var(--ty-accent, #4c1d95);
+	font-size: 9px;
+	line-height: 1;
+	vertical-align: middle;
+	flex: 0 0 auto;
+}
+
+.ty-track__vid i { line-height: 1; }
+
+/* =========================================================================
    ۱۲) «مشخصات اثر» — بازطراحی ۳.۷.۸ (کارت استاندارد و خوانا)
    ---------------------------------------------------------------------
    ایرادهای نسخهٔ قبل: ردیفِ چیپ‌های ریز با جداکننده‌های نامنظم، در موبایل
@@ -2564,47 +2645,82 @@ body.tara-dock-open .top_page { bottom: 92px; }
    می‌شد. حالا کاور+عنوان در ردیف اول و کنترل‌ها (قبلی/پخش/بعدی + صدا +
    فهرست) در ردیف دوم می‌نشینند؛ همه‌چیز بزرگ و قابل لمس می‌ماند. */
 @media (max-width: 640px) {
+	/* v3.7.9 — درخواست صریح: کنترلِ صدا از نوار چسبانِ گوشی برداشته شود
+	   (صدای گوشی با دکمه‌های سخت‌افزاری تنظیم می‌شود) و دکمهٔ «فهرست پخش»
+	   کنار «بستن» بنشیند. سه ردیفِ قبلی هم به دو ردیف کم شد. */
 	.ty-dock {
-		grid-template-columns: 40px 40px minmax(0, 1fr) 40px;
+		grid-template-columns: 40px minmax(0, 1fr) 34px 34px;
 		grid-template-areas:
-			"art meta meta close"
-			"prev toggle next list"
-			"prev vol vol list";
-		grid-template-rows: auto auto auto;
-		row-gap: 2px;
-		column-gap: 6px;
+			"art meta list close"
+			"prev toggle next next";
+		row-gap: 4px;
+		column-gap: 8px;
 		padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
 	}
 
-	.ty-dock__bars { display: none; }
+	.ty-dock__bars,
+	.ty-dock__vol { display: none; }
+
 	.ty-dock__img { width: 40px; height: 40px; border-radius: 9px; }
 	.ty-dock__title { font-size: 12.5px; }
 	.ty-dock__artist { font-size: 10.5px; }
 	.ty-dock__rail { margin-top: 3px; }
 
 	.ty-dock [data-tara-dock-prev],
-	.ty-dock [data-tara-dock-next],
+	.ty-dock__btn--main { width: 44px; height: 44px; }
+
+	.ty-dock [data-tara-dock-next] { width: 40px; height: 40px; }
+
 	.ty-dock [data-tara-dock-list],
-	.ty-dock [data-tara-dock-close],
-	.ty-dock__btn--main { width: 40px; height: 40px; }
+	.ty-dock [data-tara-dock-close] { width: 34px; height: 34px; }
 
-	.ty-dock__vol {
-		grid-area: vol;
-		justify-self: stretch;
-		gap: 6px;
+	.ty-dock [data-tara-dock-close] { justify-self: end; }
+
+	body.has-tara-dock { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+}
+
+/* v3.7.9 — ترابریِ پلیر در گوشی: دو ردیفِ تمیز، نه سه ردیفِ درهم.
+   ردیف اول: قبلی / پخش / بعدی و در انتها زمان و آیکون بی‌صدا؛
+   ردیف دوم: نوار پیشرفتِ تمام‌عرض. اسلایدر صدا هم برداشته شد تا هم جا
+   باز شود و هم کاربر با دکمه‌های سخت‌افزاری گوشی تنظیم کند (درخواست صریح
+   برای نوار چسبان، این‌جا هم همان منطق برای هم‌خوانی). */
+@media (max-width: 640px) {
+	.ty-player__transport {
+		flex-wrap: wrap;
+		gap: 2px 8px;
 	}
 
-	.ty-dock__btn--vol { width: 30px; height: 30px; }
+	.ty-player__btn--skip,
+	.ty-player__btn--main { order: 1; }
 
-	.ty-dock__volrange {
-		width: 100%;
-		flex: 1 1 auto;
-		height: 26px;
+	.ty-player__time {
+		order: 2;
+		margin-inline-start: auto;
+		font-size: 10.5px;
+		min-width: 0;
 	}
 
-	.ty-dock [data-tara-dock-close] { align-self: start; }
+	.ty-player__vol { order: 3; margin-inline-start: 0; gap: 0; }
 
-	body.has-tara-dock { padding-bottom: 134px; }
+	.ty-player__vol input[type="range"] { display: none; }
+
+	.ty-player__vol-btn { width: 32px; height: 32px; }
+
+	.ty-player__timeline {
+		order: 4;
+		flex-basis: 100%;
+		height: 6px;
+		margin-top: 2px;
+	}
+}
+
+/* گوشی‌های باریک: دکمه‌های پلیر فقط آیکون می‌شوند تا نام آهنگ جا داشته باشد
+   (نام دسترس‌پذیر با aria-label روی خود دکمه‌ها می‌ماند). */
+@media (max-width: 420px) {
+	.ty-player__tool { padding: 7px; }
+	.ty-player__tool-label { display: none; }
+	.ty-player__tool .ty-icon-list,
+	.ty-player__tool .ty-icon-note { margin: 0; width: 15px; height: 15px; }
 }
 
 @media (max-width: 380px) {
@@ -2625,9 +2741,9 @@ body.tara-dock-open .top_page { bottom: 92px; }
 
 	.ty-player__song { font-size: 15px; }
 
-	.ty-player__vol input[type="range"] { display: none; }
+	.ty-player__vol { display: none; }
 
-	body.has-tara-dock { padding-bottom: 130px; }
+	body.has-tara-dock { padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
 }
 
 /* ---- دکمهٔ «بالا» نباید روی نوار چسبان بیفتد ----
@@ -2639,7 +2755,7 @@ body.has-tara-dock .top_page {
 
 @media (max-width: 640px) {
 	body.has-tara-dock .top_page {
-		bottom: calc(142px + env(safe-area-inset-bottom)) !important;
+		bottom: calc(122px + env(safe-area-inset-bottom)) !important;
 		width: 40px;
 		height: 40px;
 		left: 8px;

@@ -1,19 +1,22 @@
 /**
- * ترانه یار ۳.۷.۸ — اسلایدر ویژهٔ صفحهٔ اصلی (بدون وابستگی)
+ * ترانه یار ۳.۷.۹ — اسلایدر ویژهٔ صفحهٔ اصلی (ریل بومی، بدون وابستگی)
  * ==========================================================================
- * چرا از نو نوشته شد؟
- *   نسخهٔ قبل با owl.carousel راه می‌افتاد. owl برای هر اسلاید یک `.owl-item`
- *   با عرض ۳۰۰٪ می‌سازد و اگر یک شرط CSS یا ترتیب بارگذاری اسکریپت به هم
- *   می‌خورد، ناحیه‌ای سفید به اندازهٔ سه اسلاید می‌ماند و هیچ تصویری دیده
- *   نمی‌شد — همان چیزی که کاربر گزارش کرد («کلا ریخته به هم»).
+ * چرا این‌قدر ساده است؟ چون دو بار در نسخه‌های قبل «لایه‌ای» نوشته شد و هر
+ * بار یک جای دیگر آن را شکست:
+ *   • ۳.۷.۰–۳.۷.۷ با owl: ناحیهٔ سفیدِ سه‌برابرِ عرض و اسلایدهای نامرئی.
+ *   • ۳.۷.۸ با cross-fade: یک قاعدهٔ CSS جا‌مانده از دوران owl همهٔ اسلایدها
+ *     جز اولی را `display:none` می‌کرد ⇒ «فقط یکی می‌آید بالا».
  *
- * معماری تازه:
- *   • اسلایدها همان مارکاپ قبلی‌اند؛ فقط کلاس `is-active` جابه‌جا می‌شود.
- *   • فقط یک اسلاید در جریان صفحه است ⇒ ارتفاع کارت همیشه درست است.
- *   • نشانگرها (dots) این‌جا ساخته می‌شوند تا مارکاپ صفحه سبک بماند.
- *   • پخش خودکار با هاور/فوکوس/تبِ پنهان متوقف می‌شود؛ با `prefers-reduced
- *     -motion` هم خودکار خاموش است. کشیدن انگشت هم اسلاید را عوض می‌کند.
- *   • اگر همین فایل بارگذاری نشود، CSS اسلاید اول را نشان می‌دهد (بدون JS).
+ * معماری کنونی:
+ *   اسلایدها در یک ریل `overflow-x:auto` کنار هم نشسته‌اند و `scroll-snap`
+ *   آن‌ها را می‌چسباند. یعنی **بدون این فایل هم** هر پنج اسلاید با انگشت یا
+ *   تراک‌پد دیده می‌شوند. این فایل فقط سه چیز اضافه می‌کند:
+ *     ۱) چرخش خودکار (با توقف روی هاور/فوکوس/تبِ پنهان)
+ *     ۲) نشانگرهای پایین کارت، هم‌گام با اسکرول
+ *     ۳) کلیدهای چپ/راست و نمایش اسلاید فعلی برای صفحه‌خوان
+ *
+ * هیچ‌جا `opacity` یا `display` دست نمی‌زنیم؛ پس هیچ اسلایدی نمی‌تواند
+ * «محو» شود.
  *
  * @package Taranehyar
  */
@@ -21,94 +24,145 @@
 	'use strict';
 
 	function initSlider(root) {
-		var slides = root.querySelectorAll('[data-ty-slide]');
-		if (slides.length < 2) {
+		var slides = [].slice.call(root.querySelectorAll('[data-ty-slide]'));
+		var total = slides.length;
+		if (!total) {
 			return;
 		}
 
-		var total = slides.length;
-		var current = 0;
+		/* روی ریل، جهت ltr است (توسط CSS)؛ پس scrollLeft همیشه مثبت است. */
+		var wrap = root.parentNode && root.parentNode.nodeType === 1 ? root.parentNode : root;
+
 		var interval = parseInt(root.getAttribute('data-interval'), 10);
-		if (!interval || interval < 2000) {
+		if (!interval || interval < 2500) {
 			interval = 5200;
 		}
 
-		var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-		/* نشانگرها -------------------------------------------------------- */
-		var dots = document.createElement('div');
-		dots.className = 'ty-hero-dots';
-		dots.setAttribute('role', 'tablist');
-		dots.setAttribute('aria-label', 'انتخاب اسلاید');
+		function width() {
+			return root.clientWidth || 1;
+		}
 
+		function index() {
+			var raw = Math.round(root.scrollLeft / width());
+			if (raw < 0) {
+				raw = 0;
+			}
+			if (raw > total - 1) {
+				raw = total - 1;
+			}
+			return raw;
+		}
+
+		function scrollToIndex(i, smooth) {
+			var left = i * width();
+			if (smooth && typeof root.scrollTo === 'function') {
+				root.scrollTo({ left: left, behavior: 'smooth' });
+			} else {
+				root.scrollLeft = left;
+			}
+		}
+
+		/* نشانگرها ------------------------------------------------------- */
+		var dots = null;
 		var buttons = [];
-		for (var i = 0; i < total; i++) {
-			var dot = document.createElement('button');
-			dot.type = 'button';
-			dot.className = 'ty-hero-dot' + (i === 0 ? ' is-active' : '');
-			dot.setAttribute('role', 'tab');
-			dot.setAttribute('aria-label', 'اسلاید ' + (i + 1) + ' از ' + total);
-			dot.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
-			(function (index) {
-				dot.addEventListener('click', function () {
-					go(index, true);
-				});
-			})(i);
-			dots.appendChild(dot);
-			buttons.push(dot);
+
+		if (total > 1) {
+			dots = document.createElement('div');
+			dots.className = 'ty-hero-dots';
+			dots.setAttribute('role', 'tablist');
+			dots.setAttribute('aria-label', 'انتخاب اسلاید');
+
+			for (var i = 0; i < total; i++) {
+				var dot = document.createElement('button');
+				dot.type = 'button';
+				dot.className = 'ty-hero-dot';
+				dot.setAttribute('role', 'tab');
+				dot.setAttribute('aria-label', 'اسلاید ' + (i + 1) + ' از ' + total);
+				/* بستن حلقه با closure — بدون آن همه به آخرین عدد اشاره می‌کردند */
+				(function (target) {
+					dot.addEventListener('click', function () {
+						scrollToIndex(target, true);
+						restart();
+					});
+				})(i);
+				dots.appendChild(dot);
+				buttons.push(dot);
+			}
+
+			wrap.appendChild(dots);
 		}
 
-		if (root.parentNode) {
-			root.parentNode.appendChild(dots);
-		}
+		/* هم‌گام‌سازی وضعیت --------------------------------------------- */
+		var lastIndex = -1;
 
-		/* تعویض اسلاید ---------------------------------------------------- */
-		function go(next, byUser) {
-			next = ((next % total) + total) % total;
-			if (next === current) {
+		function sync() {
+			var current = index();
+			if (current === lastIndex) {
 				return;
 			}
-			slides[current].classList.remove('is-active');
-			slides[current].setAttribute('aria-hidden', 'true');
-			buttons[current].classList.remove('is-active');
-			buttons[current].setAttribute('aria-selected', 'false');
+			lastIndex = current;
 
-			current = next;
+			for (var n = 0; n < total; n++) {
+				var on = n === current;
+				slides[n].classList[on ? 'add' : 'remove']('is-active');
+				slides[n].setAttribute('aria-hidden', on ? 'false' : 'true');
 
-			slides[current].classList.add('is-active');
-			slides[current].setAttribute('aria-hidden', 'false');
-			buttons[current].classList.add('is-active');
-			buttons[current].setAttribute('aria-selected', 'true');
-
-			if (byUser) {
-				restart();
+				if (buttons[n]) {
+					buttons[n].classList[on ? 'add' : 'remove']('is-active');
+					buttons[n].setAttribute('aria-selected', on ? 'true' : 'false');
+					buttons[n].setAttribute('tabindex', on ? '0' : '-1');
+				}
 			}
 		}
 
-		function nextSlide() {
-			go(current + 1, false);
-		}
+		/* اسکرول با rAF جمع می‌شود تا روی گوشیِ ضعیف هم هزینه نداشته باشد */
+		var queued = false;
 
-		/* پخش خودکار ------------------------------------------------------ */
+		root.addEventListener('scroll', function () {
+			if (queued) {
+				return;
+			}
+			queued = true;
+			window.requestAnimationFrame(function () {
+				queued = false;
+				sync();
+			});
+		}, { passive: true });
+
+		/* چرخش خودکار ---------------------------------------------------- */
 		var timer = null;
 		var paused = false;
 
-		function start() {
-			if (reduce || timer) {
+		function tick() {
+			if (paused || document.hidden) {
 				return;
 			}
-			timer = window.setInterval(function () {
-				if (!paused && !document.hidden) {
-					nextSlide();
-				}
-			}, interval);
+			/* اگر کاربر خودش اسکرول کرده باشد، از اسلاید فعلی ادامه می‌دهیم */
+			var next = index() + 1;
+			if (next >= total) {
+				next = 0;
+			}
+			scrollToIndex(next, !reduce);
 		}
 
-		function restart() {
+		function start() {
+			if (reduce || timer || total < 2) {
+				return;
+			}
+			timer = window.setInterval(tick, interval);
+		}
+
+		function stop() {
 			if (timer) {
 				window.clearInterval(timer);
 				timer = null;
 			}
+		}
+
+		function restart() {
+			stop();
 			start();
 		}
 
@@ -116,48 +170,54 @@
 		root.addEventListener('mouseleave', function () { paused = false; });
 		root.addEventListener('focusin', function () { paused = true; });
 		root.addEventListener('focusout', function () { paused = false; });
-
-		/* کشیدن انگشت ---------------------------------------------------- */
-		var startX = 0;
-		var startY = 0;
-		var tracking = false;
-
-		root.addEventListener('touchstart', function (event) {
-			if (!event.touches || event.touches.length !== 1) {
-				return;
-			}
-			tracking = true;
-			startX = event.touches[0].clientX;
-			startY = event.touches[0].clientY;
-		}, { passive: true });
-
-		root.addEventListener('touchend', function (event) {
-			if (!tracking) {
-				return;
-			}
-			tracking = false;
-			var touch = event.changedTouches && event.changedTouches[0];
-			if (!touch) {
-				return;
-			}
-			var dx = touch.clientX - startX;
-			var dy = touch.clientY - startY;
-			if (Math.abs(dx) < 42 || Math.abs(dx) < Math.abs(dy)) {
-				return;
-			}
-			/* در RTL، کشیدن به چپ = اسلاید بعدی */
-			go(current + (dx < 0 ? 1 : -1), true);
+		root.addEventListener('pointerdown', function () { paused = true; });
+		document.addEventListener('visibilitychange', function () {
+			paused = !!document.hidden;
 		});
 
-		/* آماده — برای CSS که اسلاید اول را در نبود JS نگه می‌دارد */
+		/* وقتی کاربر با انگشت اسکرول می‌کند، تایمر از نو شروع شود */
+		root.addEventListener('touchend', function () {
+			paused = false;
+			restart();
+		}, { passive: true });
+
+		/* کلیدهای صفحه‌کلید --------------------------------------------- */
+		root.setAttribute('tabindex', '0');
+		root.addEventListener('keydown', function (event) {
+			if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+				var step = event.key === 'ArrowRight' ? 1 : -1;
+				event.preventDefault();
+				scrollToIndex(index() + step, true);
+				restart();
+			}
+		});
+
+		/* تغییر اندازهٔ صفحه: بدون انیمیشن، همان اسلاید بماند ------------- */
+		var resizeTimer = null;
+		window.addEventListener('resize', function () {
+			if (resizeTimer) {
+				window.clearTimeout(resizeTimer);
+			}
+			resizeTimer = window.setTimeout(function () {
+				scrollToIndex(index(), false);
+			}, 150);
+		});
+
 		root.classList.add('is-ready');
+		sync();
 		start();
 	}
 
 	function boot() {
 		var nodes = document.querySelectorAll('[data-ty-hero]');
 		for (var i = 0; i < nodes.length; i++) {
-			initSlider(nodes[i]);
+			try {
+				initSlider(nodes[i]);
+			} catch (error) {
+				/* یک اسلایدر خراب نباید بقیهٔ صفحه را متوقف کند؛ و چون همهٔ
+				   اسلایدها در DOM و قابل اسکرول‌اند، خرابیِ JS فقط یعنی
+				   «بدون چرخش خودکار» — نه «بدون اسلاید». */
+			}
 		}
 	}
 

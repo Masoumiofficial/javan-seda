@@ -539,6 +539,68 @@ if ( ! function_exists( 'tara_settings_shell_core_ui' ) ) {
 		#option-tree-settings-api .format-settings.has-label > .format-setting-wrap > *:not(.format-setting-label) { display: none; }
 		#option-tree-settings-api .format-settings.has-label.is-open > .format-setting-wrap > *:not(.format-setting-label) { display: block; }
 		#option-tree-settings-api .format-settings.has-label.is-open > .format-setting-wrap { padding-bottom: 6px; }
+
+		/* ---------- آیتم‌های فهرستی (مثل «باکس مطالب») — v3.7.9 ----------
+		   این‌ها مارکاپِ خودِ OptionTree هستند: هر آیتم یک سرتیتر (`.open`) و یک
+		   بدنه دارد که تا امروز فقط با دکمهٔ «ویرایش» باز/بسته می‌شد و کاربر
+		   فکر می‌کرد «قابل جمع‌شدن نیست». حالا سرتیتر خودش دکمهٔ باز/بستن است
+		   (با فلش، هاور و دسترس‌پذیری) و شکل کارتِ مرتب گرفته است. */
+		#option-tree-settings-api .option-tree-setting-wrap { margin: 0; padding: 0; list-style: none; }
+		#option-tree-settings-api .list-list-item { margin: 0 0 8px; padding: 0; border: 0; background: transparent; }
+		#option-tree-settings-api .option-tree-setting {
+			border: 1px solid #ece9f7;
+			border-radius: 12px;
+			background: #fff;
+			overflow: hidden;
+		}
+		#option-tree-settings-api .option-tree-setting > .open {
+			position: relative;
+			margin: 0;
+			padding: 11px 40px 11px 14px;
+			font-size: 13px;
+			font-weight: 700;
+			color: #3b3550;
+			background: #fbfaff;
+			cursor: pointer;
+			user-select: none;
+		}
+		#option-tree-settings-api .option-tree-setting > .open:hover { background: #f5f1ff; color: #4c1d95; }
+		#option-tree-settings-api .option-tree-setting > .open:focus-visible {
+			outline: 2px solid #6d28d9;
+			outline-offset: -2px;
+		}
+		#option-tree-settings-api .option-tree-setting > .open::after {
+			content: "▾";
+			position: absolute;
+			inset-inline-start: 14px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: #8b8899;
+			font-size: 12px;
+			line-height: 1;
+		}
+		#option-tree-settings-api .option-tree-setting.tara-li-open > .open {
+			background: #f5f1ff;
+			color: #4c1d95;
+			border-bottom: 1px solid #ece9f7;
+		}
+		#option-tree-settings-api .option-tree-setting.tara-li-open > .open::after { content: "▴"; }
+		#option-tree-settings-api .option-tree-setting .button-section { padding: 0 14px 8px; background: transparent; }
+		#option-tree-settings-api .option-tree-setting .option-tree-setting-body { padding: 4px 14px 12px; }
+		#option-tree-settings-api .option-tree-setting .option-tree-setting-body .format-setting { border: 0; background: transparent; padding: 6px 0; }
+		/* نوار ابزار بالای محتوا، نه زیر فهرست بخش‌ها */
+		#option-tree-settings-api #poststuff > .tara-settings-toolbar {
+			grid-column: auto;
+			position: sticky;
+			top: 32px;
+			z-index: 5;
+			margin: 0 0 10px !important;
+			padding: 8px 10px;
+			border: 1px solid #ece9f7;
+			border-radius: 12px;
+			background: rgba(255, 255, 255, .94);
+			backdrop-filter: blur(6px);
+		}
 		</style>
 		<script id="tara-settings-core-js">
 		(function () {
@@ -659,12 +721,90 @@ if ( ! function_exists( 'tara_settings_shell_core_ui' ) ) {
 					lb.click();
 				});
 
+				/* ---------- جمع‌شدنِ آیتم‌های فهرستی (باکس مطالب و مانند آن) ----
+				   سرتیتر هر آیتم خودش دکمهٔ باز/بستن می‌شود؛ دکمهٔ «ویرایش» خودِ
+				   OptionTree هم سر جایش می‌ماند و هیچ‌کدام دیگری را خراب نمی‌کند. */
+				function itemBody(box) {
+					return box.querySelector('.option-tree-setting-body');
+				}
+
+				function setItem(box, open) {
+					var body = itemBody(box);
+					box.classList.toggle('tara-li-open', !!open);
+					if (body) {
+						body.style.display = open ? 'block' : 'none';
+					}
+					var head = box.querySelector('.open');
+					if (head) {
+						head.setAttribute('aria-expanded', open ? 'true' : 'false');
+					}
+				}
+
+				function prepItems(scope) {
+					var items = (scope || root).querySelectorAll('.option-tree-setting');
+					for (var n = 0; n < items.length; n++) {
+						var box = items[n];
+						if (box.getAttribute('data-tara-li') === '1') {
+							continue;
+						}
+						box.setAttribute('data-tara-li', '1');
+						var head = box.querySelector('.open');
+						if (!head) {
+							continue;
+						}
+						head.setAttribute('role', 'button');
+						head.setAttribute('tabindex', '0');
+						var body = itemBody(box);
+						setItem(box, !!body && body.offsetParent !== null);
+					}
+				}
+
+				prepItems(root);
+
+				/* آیتمی که با «افزودن» ساخته می‌شود هم همین ظاهر را بگیرد */
+				if (window.MutationObserver) {
+					var mo = new MutationObserver(function () { prepItems(root); });
+					mo.observe(root, { childList: true, subtree: true });
+				}
+
+				root.addEventListener('click', function (ev) {
+					var head = ev.target.closest ? ev.target.closest('.option-tree-setting > .open') : null;
+					if (!head) {
+						return;
+					}
+					/* اگر روی دکمه‌های داخل سرتیتر کلیک شد، دخالت نکن */
+					if (ev.target.closest('.option-tree-ui-button')) {
+						return;
+					}
+					var box = head.parentNode;
+					if (!box || !box.classList.contains('option-tree-setting')) {
+						return;
+					}
+					setItem(box, !box.classList.contains('tara-li-open'));
+				});
+
+				root.addEventListener('keydown', function (ev) {
+					if (ev.key !== 'Enter' && ev.key !== ' ') {
+						return;
+					}
+					var head = ev.target.closest ? ev.target.closest('.option-tree-setting > .open') : null;
+					if (!head) {
+						return;
+					}
+					ev.preventDefault();
+					head.click();
+				});
+
 				/* نوار ابزار: باز/بستن همه */
 				var bar = document.createElement('div');
 				bar.className = 'tara-settings-toolbar';
 				bar.innerHTML = '<button type="button" data-all="open">باز کردن همه</button>'
 					+ '<button type="button" data-all="close">بستن همه</button>';
-				if (nav && nav.parentNode) {
+				/* v3.7.9 — بالای محتوا می‌نشیند تا همیشه دم دست باشد */
+				var poststuff = root.querySelector('#poststuff');
+				if (poststuff) {
+					poststuff.insertBefore(bar, poststuff.firstChild);
+				} else if (nav && nav.parentNode) {
 					nav.parentNode.insertBefore(bar, nav.nextSibling);
 				} else {
 					root.insertBefore(bar, root.firstChild);
@@ -680,6 +820,11 @@ if ( ! function_exists( 'tara_settings_shell_core_ui' ) ) {
 					var list = panel.querySelectorAll('.format-settings.has-label');
 					for (var i = 0; i < list.length; i++) {
 						toggle(list[i], open);
+					}
+					/* v3.7.9 — آیتم‌های فهرستی هم با «همه» جمع/باز شوند */
+					var items = panel.querySelectorAll('.option-tree-setting');
+					for (var m = 0; m < items.length; m++) {
+						setItem(items[m], open);
 					}
 				});
 

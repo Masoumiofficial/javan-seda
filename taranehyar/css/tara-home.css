@@ -8,13 +8,24 @@
  */
 
 /* =========================================================================
-   اسلایدر ویژهٔ صفحهٔ اصلی — v3.7.8 (بدون owl)
+   اسلایدر ویژهٔ صفحهٔ اصلی — v3.7.9 (ریل بومی + scroll-snap)
    -------------------------------------------------------------------------
-   ساختار سادهٔ cross-fade:
-     • فقط اسلاید فعال `position:relative` است و ارتفاع کارت را می‌سازد،
-       بقیه کاملاً از جریان بیرون‌اند ⇒ هیچ ناحیهٔ سفیدِ سه‌برابرِ عرض نمی‌ماند.
-     • بدون جاوااسکریپت، اسلاید اول دیده می‌شود (`.ty-hero-track` نه `is-ready`).
-     • نشانگرها با JS ساخته می‌شوند و در پایین کارت می‌نشینند.
+   چرا دوباره بازنویسی شد؟
+     نسخهٔ ۳.۷.۸ برای هر اسلاید `opacity/visibility` می‌گذاشت و فقط اسلاید
+     فعال را `position: relative` می‌کرد. یک قاعدهٔ قدیمیِ owl در style.css
+     (`>:nth-child(n+2){display:none}`) همهٔ اسلایدها جز اولی را برای همیشه
+     پنهان می‌کرد و بعد از آن هم هر خطای JS کل اسلایدر را به «یک تصویر»
+     تبدیل می‌کرد.
+
+   معماری تازه — هیچ‌چیز به جاوااسکریپت وابسته نیست:
+     • هر اسلاید یک ستون کامل از یک ریل افقی است (`flex: 0 0 100%`).
+     • `scroll-snap` اسلایدها را دقیق می‌چسباند؛ کاربر با انگشت/تراک‌پد
+       می‌تواند همین‌طور همه را ببیند، حتی اگر JS بارگذاری نشود.
+     • جهت ریل `ltr` است تا محاسبهٔ `scrollLeft` در همهٔ مرورگرها یکسان
+       باشد (در RTL مقادیر منفی می‌شوند و اسکریپت‌ها را می‌شکنند)؛
+       خودِ هر اسلاید `rtl` می‌ماند تا متن فارسی درست بچیند.
+     • ارتفاع ریل = ارتفاع بلندترین اسلاید (همه یک نسبت دارند) ⇒ پرش/سفیدی
+       ندارد. بدون `opacity:0` هیچ اسلایدی «محو» نمی‌شود.
    ====================================================================== */
 .ty-hero-slider {
 	--ty-hs-radius: 22px;
@@ -26,50 +37,43 @@
 
 .ty-hero-track {
 	position: relative;
-	overflow: hidden;
+	display: flex;
+	flex-wrap: nowrap;
+	direction: ltr; /* فقط برای ریاضیات اسکرول؛ اسلایدها rtl هستند */
+	width: 100%;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	overscroll-behavior-x: contain;
+	-webkit-overflow-scrolling: touch;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
 	border-radius: var(--ty-hs-radius);
 	background: #10172a;
-	display: block;
-	width: 100%;
 }
 
+.ty-hero-track::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
 .ty-hero-slide {
-	position: absolute;
-	inset: 0;
+	position: relative;
+	flex: 0 0 100%;
+	width: 100%;
+	min-width: 100%;
 	display: block;
 	margin: 0;
 	padding: 0;
-	border-radius: var(--ty-hs-radius);
+	direction: rtl;
+	scroll-snap-align: start;
+	scroll-snap-stop: always;
 	overflow: hidden;
+	border-radius: var(--ty-hs-radius);
 	background: #10172a;
-	opacity: 0;
-	visibility: hidden;
-	pointer-events: none;
-	transition: opacity .42s ease;
 }
 
-/* بدون JS: اسلاید اول کاشته می‌شود */
-.ty-hero-slide:first-child {
-	position: relative;
-	opacity: 1;
-	visibility: visible;
-	pointer-events: auto;
-}
-
-.ty-hero-track.is-ready .ty-hero-slide:first-child:not(.is-active) {
-	position: absolute;
-	opacity: 0;
-	visibility: hidden;
-	pointer-events: none;
-}
-
-.ty-hero-slide.is-active {
-	position: relative;
-	opacity: 1;
-	visibility: visible;
-	pointer-events: auto;
-	z-index: 1;
-}
+/* نشانگرها هم با کمی تأخیر: کلاس را JS می‌گذارد، ولی نبودش چیزی را
+   پنهان نمی‌کند (برخلاف نسخهٔ قبل). */
+.ty-hero-slide.is-active { z-index: 1; }
 
 .ty-hero-slide__media {
 	display: block;
@@ -95,40 +99,57 @@
 /* نشانگرها ------------------------------------------------------------ */
 .ty-hero-dots {
 	position: absolute;
-	inset-inline-start: 50%;
+	left: 50%;
+	transform: translateX(-50%); /* فیزیکی — در RTL هم دقیقاً وسط می‌نشیند */
 	bottom: 12px;
-	transform: translateX(50%);
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	justify-content: center;
+	gap: 2px;
+	padding: 4px 6px;
+	border-radius: 999px;
+	background: rgba(10, 15, 30, 0.28);
+	backdrop-filter: blur(6px);
 	z-index: 4;
 }
 
 .ty-hero-dot {
 	appearance: none;
 	border: 0;
-	padding: 0;
+	padding: 6px;
+	margin: 0;
+	width: 20px;
+	height: 20px;
+	background: transparent;
+	cursor: pointer;
+	line-height: 0;
+	border-radius: 999px;
+}
+
+.ty-hero-dot::before {
+	content: "";
+	display: block;
 	width: 8px;
 	height: 8px;
+	margin: 0 auto;
 	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.45);
+	background: rgba(255, 255, 255, 0.5);
 	box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
-	cursor: pointer;
 	transition: width .2s ease, background .2s ease;
 }
 
-.ty-hero-dot.is-active {
-	width: 22px;
+.ty-hero-dot.is-active::before {
+	width: 18px;
 	background: #fff;
 }
 
 .ty-hero-dot:focus-visible {
 	outline: 2px solid #fff;
-	outline-offset: 2px;
+	outline-offset: 1px;
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ty-hero-slide,
+	.ty-hero-track { scroll-behavior: auto; }
 	.ty-hero-slide__media img { transition: none; }
 }
 
@@ -141,13 +162,14 @@
 		margin: 12px 0 18px;
 	}
 
-	.ty-hero-slide__media { aspect-ratio: 16 / 9; }
+	/* نسبت کوتاه‌تر تا اسلایدر روی گوشی نصف صفحه را نگیرد */
+	.ty-hero-slide__media { aspect-ratio: 16 / 10; }
 
-	.ty-hero-dots { bottom: 8px; gap: 5px; }
+	.ty-hero-dots { bottom: 8px; }
 }
 
 @media (max-width: 480px) {
-	.ty-hero-slide__media { aspect-ratio: 4 / 3; }
+	.ty-hero-slide__media { aspect-ratio: 5 / 4; }
 	.ty-hero-slide__media img { object-position: center 32%; }
 }
 

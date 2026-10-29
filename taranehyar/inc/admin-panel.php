@@ -392,6 +392,12 @@ function taranehyar_panel_sections() {
 			'desc'  => 'پلیر، کارت‌ها، حالت شب و جزئیات ظاهریِ همین قالب.',
 		),
 		array(
+			'id'    => 'radio',
+			'title' => 'رادیو و دی‌جی',
+			'icon'  => 'dashicons-controls-volumeon',
+			'desc'  => 'میکسِ خودکار، وکالِ معرفیِ سایت، منبعِ آهنگ‌ها و طولِ کراس‌فید.',
+		),
+		array(
 			'id'    => 'footer',
 			'title' => 'پانوشت',
 			'icon'  => 'dashicons-editor-insertmore',

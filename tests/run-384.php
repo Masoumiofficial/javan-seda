@@ -203,9 +203,9 @@ t(
 /* ======================================================================
    ۵) نسخه
    ====================================================================== */
-t( 'نسخه: style.css روی ۳.۸.۴ است', (bool) preg_match( '/Version: 3\.8\.[4-9]/', $style ) );
-t( 'نسخه: fallback در functions.php روی ۳.۸.۴ است', (bool) preg_match( "/: '3\.8\.[4-9]' \)/", f( 'functions.php' ) ) );
-t( 'نسخه: نشانهٔ پلیر روی ۳.۸.۴ است', (bool) preg_match( "/'data-tara-ready', '3\.8\.[4-9]'/", f( 'js/tara-player.js' ) ) );
+t( 'نسخه: style.css روی ۳.۸.۴ است', (bool) preg_match( '/Version: 3\.(8\.[4-9]|9\.\d+)/', $style ) );
+t( 'نسخه: fallback در functions.php روی ۳.۸.۴ است', (bool) preg_match( "/: '3\.(8\.[4-9]|9\.\d+)' \)/", f( 'functions.php' ) ) );
+t( 'نسخه: نشانهٔ پلیر روی ۳.۸.۴ است', (bool) preg_match( "/'data-tara-ready', '3\.(8\.[4-9]|9\.\d+)'/", f( 'js/tara-player.js' ) ) );
 
 echo "\n";
 echo 'RESULT pass=' . $PASS . ' fail=' . $FAIL . "\n";

@@ -1,0 +1,1472 @@
+/**
+ * ترانه یار — رادیو و دی‌جیِ زنده (نسخهٔ ۳.۹.۰)
+ * ===========================================================================
+ * این فایل فقط با پیشوند `.ty-radio` / `.ty-radio-home` کار می‌کند تا هیچ
+ * قاعده‌ای از استایل‌های قدیمی قالب را عوض نکند. کارتِ رادیو عمداً **همیشه
+ * تیره** است (حتی در حالتِ روز): مثل یک کنسولِ استودیو روی صفحهٔ روشن می‌نشیند
+ * و کانونِ توجه می‌شود. رنگِ اصلی/فرعیِ سایت (متغیرهای `--ty-accent` و
+ * `--ty-accent-2`) در آن جریان دارد، پس با «رنگ‌ها و هویت» هم‌گام می‌ماند.
+ *
+ * هیچ انیمیشنی بی‌دلیل روی عنصرِ بزرگ اجرا نمی‌شود و همهٔ حرکت‌ها در
+ * `prefers-reduced-motion` خاموش می‌شوند.
+ *
+ * @package Taranehyar
+ */
+
+/* =========================================================================
+   ۱) توکن‌ها
+   ====================================================================== */
+.ty-radio,
+.ty-radio-home,
+.ty-radio__mine,
+.ty-radio-add {
+	--rd-ink: #04060d;
+	--rd-panel: #0a0f1f;
+	--rd-panel-2: #111a33;
+	--rd-glass: rgba(255, 255, 255, 0.055);
+	--rd-glass-2: rgba(255, 255, 255, 0.1);
+	--rd-line: rgba(255, 255, 255, 0.11);
+	--rd-text: #f2f5ff;
+	--rd-muted: #97a1bd;
+	--rd-a1: var(--ty-accent, var(--ab-blue, #185adb));
+	--rd-a2: var(--ty-accent-2, var(--tara-brand-2, #6d28d9));
+	--rd-a3: #22d3ee;
+	--rd-live: #ff4d6d;
+	--rd-radius: 26px;
+	direction: rtl;
+	text-align: right;
+	line-height: 1.75;
+}
+
+/* =========================================================================
+   ۲) کارتِ اصلی
+   ====================================================================== */
+.ty-radio {
+	position: relative;
+	isolation: isolate;
+	overflow: hidden;
+	margin: 26px 0;
+	padding: 26px clamp(16px, 3vw, 32px) 24px;
+	border: 1px solid rgba(255, 255, 255, 0.09);
+	border-radius: var(--rd-radius);
+	background:
+		radial-gradient(120% 100% at 100% 0%, rgba(34, 211, 238, 0.12) 0%, transparent 52%),
+		radial-gradient(120% 110% at 0% 100%, rgba(109, 40, 217, 0.2) 0%, transparent 55%),
+		linear-gradient(160deg, #0c1226 0%, #0a0f1f 40%, #060912 100%);
+	background-color: var(--rd-panel);
+	box-shadow:
+		0 40px 80px -60px rgba(2, 8, 23, 0.95),
+		0 2px 0 rgba(255, 255, 255, 0.04) inset;
+	color: var(--rd-text);
+}
+
+.ty-radio::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	padding: 1px;
+	background: linear-gradient(150deg, rgba(255, 255, 255, 0.22), transparent 32%, transparent 68%, rgba(34, 211, 238, 0.24));
+	-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+	-webkit-mask-composite: xor;
+	mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+	mask-composite: exclude;
+	pointer-events: none;
+	z-index: 3;
+}
+
+.ty-radio__aura {
+	position: absolute;
+	top: -38%;
+	inset-inline-end: -18%;
+	width: min(620px, 78%);
+	aspect-ratio: 1;
+	border-radius: 50%;
+	background: conic-gradient(from 210deg, var(--rd-a1), var(--rd-a3), var(--rd-a2), var(--rd-a1));
+	filter: blur(78px);
+	opacity: 0.34;
+	animation: rd-aura 22s linear infinite;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.ty-radio__scan {
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background:
+		repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.035) 0 1px, transparent 1px 4px),
+		radial-gradient(120% 120% at 50% 0%, transparent 55%, rgba(0, 0, 0, 0.35) 100%);
+	mix-blend-mode: screen;
+	opacity: 0.5;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.ty-radio > *:not(.ty-radio__aura):not(.ty-radio__scan):not(.ty-radio__data) {
+	position: relative;
+	z-index: 2;
+}
+
+/* =========================================================================
+   ۳) سربرگ
+   ====================================================================== */
+.ty-radio__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 14px 22px;
+	margin-bottom: 20px;
+}
+
+.ty-radio__ident { min-width: 0; flex: 1 1 320px; }
+
+.ty-radio__live {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 5px 12px 5px 10px;
+	border-radius: 999px;
+	border: 1px solid rgba(255, 77, 109, 0.4);
+	background: rgba(255, 77, 109, 0.12);
+	color: #ffd9e0;
+	font-size: 11.5px;
+	font-weight: 700;
+	letter-spacing: 0.2px;
+	line-height: 1.9;
+}
+
+.ty-radio__live em {
+	font-style: normal;
+	padding: 0 6px;
+	border-radius: 999px;
+	background: var(--rd-live);
+	color: #fff;
+	font-size: 10px;
+	letter-spacing: 1px;
+	line-height: 1.9;
+}
+
+.ty-radio__pulse {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--rd-live);
+	box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.65);
+	animation: rd-pulse 2s ease-out infinite;
+}
+
+.ty-radio__title {
+	margin: 12px 0 6px;
+	font-size: clamp(20px, 2.6vw, 30px);
+	line-height: 1.45;
+	font-weight: 700;
+	color: #fff;
+	letter-spacing: -0.2px;
+	text-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+}
+
+.ty-radio__sub {
+	margin: 0;
+	max-width: 68ch;
+	font-size: 12.8px;
+	line-height: 2;
+	color: var(--rd-muted);
+}
+
+.ty-radio__meter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ty-radio__meter li {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 78px;
+	padding: 8px 14px;
+	border-radius: 14px;
+	border: 1px solid var(--rd-line);
+	background: var(--rd-glass);
+	backdrop-filter: blur(6px);
+	line-height: 1.5;
+}
+
+.ty-radio__meter span { font-size: 10.5px; color: var(--rd-muted); }
+.ty-radio__meter strong {
+	font-size: 16px;
+	font-weight: 700;
+	color: #fff;
+	font-variant-numeric: tabular-nums;
+	direction: ltr;
+	text-align: right;
+}
+
+/* =========================================================================
+   ۴) صحنه: کاور + کنسول
+   ====================================================================== */
+.ty-radio__deck {
+	display: grid;
+	grid-template-columns: clamp(190px, 26vw, 290px) minmax(0, 1fr);
+	gap: clamp(16px, 2.4vw, 30px);
+	align-items: center;
+}
+
+.ty-radio__artwrap {
+	position: relative;
+	width: 100%;
+	max-width: 320px;
+	margin-inline: auto;
+	aspect-ratio: 1;
+	border-radius: 24px;
+	overflow: hidden;
+	background: #0b1120;
+	box-shadow: 0 34px 60px -34px rgba(0, 0, 0, 0.95);
+}
+
+.ty-radio__halo {
+	position: absolute;
+	inset: -14%;
+	border-radius: 50%;
+	background: conic-gradient(from 0deg, var(--rd-a1), var(--rd-a3), var(--rd-a2), var(--rd-a1));
+	filter: blur(34px);
+	opacity: 0.4;
+	z-index: 0;
+}
+
+.ty-radio__art {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	z-index: 1;
+	transform: scale(1.02);
+	transition: transform 0.9s cubic-bezier(0.22, 0.68, 0, 1), filter 0.6s ease;
+}
+
+.ty-radio__disc {
+	position: absolute;
+	inset: 7%;
+	border-radius: 50%;
+	z-index: 2;
+	background:
+		repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.14) 0 1px, transparent 1px 5px),
+		radial-gradient(circle at 50% 50%, transparent 0 47%, rgba(0, 0, 0, 0.5) 47.4% 100%);
+	mix-blend-mode: overlay;
+	opacity: 0;
+	transform: scale(0.94);
+	transition: opacity 0.5s ease, transform 0.6s ease;
+	pointer-events: none;
+}
+
+.ty-radio__sheen {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.22) 46%, transparent 62%);
+	transform: translateX(-120%);
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ty-radio__vu {
+	position: absolute;
+	inset-inline: 10px;
+	bottom: 10px;
+	z-index: 3;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 3px;
+	height: 46px;
+	padding: 0 6px;
+	border-radius: 12px;
+	background: linear-gradient(0deg, rgba(4, 6, 13, 0.72), rgba(4, 6, 13, 0));
+	pointer-events: none;
+}
+
+.ty-radio__vu i {
+	flex: 1 1 auto;
+	max-width: 6px;
+	height: 12%;
+	border-radius: 3px;
+	background: linear-gradient(0deg, var(--rd-a1), var(--rd-a3));
+	opacity: 0.5;
+	transform-origin: bottom;
+	transition: height 0.35s ease, opacity 0.35s ease;
+}
+
+.ty-radio.is-playing .ty-radio__vu i {
+	opacity: 0.92;
+	animation: rd-vu 0.9s ease-in-out infinite alternate;
+	animation-delay: calc(var(--i, 0) * -0.055s);
+}
+
+.ty-radio.is-playing .ty-radio__sheen { opacity: 1; animation: rd-sheen 6.5s ease-in-out infinite; }
+.ty-radio.is-playing .ty-radio__art { transform: scale(1.06); filter: saturate(1.08) contrast(1.03); }
+.ty-radio.is-playing .ty-radio__disc { opacity: 0.5; transform: scale(1); animation: rd-spin 18s linear infinite; }
+
+.ty-radio__start {
+	position: absolute;
+	inset: 0;
+	z-index: 4;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin: auto;
+	width: 100%;
+	height: 100%;
+	border: 0;
+	background: radial-gradient(circle at 50% 50%, rgba(4, 6, 13, 0.44), rgba(4, 6, 13, 0.08) 60%, transparent 72%);
+	color: #fff;
+	cursor: pointer;
+	transition: background 0.3s ease;
+}
+
+.ty-radio__start-ico {
+	display: grid;
+	place-items: center;
+	width: 74px;
+	height: 74px;
+	border-radius: 50%;
+	border: 1px solid rgba(255, 255, 255, 0.3);
+	background: rgba(9, 13, 26, 0.55);
+	backdrop-filter: blur(8px);
+	font-size: 30px;
+	box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.9), 0 0 0 0 rgba(34, 211, 238, 0.45);
+	transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.ty-radio__start-ico i { line-height: 1; }
+.ty-radio__start-ico i:last-child { display: none; }
+.ty-radio.is-playing .ty-radio__start-ico i:first-child { display: none; }
+.ty-radio.is-playing .ty-radio__start-ico i:last-child { display: inline-block; }
+
+.ty-radio__start-txt {
+	padding: 4px 12px;
+	border-radius: 999px;
+	background: rgba(4, 6, 13, 0.5);
+	font-size: 11.5px;
+	font-weight: 700;
+	letter-spacing: 0.2px;
+}
+
+.ty-radio__start:hover .ty-radio__start-ico,
+.ty-radio__start:focus-visible .ty-radio__start-ico {
+	transform: scale(1.06);
+	background: rgba(24, 90, 219, 0.5);
+	box-shadow: 0 20px 44px -18px rgba(0, 0, 0, 0.9), 0 0 0 8px rgba(34, 211, 238, 0.12);
+}
+
+.ty-radio.is-playing .ty-radio__start { background: transparent; }
+.ty-radio.is-playing .ty-radio__start-txt { opacity: 0; transform: translateY(6px); }
+.ty-radio.is-playing .ty-radio__start-ico { opacity: 0.55; width: 56px; height: 56px; font-size: 22px; }
+.ty-radio.is-playing .ty-radio__start:hover .ty-radio__start-ico,
+.ty-radio.is-playing .ty-radio__start:focus-visible .ty-radio__start-ico { opacity: 1; }
+
+.ty-radio.is-loading .ty-radio__start-ico { opacity: 0.9; }
+.ty-radio.is-loading .ty-radio__start-ico::after {
+	content: "";
+	position: absolute;
+	width: 88px;
+	height: 88px;
+	border-radius: 50%;
+	border: 2px solid transparent;
+	border-top-color: var(--rd-a3);
+	animation: rd-spin 0.9s linear infinite;
+}
+.ty-radio__start-ico { position: relative; }
+
+/* ---- کنسول ---- */
+.ty-radio__console { min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+
+.ty-radio__now { min-width: 0; }
+
+.ty-radio__kicker {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 10.5px;
+	font-weight: 700;
+	letter-spacing: 0.6px;
+	color: var(--rd-a3);
+}
+
+.ty-radio__kicker::before {
+	content: "";
+	width: 14px;
+	height: 2px;
+	border-radius: 2px;
+	background: currentColor;
+}
+
+.ty-radio__song {
+	display: block;
+	margin: 4px 0 2px;
+	font-size: clamp(17px, 2vw, 23px);
+	font-weight: 700;
+	line-height: 1.55;
+	color: #fff;
+	text-decoration: none;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	transition: color 0.2s ease;
+}
+
+.ty-radio__song:hover,
+.ty-radio__song:focus-visible { color: var(--rd-a3); }
+
+.ty-radio__artist {
+	display: block;
+	font-size: 12.5px;
+	color: var(--rd-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* ---- نوار زمان ---- */
+.ty-radio__seek {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding-top: 6px;
+}
+
+.ty-radio__rail {
+	position: relative;
+	flex: 1 1 auto;
+	height: 8px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.1);
+	overflow: hidden;
+}
+
+.ty-radio__buffer,
+.ty-radio__fill {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-start: 0;
+	width: 0%;
+	border-radius: inherit;
+	transition: width 0.18s linear;
+}
+
+.ty-radio__buffer { background: rgba(255, 255, 255, 0.16); }
+.ty-radio__fill {
+	background: linear-gradient(90deg, var(--rd-a1), var(--rd-a3));
+	box-shadow: 0 0 16px rgba(34, 211, 238, 0.45);
+}
+
+.ty-radio__range {
+	appearance: none;
+	-webkit-appearance: none;
+	background: transparent;
+	direction: ltr;
+}
+
+.ty-radio__seek .ty-radio__range {
+	position: absolute;
+	inset-inline-start: 0;
+	top: 0;
+	width: calc(100% - 96px);
+	height: 100%;
+	margin: 0;
+	cursor: pointer;
+	z-index: 2;
+}
+
+.ty-radio__range::-webkit-slider-runnable-track { height: 8px; background: transparent; }
+.ty-radio__range::-moz-range-track { height: 8px; background: transparent; }
+.ty-radio__range::-webkit-slider-thumb {
+	-webkit-appearance: none;
+	width: 14px;
+	height: 14px;
+	margin-top: -3px;
+	border-radius: 50%;
+	background: #fff;
+	border: 2px solid var(--rd-a3);
+	box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.16);
+	cursor: grab;
+}
+.ty-radio__range::-moz-range-thumb {
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	background: #fff;
+	border: 2px solid var(--rd-a3);
+	cursor: grab;
+}
+.ty-radio__range:focus-visible { outline: 2px solid var(--rd-a3); outline-offset: 4px; }
+
+.ty-radio__time {
+	flex: 0 0 auto;
+	min-width: 84px;
+	text-align: center;
+	font-size: 11.5px;
+	color: var(--rd-muted);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ---- ترانسپورت ---- */
+.ty-radio__transport {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex-wrap: wrap;
+}
+
+.ty-radio__tbtn {
+	appearance: none;
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border-radius: 50%;
+	border: 1px solid var(--rd-line);
+	background: var(--rd-glass);
+	color: var(--rd-text);
+	font-size: 18px;
+	cursor: pointer;
+	transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.ty-radio__tbtn i { line-height: 1; }
+.ty-radio__tbtn:hover,
+.ty-radio__tbtn:focus-visible { background: var(--rd-glass-2); border-color: rgba(255, 255, 255, 0.28); transform: translateY(-1px); }
+.ty-radio__tbtn:active { transform: translateY(0) scale(0.96); }
+
+.ty-radio__tbtn--main {
+	position: relative;
+	width: 58px;
+	height: 58px;
+	border: 0;
+	color: #fff;
+	font-size: 22px;
+	background: linear-gradient(140deg, var(--rd-a1), var(--rd-a2) 72%, var(--rd-a3));
+	box-shadow: 0 16px 34px -18px rgba(24, 90, 219, 0.95), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+}
+
+.ty-radio__tbtn--main:hover,
+.ty-radio__tbtn--main:focus-visible {
+	filter: brightness(1.06);
+	box-shadow: 0 20px 40px -18px rgba(24, 90, 219, 1), 0 0 0 8px rgba(34, 211, 238, 0.1);
+}
+
+.ty-radio__tbtn--main i:last-of-type { display: none; }
+.ty-radio.is-playing .ty-radio__tbtn--main i:first-of-type { display: none; }
+.ty-radio.is-playing .ty-radio__tbtn--main i:last-of-type { display: inline-block; }
+.ty-radio.is-loading .ty-radio__tbtn--main i { opacity: 0.2; }
+
+.ty-radio__spin {
+	position: absolute;
+	inset: 0;
+	margin: auto;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	border: 2px solid transparent;
+	border-top-color: #fff;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ty-radio.is-loading .ty-radio__spin { opacity: 0.9; animation: rd-spin 0.9s linear infinite; }
+
+.ty-radio__tbtn--ghost { border-style: dashed; color: var(--rd-muted); }
+.ty-radio__tbtn.is-on { color: #fff; border-color: var(--rd-a3); background: rgba(34, 211, 238, 0.14); }
+
+/* ---- میکسر ---- */
+.ty-radio__mixer {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px 16px;
+	padding: 12px 14px;
+	border-radius: 16px;
+	border: 1px dashed rgba(255, 255, 255, 0.14);
+	background: rgba(255, 255, 255, 0.035);
+}
+
+.ty-radio__ctrl {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: 1 1 220px;
+	min-width: 0;
+	margin: 0;
+}
+
+.ty-radio__ctrl-label { font-size: 11.5px; color: var(--rd-muted); white-space: nowrap; }
+.ty-radio__ctrl-val { font-size: 12px; font-weight: 700; color: var(--rd-a3); white-space: nowrap; min-width: 52px; }
+.ty-radio__range--mix { flex: 1 1 auto; width: auto; min-width: 90px; height: 18px; cursor: pointer; }
+
+.ty-radio__range--mix::-webkit-slider-runnable-track {
+	height: 6px;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--rd-a1), var(--rd-a3));
+	opacity: 0.85;
+}
+.ty-radio__range--mix::-moz-range-track {
+	height: 6px;
+	border-radius: 999px;
+	background: linear-gradient(90deg, var(--rd-a1), var(--rd-a3));
+}
+.ty-radio__range--mix::-webkit-slider-thumb {
+	width: 16px;
+	height: 16px;
+	margin-top: -5px;
+	background: #fff;
+	border: 2px solid var(--rd-a3);
+}
+
+.ty-radio__power {
+	display: inline-flex;
+	gap: 2px;
+	padding: 3px;
+	border-radius: 999px;
+	background: rgba(4, 6, 13, 0.6);
+	border: 1px solid var(--rd-line);
+}
+
+.ty-radio__power button {
+	appearance: none;
+	border: 0;
+	background: transparent;
+	color: var(--rd-muted);
+	font-size: 11.5px;
+	font-weight: 700;
+	padding: 6px 12px;
+	border-radius: 999px;
+	cursor: pointer;
+	line-height: 1.7;
+	transition: background 0.2s ease, color 0.2s ease;
+}
+
+.ty-radio__power button:hover { color: #fff; }
+.ty-radio__power button[aria-pressed="true"] {
+	background: linear-gradient(140deg, rgba(34, 211, 238, 0.24), rgba(109, 40, 217, 0.4));
+	color: #fff;
+	box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.35) inset;
+}
+
+/* ---- ابزارها ---- */
+.ty-radio__tools {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 10px;
+}
+
+.ty-radio__tool {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 7px 13px;
+	border-radius: 999px;
+	border: 1px solid var(--rd-line);
+	background: transparent;
+	color: var(--rd-text);
+	font-size: 11.5px;
+	font-weight: 700;
+	cursor: pointer;
+	line-height: 1.9;
+	transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.ty-radio__tool:hover,
+.ty-radio__tool:focus-visible { background: var(--rd-glass-2); border-color: rgba(255, 255, 255, 0.3); }
+.ty-radio__tool b { font-weight: 700; color: var(--rd-a3); }
+.ty-radio__tool i { font-size: 14px; line-height: 1; }
+
+.ty-radio__hint { font-size: 10.5px; line-height: 1.9; color: rgba(151, 161, 189, 0.85); flex: 1 1 160px; }
+
+/* =========================================================================
+   ۵) منابع (صفحهٔ رادیو)
+   ====================================================================== */
+.ty-radio__sources {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 20px 0 0;
+}
+
+.ty-radio__source {
+	appearance: none;
+	padding: 8px 16px;
+	border-radius: 999px;
+	border: 1px solid var(--rd-line);
+	background: var(--rd-glass);
+	color: var(--rd-muted);
+	font-size: 12px;
+	font-weight: 700;
+	cursor: pointer;
+	line-height: 1.9;
+	transition: all 0.18s ease;
+}
+
+.ty-radio__source:hover { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+.ty-radio__source.is-active {
+	color: #04060d;
+	border-color: transparent;
+	background: linear-gradient(120deg, var(--rd-a3), #a5f3fc);
+	box-shadow: 0 10px 24px -14px rgba(34, 211, 238, 0.9);
+}
+
+/* =========================================================================
+   ۶) صف
+   ====================================================================== */
+.ty-radio__timeline { margin-top: 22px; }
+
+.ty-radio__tlhead {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 10px;
+}
+
+.ty-radio__tlhead h3 {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 700;
+	color: #fff;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.ty-radio__tlhead h3::before {
+	content: "";
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--rd-a3);
+	box-shadow: 0 0 12px rgba(34, 211, 238, 0.8);
+}
+
+.ty-radio__tlmeta { font-size: 11px; color: var(--rd-muted); }
+
+.ty-radio__queue {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	max-height: 340px;
+	overflow-y: auto;
+	scrollbar-width: thin;
+	scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+}
+
+.ty-radio__queue::-webkit-scrollbar { width: 8px; }
+.ty-radio__queue::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 999px; }
+
+.ty-radio__row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 7px 10px;
+	border-radius: 14px;
+	border: 1px solid transparent;
+	background: rgba(255, 255, 255, 0.035);
+	transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+	min-width: 0;
+}
+
+.ty-radio__row:hover { background: rgba(255, 255, 255, 0.075); border-color: rgba(255, 255, 255, 0.12); }
+.ty-radio__row.is-current {
+	border-color: rgba(34, 211, 238, 0.45);
+	background: linear-gradient(90deg, rgba(34, 211, 238, 0.14), rgba(109, 40, 217, 0.1));
+}
+
+.ty-radio__rowplay {
+	appearance: none;
+	flex: 0 0 auto;
+	display: grid;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	border-radius: 50%;
+	border: 1px solid var(--rd-line);
+	background: rgba(4, 6, 13, 0.5);
+	color: #fff;
+	font-size: 13px;
+	cursor: pointer;
+	transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.ty-radio__rowplay i { line-height: 1; }
+.ty-radio__rowplay:hover { background: var(--rd-a1); transform: scale(1.06); }
+.ty-radio__row.is-current .ty-radio__rowplay { background: var(--rd-a3); color: #04060d; border-color: transparent; }
+
+.ty-radio__rowart {
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	border-radius: 10px;
+	object-fit: cover;
+	background: #0b1120;
+}
+
+.ty-radio__rowmeta { min-width: 0; flex: 1 1 auto; display: flex; flex-direction: column; line-height: 1.55; }
+.ty-radio__rowmeta strong {
+	font-size: 12px;
+	font-weight: 700;
+	color: #eef2ff;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.ty-radio__rowmeta em {
+	font-style: normal;
+	font-size: 10.5px;
+	color: var(--rd-muted);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ty-radio__rownum {
+	flex: 0 0 auto;
+	font-size: 10.5px;
+	color: rgba(151, 161, 189, 0.7);
+	font-variant-numeric: tabular-nums;
+}
+
+.ty-radio__empty {
+	margin: 8px 0 0;
+	padding: 14px 16px;
+	border-radius: 14px;
+	border: 1px dashed rgba(255, 255, 255, 0.16);
+	font-size: 12px;
+	color: var(--rd-muted);
+	line-height: 2;
+}
+
+/* =========================================================================
+   ۷) فهرست من
+   ====================================================================== */
+.ty-radio__mine {
+	margin-top: 14px;
+	padding: 14px;
+	border-radius: 18px;
+	border: 1px dashed rgba(34, 211, 238, 0.34);
+	background: rgba(34, 211, 238, 0.05);
+}
+
+.ty-radio__minehead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.ty-radio__minehead h3 { margin: 0; font-size: 13px; font-weight: 700; color: #fff; }
+
+.ty-radio__mineclear {
+	appearance: none;
+	border: 1px solid rgba(255, 77, 109, 0.4);
+	background: rgba(255, 77, 109, 0.12);
+	color: #ffd9e0;
+	font-size: 11px;
+	padding: 5px 12px;
+	border-radius: 999px;
+	cursor: pointer;
+	line-height: 1.8;
+}
+
+.ty-radio__mineclear:hover { background: rgba(255, 77, 109, 0.24); }
+
+.ty-radio__minelist { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+
+.ty-radio__minelist li {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+	color: var(--rd-text);
+	min-width: 0;
+}
+
+.ty-radio__minelist span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ty-radio__minelist button {
+	appearance: none;
+	flex: 0 0 auto;
+	border: 0;
+	background: transparent;
+	color: rgba(255, 255, 255, 0.5);
+	cursor: pointer;
+	font-size: 14px;
+	padding: 0 4px;
+}
+
+.ty-radio__minelist button:hover { color: var(--rd-live); }
+
+.ty-radio__mineempty { margin: 0; font-size: 11.5px; color: var(--rd-muted); line-height: 2; }
+
+/* =========================================================================
+   ۸) پیامِ کوتاه (Toast)
+   ====================================================================== */
+.ty-radio__toast {
+	position: absolute;
+	inset-inline: 0;
+	bottom: 16px;
+	margin: 0 auto;
+	width: max-content;
+	max-width: calc(100% - 32px);
+	padding: 9px 18px;
+	border-radius: 999px;
+	background: rgba(4, 6, 13, 0.92);
+	border: 1px solid rgba(34, 211, 238, 0.4);
+	color: #eafcff;
+	font-size: 12px;
+	line-height: 1.9;
+	box-shadow: 0 16px 40px -20px rgba(0, 0, 0, 0.9);
+	z-index: 20;
+	animation: rd-toast 0.28s ease both;
+}
+
+.ty-radio__toast[hidden] { display: none; }
+
+/* =========================================================================
+   ۹) دکمهٔ «افزودن به رادیو» (روی ردیف‌ها و صفحهٔ آهنگ)
+   ====================================================================== */
+.ty-radio-add {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 10px;
+	border-radius: 999px;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	background: var(--ty-surface, #fff);
+	color: var(--ty-muted, #6b7280);
+	font-size: 10.5px;
+	font-weight: 700;
+	line-height: 1.9;
+	cursor: pointer;
+	transition: color 0.18s ease, border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
+}
+
+.ty-radio-add:hover,
+.ty-radio-add:focus-visible {
+	color: var(--ty-accent, #185adb);
+	border-color: var(--ty-accent, #185adb);
+	transform: translateY(-1px);
+}
+
+.ty-radio-add.is-added {
+	color: #fff;
+	border-color: transparent;
+	background: var(--ty-accent, #185adb);
+}
+
+.ty-radio-add__ico::before {
+	content: "+";
+	display: inline-grid;
+	place-items: center;
+	width: 14px;
+	height: 14px;
+	border-radius: 50%;
+	border: 1px solid currentColor;
+	font-size: 11px;
+	line-height: 1;
+}
+
+.ty-radio-add.is-added .ty-radio-add__ico::before { content: "✓"; border-color: transparent; }
+
+.ty-track .ty-radio-add { margin-inline-start: auto; }
+
+/* =========================================================================
+   ۱۰) بخشِ صفحهٔ اصلی
+   ====================================================================== */
+.ty-radio-home { margin: 30px auto; }
+
+.ty-radio-home__head {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	justify-content: space-between;
+	gap: 10px 20px;
+	margin-bottom: 12px;
+}
+
+.ty-radio-home__eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 11px;
+	font-weight: 700;
+	letter-spacing: 0.3px;
+	color: var(--ty-accent, var(--ab-blue, #185adb));
+}
+
+.ty-radio-home__eyebrow i { font-size: 15px; }
+
+.ty-radio-home__title {
+	margin: 6px 0 4px;
+	font-size: clamp(19px, 2.2vw, 26px);
+	font-weight: 700;
+	line-height: 1.5;
+	color: var(--ty-ink, var(--ab-text, #111));
+}
+
+.ty-radio-home__sub {
+	margin: 0;
+	max-width: 72ch;
+	font-size: 12.5px;
+	line-height: 2;
+	color: var(--ty-muted, var(--ab-muted, #6b7280));
+}
+
+.ty-radio-home__more {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 9px 16px;
+	border-radius: 999px;
+	border: 1px solid var(--ty-line, #e6e8ee);
+	background: var(--ty-surface, #fff);
+	color: var(--ty-accent, #185adb);
+	font-size: 12px;
+	font-weight: 700;
+	transition: all 0.2s ease;
+}
+
+.ty-radio-home__more:hover {
+	background: var(--ty-accent, #185adb);
+	border-color: transparent;
+	color: #fff;
+	transform: translateY(-1px);
+}
+
+.night .ty-radio-home__more,
+html[data-tara-night="1"] .ty-radio-home__more {
+	background: rgba(255, 255, 255, 0.06);
+	border-color: rgba(255, 255, 255, 0.14);
+	color: #fff;
+}
+
+/* =========================================================================
+   ۱۱) انیمیشن‌ها
+   ====================================================================== */
+@keyframes rd-aura {
+	from { transform: rotate(0deg) scale(1); }
+	to { transform: rotate(360deg) scale(1.08); }
+}
+
+@keyframes rd-pulse {
+	0% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0.6); }
+	70% { box-shadow: 0 0 0 9px rgba(255, 77, 109, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(255, 77, 109, 0); }
+}
+
+@keyframes rd-vu {
+	0% { height: 16%; }
+	35% { height: 74%; }
+	70% { height: 38%; }
+	100% { height: 92%; }
+}
+
+@keyframes rd-sheen {
+	0%, 100% { transform: translateX(-120%); }
+	45%, 55% { transform: translateX(120%); }
+}
+
+@keyframes rd-spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+@keyframes rd-toast {
+	from { opacity: 0; transform: translateY(10px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================================
+   ۱۲) واکنش‌گرایی
+   ====================================================================== */
+@media (max-width: 900px) {
+	.ty-radio__deck { grid-template-columns: 1fr; gap: 18px; }
+	.ty-radio__artwrap { max-width: 240px; }
+	.ty-radio__meter li { min-width: 68px; padding: 7px 11px; }
+	.ty-radio__queue { grid-template-columns: 1fr; max-height: 300px; }
+	.ty-radio__head { margin-bottom: 16px; }
+}
+
+@media (max-width: 640px) {
+	.ty-radio {
+		padding: 18px 14px 16px;
+		border-radius: 20px;
+		margin: 18px 0;
+	}
+	.ty-radio__title { margin-top: 9px; }
+	.ty-radio__sub { font-size: 12px; line-height: 1.95; }
+	.ty-radio__meter { width: 100%; gap: 6px; }
+	.ty-radio__meter li { flex: 1 1 0; min-width: 0; padding: 6px 9px; border-radius: 12px; }
+	.ty-radio__meter strong { font-size: 14px; }
+	.ty-radio__artwrap { max-width: 210px; }
+	.ty-radio__start-ico { width: 62px; height: 62px; font-size: 25px; }
+	.ty-radio__tbtn { width: 40px; height: 40px; font-size: 16px; }
+	.ty-radio__tbtn--main { width: 52px; height: 52px; font-size: 20px; }
+	.ty-radio__transport { gap: 8px; }
+	.ty-radio__mixer { padding: 10px; gap: 10px; }
+	.ty-radio__ctrl { flex: 1 1 100%; }
+	.ty-radio__power { width: 100%; }
+	.ty-radio__power button { flex: 1 1 0; padding: 6px 4px; font-size: 11px; }
+	.ty-radio__hint { flex: 1 1 100%; }
+	.ty-radio__tool { font-size: 11px; padding: 6px 10px; }
+	.ty-radio__time { min-width: 74px; font-size: 10.5px; }
+	.ty-radio__seek .ty-radio__range { width: calc(100% - 86px); }
+	.ty-radio__rowart { width: 36px; height: 36px; }
+	.ty-radio__rowplay { width: 30px; height: 30px; font-size: 12px; }
+	.ty-radio-home__head { align-items: flex-start; }
+	.ty-radio-home__more { width: 100%; justify-content: center; }
+}
+
+@media (max-width: 420px) {
+	.ty-radio__vu { height: 36px; inset-inline: 8px; bottom: 8px; gap: 2px; }
+	.ty-radio__rowmeta strong { font-size: 11.5px; }
+	.ty-radio__rownum { display: none; }
+}
+
+/* =========================================================================
+   ۱۳) کم‌کردن حرکت
+   ====================================================================== */
+@media (prefers-reduced-motion: reduce) {
+	.ty-radio__aura,
+	.ty-radio__pulse,
+	.ty-radio__sheen,
+	.ty-radio__disc,
+	.ty-radio__spin,
+	.ty-radio.is-playing .ty-radio__vu i,
+	.ty-radio__toast {
+		animation: none !important;
+	}
+	.ty-radio__art,
+	.ty-radio__tbtn,
+	.ty-radio__start-ico { transition: none !important; }
+}
+
+/* =========================================================================
+   ۱۴) حالت‌های زنده و پیامِ شناورِ عمومی
+   ====================================================================== */
+/* وقتی Web Audio فعال است، ارتفاعِ میله‌ها از تحلیلِ فرکانس می‌آید نه CSS */
+.ty-radio.has-graph.is-playing .ty-radio__vu i {
+	animation: none;
+	transition: height 0.09s linear;
+}
+
+.ty-radio.is-talking .ty-radio__live {
+	border-color: rgba(34, 211, 238, 0.55);
+	background: rgba(34, 211, 238, 0.14);
+	color: #dffbff;
+}
+
+.ty-radio.is-fading .ty-radio__console {
+	filter: drop-shadow(0 0 24px rgba(34, 211, 238, 0.18));
+}
+
+.ty-radio.is-switching .ty-radio__art {
+	animation: rd-switch 0.34s ease;
+}
+
+@keyframes rd-switch {
+	0% { opacity: 0.45; transform: scale(1.08) rotate(-1deg); }
+	100% { opacity: 1; transform: scale(1.06) rotate(0); }
+}
+
+.ty-radio__audioel {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ty-radio--page .ty-radio__deck { grid-template-columns: clamp(210px, 24vw, 300px) minmax(0, 1fr); }
+
+.ty-radio--tax { margin-top: 0; }
+
+.ty-radio__audio { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.ty-radio-global-toast {
+	position: fixed;
+	inset-inline: 0;
+	bottom: 26px;
+	margin-inline: auto;
+	width: max-content;
+	max-width: calc(100% - 32px);
+	padding: 11px 22px;
+	border-radius: 999px;
+	background: rgba(6, 9, 18, 0.95);
+	border: 1px solid rgba(34, 211, 238, 0.45);
+	color: #ecfeff;
+	font-family: vazir, tahoma, sans-serif;
+	font-size: 12.5px;
+	line-height: 1.9;
+	box-shadow: 0 22px 50px -22px rgba(0, 0, 0, 0.85);
+	z-index: 99999;
+	opacity: 0;
+	transform: translateY(14px);
+	pointer-events: none;
+	transition: opacity 0.24s ease, transform 0.24s ease;
+}
+
+.ty-radio-global-toast.is-on { opacity: 1; transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+	.ty-radio.is-switching .ty-radio__art { animation: none !important; }
+	.ty-radio-global-toast { transition: none !important; }
+}
+
+/* =========================================================================
+   ۱۵) صفحهٔ «رادیو ترانه یار»
+   ====================================================================== */
+.ty-radio-page__head {
+	background-color: var(--ab-surface, #fff);
+	margin: 22px 0 6px;
+	padding: 22px 24px;
+	border-radius: 22px;
+	border: 1px solid var(--ab-line, #e6e8ee);
+	background:
+		radial-gradient(120% 140% at 100% 0%, color-mix(in srgb, var(--ty-accent, #185adb) 14%, transparent) 0%, transparent 58%),
+		var(--ab-surface, #fff);
+}
+
+body.night .ty-radio-page__head,
+html[data-tara-night="1"] .ty-radio-page__head {
+	border-color: rgba(255, 255, 255, 0.12);
+	background:
+		radial-gradient(120% 140% at 100% 0%, rgba(24, 90, 219, 0.24) 0%, transparent 58%),
+		#1b1b24;
+}
+
+.ty-radio-page__eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	font-size: 11.5px;
+	font-weight: 700;
+	color: var(--ty-accent, var(--ab-blue, #185adb));
+}
+
+.ty-radio-page__title {
+	margin: 8px 0 6px;
+	font-size: clamp(24px, 3.4vw, 36px);
+	font-weight: 700;
+	line-height: 1.4;
+	color: var(--ty-ink, var(--ab-text, #111));
+}
+
+.ty-radio-page__sub {
+	margin: 0;
+	max-width: 76ch;
+	font-size: 13px;
+	line-height: 2.05;
+	color: var(--ty-muted, var(--ab-muted, #6b7280));
+}
+
+.ty-radio-page__off {
+	margin: 20px 0;
+	padding: 18px 20px;
+	border-radius: 16px;
+	border: 1px dashed var(--ab-line, #e6e8ee);
+	background: var(--ab-surface, #fff);
+	font-size: 13px;
+	line-height: 2;
+}
+
+.ty-radio-page__how {
+	margin: 30px 0 10px;
+}
+
+.ty-radio-page__how h2 {
+	margin: 0 0 14px;
+	font-size: 18px;
+	font-weight: 700;
+	color: var(--ty-ink, var(--ab-text, #111));
+}
+
+.ty-radio-page__steps {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	counter-reset: none;
+}
+
+.ty-radio-page__steps li {
+	position: relative;
+	padding: 16px 16px 14px;
+	border-radius: 18px;
+	border: 1px solid var(--ab-line, #e6e8ee);
+	background: var(--ab-surface, #fff);
+	line-height: 1.9;
+}
+
+body.night .ty-radio-page__steps li,
+html[data-tara-night="1"] .ty-radio-page__steps li {
+	border-color: rgba(255, 255, 255, 0.12);
+	background: #1b1b24;
+}
+
+.ty-radio-page__num {
+	display: inline-grid;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	margin-bottom: 8px;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--ty-accent, #185adb) 14%, transparent);
+	color: var(--ty-accent, #185adb);
+	font-size: 12px;
+	font-weight: 700;
+}
+
+.ty-radio-page__steps strong {
+	display: block;
+	margin-bottom: 4px;
+	font-size: 13.5px;
+	font-weight: 700;
+	color: var(--ty-ink, var(--ab-text, #111));
+}
+
+.ty-radio-page__steps p {
+	margin: 0;
+	font-size: 12px;
+	line-height: 2;
+	color: var(--ty-muted, var(--ab-muted, #6b7280));
+}
+
+.ty-radio-page__taxes {
+	display: grid;
+	gap: 16px;
+	margin: 28px 0 10px;
+}
+
+.ty-radio-page__taxgroup h2 {
+	margin: 0 0 8px;
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--ty-ink, var(--ab-text, #111));
+}
+
+.ty-radio-page__taxlinks {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 7px;
+}
+
+.ty-radio-page__content { margin-top: 26px; }
+
+@media (max-width: 640px) {
+	.ty-radio-page__head { padding: 16px 14px; border-radius: 18px; }
+	.ty-radio-page__sub { font-size: 12.5px; }
+	.ty-radio-page__steps { grid-template-columns: 1fr; }
+}
+
+/* =========================================================================
+   ۱۶) دکمهٔ «افزودن به رادیو» در صفحهٔ آهنگ (v3.9.0)
+   ====================================================================== */
+.ty-radio-add--single {
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	margin: 4px 0 2px;
+	padding: 10px 18px;
+	border-radius: 999px;
+	border: 1px solid var(--rd-line);
+	background: var(--rd-panel-2);
+	color: var(--rd-text);
+	font-family: vazir, tahoma, sans-serif;
+	font-size: 12.5px;
+	font-weight: 700;
+	line-height: 1.9;
+	cursor: pointer;
+	transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.ty-radio-add--single:hover {
+	transform: translateY(-1px);
+	border-color: var(--rd-a1);
+	background: #16223f;
+}
+
+.ty-radio-add--single.is-added {
+	border-color: var(--rd-a3);
+	background: rgba(34, 211, 238, 0.14);
+	color: #d9fbff;
+}
+
+.ty-radio-add__ico {
+	position: relative;
+	width: 17px;
+	height: 17px;
+	border-radius: 50%;
+	border: 1.6px solid currentColor;
+	flex: 0 0 auto;
+}
+
+.ty-radio-add__ico::before,
+.ty-radio-add__ico::after {
+	content: "";
+	position: absolute;
+	inset-inline-start: 50%;
+	inset-block-start: 50%;
+	background: currentColor;
+	border-radius: 2px;
+	transform: translate(-50%, -50%);
+}
+
+.ty-radio-add__ico::before { width: 9px; height: 1.6px; }
+.ty-radio-add__ico::after { width: 1.6px; height: 9px; }
+.ty-radio-add.is-added .ty-radio-add__ico::after { display: none; }
+
+.ty-radio-add--row {
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	border-radius: 50%;
+	display: inline-grid;
+	place-items: center;
+	flex: 0 0 auto;
+}
+
+.ty-radio-add--row .ty-radio-add__txt { display: none; }
+.ty-radio-add--row .ty-radio-add__ico { width: 14px; height: 14px; }
+.ty-radio-add--row .ty-radio-add__ico::before { width: 7px; }
+.ty-radio-add--row .ty-radio-add__ico::after { height: 7px; }
+
+@media (prefers-reduced-motion: reduce) {
+	.ty-radio-add--single { transition: none; }
+	.ty-radio-add--single:hover { transform: none; }
+}
+
+/* در گوشی، ردیف آهنگ سه‌ستونه است (تاریخ و برچسب پنهان می‌شوند)؛ دکمهٔ
+   «افزودن به رادیو» باید ستونِ چهارم را بگیرد تا به سطر دوم نیفتد. */
+@media (max-width: 640px) {
+	.ty-track { grid-template-columns: 34px 42px minmax(0, 1fr) auto; }
+	.ty-track .ty-radio-add { margin-inline-start: 0; }
+	.ty-radio-add--row { width: 28px; height: 28px; }
+}

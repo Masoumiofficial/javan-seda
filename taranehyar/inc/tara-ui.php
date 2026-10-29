@@ -642,6 +642,14 @@ if ( ! function_exists( 'tara_track_row' ) ) {
 			<?php if ( $args['show_date'] ) : ?>
 				<span class="ty-track__date"><?php echo esc_html( get_the_date( '', $post_id ) ); ?></span>
 			<?php endif; ?>
+
+			<?php
+			/* v3.9.0 — «افزودن به رادیو» روی هر ردیفِ فهرست. اگر رادیو خاموش
+			   باشد یا فایل صوتی نباشد، تابع خودش رشتهٔ خالی برمی‌گرداند. */
+			if ( function_exists( 'tara_radio_add_button' ) && '' !== (string) $src ) {
+				echo tara_radio_add_button( $post_id, array( 'class' => 'ty-radio-add ty-radio-add--row' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی escape شده
+			}
+			?>
 		</div>
 		<?php
 

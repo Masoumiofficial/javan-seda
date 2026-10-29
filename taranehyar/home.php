@@ -55,6 +55,13 @@ if ( function_exists( 'tara_news_ticker' ) ) {
 
 <?php get_template_part('inc/vip_slider'); ?>
 <?php get_template_part('inc/tarlanweb_player'); ?>
+<?php
+/* v3.9.0 — «رادیو ترانه یار»: ایستگاهِ همیشه‌روشن با میکسِ خودکار.
+   اگر در تنظیمات روشن باشد و آهنگی برای صف پیدا شود، همین‌جا چاپ می‌شود. */
+if ( function_exists( 'tara_radio_home_section' ) ) {
+	echo tara_radio_home_section(); // phpcs:ignore WordPress.Security.EscapeOutput -- مارکاپِ همین قالب
+}
+?>
 <div id="new-songs" class="ab-section-anchor"></div>
 <?php get_template_part('inc/new_posts'); ?>
 <div id="popular-songs" class="ab-section-anchor"></div>

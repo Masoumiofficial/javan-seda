@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.8.4' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.9.0' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -202,6 +202,10 @@ if ( ! function_exists( 'tara_asset_styles' ) ) {
 		}
 		if ( tara_page_is_artist() ) {
 			$styles['taranehyar-artist'] = '/css/tara-artist.css';
+		}
+		/* v3.9.0 — سربرگِ غنیِ «ژانر» و «حال‌وهوا» (فقط همان دو آرشیو). */
+		if ( function_exists( 'tara_radio_is_tax_page' ) && tara_radio_is_tax_page() ) {
+			$styles['taranehyar-tax'] = '/css/tara-tax.css';
 		}
 
 		/* v3.8.3 — اگر نسخهٔ فشرده هست، همان سرو می‌شود (بدون ترکیب). */
@@ -533,6 +537,28 @@ if ( is_readable( $taranehyar_ui ) ) {
 	require_once $taranehyar_ui;
 }
 unset( $taranehyar_ui );
+
+/* ۶-الف-۳-۱) رادیو و دی‌جی (۳.۹.۰) — داده، تنظیمات و AJAXِ صف
+   و مارکاپِ کارت رادیو. پیش از لایهٔ رنگ‌ها بار می‌شود تا ابزارهای عددی
+   (tara_fa_number و …) که از `tara-ui.php` می‌آیند حاضر باشند. */
+$taranehyar_radio = TARANEHYAR_DIR . '/inc/tara-radio.php';
+if ( is_readable( $taranehyar_radio ) ) {
+	require_once $taranehyar_radio;
+}
+unset( $taranehyar_radio );
+
+$taranehyar_radio_ui = TARANEHYAR_DIR . '/inc/tara-radio-ui.php';
+if ( is_readable( $taranehyar_radio_ui ) ) {
+	require_once $taranehyar_radio_ui;
+}
+unset( $taranehyar_radio_ui );
+
+/* ۶-الف-۳-۱-۲) سربرگِ غنیِ آرشیو ژانر/حال‌وهوا (۳.۹.۰) */
+$taranehyar_tax_hero = TARANEHYAR_DIR . '/inc/tara-tax-hero.php';
+if ( is_readable( $taranehyar_tax_hero ) ) {
+	require_once $taranehyar_tax_hero;
+}
+unset( $taranehyar_tax_hero );
 
 /* ۶-الف-۳-۲) رنگ‌ها و هویت (۳.۷.۷) — متغیرهای CSS از تنظیمات قالب */
 $taranehyar_brand = TARANEHYAR_DIR . '/inc/tara-brand.php';

@@ -71,4 +71,4 @@ foreach ($bad as $b) { echo "FAIL " . $b . "\\n"; }
 
 await php.run(phpCode);
 process.stdout.write(out);
-process.exit(/\nbad=0\n/.test(out) ? 0 : 1);
+process.exit(/\sbad=0(\s|$)/.test(out) ? 0 : 1);

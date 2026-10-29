@@ -182,6 +182,20 @@ if ( ! function_exists( 'tara_seo_description' ) ) {
 				$d = 'آرشیو ' . ( $term ? $term->name : '' ) . ' — ' . $n . ' اثر برای دانلود با کیفیت ۱۲۸ و ۳۲۰';
 			}
 			$txt = $d;
+		} elseif ( is_tax( 'tara_genre' ) || is_tax( 'tara_mood' ) ) {
+			/* v3.9.0 — ژانر و حال‌وهوا تا امروز هیچ meta description نداشتند
+			   (فقط دسته/برچسب و هنرمند پوشش داده شده بود). این‌جا یک توضیحِ
+			   یکتا از دادهٔ واقعیِ همان ترم ساخته می‌شود. */
+			$term = get_queried_object();
+			$d    = $term ? (string) $term->description : '';
+			$d    = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( $d ) ) );
+			$n    = ( isset( $GLOBALS['wp_query']->found_posts ) ) ? (int) $GLOBALS['wp_query']->found_posts : 0;
+			$kind = ( $term && 'tara_mood' === $term->taxonomy ) ? 'حال‌وهوا' : 'ژانر';
+			if ( '' !== $d ) {
+				$txt = $d;
+			} else {
+				$txt = 'آهنگ‌های ' . $kind . ' ' . ( $term ? $term->name : '' ) . ' — ' . $n . ' اثر با پخش آنلاین، میکس خودکار رادیو، متن ترانه و دانلود کیفیت ۱۲۸ و ۳۲۰';
+			}
 		} elseif ( is_tax( tara_artist_tax() ) ) {
 			$term = get_queried_object();
 			$n    = ( isset( $GLOBALS['wp_query']->found_posts ) ) ? (int) $GLOBALS['wp_query']->found_posts : 0;

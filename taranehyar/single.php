@@ -514,6 +514,13 @@ if ( $taranehyar_download_title && ( $tara_dl_audio || $tara_dl_video ) ) {
 </div>
 <?php endif; ?>
 <?php
+/* v3.9.0 — «افزودن به رادیو»: این آهنگ را به فهرستِ شخصیِ رادیو در مرورگر
+   همین کاربر اضافه می‌کند (بدونِ حساب کاربری و بدونِ ذخیره در دیتابیس). */
+if ( function_exists( 'tara_radio_add_button' ) && function_exists( 'tara_radio_on' ) && tara_radio_on() ) {
+	echo tara_radio_add_button( get_the_ID(), array( 'class' => 'ty-radio-add ty-radio-add--single' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی escape شده
+}
+?>
+<?php
 /* v3.7.9 — «مشخصات اثر» رفت پایینِ لینک‌های دانلود (درخواست صریح).
    ترتیب نهایی صفحه: پلیر → ما را دنبال کنید → توضیحات → ویدیو →
    لینک‌های دانلود → مشخصات اثر → متن ترانه.

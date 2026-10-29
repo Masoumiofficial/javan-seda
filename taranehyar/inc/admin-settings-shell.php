@@ -99,6 +99,7 @@ if ( ! function_exists( 'tara_settings_shell_sections' ) ) {
 			'homes'   => array( 'title' => 'صفحه اصلی', 'icon' => 'dashicons-admin-home', 'hint' => 'اسلایدر، بخش‌ها و ترتیب مطالب صفحهٔ اصلی' ),
 			'dl_pages' => array( 'title' => 'صفحه دانلود آهنگ', 'icon' => 'dashicons-download', 'hint' => 'چیدمان صفحهٔ آهنگ و دکمه‌های دانلود' ),
 			'ab_ui'   => array( 'title' => 'ظاهر و رفتار ترانه یار', 'icon' => 'dashicons-admin-appearance', 'hint' => 'پلیر، کارت‌ها، مود شب و جزئیات ظاهری همین قالب' ),
+			'radio'   => array( 'title' => 'رادیو و دی‌جی', 'icon' => 'dashicons-controls-volumeon', 'hint' => 'میکس خودکار، وکال معرفی سایت، منبع آهنگ‌ها و صفحهٔ رادیو' ),
 			'footer'  => array( 'title' => 'پانوشت', 'icon' => 'dashicons-editor-insertmore', 'hint' => 'متن، دسته‌ها و کپی‌رایت پایین سایت' ),
 			'socials' => array( 'title' => 'شبکه‌های اجتماعی', 'icon' => 'dashicons-share', 'hint' => 'آدرس اینستاگرام، تلگرام و بقیه' ),
 			'ads1'    => array( 'title' => 'تبلیغات', 'icon' => 'dashicons-megaphone', 'hint' => 'کدهای تبلیغاتی بالای سایت و کنار مطالب' ),

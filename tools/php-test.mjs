@@ -48,16 +48,16 @@ for (const js of ['admin-panel.js']) {
   files.push({ parent: '/tmp/theme/js', name: js, url: 'file://' + path.join(theme, 'js', js) });
 }
 /* فایل‌های تازهٔ ۳.۷.۰ — آزمون run-370 */
-for (const name of ['tara-taxonomies.php', 'tara-ui.php', 'tara-critical.php', 'tara-brand.php', 'admin-settings-shell.php', 'tax-listing.php', 'ab-credits.php', 'vip_slider.php', 'ab-seo.php', 'ab-logo-setting.php', 'ab-post-extras.php', 'ab-vip-image.php', 'tara-assets.php', 'ab-glass.php', 'ab-ui-guard.php']) {
+for (const name of ['tara-taxonomies.php', 'tara-ui.php', 'tara-critical.php', 'tara-brand.php', 'admin-settings-shell.php', 'tax-listing.php', 'ab-credits.php', 'vip_slider.php', 'ab-seo.php', 'ab-logo-setting.php', 'ab-post-extras.php', 'ab-vip-image.php', 'tara-assets.php', 'ab-glass.php', 'ab-ui-guard.php', 'tara-radio.php', 'tara-radio-ui.php', 'tara-tax-hero.php']) {
   files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
 }
-for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-settings.css', 'ab-glass.css', 'ab-ui.css', 'ab-vip-image.css', 'tara-ui.min.css', 'style.min.css', 'ab-glass.min.css', 'ab-logo-card.css']) {
+for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-settings.css', 'ab-glass.css', 'ab-ui.css', 'ab-vip-image.css', 'tara-ui.min.css', 'style.min.css', 'ab-glass.min.css', 'ab-logo-card.css', 'tara-radio.css', 'tara-tax.css']) {
   files.push({ parent: '/tmp/theme/css', name, url: 'file://' + path.join(theme, 'css', name) });
 }
-for (const name of ['tara-player.js', 'hero-slider.js', 'admin-settings.js', 'ab-vip-image.js']) {
+for (const name of ['tara-player.js', 'hero-slider.js', 'admin-settings.js', 'ab-vip-image.js', 'tara-radio.js']) {
   files.push({ parent: '/tmp/theme/js', name, url: 'file://' + path.join(theme, 'js', name) });
 }
-for (const name of ['single.php', 'category.php', 'footer.php', '404.php', 'taxonomy-artist.php', 'taxonomy-tara_genre.php', 'home.php', 'search.php', 'inc/songs_post.php', 'inc/mobiles_header.php', 'inc/no-content.php']) {
+for (const name of ['single.php', 'category.php', 'footer.php', '404.php', 'taxonomy-artist.php', 'taxonomy-tara_genre.php', 'home.php', 'search.php', 'page-radio.php', 'inc/songs_post.php', 'inc/mobiles_header.php', 'inc/no-content.php']) {
   const parent = name.includes('/') ? '/tmp/theme/inc' : '/tmp/theme';
   const base = name.includes('/') ? name.split('/')[1] : name;
   files.push({ parent, name: base, url: 'file://' + path.join(theme, name) });

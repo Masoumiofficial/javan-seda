@@ -1792,7 +1792,15 @@
 		}
 
 		root.addEventListener('keydown', function (event) {
-			if (event.target && /input|textarea|select/i.test(event.target.tagName)) {
+			/* روی کنترل‌های خودشان دست نگذارید: Space روی یک دکمه باید همان
+			   دکمه را بزند، نه اینکه پخش را دو بار عوض کند. */
+			var target = event.target;
+			var busy = target && (
+				target.isContentEditable ||
+				/^(input|textarea|select|button|a|summary)$/i.test( target.tagName || '' ) ||
+				( target.closest && target.closest( '[role="button"], [contenteditable="true"]' ) )
+			);
+			if ( busy ) {
 				return;
 			}
 			if (event.key === ' ' || event.key === 'Spacebar') {

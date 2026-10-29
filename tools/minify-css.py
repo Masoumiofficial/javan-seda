@@ -120,7 +120,7 @@ def counts(css):
 
 # فقط CSSهایی که واقعاً به مرورگرِ کاربر می‌روند. CSS پیشخوان فشرده نمی‌شود
 # (در پنل، حجم مهم نیست و فایلِ کمتر یعنی احتمالِ جاافتادن کمتر).
-FRONT_CSS = ('tara-ui.css', 'tara-home.css', 'tara-artist.css', 'ab-ui.css', 'ab-glass.css', 'tara-radio.css', 'tara-tax.css')
+FRONT_CSS = ('tara-ui.css', 'tara-home.css', 'tara-artist.css', 'ab-ui.css', 'ab-glass.css', 'tara-radio.css', 'tara-tax.css', 'tara-account.css')
 
 
 def targets():

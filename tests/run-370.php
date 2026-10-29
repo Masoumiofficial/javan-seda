@@ -325,7 +325,7 @@ tara_settings_shell_assets( 'taranehyar_page_ot-theme-options' );
 t( 'تنظیمات: دوباره روی صفحهٔ درست بار می‌شود', isset( $GLOBALS['__styles']['taranehyar-settings'] ) );
 t( 'تنظیمات: پیکربندی JS به صفحه تزریق شد', isset( $GLOBALS['__localized']['taranehyar-settings']['taraSettings'] ) );
 
-t( 'تنظیمات: نقشهٔ یازده بخش', 11 === count( tara_settings_shell_sections() ) );
+t( 'تنظیمات: نقشهٔ دوازده بخش', 12 === count( tara_settings_shell_sections() ) );
 t( 'تنظیمات: بخش «رادیو و دی‌جی» در نقشه هست', isset( tara_settings_shell_sections()['radio'] ) );
 t( 'تنظیمات: هر بخش عنوان/آیکون/راهنما دارد', ( function () {
 	foreach ( tara_settings_shell_sections() as $id => $item ) {
@@ -499,7 +499,7 @@ t( 'تاکسونومی: قالب مشترک آرشیو موجود', is_readable(
 /* ======================================================================
    v3.7.7 — بازبینی خرابی‌های گزارش‌شده و تنظیمات تازه
    ====================================================================== */
-t( 'نسخه: style.css روی ۳.۸.۲ یا بالاتر است', (bool) preg_match( '/Version: 3\.(8\.[2-9]|9\.\d+)/', (string) @file_get_contents( '/tmp/theme/style.css' ) ) );
+t( 'نسخه: style.css روی ۳.۸.۲ یا بالاتر است', (bool) preg_match( '/Version: 3\.(8\.[2-9]|9\.\d+|10\.\d+)/', (string) @file_get_contents( '/tmp/theme/style.css' ) ) );
 
 $opts = (string) @file_get_contents( '/tmp/theme/inc/theme-options.php' );
 t( 'تنظیمات: بخش رنگ‌ها اضافه شده', false !== strpos( $opts, "'id'=>'brand'" ) );
@@ -552,7 +552,7 @@ $dock_php = (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' );
 t( 'نوار چسبان: مارکاپ صدا دارد', false !== strpos( $dock_php, 'data-tara-dock-vol' ) && false !== strpos( $dock_php, 'data-tara-dock-mute' ) );
 $player_js2 = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
 t( 'ویدیو: خروج با Esc و تغییر جهت', false !== strpos( $player_js2, "'orientationchange'" ) && false !== strpos( $player_js2, "e.key !== 'Escape'" ) );
-t( 'پلیر: نشانهٔ نسخه ۳.۸.۲ یا بالاتر', (bool) preg_match( "/'data-tara-ready', '3\\.(8\\.[2-9]|9\\.\\d+)'/", $player_js2 ) );
+t( 'پلیر: نشانهٔ نسخه ۳.۸.۲ یا بالاتر', (bool) preg_match( "/'data-tara-ready', '3\\.(8\\.[2-9]|9\\.\\d+|10\\.\\d+)'/", $player_js2 ) );
 
 /* ======================================================================
    ۳.۷.۸ — دور ۶۶: ترتیب صفحهٔ آهنگ، اسلایدر تازه، سربرگ سه‌ستونهٔ هنرمند،

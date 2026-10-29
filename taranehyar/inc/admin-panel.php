@@ -398,6 +398,12 @@ function taranehyar_panel_sections() {
 			'desc'  => 'میکسِ خودکار، وکالِ معرفیِ سایت، منبعِ آهنگ‌ها و طولِ کراس‌فید.',
 		),
 		array(
+			'id'    => 'account',
+			'title' => 'حساب کاربری و ورود',
+			'icon'  => 'dashicons-admin-users',
+			'desc'  => 'ورود با پیامک، پنل کاربری، علاقه‌مندی، پلی‌لیست و اتصال به رباتِ تلگرام.',
+		),
+		array(
 			'id'    => 'footer',
 			'title' => 'پانوشت',
 			'icon'  => 'dashicons-editor-insertmore',

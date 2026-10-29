@@ -28,6 +28,7 @@ array('id'=>'homes','title'=>'صفحه اصلی'),
 array('id'=>'dl_pages','title'=>'صفحه دانلود آهنگ'),
 array('id'=>'ab_ui','title'=>'ترانه یار — ظاهر و رفتار'),
 array('id'=>'radio','title'=>'رادیو و دی‌جی'),
+array('id'=>'account','title'=>'حساب کاربری و ورود'),
 array('id'=>'footer','title'=>'پانوشت'),
 array('id'=>'socials','title'=>'شبکه های اجتماعی'),
 array('id'=>'ads1','title'=>'تبلیغات'),
@@ -1312,6 +1313,304 @@ array(
 'section'=>'radio'
 ),
 
+/* ---------------------------------------------------------------------------
+   v3.10.0 — «حساب کاربری و ورود»: ورودِ پیامکی (OTP)، پنلِ کاربری و ربات
+   ------------------------------------------------------------------------ */
+array(
+'id'=>'account_guide',
+'label'=>'',
+'desc'=>'<strong>ورود بدونِ رمز.</strong> کاربر فقط شمارهٔ موبایل را می‌دهد، یک کدِ ۶رقمی پیامک می‌شود و با همان وارد می‌شود؛ حساب اگر نباشد خودکار ساخته می‌شود. برای پیامک، حسابِ <a href="https://melipayamak.com" target="_blank" rel="noopener">ملی‌پیامک</a> یا هر پنلِ دیگر (از راهِ وب‌هوک) کافی است. تا وقتی «حالتِ آزمایشی» روشن است، کد روی صفحه نشان داده می‌شود و پیامکی نمی‌رود — برای تست قبل از خریدِ پنل.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'account',
+'class'=>'ab-guide'
+),
+array(
+'id'=>'account_on',
+'label'=>'حسابِ کاربری روشن باشد',
+'desc'=>'خاموش = دکمهٔ ورود، پنلِ کاربری و همهٔ قابلیت‌های آن (علاقه‌مندی، پلی‌لیست، دنبال‌کردن) از سایت برداشته می‌شود. هیچ داده‌ای پاک نمی‌شود.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_allow_password',
+'label'=>'ورود با نام‌کاربری و رمزِ وردپرس هم ممکن باشد',
+'desc'=>'برای حسابِ مدیران و کاربرانِ قدیمی خوب است. کاربرانِ عادیِ تازه فقط با پیامک وارد می‌شوند.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_code_ttl',
+'label'=>'عمرِ کدِ ورود (ثانیه)',
+'desc'=>'پیش‌فرض ۱۸۰ = سه دقیقه. کمتر = امن‌تر، ولی اگر پیامک دیر برسد کاربر باید دوباره بگیرد.',
+'std'=>'180',
+'type'=>'numeric-slider',
+'min_max_step'=>'60,600,30',
+'section'=>'account'
+),
+array(
+'id'=>'account_resend',
+'label'=>'فاصلهٔ ارسالِ دوبارهٔ کد (ثانیه)',
+'desc'=>'جلوگیری از هزینهٔ پیامکِ تکراری. در فرم، شمارندهٔ معکوس نشان داده می‌شود.',
+'std'=>'60',
+'type'=>'numeric-slider',
+'min_max_step'=>'20,300,10',
+'section'=>'account'
+),
+array(
+'id'=>'account_tries',
+'label'=>'حداکثر تلاشِ اشتباه برای هر کد',
+'desc'=>'بعد از این تعداد، کد باطل می‌شود و کاربر باید کدِ تازه بگیرد.',
+'std'=>'6',
+'type'=>'numeric-slider',
+'min_max_step'=>'3,10,1',
+'section'=>'account'
+),
+array(
+'id'=>'account_per_phone',
+'label'=>'حداکثر پیامک در ساعت برای هر شماره',
+'desc'=>'اگر کسی پشتِ سرِ هم کد بخواهد، جلویش گرفته می‌شود.',
+'std'=>'5',
+'type'=>'numeric-slider',
+'min_max_step'=>'1,20,1',
+'section'=>'account'
+),
+array(
+'id'=>'account_per_ip',
+'label'=>'حداکثر پیامک در ساعت از هر IP',
+'desc'=>'محافظت در برابرِ سوءاستفادهٔ گروهی. برای سایت‌های پشتِ پراکسی عدد را کمی بالاتر بگذارید.',
+'std'=>'12',
+'type'=>'numeric-slider',
+'min_max_step'=>'3,60,1',
+'section'=>'account'
+),
+array(
+'id'=>'account_sms',
+'label'=>'سرویسِ پیامک',
+'desc'=>'«ملی‌پیامک» مستقیم به RESTِ رسمی وصل می‌شود. «وب‌هوک» برای هر پنلِ دیگر (کاوه‌نگار، SMS.ir، اسکریپتِ اختصاصی). «آزمایشی» پیامک نمی‌فرستد و کد را روی همان صفحه نشان می‌دهد.',
+'std'=>'dev',
+'type'=>'select',
+'choices'=>array(
+array('value'=>'dev','label'=>'آزمایشی (بدونِ پیامک)'),
+array('value'=>'melipayamak','label'=>'ملی‌پیامک (REST)'),
+array('value'=>'webhook','label'=>'وب‌هوکِ دلخواه'),
+),
+'section'=>'account'
+),
+array(
+'id'=>'account_sms_user',
+'label'=>'ملی‌پیامک — نام‌کاربری',
+'desc'=>'همان نام‌کاربریِ ورود به پنلِ ملی‌پیامک.',
+'std'=>'',
+'type'=>'text',
+'section'=>'account'
+),
+array(
+'id'=>'account_sms_pass',
+'label'=>'ملی‌پیامک — رمزِ عبور',
+'desc'=>'رمزِ پنل. فقط در همین تنظیمات ذخیره می‌شود و هیچ‌جا نمایش داده نمی‌شود (مگر همین کادر برای مدیر).',
+'std'=>'',
+'type'=>'text',
+'section'=>'account'
+),
+array(
+'id'=>'account_sms_from',
+'label'=>'ملی‌پیامک — شمارهٔ فرستنده',
+'desc'=>'مثلاً ۳۰۰۰۶۸ یا شمارهٔ اختصاصیِ شما، بدونِ صفرِ اضافه.',
+'std'=>'',
+'type'=>'text',
+'section'=>'account'
+),
+array(
+'id'=>'account_sms_pattern',
+'label'=>'ملی‌پیامک — کدِ پترن (اختیاری)',
+'desc'=>'اگر پترن دارید، فقط شمارهٔ پترن را بگذارید؛ ارسال سریع‌تر و ارزان‌تر است و «متنِ پیامک» نادیده گرفته می‌شود. خالی = ارسالِ متنیِ معمولی.',
+'std'=>'',
+'type'=>'text',
+'section'=>'account'
+),
+array(
+'id'=>'account_sms_hook',
+'label'=>'وب‌هوک — آدرس',
+'desc'=>'یک POSTِ JSON با این بدنه به آدرس می‌رود: <code>{phone, code, text, site, name}</code>. فقط https پذیرفته می‌شود و پاسخِ 2xx یعنی «ارسال شد».',
+'std'=>'',
+'type'=>'text',
+'section'=>'account'
+),
+array(
+'id'=>'account_sms_hook_auth',
+'label'=>'وب‌هوک — هدرِ احراز (اختیاری)',
+'desc'=>'مثلاً <code>Bearer xxxxx</code>. اگر خالی باشد هدری فرستاده نمی‌شود.',
+'std'=>'',
+'type'=>'text',
+'section'=>'account'
+),
+array(
+'id'=>'account_sms_text',
+'label'=>'متنِ پیامک',
+'desc'=>'از <code>{code}</code> برای کد و از <code>{site}</code> برای نامِ سایت استفاده کنید.',
+'std'=>'کدِ ورود شما به {site}: {code}
+این کد را به هیچ‌کس ندهید.',
+'type'=>'textarea',
+'section'=>'account'
+),
+array(
+'id'=>'account_dev_show',
+'label'=>'در حالتِ آزمایشی کد روی صفحه دیده شود',
+'desc'=>'فقط برای تست. در سایتِ واقعی که پیامک روشن است، این گزینه هیچ اثری ندارد.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_features',
+'label'=>'',
+'desc'=>'<strong>قابلیت‌های پنلِ کاربری.</strong> هر کدام را خاموش کنید، هم از پنل و هم از صفحهٔ آهنگ/خواننده برداشته می‌شود؛ داده‌های قبلی می‌مانند.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'account',
+'class'=>'ab-guide'
+),
+array(
+'id'=>'account_likes',
+'label'=>'ذخیره در علاقه‌مندی‌ها (قلب)',
+'desc'=>'دکمهٔ قلب روی صفحهٔ آهنگ و ردیف‌های فهرست.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_playlists',
+'label'=>'پلی‌لیست‌ها',
+'desc'=>'ساختِ پلی‌لیست، افزودن/برداشتنِ آهنگ و لینکِ اشتراکی.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_follows',
+'label'=>'دنبال‌کردنِ خواننده‌ها',
+'desc'=>'دکمه روی صفحهٔ خواننده + فیدِ آهنگ‌های تازه در پنل.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_history',
+'label'=>'تاریخچهٔ شنیدن',
+'desc'=>'آهنگ‌هایی که کاربر پخش می‌کند در پنلِ خودش ثبت می‌شود. برای حریمِ خصوصی، هیچ‌جا عمومی نیست.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_notifs',
+'label'=>'پیام‌ها و اعلان‌ها',
+'desc'=>'پیامِ خوش‌آمد، اتصالِ ربات و آهنگ‌های تازهٔ خواننده‌های دنبال‌شده.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_avatar',
+'label'=>'تصویرِ پروفایل',
+'desc'=>'کاربر می‌تواند آدرسِ تصویر بدهد (یا تصویرِ گراواتار داشته باشد).',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_welcome',
+'label'=>'پیامِ خوش‌آمد برای کاربرِ تازه',
+'desc'=>'بلافاصله بعد از اولین ورود، یک پیام در پنل می‌نشیند.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'account'
+),
+array(
+'id'=>'account_max_likes',
+'label'=>'سقفِ علاقه‌مندی‌ها برای هر کاربر',
+'desc'=>'پیش‌فرض ۵۰۰ آهنگ.',
+'std'=>'500',
+'type'=>'numeric-slider',
+'min_max_step'=>'50,2000,50',
+'section'=>'account'
+),
+array(
+'id'=>'account_max_playlists',
+'label'=>'سقفِ پلی‌لیست برای هر کاربر',
+'std'=>'30',
+'type'=>'numeric-slider',
+'min_max_step'=>'3,100,1',
+'section'=>'account'
+),
+array(
+'id'=>'account_max_tracks',
+'label'=>'سقفِ آهنگ در هر پلی‌لیست',
+'std'=>'300',
+'type'=>'numeric-slider',
+'min_max_step'=>'20,1000,20',
+'section'=>'account'
+),
+array(
+'id'=>'account_max_follows',
+'label'=>'سقفِ خوانندهٔ دنبال‌شده',
+'std'=>'500',
+'type'=>'numeric-slider',
+'min_max_step'=>'20,2000,20',
+'section'=>'account'
+),
+array(
+'id'=>'account_max_history',
+'label'=>'سقفِ تاریخچهٔ شنیدن',
+'std'=>'100',
+'type'=>'numeric-slider',
+'min_max_step'=>'20,500,20',
+'section'=>'account'
+),
+array(
+'id'=>'account_redirect',
+'label'=>'بعد از ورود کجا برود؟',
+'desc'=>'خالی = پنلِ «حساب من». می‌توانید آدرسِ یک برگهٔ دلخواه بگذارید.',
+'std'=>'',
+'type'=>'text',
+'section'=>'account'
+),
+array(
+'id'=>'account_bot_guide',
+'label'=>'',
+'desc'=>'<strong>اتصال به رباتِ تلگرام.</strong> اگر رباتِ «آهنگ‌بان» را دارید، نامِ کاربریِ ربات و همان توکنی که در فایلِ <code>.env</code> ربات گذاشته‌اید (<code>AHANGBAN_API_TOKEN</code>) را این‌جا بگذارید. کاربر در پنل کدِ ۸حرفی می‌گیرد، در ربات می‌فرستد و حسابش وصل می‌شود؛ از آن به بعد می‌تواند از تلگرام آهنگ ذخیره کند، خواننده دنبال کند و اعلان بگیرد. اگر توکن را این‌جا نگذارید، همین قالب همان توکنِ افزونهٔ «ahangban-connector» را می‌خواند و بدونِ تنظیمِ تازه کار می‌کند.',
+'type'=>'textblock',
+'std'=>'',
+'section'=>'account',
+'class'=>'ab-guide'
+),
+array(
+'id'=>'account_tg_bot',
+'label'=>'نامِ کاربریِ ربات',
+'desc'=>'بدونِ @؛ مثلاً <code>ahangbanbot</code>. برای ساختنِ لینکِ مستقیم در پنل لازم است.',
+'std'=>'',
+'type'=>'text',
+'section'=>'account'
+),
+array(
+'id'=>'account_tg_token',
+'label'=>'توکنِ RESTِ ربات (۶۴ کاراکترِ هگز)',
+'desc'=>'همان مقدارِ <code>AHANGBAN_API_TOKEN</code> در ربات. خالی = خواندنِ توکنِ افزونهٔ ربات. با این توکن، ربات می‌تواند پروفایل، دنبال‌شده‌ها، فیدِ تازه‌ها و پلی‌لیست‌ها را برای کاربر بخواند.',
+'std'=>'',
+'type'=>'text',
+'section'=>'account'
+),
+array(
+'id'=>'account_tg_code_ttl',
+'label'=>'عمرِ کدِ اتصال به ربات (ثانیه)',
+'std'=>'600',
+'type'=>'numeric-slider',
+'min_max_step'=>'120,1800,60',
+'section'=>'account'
+),
 ));
   /* allow settings to be filtered before saving */
   $custom_settings = apply_filters( 'option_tree_settings_args', $custom_settings );

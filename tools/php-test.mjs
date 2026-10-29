@@ -54,6 +54,15 @@ for (const name of ['tara-taxonomies.php', 'tara-ui.php', 'tara-critical.php', '
 for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-settings.css', 'ab-glass.css', 'ab-ui.css', 'ab-vip-image.css', 'tara-ui.min.css', 'style.min.css', 'ab-glass.min.css', 'ab-logo-card.css', 'tara-radio.css', 'tara-tax.css']) {
   files.push({ parent: '/tmp/theme/css', name, url: 'file://' + path.join(theme, 'css', name) });
 }
+/* v3.10.0 — حسابِ کاربری، ورودِ پیامکی و ربات */
+for (const name of ['tara-account.php', 'tara-account-ui.php']) {
+  files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
+}
+for (const name of ['page-account.php', 'page-login.php']) {
+  files.push({ parent: '/tmp/theme', name, url: 'file://' + path.join(theme, name) });
+}
+files.push({ parent: '/tmp/theme/css', name: 'tara-account.css', url: 'file://' + path.join(theme, 'css', 'tara-account.css') });
+files.push({ parent: '/tmp/theme/js', name: 'tara-account.js', url: 'file://' + path.join(theme, 'js', 'tara-account.js') });
 for (const name of ['tara-player.js', 'hero-slider.js', 'admin-settings.js', 'ab-vip-image.js', 'tara-radio.js']) {
   files.push({ parent: '/tmp/theme/js', name, url: 'file://' + path.join(theme, 'js', name) });
 }
@@ -64,6 +73,8 @@ for (const name of ['single.php', 'category.php', 'footer.php', '404.php', 'taxo
 }
 files.push({ parent: '/preload/tests', name: 'stubs-wp.php', url: 'file://' + path.join(root, 'tests', 'stubs-wp.php') });
 files.push({ parent: '/preload/tests', name: path.basename(file), url: 'file://' + path.resolve(file) });
+/* v3.10.0 — دامِ ساختگیِ حساب، مشترک بینِ run-391 و dump-391 */
+files.push({ parent: '/preload/tests', name: 'run-391-fixtures.php', url: 'file://' + path.join(root, 'tests', 'run-391-fixtures.php') });
 
 const php = new PhpNode({ files });
 let out = '';

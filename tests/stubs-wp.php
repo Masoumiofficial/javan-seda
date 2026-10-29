@@ -53,9 +53,25 @@ class WP_Term {
 class WP_Error {
 	public $code;
 	public $message;
-	public function __construct( $code = '', $message = '' ) {
+	public $data = null;
+	public function __construct( $code = '', $message = '', $data = null ) {
 		$this->code    = $code;
 		$this->message = $message;
+		$this->data    = $data;
+	}
+	/* v3.10.0 — همان سه متدِ پرکاربردِ وردپرس که کدِ قالب صدا می‌زند. */
+	public function get_error_code() {
+		return $this->code;
+	}
+	public function get_error_message() {
+		return $this->message;
+	}
+	public function get_error_data() {
+		return $this->data;
+	}
+	public function add_data( $data ) {
+		$this->data = $data;
+		return true;
 	}
 }
 
@@ -510,7 +526,10 @@ function current_user_can( $cap, $arg = null ) {
 	return ! empty( $GLOBALS['__caps'][ $cap ] );
 }
 function wp_verify_nonce( $nonce, $action ) {
-	return ( 'good' === $nonce && 'tara_save_term' === $action ) || ( 'good-post' === $nonce && 'tara_post_artist' === $action );
+	if ( 'good' === $nonce && in_array( (string) $action, array( 'tara_save_term', 'tara_account', 'tara_rest' ), true ) ) {
+		return true;
+	}
+	return 'good-post' === $nonce && 'tara_post_artist' === $action;
 }
 function check_ajax_referer( $action, $name ) {
 	return true;
@@ -745,4 +764,223 @@ function wp_send_json_success( $data = null ) {
 function wp_send_json_error( $data = null, $code = 200 ) {
 	$GLOBALS['__json'] = array( 'success' => false, 'data' => $data, 'code' => $code );
 	throw new RuntimeException( 'json_error' );
+}
+
+/* ======================================================================
+   v3.10.0 — کاربر، ورود و REST (برای آزمونِ حسابِ کاربری)
+   ====================================================================== */
+
+$GLOBALS['__users']     = array();   /* id => array( data ) */
+$GLOBALS['__usermeta']  = array();   /* id => array( key => value ) */
+$GLOBALS['__current']   = 0;
+$GLOBALS['__auth']      = array();
+$GLOBALS['__rest_routes'] = array();
+
+if ( ! class_exists( 'WP_User' ) ) {
+	class WP_User {
+		public $ID;
+		public $data;
+		public $user_login;
+		public $user_email;
+		public $display_name;
+		public $roles = array();
+		public function __construct( $data ) {
+			$data               = (array) $data;
+			$this->ID           = isset( $data['ID'] ) ? (int) $data['ID'] : 0;
+			$this->user_login   = isset( $data['user_login'] ) ? (string) $data['user_login'] : '';
+			$this->user_email   = isset( $data['user_email'] ) ? (string) $data['user_email'] : '';
+			$this->display_name = isset( $data['display_name'] ) ? (string) $data['display_name'] : $this->user_login;
+			$this->roles        = isset( $data['roles'] ) ? (array) $data['roles'] : array( 'subscriber' );
+			$this->data         = $data;
+		}
+		public function exists() {
+			return $this->ID > 0;
+		}
+	}
+}
+
+function get_users( $args = array() ) {
+	$args     = (array) $args;
+	$out      = array();
+	$key      = isset( $args['meta_key'] ) ? (string) $args['meta_key'] : '';
+	$value    = isset( $args['meta_value'] ) ? (string) $args['meta_value'] : '';
+	$number   = isset( $args['number'] ) ? (int) $args['number'] : 0;
+
+	foreach ( $GLOBALS['__users'] as $id => $data ) {
+		if ( '' !== $key && isset( $args['meta_value'] ) ) {
+			$have = isset( $GLOBALS['__usermeta'][ $id ][ $key ] ) ? $GLOBALS['__usermeta'][ $id ][ $key ] : '';
+			$have = is_scalar( $have ) ? (string) $have : '';
+			if ( $have !== $value ) {
+				continue;
+			}
+		}
+		$out[] = new WP_User( array_merge( array( 'ID' => $id ), $data ) );
+		if ( $number > 0 && count( $out ) >= $number ) {
+			break;
+		}
+	}
+
+	return $out;
+}
+
+function get_user_by( $field, $value ) {
+	if ( 'id' === $field ) {
+		$id = (int) $value;
+		if ( isset( $GLOBALS['__users'][ $id ] ) ) {
+			return new WP_User( array_merge( array( 'ID' => $id ), $GLOBALS['__users'][ $id ] ) );
+		}
+		return false;
+	}
+	foreach ( $GLOBALS['__users'] as $id => $data ) {
+		$have = 'login' === $field ? (string) $data['user_login'] : (string) $data['user_email'];
+		if ( $have === (string) $value ) {
+			return new WP_User( array_merge( array( 'ID' => $id ), $data ) );
+		}
+	}
+	return false;
+}
+
+function username_exists( $login, $site = true ) {
+	foreach ( $GLOBALS['__users'] as $id => $data ) {
+		if ( (string) $data['user_login'] === (string) $login ) {
+			return (int) $id;
+		}
+	}
+	return false;
+}
+
+function wp_insert_user( $data ) {
+	$data = (array) $data;
+	if ( isset( $data['user_login'] ) && username_exists( $data['user_login'] ) ) {
+		return new WP_Error( 'existing_user_login', 'این نام‌کاربری هست.' );
+	}
+	$id                              = empty( $GLOBALS['__users'] ) ? 1 : ( max( array_keys( $GLOBALS['__users'] ) ) + 1 );
+	$GLOBALS['__users'][ $id ]       = array(
+		'user_login'   => isset( $data['user_login'] ) ? (string) $data['user_login'] : 'user' . $id,
+		'user_email'   => isset( $data['user_email'] ) ? (string) $data['user_email'] : '',
+		'display_name' => isset( $data['display_name'] ) ? (string) $data['display_name'] : '',
+		'roles'        => array( isset( $data['role'] ) ? (string) $data['role'] : 'subscriber' ),
+	);
+	$GLOBALS['__usermeta'][ $id ]    = array();
+	return $id;
+}
+
+function wp_update_user( $data ) {
+	$data = (array) $data;
+	$id   = isset( $data['ID'] ) ? (int) $data['ID'] : 0;
+	if ( ! isset( $GLOBALS['__users'][ $id ] ) ) {
+		return new WP_Error( 'invalid_user_id', 'کاربر نیست.' );
+	}
+	foreach ( array( 'user_email', 'display_name', 'user_login' ) as $f ) {
+		if ( isset( $data[ $f ] ) ) {
+			$GLOBALS['__users'][ $id ][ $f ] = (string) $data[ $f ];
+		}
+	}
+	return $id;
+}
+
+function wp_generate_password( $len = 12, $special = true, $extra = true ) {
+	/* باید هر بار متفاوت باشد؛ وگرنه حلقهٔ «تا وقتی کلید تکراری نیست» تمام نمی‌شود. */
+	static $n = 0;
+	$n++;
+	$alphabet = 'abcdefghijkmnpqrstuvwxyz23456789';
+	$out      = '';
+	for ( $i = 0; $i < (int) $len; $i++ ) {
+		$out .= $alphabet[ ( $n * 7 + $i * 13 ) % strlen( $alphabet ) ];
+	}
+	return substr( $out . (string) $n, 0, (int) $len );
+}
+
+function get_user_meta( $id, $key = '', $single = false ) {
+	$id = (int) $id;
+	if ( '' === $key ) {
+		return isset( $GLOBALS['__usermeta'][ $id ] ) ? $GLOBALS['__usermeta'][ $id ] : array();
+	}
+	$have = isset( $GLOBALS['__usermeta'][ $id ][ $key ] ) ? $GLOBALS['__usermeta'][ $id ][ $key ] : '';
+	return $single ? $have : ( '' === $have ? array() : array( $have ) );
+}
+
+function update_user_meta( $id, $key, $value ) {
+	$GLOBALS['__usermeta'][ (int) $id ][ (string) $key ] = $value;
+	return true;
+}
+
+function delete_user_meta( $id, $key ) {
+	unset( $GLOBALS['__usermeta'][ (int) $id ][ (string) $key ] );
+	return true;
+}
+
+function get_current_user_id() {
+	return (int) $GLOBALS['__current'];
+}
+
+function is_user_logged_in() {
+	return (int) $GLOBALS['__current'] > 0;
+}
+
+function wp_set_current_user( $id ) {
+	$GLOBALS['__current'] = (int) $id;
+	return new WP_User( array( 'ID' => (int) $id ) );
+}
+
+function wp_set_auth_cookie( $id, $remember = false, $secure = false ) {
+	$GLOBALS['__auth'][] = array( $id, $remember, $secure );
+	return true;
+}
+
+function wp_logout() {
+	$GLOBALS['__current'] = 0;
+	return true;
+}
+
+function wp_signon( $creds = array(), $secure = '' ) {
+	$creds = (array) $creds;
+	$login = isset( $creds['user_login'] ) ? (string) $creds['user_login'] : '';
+	$pass  = isset( $creds['user_password'] ) ? (string) $creds['user_password'] : '';
+	$user  = get_user_by( 'login', $login );
+	if ( ! $user ) {
+		return new WP_Error( 'invalid_username', 'نام کاربری نیست.' );
+	}
+	if ( 'good-pass' !== $pass ) {
+		return new WP_Error( 'incorrect_password', 'رمز اشتباه است.' );
+	}
+	$GLOBALS['__current'] = (int) $user->ID;
+	return $user;
+}
+
+function wp_login_url( $redirect = '' ) {
+	return 'https://ex/wp-login.php' . ( '' !== $redirect ? '?redirect_to=' . rawurlencode( $redirect ) : '' );
+}
+
+function wp_hash( $data, $scheme = 'auth' ) {
+	return hash_hmac( 'md5', (string) $data, 'salt-' . $scheme );
+}
+
+function wp_rand( $min = 0, $max = 0 ) {
+	$max = (int) $max > 0 ? (int) $max : 4294967295;
+	$min = (int) $min;
+	return $min + ( crc32( (string) $min . '|' . (string) $max . '|' . (string) mt_rand() ) % max( 1, $max - $min + 1 ) );
+}
+
+function get_avatar_url( $id, $args = array() ) {
+	return 'https://ex/avatar-' . (int) $id . '.jpg';
+}
+
+function register_rest_route( $ns, $route, $args = array(), $override = false ) {
+	$GLOBALS['__rest_routes'][ $ns . '/' . ltrim( (string) $route, '/' ) ] = $args;
+	return true;
+}
+
+function wp_remote_post( $url, $args = array() ) {
+	$GLOBALS['__http'][] = array( 'url' => $url, 'args' => $args );
+	$next                = isset( $GLOBALS['__http_next'] ) ? $GLOBALS['__http_next'] : array( 'code' => 200, 'body' => '{"RetStatus":1}' );
+	return array( 'response' => array( 'code' => (int) $next['code'] ), 'body' => (string) $next['body'] );
+}
+
+function wp_remote_retrieve_response_code( $res ) {
+	return isset( $res['response']['code'] ) ? (int) $res['response']['code'] : 0;
+}
+
+function wp_remote_retrieve_body( $res ) {
+	return isset( $res['body'] ) ? (string) $res['body'] : '';
 }

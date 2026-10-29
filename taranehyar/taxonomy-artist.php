@@ -634,6 +634,14 @@ $taranehyar_social_icons = array(
 			<span class="ty-artist__eyebrow"><i class="icofont-radio-mic" aria-hidden="true"></i> صفحهٔ هنرمند</span>
 			<h1 class="ty-artist__name"><?php echo esc_html( $taranehyar_term->name ); ?></h1>
 
+			<?php
+			/* v3.10.0 — «دنبال‌کردن» با شمارندهٔ واقعیِ دنبال‌کننده‌ها.
+			   اگر حسابِ کاربری خاموش باشد، تابع رشتهٔ خالی می‌دهد. */
+			if ( function_exists( 'tara_acc_follow_button' ) ) {
+				echo tara_acc_follow_button( (int) $taranehyar_term->term_id, array( 'class' => 'ty-acct-follow--hero' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
+			}
+			?>
+
 			<?php $taranehyar_latin = $taranehyar_term_field( 'artist_en' ); ?>
 			<?php if ( '' !== $taranehyar_latin ) : ?>
 				<p class="ty-artist__latin" lang="en" dir="ltr"><?php echo esc_html( $taranehyar_latin ); ?></p>

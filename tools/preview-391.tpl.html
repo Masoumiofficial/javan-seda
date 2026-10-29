@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>پیش‌نمایشِ ترانه یار ۳.۱۰.۰ — حسابِ کاربری، ورود با موبایل و ربات</title>
+<style>
+:root{--ty-accent:#185adb;--ty-accent-2:#7c3aed;--ty-ink:#0f172a;--ty-text:#26303f;--ty-muted:#6b7280;
+--ty-line:#e5e8ee;--ty-surface:#fff;--ty-accent-soft:rgba(24,90,219,.07)}
+*{box-sizing:border-box}
+body{margin:0;padding:0 0 60px;font-family:Vazirmatn,IRANSans,Vazir,Tahoma,system-ui,-apple-system,"Segoe UI",sans-serif;
+font-size:14px;line-height:1.9;color:var(--ty-text);
+background:radial-gradient(1200px 520px at 88% -8%,rgba(124,58,237,.14),transparent 62%),
+radial-gradient(900px 460px at 4% 6%,rgba(24,90,219,.12),transparent 60%),#f5f6fb;
+-webkit-font-smoothing:antialiased}
+body.is-night{--ty-ink:#f3f4ff;--ty-text:#e6e7f2;--ty-muted:#a9adc4;--ty-line:rgba(255,255,255,.13);
+--ty-surface:#171827;--ty-accent-soft:rgba(124,58,237,.18);
+background:radial-gradient(1200px 520px at 88% -8%,rgba(124,58,237,.3),transparent 62%),
+radial-gradient(900px 460px at 4% 6%,rgba(24,90,219,.24),transparent 60%),#0b0c15}
+.pv-wrap{max-width:1140px;margin:0 auto;padding:22px 16px 0;transition:max-width .25s ease}
+.pv-top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;
+border-radius:22px;border:1px solid var(--ty-line);background:var(--ty-surface);margin-bottom:14px}
+.pv-top h1{margin:0;font-size:clamp(15px,2.2vw,20px);color:var(--ty-ink)}
+.pv-top p{margin:4px 0 0;font-size:12.5px;color:var(--ty-muted)}
+.pv-tools{display:flex;flex-wrap:wrap;gap:8px}
+.pv-btn{appearance:none;cursor:pointer;font:inherit;font-size:12px;font-weight:700;padding:9px 15px;border-radius:999px;
+border:1px solid var(--ty-line);background:var(--ty-surface);color:var(--ty-ink);transition:.18s ease}
+.pv-btn:hover{border-color:var(--ty-accent);color:var(--ty-accent)}
+.pv-btn--main{background:linear-gradient(135deg,var(--ty-accent),var(--ty-accent-2));border-color:transparent;color:#fff}
+.pv-btn--main:hover{color:#fff;filter:brightness(1.08)}
+.pv-note{margin:0 0 6px;padding:12px 16px;border-radius:16px;font-size:12.5px;line-height:2;
+border:1px dashed rgba(24,90,219,.4);background:rgba(24,90,219,.05)}
+.pv-note b{color:var(--ty-accent)}
+.pv-h{display:flex;align-items:center;gap:8px;margin:26px 0 12px;font-size:15px;font-weight:800;color:var(--ty-ink)}
+.pv-h::before{content:"";width:4px;height:18px;border-radius:4px;background:linear-gradient(180deg,var(--ty-accent),var(--ty-accent-2))}
+.pv-h small{font-weight:500;font-size:12px;color:var(--ty-muted)}
+.pv-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media(max-width:900px){.pv-grid{grid-template-columns:1fr}}
+.pv-stage{position:relative;border-radius:24px;border:1px solid var(--ty-line);overflow:hidden;padding:18px;
+background:radial-gradient(700px 320px at 80% 0%,rgba(124,58,237,.26),transparent 60%),#101223;min-height:520px;
+display:grid;place-items:center}
+.pv-stage .ty-acct-modal{position:static;inset:auto;z-index:1;width:100%;display:block;padding:0}
+.pv-stage .ty-acct-modal__card{max-width:392px;margin:0 auto}
+.pv-stage .ty-acct-modal__veil{display:none}
+.pv-tag{position:absolute;top:12px;inset-inline-start:14px;z-index:2;font-size:11px;padding:3px 10px;border-radius:999px;
+background:rgba(255,255,255,.1);color:#d8dbff;border:1px solid rgba(255,255,255,.14)}
+.pv-frame{border-radius:24px;border:1px solid var(--ty-line);padding:14px;background:var(--ty-surface);overflow:hidden}
+.pv-chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.pv-chip{appearance:none;cursor:pointer;font:inherit;font-size:12.5px;font-weight:700;padding:8px 14px;border-radius:999px;
+border:1px solid var(--ty-line);background:var(--ty-surface);color:var(--ty-text);transition:.16s}
+.pv-chip:hover{border-color:var(--ty-accent);color:var(--ty-accent)}
+.pv-chip[aria-pressed="true"]{background:linear-gradient(135deg,var(--ty-accent),var(--ty-accent-2));border-color:transparent;color:#fff}
+.pv-pane.is-off{display:none}
+.pv-sheet .ty-acct-sheet{position:static;inset:auto;display:block;padding:0}
+.pv-sheet .ty-acct-sheet__veil{display:none}
+.pv-sheet .ty-acct-sheet__card{max-width:420px;margin:0 auto;position:static}
+.pv-demo{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;
+border:1px dashed var(--ty-line);background:var(--ty-accent-soft);margin-bottom:12px}
+.pv-demo__lbl{font-size:11.5px;font-weight:700;color:var(--ty-muted);width:100%}
+.pv-foot{margin-top:26px;font-size:12px;color:var(--ty-muted)}
+.pv-foot code{font-size:11.5px}
+@media(max-width:520px){.pv-top{padding:13px 14px}.pv-stage{padding:12px;min-height:0}.pv-frame{padding:10px}}
+</style>
+<style>
+__CSS__
+</style>
+</head>
+<body>
+<div class="pv-wrap" id="pv-wrap">
+  <div class="pv-top">
+    <div>
+      <h1>ترانه یار ۳.۱۰.۰ — حسابِ کاربری، ورود با موبایل و رباتِ آهنگ‌بان</h1>
+      <p>همان مارکاپ و همان CSSِ قالب؛ فقط داده نمونه است و سرور شبیه‌سازی شده.</p>
+    </div>
+    <div class="pv-tools">
+      <button class="pv-btn" type="button" id="pv-night">حالتِ شب / روز</button>
+      <button class="pv-btn pv-btn--main" type="button" id="pv-zoom">نمای گوشی</button>
+    </div>
+  </div>
+
+  <p class="pv-note">
+    <b>چه ببینید:</b> ورود بدونِ رمز — شماره ← کدِ ۶رقمی ← داخل. کد با ملی‌پیامک می‌رود و در حالتِ
+    آزمایشی روی همان صفحه نشان داده می‌شود. پایین‌تر پنلِ «حساب من» با هر هشت تب، برگهٔ پلی‌لیست
+    و دکمه‌هایی که در صفحهٔ آهنگ و خواننده می‌بینید. دکمه‌ها همین‌جا هم کار می‌کنند (سرور شبیه‌سازی
+    شده است) تا حسِ واقعیِ تعامل را ببینید.
+  </p>
+
+  <div class="pv-h">۱) ورود و ثبت‌نام <small>دو مرحله، بدونِ رمز</small></div>
+  <div class="pv-grid">
+    <div class="pv-stage">
+      <span class="pv-tag">مرحلهٔ ۱ — شمارهٔ موبایل</span>
+      __MODAL_PHONE__
+    </div>
+    <div class="pv-stage">
+      <span class="pv-tag">مرحلهٔ ۲ — کدِ ۶رقمی و حالتِ آزمایشی</span>
+      __MODAL_CODE__
+    </div>
+  </div>
+
+  <div class="pv-h">۲) پنلِ «حساب من» <small>هشت تب</small></div>
+  <div class="pv-chips">__CHIPS__</div>
+  __PANES__
+
+  <div class="pv-h">۳) برگهٔ «افزودن به پلی‌لیست» و دکمه‌های سایت</div>
+  <div class="pv-grid">
+    <div class="pv-frame pv-sheet">__PICKER__</div>
+    <div class="pv-frame">
+      <div class="pv-demo"><span class="pv-demo__lbl">دکمه‌های زیرِ پلیر در صفحهٔ آهنگ</span>__S_ACTIONS__</div>
+      <div class="pv-demo"><span class="pv-demo__lbl">دکمهٔ حساب در هدر</span>__S_HEADER__</div>
+      <div class="pv-demo"><span class="pv-demo__lbl">دکمهٔ «دنبال‌کردن» در هیروی خواننده</span>__S_FOLLOW__</div>
+      <div class="pv-demo"><span class="pv-demo__lbl">قلبِ ذخیره در فهرستِ آهنگ‌ها</span>__S_LIKE__</div>
+    </div>
+  </div>
+
+  <p class="pv-foot">
+    ساخته‌شده از خروجیِ واقعیِ <code>inc/tara-account-ui.php</code> — همین مارکاپ در سایت با دادهٔ خودِ
+    کاربر سرو می‌شود. آزمون‌ها: ۲۸۰ سنجهٔ PHP + ۲۹ سنجهٔ jsdom برای همین بخش.
+  </p>
+</div>
+<script>
+/* ---------- شبیه‌سازیِ سرورِ وردپرس برای همین پیش‌نمایش ---------- */
+window.TaraAccount = {
+  api: '#preview-ajax',
+  nonce: 'preview',
+  logged: false,
+  user: {},
+  url: { account: '#demo', login: '#demo', home: '#' },
+  features: { likes: true, playlists: true, follows: true, history: true, notifs: true },
+  allow_password: true,
+  bot: 'ahangbanbot',
+  labels: {
+    sending: 'در حال ارسال…', verifying: 'در حال بررسی…', saved: 'ذخیره شد.', copied: 'کپی شد.',
+    error: 'خطا', needLogin: 'اول وارد شوید.', codeSent: 'کد پیامک شد.',
+    resendIn: 'ارسالِ دوباره تا %s ثانیه', resend: 'ارسالِ دوبارهٔ کد',
+    added: 'به پلی‌لیست اضافه شد.', removed: 'از پلی‌لیست برداشته شد.',
+    newList: 'نامِ پلی‌لیستِ تازه', confirmDelete: 'پاک شود؟'
+  }
+};
+(function () {
+  var answers = {
+    send: { success: true, data: { phone: '۰۹۱۲ ۱۲۳ ۴۵۶۷', dev: true, dev_code: '492806', resend: 60, ttl: 180, has_account: true } },
+    verify: { success: true, data: { user: { id: 1, name: 'شنوندهٔ ۴۵۶۷' }, redirect: '#demo', fresh: false } },
+    like: { success: true, data: { liked: true, count: 12 } },
+    follow: { success: true, data: { following: true, count: 129 } },
+    playlist: { success: true, data: { k: 'aaa111', n: 'لیستِ تازه', t: [], p: 0, playlists: [], added: true, count: 1 } },
+    profile: { success: true, data: { ok: true } },
+    'history-clear': { success: true, data: { ok: true } },
+    'notifs-read': { success: true, data: { ok: true } },
+    logout: { success: true, data: { redirect: '#' } }
+  };
+  window.fetch = function (url, opts) {
+    var body = new URLSearchParams((opts && opts.body) || '');
+    var payload = answers[body.get('do')] || { success: true, data: {} };
+    return Promise.resolve({ ok: true, json: function () { return Promise.resolve(payload); } });
+  };
+  var modal = document.getElementById('ty-acct-modal');
+  document.addEventListener('click', function (e) {
+    var open = e.target.closest && e.target.closest('[data-tara-open]');
+    if (open && modal) {
+      modal.hidden = false;
+      modal.classList.add('is-open');
+    }
+  });
+  /* چیپ‌های تب */
+  var chips = document.querySelectorAll('.pv-chip');
+  Array.prototype.forEach.call(chips, function (chip) {
+    chip.addEventListener('click', function () {
+      Array.prototype.forEach.call(chips, function (c) { c.setAttribute('aria-pressed', 'false'); });
+      chip.setAttribute('aria-pressed', 'true');
+      Array.prototype.forEach.call(document.querySelectorAll('.pv-pane'), function (p) {
+        p.classList.toggle('is-off', p.getAttribute('data-pane') !== chip.getAttribute('data-pv-tab'));
+      });
+    });
+  });
+  /* لینک‌های ناوبریِ پنل هم تب را عوض کنند */
+  document.addEventListener('click', function (e) {
+    var link = e.target.closest && e.target.closest('.ty-acct__navlink');
+    if (!link) { return; }
+    var key = (link.getAttribute('href') || '').replace('?tab=', '');
+    var chip = document.querySelector('.pv-chip[data-pv-tab="' + key + '"]');
+    if (chip) { e.preventDefault(); chip.click(); }
+  });
+  /* نمای گوشی */
+  var zoom = document.getElementById('pv-zoom');
+  if (zoom) {
+    zoom.addEventListener('click', function () {
+      var wrap = document.getElementById('pv-wrap');
+      var narrow = wrap.getAttribute('data-narrow') === '1';
+      wrap.setAttribute('data-narrow', narrow ? '0' : '1');
+      wrap.style.maxWidth = narrow ? '1140px' : '430px';
+    });
+  }
+  /* شب/روز */
+  var night = document.getElementById('pv-night');
+  if (night) {
+    night.addEventListener('click', function () { document.body.classList.toggle('is-night'); });
+  }
+})();
+</script>
+<script>
+__JS__
+</script>
+</body>
+</html>

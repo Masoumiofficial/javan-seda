@@ -586,6 +586,7 @@ if ( ! function_exists( 'tara_track_row' ) ) {
 				'show_date'  => false,
 				'badge'      => '',
 				'current'    => false,
+				'actions'    => '',
 			)
 		);
 
@@ -603,6 +604,10 @@ if ( ! function_exists( 'tara_track_row' ) ) {
 		   است؛ وگرنه دکمه به سطرِ دوم می‌افتد و ردیف دوخطی می‌شود. */
 		if ( '' !== (string) $src && function_exists( 'tara_radio_add_button' ) && function_exists( 'tara_radio_on' ) && tara_radio_on() ) {
 			$classes .= ' ty-track--radio';
+		}
+		/* v3.10.0 — دکمه‌های حسابِ کاربری (علاقه‌مندی/پلی‌لیست/برداشتن) */
+		if ( '' !== (string) $args['actions'] ) {
+			$classes .= ' ty-track--act';
 		}
 
 		ob_start();
@@ -653,6 +658,12 @@ if ( ! function_exists( 'tara_track_row' ) ) {
 			   باشد یا فایل صوتی نباشد، تابع خودش رشتهٔ خالی برمی‌گرداند. */
 			if ( function_exists( 'tara_radio_add_button' ) && '' !== (string) $src ) {
 				echo tara_radio_add_button( $post_id, array( 'class' => 'ty-radio-add ty-radio-add--row' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی escape شده
+			}
+
+			/* v3.10.0 — دکمه‌های حساب؛ مارکاپشان در inc/tara-account-ui.php
+			   ساخته می‌شود و همین‌جا فقط چاپ می‌شود. */
+			if ( '' !== (string) $args['actions'] ) {
+				echo '<span class="ty-track__act">' . $args['actions'] . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput -- در همان تابع escape شده
 			}
 			?>
 		</div>

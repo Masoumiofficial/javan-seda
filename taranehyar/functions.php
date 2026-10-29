@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.9.1' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.10.0' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -559,6 +559,20 @@ if ( is_readable( $taranehyar_tax_hero ) ) {
 	require_once $taranehyar_tax_hero;
 }
 unset( $taranehyar_tax_hero );
+
+/* ۶-الف-۳-۱-۳) حسابِ کاربری (۳.۱۰.۰) — ورودِ پیامکی، پنل، دنبال‌کردن و RESTِ ربات.
+   دو فایلِ جدا: داده/منطق و مارکاپ. */
+$taranehyar_account = TARANEHYAR_DIR . '/inc/tara-account.php';
+if ( is_readable( $taranehyar_account ) ) {
+	require_once $taranehyar_account;
+}
+unset( $taranehyar_account );
+
+$taranehyar_account_ui = TARANEHYAR_DIR . '/inc/tara-account-ui.php';
+if ( is_readable( $taranehyar_account_ui ) ) {
+	require_once $taranehyar_account_ui;
+}
+unset( $taranehyar_account_ui );
 
 /* ۶-الف-۳-۲) رنگ‌ها و هویت (۳.۷.۷) — متغیرهای CSS از تنظیمات قالب */
 $taranehyar_brand = TARANEHYAR_DIR . '/inc/tara-brand.php';

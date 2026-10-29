@@ -248,6 +248,14 @@ if ( empty( $tara_tracks ) && has_post_thumbnail() ) {
 }
 ?>
 
+<?php
+/* v3.10.0 — دکمه‌های حساب (ذخیره در علاقه‌مندی‌ها و افزودن به پلی‌لیست)
+   بلافاصله بعد از پلیر، جایی که چشمِ کاربر بعد از «پخش» می‌رود. */
+if ( function_exists( 'tara_acc_single_actions' ) ) {
+	echo tara_acc_single_actions( get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+}
+?>
+
 <?php /* «ما را دنبال کنید» — v3.7.8: بلافاصله بعد از پلیر و پیش از توضیحات.
    تابع در inc/ab-post-extras.php است و با function_exists محافظت شده؛
    نبودن فایل ⇒ صفر خروجی و صفر خطا. لینک‌ها و متن دکمه‌ها از تنظیمات قالب →

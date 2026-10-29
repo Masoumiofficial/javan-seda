@@ -103,6 +103,16 @@ if ( function_exists( 'tara_logo_img' ) ) {
 <button type="submit" aria-label="جست‌وجو"><i class="icofont-search" aria-hidden="true"></i></button>
 </form>
 
+<?php
+/* v3.10.0 — دکمهٔ حسابِ کاربری در هدر (ورود / نام + تصویر + نشانِ پیام).
+   اگر قابلیت خاموش باشد، خروجی صفر است. */
+if ( function_exists( 'tara_acc_header_button' ) ) {
+	echo '<div class="ty-acct-slot">';
+	tara_acc_header_button( 'desktop' );
+	echo '</div>';
+}
+?>
+
 <?php $enablepop = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'sun_moon' ) : ( 'off' != ot_get_option( 'sun_moon' ) );
 if ( $enablepop ) { ?>
 <?php $darks_on = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'dark_modes', false ) : ( 'off' != ot_get_option( 'dark_modes' ) ); ?>

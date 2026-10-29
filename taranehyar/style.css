@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.8.3
+Version: 3.8.4
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -3704,17 +3704,29 @@ body.ab-post-img-square .single_featured_cover .single_featured_image img{
    اگر «لوگوی شب» در تنظیمات خالی باشد، تصویر دوم اصلاً چاپ نمی‌شود و
    همین قواعد بی‌اثر می‌مانند.
    ========================================================================== */
-.ab-logo__img--night { display: none; }
+/* نکتهٔ ۳.۸.۴ — این قواعد با شناسه (#) و !important نوشته می‌شوند، چون
+   style.css قاعدهٔ `#header .logo_top img { display:block !important }` را
+   دارد و با یک کلاسِ تنها شکست می‌خورد؛ نتیجه‌اش همان بود که کاربر دید:
+   لوگوی شب در حالت روز «زیر» لوگوی روز هم چاپ می‌شد. */
+#header .logo_top img.ab-logo__img--night,
+#mobiles_header .logo_mobiles img.ab-logo__img--night { display: none !important; }
 
-body.night .ab-logo__img--day,
-html[data-tara-night="1"] .ab-logo__img--day { display: none !important; }
+body.night #header .logo_top img.ab-logo__img--day,
+body.night #mobiles_header .logo_mobiles img.ab-logo__img--day,
+html[data-tara-night="1"] #header .logo_top img.ab-logo__img--day,
+html[data-tara-night="1"] #mobiles_header .logo_mobiles img.ab-logo__img--day { display: none !important; }
 
-body.night .ab-logo__img--night,
-html[data-tara-night="1"] .ab-logo__img--night { display: inline-block !important; }
+body.night #header .logo_top img.ab-logo__img--night,
+body.night #mobiles_header .logo_mobiles img.ab-logo__img--night,
+html[data-tara-night="1"] #header .logo_top img.ab-logo__img--night,
+html[data-tara-night="1"] #mobiles_header .logo_mobiles img.ab-logo__img--night { display: block !important; }
 
-/* در حالت شب، لوگوی روز نباید جای خودش را نگه دارد (ترازِ سربرگ) */
+/* فقط یک تصویر در جریانِ صفحه است؛ دومی با display:none کاملاً از چیدمان
+   بیرون می‌رود، پس نه ارتفاع می‌گیرد و نه زیرِ لوگوی روز می‌افتد. */
 .logo_top figure,
 #mobiles_header .logo_mobiles figure { line-height: 0; }
+
+#header .logo_top figure img + img.ab-logo__img--night { margin: 0; }
 
 /* ==========================================================================
    v3.8.3 — خواناییِ حالت شب (لایهٔ .ab-*)

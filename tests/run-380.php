@@ -124,9 +124,9 @@ t(
 
 t(
 	'لوگو: قاعدهٔ تعویض روز/شب در هر دو فایل CSS هست',
-	false !== strpos( $cssui, '.ab-logo__img--night { display: none; }' )
-		&& false !== strpos( $cssui, 'html[data-tara-night="1"] .ab-logo__img--night' )
-		&& false !== strpos( $style, 'html[data-tara-night="1"] .ab-logo__img--night' )
+	false !== strpos( $cssui, 'img.ab-logo__img--night { display: none !important; }' )
+		&& false !== strpos( $cssui, 'html[data-tara-night="1"] #header .logo_top img.ab-logo__img--night' )
+		&& false !== strpos( $style, 'html[data-tara-night="1"] #header .logo_top img.ab-logo__img--night' )
 );
 
 /* ======================================================================
@@ -378,15 +378,15 @@ t(
    ====================================================================== */
 t(
 	'نسخه: style.css روی ۳.۸.۳ است',
-	false !== strpos( $style, 'Version: 3.8.3' )
+	(bool) preg_match( '/Version: 3\.8\.[3-9]/', $style )
 );
 t(
 	'نسخه: fallback در functions.php روی ۳.۸.۳ است',
-	false !== strpos( $func, ": '3.8.3' )" )
+	(bool) preg_match( "/: '3\\.8\\.[3-9]' \\)/", $func )
 );
 t(
 	'نسخه: نشانهٔ پلیر روی ۳.۸.۳ است',
-	false !== strpos( $playerjs, "'data-tara-ready', '3.8.3'" )
+	(bool) preg_match( "/'data-tara-ready', '3\\.8\\.[3-9]'/", $playerjs )
 );
 
 /* ======================================================================

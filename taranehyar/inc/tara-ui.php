@@ -119,8 +119,12 @@ if ( ! function_exists( 'tara_logo_img' ) ) {
 
 		$html = '<img class="' . $base . ' ab-logo__img--day" src="' . esc_url( $day ) . '"' . $dim . $alt . $title . ' decoding="async" fetchpriority="high">';
 
-		if ( $night !== $day || '' !== tara_logo_raw( 'logo_night' ) ) {
-			$html .= '<img class="' . $base . ' ab-logo__img--night" src="' . esc_url( $night ) . '"' . $dim . $alt . $title . ' decoding="async" loading="lazy">';
+		if ( '' !== tara_logo_raw( 'logo_night' ) ) {
+			/* v3.8.4 — عمداً lazy نیست: تصویر در حالت روز display:none است و
+			   مرورگرها تصویرِ lazyِ پنهان را تا لحظهٔ نمایش دانلود نمی‌کنند؛
+			   نتیجه یک لحظه جای خالی هنگامِ روشن‌کردنِ حالت شب بود. لوگو
+			   چند کیلوبایت است، پس eager درست‌تر است. */
+			$html .= '<img class="' . $base . ' ab-logo__img--night" src="' . esc_url( $night ) . '"' . $dim . $alt . $title . ' decoding="async">';
 		}
 
 		return $html;

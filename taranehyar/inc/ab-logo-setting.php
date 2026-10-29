@@ -76,9 +76,18 @@ if ( ! function_exists( 'tara_logo_admin_handle' ) ) {
 		$variant = isset( $_POST['tara_logo_target'] ) ? sanitize_key( wp_unslash( (string) $_POST['tara_logo_target'] ) ) : 'day';
 		$variant = ( 'night' === $variant ) ? 'night' : 'day';
 
+		/* v3.8.4 — اگر فرم از صفحهٔ «تنظیمات قالب» فرستاده شده باشد، به همان
+		   صفحه برمی‌گردیم؛ وگرنه به پیشخوانِ پنل. */
+		$from = isset( $_POST['tara_logo_from'] ) ? sanitize_key( wp_unslash( (string) $_POST['tara_logo_from'] ) ) : 'panel';
+		if ( 'settings' === $from ) {
+			$page = 'ot-theme-options';
+		} else {
+			$page = function_exists( 'taranehyar_panel_slug' ) ? taranehyar_panel_slug() : 'taranehyar';
+		}
+
 		$redirect = add_query_arg(
 			array(
-				'page'        => function_exists( 'taranehyar_panel_slug' ) ? taranehyar_panel_slug() : 'taranehyar',
+				'page'        => $page,
 				'tara-logo-v' => $variant,
 			),
 			admin_url( 'admin.php' )
@@ -157,8 +166,9 @@ if ( ! function_exists( 'tara_logo_card_variant' ) ) {
 	 * @param string $variant day|night.
 	 * @param string $current آدرسِ فعلیِ همین حالت.
 	 * @param bool   $is_std  آیا همان پیش‌فرضِ قالب است؟
+	 * @param string $context panel|settings — بعد از ذخیره کجا برگردیم.
 	 */
-	function tara_logo_card_variant( $variant, $current, $is_std ) {
+	function tara_logo_card_variant( $variant, $current, $is_std, $context = 'panel' ) {
 		$is_night = ( 'night' === $variant );
 		$id       = $is_night ? 'tara-logo-night' : 'tara-logo-day';
 		$title    = $is_night ? 'لوگوی حالت شب' : 'لوگوی حالت روز';
@@ -184,6 +194,7 @@ if ( ! function_exists( 'tara_logo_card_variant' ) ) {
 				action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="tara_save_logo">
 				<input type="hidden" name="tara_logo_target" value="<?php echo esc_attr( $variant ); ?>">
+				<input type="hidden" name="tara_logo_from" value="<?php echo esc_attr( $context ); ?>">
 				<?php wp_nonce_field( 'tara_save_logo' ); ?>
 
 				<p class="ty-logo-card__row">
@@ -214,27 +225,51 @@ if ( ! function_exists( 'tara_logo_card_variant' ) ) {
 
 if ( ! function_exists( 'tara_logo_card' ) ) {
 	/**
-	 * کارتِ «لوگو سایت» برای پیشخوان پنل — دو حالته (روز/شب).
+	 * کارتِ «لوگو سایت» — دو حالته (روز/شب).
+	 *
+	 * v3.8.4 — همین کارت در دو جا نمایش داده می‌شود:
+	 *   • پیشخوانِ پنل «ترانه یار» (page=taranehyar)
+	 *   • صفحهٔ «تنظیمات قالب» (page=ot-theme-options) — کاربر خواسته بود
+	 *     تنظیمات لوگو همان‌جا هم در دسترس باشد، نه فقط در پیشخوان.
+	 *
+	 * @param string $context panel|settings.
 	 */
-	function tara_logo_card() {
+	function tara_logo_card( $context = 'panel' ) {
 		if ( ! function_exists( 'tara_logo_url' ) || ! function_exists( 'tara_logo_night_url' ) ) {
 			return;
 		}
+
+		$context   = ( 'settings' === $context ) ? 'settings' : 'panel';
 		$day       = tara_logo_url();
 		$night     = tara_logo_night_url();
 		$day_std   = ( $day === tara_logo_default() );
 		$night_std = ( '' === tara_logo_raw( 'logo_night' ) );
-		?>
-		<h2 class="ty-heading">
-			لوگوی سایت — روز و شب
-			<span class="ty-heading__hint">همین‌جا عوضش کنید — نیازی به رفتن به تنظیمات نیست</span>
-		</h2>
 
-		<div class="ty-card ty-card--wide ty-logo-card" dir="rtl">
+		if ( 'panel' === $context ) {
+			?>
+			<h2 class="ty-heading">
+				لوگوی سایت — روز و شب
+				<span class="ty-heading__hint">همین‌جا عوضش کنید — نیازی به رفتن به تنظیمات نیست</span>
+			</h2>
+			<?php
+		}
+		?>
+		<div class="ty-logo-card<?php echo ( 'settings' === $context ) ? ' ty-logo-card--settings' : ' ty-card ty-card--wide'; ?>"
+			dir="rtl">
+			<?php if ( 'settings' === $context ) : ?>
+				<h2 class="ty-logo-card__title">لوگوی سایت — روز و شب</h2>
+				<p class="ty-logo-card__lead">
+					همین کارت، آسان‌ترین راهِ عوض‌کردنِ لوگوست: یا فایل را از رایانه انتخاب کنید یا آدرسِ
+					تصویر را بگذارید و «ذخیره» را بزنید. مقدارها دقیقاً روی همان گزینه‌های
+					<strong>«لوگو (حالت روز)»</strong> و <strong>«لوگو (حالت شب)»</strong> در بخش «همگانی»
+					می‌نشینند؛ هر کدام را این‌جا عوض کنید، آن‌جا هم عوض می‌شود.
+				</p>
+			<?php endif; ?>
+
 			<div class="ty-logo-card__grid">
 				<?php
-				tara_logo_card_variant( 'day', $day, $day_std );
-				tara_logo_card_variant( 'night', $night, $night_std );
+				tara_logo_card_variant( 'day', $day, $day_std, $context );
+				tara_logo_card_variant( 'night', $night, $night_std, $context );
 				?>
 			</div>
 
@@ -244,7 +279,91 @@ if ( ! function_exists( 'tara_logo_card' ) ) {
 				نگه دارید تا در سربرگ و کشوی گوشی بدون کشیدگی بنشیند. فایل‌ها در
 				«کتابخانهٔ رسانه» ذخیره می‌شوند.
 			</p>
+
+			<?php if ( 'panel' === $context ) : ?>
+				<p class="ty-logo-card__hint">
+					همین کارت در
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=ot-theme-options' ) ); ?>">تنظیمات قالب</a>
+					هم هست؛ هر دو یک مقدار را می‌خوانند و می‌نویسند.
+				</p>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
+}
+
+if ( ! function_exists( 'tara_logo_settings_page' ) ) {
+	/**
+	 * آیا صفحهٔ جاری، «تنظیمات قالب» (OptionTree) است؟
+	 *
+	 * @return bool
+	 */
+	function tara_logo_is_settings_screen() {
+		if ( ! is_admin() || ! isset( $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- فقط خواندنِ نامِ صفحه
+			return false;
+		}
+
+		return 'ot-theme-options' === sanitize_key( wp_unslash( (string) $_GET['page'] ) );
+	}
+}
+
+if ( ! function_exists( 'tara_logo_settings_notice' ) ) {
+	/**
+	 * کارتِ لوگو در بالای صفحهٔ «تنظیمات قالب».
+	 *
+	 * از `admin_notices` استفاده می‌شود: بالای فرمِ OptionTree می‌نشیند، به
+	 * هیچ قلابِ داخلیِ OptionTree وابسته نیست و اگر روزی آن صفحه عوض شود،
+	 * فقط همین یک قلاب لازم است عوض شود. کدِ ذخیره‌سازی مستقل از فرمِ
+	 * OptionTree است، پس دو فرم روی یک صفحه با هم تداخل ندارند.
+	 */
+	function tara_logo_settings_notice() {
+		if ( ! current_user_can( 'manage_options' ) || ! tara_logo_is_settings_screen() ) {
+			return;
+		}
+
+		echo '<div class="tara-logo-settings-wrap">';
+		tara_logo_notice();
+		tara_logo_card( 'settings' );
+		echo '</div>';
+	}
+}
+if ( function_exists( 'add_action' ) ) {
+	add_action( 'admin_notices', 'tara_logo_settings_notice' );
+}
+
+if ( ! function_exists( 'tara_logo_admin_assets' ) ) {
+	/**
+	 * استایلِ کارت در هر دو صفحه (پیشخوان پنل + تنظیمات قالب).
+	 *
+	 * چرا این‌جا و نه در admin-panel.php؟ چون صفحهٔ تنظیمات، CSS پنل را لود
+	 * نمی‌کند و این کارت باید در هر دو جا یک‌شکل باشد.
+	 *
+	 * @param string $hook شناسهٔ صفحه.
+	 */
+	function tara_logo_admin_assets( $hook ) {
+		unset( $hook );
+		if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( (string) $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		if ( 'ot-theme-options' !== $page && 'taranehyar' !== $page ) {
+			return;
+		}
+
+		$file = get_template_directory() . '/css/ab-logo-card.css';
+		if ( ! file_exists( $file ) ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'tara-logo-card',
+			get_template_directory_uri() . '/css/ab-logo-card.css',
+			array(),
+			(string) filemtime( $file )
+		);
+	}
+}
+if ( function_exists( 'add_action' ) ) {
+	add_action( 'admin_enqueue_scripts', 'tara_logo_admin_assets' );
 }

@@ -51,7 +51,7 @@ for (const js of ['admin-panel.js']) {
 for (const name of ['tara-taxonomies.php', 'tara-ui.php', 'tara-critical.php', 'tara-brand.php', 'admin-settings-shell.php', 'tax-listing.php', 'ab-credits.php', 'vip_slider.php', 'ab-seo.php', 'ab-logo-setting.php', 'ab-post-extras.php', 'ab-vip-image.php', 'tara-assets.php', 'ab-glass.php', 'ab-ui-guard.php']) {
   files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
 }
-for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-settings.css', 'ab-glass.css', 'ab-ui.css', 'ab-vip-image.css', 'tara-ui.min.css', 'style.min.css', 'ab-glass.min.css']) {
+for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-settings.css', 'ab-glass.css', 'ab-ui.css', 'ab-vip-image.css', 'tara-ui.min.css', 'style.min.css', 'ab-glass.min.css', 'ab-logo-card.css']) {
   files.push({ parent: '/tmp/theme/css', name, url: 'file://' + path.join(theme, 'css', name) });
 }
 for (const name of ['tara-player.js', 'hero-slider.js', 'admin-settings.js', 'ab-vip-image.js']) {

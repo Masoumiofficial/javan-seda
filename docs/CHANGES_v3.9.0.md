@@ -1,3 +1,14 @@
+## دریافتِ بسته
+
+| چه چیزی | لینک |
+| --- | --- |
+| **بستهٔ آمادهٔ قالب** (فقط پوشهٔ `taranehyar/`، همان zipی که باید در `wp-content/themes/` باز شود) | <https://raw.githubusercontent.com/Masoumiofficial/javan-seda/v3.9.0/artifacts/taranehyar-3.9.0.zip> |
+| **کلِ مخزن در همین تگ** (قالب + آزمون‌ها + مستندات) | <https://github.com/Masoumiofficial/javan-seda/archive/refs/tags/v3.9.0.zip> |
+
+بستهٔ آماده: ۱۷۱ فایل · ۲٬۱۸۵٬۲۸۳ بایت · `sha256 ffb82497467b60ca93c045f7a1eb0bae9a57b78b8bd9554221fc11f1d304e0b2`
+
+---
+
 # ترانه یار ۳.۹.۰ — «رادیو ترانه یار»: دی‌جیِ خودکار، صفحهٔ ژانر/حال‌وهوا و معرفیِ صوتی
 
 تاریخ: ۲۰۲۶-۱۰-۲۹ · نسخهٔ قبلی: ۳.۸.۴

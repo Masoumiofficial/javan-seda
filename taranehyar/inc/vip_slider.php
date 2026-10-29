@@ -68,12 +68,18 @@ if ( $tara_fixbvip ) {
 					     • رشته → آدرس دستی
 					   اگر شناسه داشته باشیم، `srcset` هم ساخته می‌شود تا گوشی
 					   نسخهٔ سبک و دسکتاپ نسخهٔ بزرگ را بگیرد (LCP و حجم). */
-					$tara_custom = function_exists( 'get_field' ) ? get_field( 'vip_img' ) : '';
+					/* v3.8.3 — اولویت با بنرِ تازهٔ ۱۹۲۰×۸۴۰ است (صفحهٔ ویرایش نوشته،
+					   متای `_tara_vip_banner`). اگر انتخاب نشده باشد، همان مسیرِ
+					   قدیمیِ ACF (`vip_img`) و بعد کاور آهنگ. */
 					$tara_image  = '';
 					$tara_srcset = '';
-					$tara_img_id = 0;
+					$tara_img_id = function_exists( 'tara_vip_banner_id' ) ? (int) tara_vip_banner_id( get_the_ID() ) : 0;
 
-					if ( is_array( $tara_custom ) ) {
+					$tara_custom = ( $tara_img_id || ! function_exists( 'get_field' ) ) ? '' : get_field( 'vip_img' );
+
+					if ( $tara_img_id ) {
+						$tara_image = (string) wp_get_attachment_image_url( $tara_img_id, 'full' );
+					} elseif ( is_array( $tara_custom ) ) {
 						foreach ( array( 'ID', 'id', 'attachment_id' ) as $tara_id_key ) {
 							if ( ! empty( $tara_custom[ $tara_id_key ] ) ) {
 								$tara_img_id = (int) $tara_custom[ $tara_id_key ];
@@ -98,6 +104,8 @@ if ( $tara_fixbvip ) {
 						if ( $tara_full ) {
 							$tara_image = $tara_full;
 							if ( function_exists( 'wp_get_attachment_image_srcset' ) ) {
+								/* v3.8.3 — سایز `tara-vip` (۱۹۲۰×۸۴۰) هم در فهرست است تا
+								   مرورگر از نسخهٔ درستِ همان نسبت انتخاب کند. */
 								$tara_srcset = (string) wp_get_attachment_image_srcset( $tara_img_id, 'full' );
 							}
 						}
@@ -126,7 +134,9 @@ if ( $tara_fixbvip ) {
 							   است (نسبتِ استانداردِ بنر) و تصویر با `cover` تمامِ کادر را
 							   پر می‌کند؛ پس لایهٔ دوم هم بی‌مصرف شد و حذف شد (DOM
 							   سبک‌تر، یک درخواست کمتر برای مرورگرهای بدون کش). */
-							$tara_img_attrs = 'width="1280" height="560"';
+							/* v3.8.3 — ابعادِ درستِ همان نسبت ۱۶:۷ (۱۹۲۰×۸۴۰) تا CLS نباشد؛
+							   CSS با `width:100%;height:auto` ظرف را پر می‌کند. */
+							$tara_img_attrs = 'width="1920" height="840"';
 							?>
 							<img class="ty-hero-slide__img" src="<?php echo esc_url( $tara_image ); ?>"
 								<?php if ( '' !== $tara_srcset ) { ?>srcset="<?php echo esc_attr( $tara_srcset ); ?>" sizes="(max-width: 782px) 100vw, (max-width: 1340px) 94vw, 1240px"<?php } ?>

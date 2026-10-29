@@ -1171,6 +1171,22 @@
 	/* ==================================================================
 	 * ۶) پلیر ویدیو
 	 * ================================================================== */
+	/* v3.8.3 — برچسبِ دکمهٔ تمام‌صفحه با وضعیتِ واقعی هم‌گام می‌شود.
+	   آیکون توسط CSS عوض می‌شود (چهار گوشهٔ بیرون/داخل)، ولی صفحه‌خوان
+	   و tooltip باید بدانند الان «ورود» است یا «خروج». */
+	function syncFsLabels() {
+		var nodes = document.querySelectorAll('[data-tara-video]');
+		for (var i = 0; i < nodes.length; i++) {
+			var on = nodes[i].classList.contains('is-fullscreen') || nodes[i].classList.contains('is-pseudofs');
+			var btn = nodes[i].querySelector('[data-tara-video-fs]');
+			if (!btn) { continue; }
+			var label = on ? 'خروج از تمام‌صفحه' : 'تمام‌صفحه';
+			btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+			btn.setAttribute('aria-label', label);
+			btn.setAttribute('title', label);
+		}
+	}
+
 	function Video(root) {
 		var video = root.querySelector('[data-tara-video-el]');
 		if (!video) {
@@ -1390,6 +1406,9 @@
 					video.requestPictureInPicture();
 				}
 			}
+
+			/* بعد از هر کلیک (خصوصاً تمام‌صفحه) برچسب/آیکون را هم‌گام کن */
+			syncFsLabels();
 		});
 
 		if (refs.seek) {
@@ -1518,6 +1537,84 @@
 	}
 
 	/* ==================================================================
+	 * ۶.۶) ادامهٔ پخش از همان‌جا که بود (v3.8.3)
+	 * ==================================================================
+	 * «آهنگ را نصفه رها کردم، برگشتم از اول شد» شکایتِ رایج است. این‌جا
+	 * قطعه و ثانیهٔ پخش در localStorage نگه داشته می‌شود و بارِ بعد که
+	 * همان قطعه انتخاب شود، پخش از همان ثانیه ادامه می‌یابد.
+	 *
+	 * سه محدودیتِ عمدی:
+	 *   • فقط بعد از ۱۵ ثانیه ذخیره/ادامه می‌دهد (۱۵ ثانیهٔ اول «شروع» است).
+	 *   • اگر تا ۳ ثانیهٔ آخر رسیده باشیم، از ابتدا پخش می‌شود.
+	 *   • بدون localStorage (حالت خصوصی) بی‌صدا کار نمی‌کند.
+	 * ================================================================== */
+	function Resume() {
+		var key = 'tara:resume';
+		var saved = null;
+		try {
+			saved = JSON.parse(window.localStorage.getItem(key) || 'null');
+		} catch (error) {
+			saved = null;
+		}
+
+		var pending = 0;
+		var lastSave = 0;
+
+		function save() {
+			var state = Engine.state ? Engine.state() : null;
+			if (!state || !state.queue || !state.queue[state.index]) {
+				return;
+			}
+			var item = state.queue[state.index];
+			var el = Engine.on();
+			if (!item || !item.src || !el) {
+				return;
+			}
+			try {
+				window.localStorage.setItem(
+					key,
+					JSON.stringify({ src: item.src, time: Math.round(el.currentTime || 0), at: Date.now() })
+				);
+			} catch (error) {}
+		}
+
+		Engine.subscribe(function (type, data) {
+			if (type === 'load') {
+				var item = data && data.track;
+				var el = Engine.on();
+				if (!saved || !item || !el || saved.src !== item.src || !(saved.time > 15)) {
+					pending = 0;
+					return;
+				}
+				pending = saved.time;
+				var apply = function () {
+					if (!pending) {
+						return;
+					}
+					if (el.duration && Math.abs(el.duration - pending) < 3) {
+						pending = 0;
+						return;
+					}
+					try {
+						el.currentTime = pending;
+					} catch (error) {}
+					pending = 0;
+				};
+				el.addEventListener('loadedmetadata', apply);
+				window.setTimeout(apply, 1200);
+			} else if (type === 'time' && !pending) {
+				var now = Date.now();
+				if (now - lastSave > 5000) {
+					lastSave = now;
+					save();
+				}
+			} else if (type === 'paused' || type === 'stop') {
+				save();
+			}
+		});
+	}
+
+	/* ==================================================================
 	 * ۷) راه‌اندازی
 	 * ================================================================== */
 	function boot() {
@@ -1541,11 +1638,12 @@
 		Modal.init();
 		bindGlobalClicks();
 		Engine.on();
+		Resume();
 		bindZoom();
 
 		/* نشانهٔ سلامت برای عیب‌یابی: اگر این صفت روی <html> نبود، یعنی همین فایل
 		   اجرا نشده است (کش/CDN/خطای اسکریپت). */
-		document.documentElement.setAttribute('data-tara-ready', '3.8.2');
+		document.documentElement.setAttribute('data-tara-ready', '3.8.3');
 
 		/* v3.7.7 — وقتی کاربر با دکمهٔ Esc یا ژست بومی از تمام‌صفحه بیرون
 		   می‌آید، کلاس‌ها و قفل چرخش باید پاک شوند؛ وگرنه صفحه سیاه/
@@ -1564,6 +1662,7 @@
 					if (screen.orientation && screen.orientation.unlock) { screen.orientation.unlock(); }
 				} catch (e) {}
 			}
+			syncFsLabels();
 		}
 		document.addEventListener('fullscreenchange', clearFs);
 		document.addEventListener('webkitfullscreenchange', clearFs);

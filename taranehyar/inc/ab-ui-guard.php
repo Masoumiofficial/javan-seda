@@ -96,9 +96,11 @@ if ( ! function_exists( 'tara_ui_layer_enqueue' ) ) {
 		}
 		$theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
 		$ver   = ( $theme && $theme->get( 'Version' ) ) ? $theme->get( 'Version' ) : false;
-		$url   = trailingslashit( get_stylesheet_directory_uri() ) . 'css/ab-ui.css';
+		/* v3.8.3 — نسخهٔ فشرده اگر تازه باشد */
+		$rel   = function_exists( 'tara_css_rel' ) ? tara_css_rel( '/css/ab-ui.css' ) : '/css/ab-ui.css';
+		$url   = trailingslashit( get_stylesheet_directory_uri() ) . ltrim( $rel, '/' );
 		if ( 0 !== strpos( $url, 'http' ) && function_exists( 'get_template_directory_uri' ) ) {
-			$url = trailingslashit( get_template_directory_uri() ) . 'css/ab-ui.css';
+			$url = trailingslashit( get_template_directory_uri() ) . ltrim( $rel, '/' );
 		}
 		wp_enqueue_style( 'ab-ui-layer', $url, $dep, $ver );
 	}

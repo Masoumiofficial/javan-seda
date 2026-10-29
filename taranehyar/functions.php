@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.8.2' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.8.3' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -102,6 +102,10 @@ if ( ! function_exists( 'taranehyar_setup' ) ) {
 			   پیش از این از thumb1 (۶۴۰×۳۶۰) استفاده می‌شد. برای تصویرهای
 			   آپلودشدهٔ قدیمی این سایز ساخته نمی‌شود و همان مسیر قبلی می‌ماند. */
 			add_image_size( 'tara-og', 1200, 630, true );
+			/* v3.8.3 — بنرِ اسلایدر ویژه: نسبتِ استانداردِ کادر ۱۶:۷ ⇒ ۱۹۲۰×۸۴۰.
+			   اندازهٔ قبلیِ همین بنر در فیلدِ ACF «۶۴۰×۳۶۰» بود و در کادرِ
+			   تمام‌عرض کشیده می‌شد. */
+			add_image_size( 'tara-vip', 1920, 840, true );
 		}
 
 		/* جای منوها — همان نامک‌هایی که در قالب‌ها فراخوانی شده‌اند */
@@ -170,6 +174,14 @@ if ( ! function_exists( 'tara_page_is_artist' ) ) {
 	}
 }
 
+/* ۶-ب-۰) کمکِ دارایی‌ها (۳.۸.۳) — فایلِ جدا تا آزمونِ خودکار هم بتواند
+   بدونِ بالا آوردنِ کلِ functions.php صدایش بزند. */
+$taranehyar_assets_helper = TARANEHYAR_DIR . '/inc/tara-assets.php';
+if ( is_readable( $taranehyar_assets_helper ) ) {
+	require_once $taranehyar_assets_helper;
+}
+unset( $taranehyar_assets_helper );
+
 if ( ! function_exists( 'tara_asset_styles' ) ) {
 	/**
 	 * فهرست «چه CSS‌ای در این صفحه لازم است».
@@ -192,6 +204,12 @@ if ( ! function_exists( 'tara_asset_styles' ) ) {
 			$styles['taranehyar-artist'] = '/css/tara-artist.css';
 		}
 
+		/* v3.8.3 — اگر نسخهٔ فشرده هست، همان سرو می‌شود (بدون ترکیب). */
+		foreach ( $styles as $tara_handle => $tara_rel ) {
+			$styles[ $tara_handle ] = tara_css_rel( $tara_rel );
+		}
+		unset( $tara_handle, $tara_rel );
+
 		return apply_filters( 'tara_asset_styles', $styles );
 	}
 }
@@ -203,7 +221,16 @@ if ( ! function_exists( 'taranehyar_assets' ) ) {
 		}
 
 		/* اولویت ۵ تا لایه‌های شیشه‌ای/رابط (۲۰ به بعد) بعد از آن بیایند */
-		wp_enqueue_style( 'taranehyar-style', get_stylesheet_uri(), array(), TARANEHYAR_VERSION );
+		/* v3.8.3 — نسخهٔ فشردهٔ style.css اگر موجود و تازه باشد. فایل اصلی
+		   سر جایش می‌ماند (هدر قالب، ابزارهای وردپرس و بازگشتِ آسان). */
+		$tara_main_css = TARANEHYAR_DIR . '/style.css';
+		$tara_min_css  = TARANEHYAR_DIR . '/css/style.min.css';
+		if ( is_file( $tara_min_css ) && is_file( $tara_main_css ) && @filemtime( $tara_min_css ) >= @filemtime( $tara_main_css ) ) {
+			wp_enqueue_style( 'taranehyar-style', TARANEHYAR_URI . '/css/style.min.css', array(), (string) @filemtime( $tara_min_css ) );
+		} else {
+			wp_enqueue_style( 'taranehyar-style', get_stylesheet_uri(), array(), TARANEHYAR_VERSION );
+		}
+		unset( $tara_main_css, $tara_min_css );
 
 		if ( file_exists( TARANEHYAR_DIR . '/css/icofont.min.css' ) ) {
 			wp_enqueue_style( 'icofont', TARANEHYAR_URI . '/css/icofont.min.css', array(), '1.0.1' );
@@ -513,6 +540,16 @@ if ( is_readable( $taranehyar_brand ) ) {
 	require_once $taranehyar_brand;
 }
 unset( $taranehyar_brand );
+
+/* ۶-الف-۳-۳) بنرِ «اسلایدر ویژه» (۳.۸.۳)
+   این فایل باید در سمت کاربر هم بار شود، چون تابعِ `tara_vip_banner_id()`
+   را `inc/vip_slider.php` روی صفحهٔ اصلی صدا می‌زند؛ جعبهٔ ویرایش و ذخیرهٔ
+   متا خودشان فقط در پیشخوان اجرا می‌شوند. */
+$taranehyar_vip_image = TARANEHYAR_DIR . '/inc/ab-vip-image.php';
+if ( is_readable( $taranehyar_vip_image ) ) {
+	require_once $taranehyar_vip_image;
+}
+unset( $taranehyar_vip_image );
 
 /* ۶-الف-۴) لایهٔ تضمینیِ ظاهر + جست‌وجوی زنده (۳.۷.۶)
    CSS ضروری را درون‌خطی چاپ می‌کند و اگر فایل‌های قالب به صفحه نرسند،

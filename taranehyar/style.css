@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.8.2
+Version: 3.8.3
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -3695,3 +3695,45 @@ body.ab-post-img-square .single_featured_cover .single_featured_image img{
 /* در فهرست‌ها/جست‌وجو هم همان کادر استفاده می‌شود؛ اگر cover در محتوا تزریق شده باشد (*TARA_COVER_IN_CONTENT*)
    چون کلاس‌ها یکی‌اند، همین قواعد یک‌دست می‌گیرد. */
 /* انتهای بلوک ۳۷ (v3.4.5) */
+
+/* ==========================================================================
+   v3.8.3 — لوگوی حالت روز و شب
+   --------------------------------------------------------------------------
+   هر حالت لوگوی خودش را دارد و تعویض فقط یک قاعدهٔ CSS است؛ هیچ درخواستِ
+   تازه‌ای در لحظهٔ تغییرِ حالت ساخته نمی‌شود و لوگو لحظه‌ای خالی نمی‌شود.
+   اگر «لوگوی شب» در تنظیمات خالی باشد، تصویر دوم اصلاً چاپ نمی‌شود و
+   همین قواعد بی‌اثر می‌مانند.
+   ========================================================================== */
+.ab-logo__img--night { display: none; }
+
+body.night .ab-logo__img--day,
+html[data-tara-night="1"] .ab-logo__img--day { display: none !important; }
+
+body.night .ab-logo__img--night,
+html[data-tara-night="1"] .ab-logo__img--night { display: inline-block !important; }
+
+/* در حالت شب، لوگوی روز نباید جای خودش را نگه دارد (ترازِ سربرگ) */
+.logo_top figure,
+#mobiles_header .logo_mobiles figure { line-height: 0; }
+
+/* ==========================================================================
+   v3.8.3 — خواناییِ حالت شب (لایهٔ .ab-*)
+   --------------------------------------------------------------------------
+   متن‌های ریزِ خاکستری (تاریخ، شمارنده، زیرنویسِ هنرمند، «معلول» و …) در
+   حالت شب روی #111/#222 زیرِ کنتراستِ ۴٫۵:۱ می‌افتادند. فقط روشن‌تر شده‌اند.
+   ========================================================================== */
+.night {
+	--ab-muted: #C6C6D3;
+}
+
+.night .disabled { color: #9A9AA8 !important; }
+
+.night :is(.ab-sp__artist, .ab-sp-time, .ab-sp__no, .ab-social-box__hint,
+	.ab-social__txt em, .ab-social__arrow, .ab-artist__latin,
+	.ab-cat-desc, .tarlanweb_post_ft, .entry-meta, .post-meta, .ab-news-date) {
+	color: var(--ab-muted, #C6C6D3) !important;
+}
+
+html[data-tara-night="1"] {
+	--ab-muted: #C6C6D3;
+}

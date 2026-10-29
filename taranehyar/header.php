@@ -77,7 +77,20 @@ if ( $darks_std ) { ?>
 <header id="header">
 <div class="tarlanweb_center">
 <?php if(is_home()){ ?> <h1 class="h1_hidden_home"><?php echo esc_html( ot_get_option('head_h1') ); ?></h1> <?php } ?>
-<div class="logo_top"><figure><a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( function_exists( 'tara_logo_url' ) ? tara_logo_url() : ot_get_option( 'logo' ) ); ?>" width="150" height="40" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" title="<?php echo ot_get_option('head_h1'); ?>"></a></figure></div>
+<?php /* v3.8.3 — لوگوی روز و شب؛ CSS فقط یکی را نشان می‌دهد (بدون درخواستِ تازه). */ ?>
+<div class="logo_top"><figure><a href="<?php echo esc_url( home_url() ); ?>"><?php
+if ( function_exists( 'tara_logo_img' ) ) {
+	echo tara_logo_img( // phpcs:ignore WordPress.Security.EscapeOutput -- داخل تابع escape شده است
+		array(
+			'class' => 'ab-logo__img',
+			'alt'   => (string) ot_get_option( 'head_h1' ),
+			'title' => (string) ot_get_option( 'head_h1' ),
+		)
+	);
+} else {
+	?><img src="<?php echo esc_url( ot_get_option( 'logo' ) ); ?>" width="150" height="40" alt="<?php echo esc_attr( ot_get_option( 'head_h1' ) ); ?>"><?php
+}
+?></a></figure></div>
 <nav class="menu_right">
 <?php wp_nav_menu(array('theme_location'=>'top_menu','menu_id'=>'tara-menu','container'=>'')); ?>
 <div class="clear"></div>

@@ -36,22 +36,94 @@ if ( ! function_exists( 'tara_logo_default' ) ) {
 	}
 }
 
-if ( ! function_exists( 'tara_logo_url' ) ) {
+if ( ! function_exists( 'tara_logo_raw' ) ) {
 	/**
-	 * آدرس لوگوی فعلی (هرگز خالی).
+	 * مقدارِ خامِ یک گزینهٔ لوگو (بدونِ پیش‌فرض) — برای تشخیص «سفارشی یا نه».
 	 *
+	 * @param string $key logo|logo_night.
 	 * @return string
 	 */
-	function tara_logo_url() {
-		$value = function_exists( 'ot_get_option' ) ? ot_get_option( 'logo', '' ) : '';
+	function tara_logo_raw( $key ) {
+		$value = function_exists( 'ot_get_option' ) ? ot_get_option( $key, '' ) : '';
 		if ( function_exists( 'tara_media_url' ) ) {
 			$value = tara_media_url( $value );
 		} elseif ( is_array( $value ) ) {
 			$value = isset( $value['url'] ) && is_string( $value['url'] ) ? $value['url'] : '';
 		}
-		$value = is_string( $value ) ? trim( $value ) : '';
+
+		return is_string( $value ) ? trim( $value ) : '';
+	}
+}
+
+if ( ! function_exists( 'tara_logo_url' ) ) {
+	/**
+	 * آدرس لوگوی روز (هرگز خالی).
+	 *
+	 * @return string
+	 */
+	function tara_logo_url() {
+		$value = tara_logo_raw( 'logo' );
 
 		return '' !== $value ? $value : tara_logo_default();
+	}
+}
+
+if ( ! function_exists( 'tara_logo_night_url' ) ) {
+	/**
+	 * آدرس لوگوی حالت شب. اگر تنظیم نشده باشد، همان لوگوی روز برمی‌گردد
+	 * (هیچ سایتی با به‌روزرسانی این نسخه خالی/سفید نمی‌شود).
+	 *
+	 * @return string
+	 */
+	function tara_logo_night_url() {
+		$value = tara_logo_raw( 'logo_night' );
+
+		return '' !== $value ? $value : tara_logo_url();
+	}
+}
+
+if ( ! function_exists( 'tara_logo_img' ) ) {
+	/**
+	 * مارک‌آپِ لوگو: دو تصویر (روز و شب) که CSS یکی را نشان می‌دهد.
+	 *
+	 * چرا دو <img> و نه یک تصویر با تعویضِ src؟ چون تعویضِ src در جاوااسکریپت
+	 * یک درخواستِ تازه در لحظهٔ تغییرِ حالت می‌سازد و تا رسیدنش لوگو خالی
+	 * می‌شود؛ این‌جا هر دو تصویر با هم می‌آیند و تعویض فقط یک قاعدهٔ CSS است.
+	 * اگر لوگوی شب تنظیم نشده باشد، تصویر دوم چاپ نمی‌شود.
+	 *
+	 * @param array $args {
+	 *     @type string $class   کلاسِ هر <img>.
+	 *     @type string $alt     متنِ جانشین.
+	 *     @type string $title   tooltip.
+	 *     @type bool   $attr    چاپِ width/height (برای کشوی گوشی لازم است).
+	 * }
+	 * @return string
+	 */
+	function tara_logo_img( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'class' => 'ab-logo__img',
+				'alt'   => '',
+				'title' => '',
+				'attr'  => true,
+			)
+		);
+
+		$day   = tara_logo_url();
+		$night = tara_logo_night_url();
+		$dim   = $args['attr'] ? ' width="150" height="40"' : '';
+		$alt   = ' alt="' . esc_attr( $args['alt'] ) . '"';
+		$title = '' !== (string) $args['title'] ? ' title="' . esc_attr( $args['title'] ) . '"' : '';
+		$base  = esc_attr( $args['class'] );
+
+		$html = '<img class="' . $base . ' ab-logo__img--day" src="' . esc_url( $day ) . '"' . $dim . $alt . $title . ' decoding="async" fetchpriority="high">';
+
+		if ( $night !== $day || '' !== tara_logo_raw( 'logo_night' ) ) {
+			$html .= '<img class="' . $base . ' ab-logo__img--night" src="' . esc_url( $night ) . '"' . $dim . $alt . $title . ' decoding="async" loading="lazy">';
+		}
+
+		return $html;
 	}
 }
 
@@ -985,8 +1057,15 @@ if ( ! function_exists( 'tara_video' ) ) {
 					<span class="ty-icon-vol" aria-hidden="true"></span>
 					<span class="ty-icon-muted" aria-hidden="true"></span>
 				</button>
-				<button type="button" class="ty-video__btn" data-tara-video-fs aria-label="تمام‌صفحه">
-					<span class="ty-icon-expand" aria-hidden="true"></span>
+				<?php
+				/* v3.8.3 — آیکونِ استانداردِ تمام‌صفحه (چهار گوشهٔ رو‌به‌بیرون) و
+				   آیکونِ «خروج» (چهار گوشهٔ رو‌به‌داخل) که وقتی پلیر تمام‌صفحه است
+				   جای آن را می‌گیرد. SVGِ درون‌خطی است تا رنگش از `currentColor`
+				   بیاید و به فونتِ آیکون وابسته نباشد. */
+				?>
+				<button type="button" class="ty-video__btn ty-video__btn--fs" data-tara-video-fs aria-label="تمام‌صفحه" aria-pressed="false">
+					<svg class="ty-video__ico ty-video__ico--expand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+					<svg class="ty-video__ico ty-video__ico--collapse" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
 				</button>
 			</div>
 		</section>

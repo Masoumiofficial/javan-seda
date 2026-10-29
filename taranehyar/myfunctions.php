@@ -237,6 +237,7 @@ add_image_size( 'thumb2', 190, 190, true);
 add_image_size( 'thumb2x', 380, 380, true); /* v3.3.8 — برای srcset/دستگاه‌های DPR2 (کارت‌ها روی موبایل شارپ می‌شوند) */
 add_image_size( 'thumb1', 640, 360, true);
 add_image_size( 'tara-og', 1200, 630, true); /* v3.8.0 — تصویر کارت شبکه‌های اجتماعی (OG/Twitter) */
+add_image_size( 'tara-vip', 1920, 840, true); /* v3.8.3 — بنر اسلایدر ویژه، نسبت ۱۶:۷ */
 add_image_size( 'ab_cover', 500, 500, true); /* v3.4.5 — کادر کاور پست؛ برای آپلودهای تازه فایل ۵۰۰² می‌سازد (برای بقیه fallback خودِ وردپرس) */
 } ?>
 <?php

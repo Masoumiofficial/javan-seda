@@ -67,7 +67,9 @@ if ( ! function_exists( 'tara_glass_enqueue' ) ) {
 		 * اولویت ۲۰ ⇒ بعد از استایل خودِ قالب در cascade می‌نشیند؛ پس لایۀ شیشه
 		 * بدون !important بر قواعد قبلی می‌برد و حذفش هم بی‌خطر است.
 		 */
-		wp_enqueue_style( 'tara-glass', trailingslashit( get_template_directory_uri() ) . 'css/ab-glass.css', array(), $ver );
+		/* v3.8.3 — نسخهٔ فشرده اگر تازه باشد */
+		$rel = function_exists( 'tara_css_rel' ) ? tara_css_rel( '/css/ab-glass.css' ) : '/css/ab-glass.css';
+		wp_enqueue_style( 'tara-glass', trailingslashit( get_template_directory_uri() ) . ltrim( $rel, '/' ), array(), $ver );
 		if ( ( defined( 'TARA_GLASS_BLUR' ) && false === TARA_GLASS_BLUR ) && function_exists( 'wp_add_inline_style' ) ) {
 			wp_add_inline_style( 'tara-glass', ':root{--ab-glass-blur:0px}' );
 		}

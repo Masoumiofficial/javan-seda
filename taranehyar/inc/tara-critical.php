@@ -121,7 +121,35 @@ if ( ! function_exists( 'tara_critical_css' ) ) {
 		#tara-search-results .tara-sr__t { display: block; font-size: 12.5px; font-weight: 700;
 			line-height: 1.6; }
 		#tara-search-results .tara-sr__a { display: block; font-size: 11px; color: #7a7790; }
-		#tara-search-results .tara-sr__empty { padding: 12px; font-size: 12px; color: #6b6a7b; }
+		#tara-search-results .tara-sr__empty { padding: 12px; font-size: 12px; color: #56536b; }
+		#tara-search-results a.tara-sr__row.is-active,
+		#tara-search-results a.tara-sr__row:hover { background: #f4f1ff; }
+		body.night #tara-search-results a.tara-sr__row.is-active,
+		html[data-tara-night="1"] #tara-search-results a.tara-sr__row.is-active { background: rgba(255, 255, 255, .10); }
+		#tara-search-results .tara-sr__a { color: #615e78; }
+		body.night #tara-search-results .tara-sr__a,
+		body.night #tara-search-results .tara-sr__empty,
+		html[data-tara-night="1"] #tara-search-results .tara-sr__a,
+		html[data-tara-night="1"] #tara-search-results .tara-sr__empty { color: #b9b6cd; }
+
+		/* v3.8.3 — اسکلتِ لودینگ: تا رسیدنِ پاسخ، ردیف‌های خاکستریِ متحرک
+		   با همان ارتفاعِ نتیجهٔ واقعی، تا کادر نپرد و کاربر بداند چیزی در راه است.
+		   با prefers-reduced-motion انیمیشن خاموش می‌شود. */
+		#tara-search-results .tara-sr__row.is-skeleton { pointer-events: none; }
+		#tara-search-results .tara-sr__sk-lines { display: grid; gap: 7px; flex: 1 1 auto; }
+		#tara-search-results .tara-sr__sk { display: block; height: 11px; border-radius: 6px;
+			background: linear-gradient(90deg, #eeeaf6 0%, #f7f5fc 40%, #eeeaf6 80%);
+			background-size: 220% 100%; animation: tara-sk 1.15s linear infinite; }
+		#tara-search-results .tara-sr__sk--img { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 10px; }
+		#tara-search-results .tara-sr__sk--sm { width: 55%; height: 9px; }
+		body.night #tara-search-results .tara-sr__sk,
+		html[data-tara-night="1"] #tara-search-results .tara-sr__sk {
+			background: linear-gradient(90deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.16) 40%, rgba(255,255,255,.08) 80%);
+			background-size: 220% 100%; }
+		@keyframes tara-sk { from { background-position: 120% 0; } to { background-position: -120% 0; } }
+		@media (prefers-reduced-motion: reduce) {
+			#tara-search-results .tara-sr__sk { animation: none !important; }
+		}
 
 		/* ---------- شناسنامهٔ آهنگ: بدون کادر سفید ---------- */
 		.ab-credits.ab-credits { border: 0 !important; border-radius: 0 !important;
@@ -296,47 +324,116 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 			var box = document.createElement('div');
 			box.id = 'tara-search-results';
 			box.setAttribute('role', 'listbox');
-			box.setAttribute('aria-live', 'polite');
+			box.setAttribute('aria-label', 'نتایج جست‌وجو');
 			var host = main ? main.closest('#searches') || main.parentNode : mob.parentNode;
 			host.appendChild(box);
 
+			/* v3.8.3 — وضعیت برای صفحه‌خوان‌ها؛ خودِ لیست aria-live ندارد
+			   تا هر تایپ دو بار خوانده نشود. */
+			var status = document.createElement('span');
+			status.className = 'screen-reader-text';
+			status.setAttribute('role', 'status');
+			status.setAttribute('aria-live', 'polite');
+			host.appendChild(status);
+
 			var timer = null;
 			var seq = 0;
+			var cache = {};
+			var active = -1;
 
-			function close() { box.classList.remove('is-open'); box.innerHTML = ''; }
 			function esc(s) {
 				return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
 					return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
 				});
 			}
 
+			function close() {
+				box.classList.remove('is-open');
+				box.innerHTML = '';
+				box.setAttribute('aria-busy', 'false');
+				box.removeAttribute('aria-activedescendant');
+				active = -1;
+				for (var i = 0; i < inputs.length; i++) {
+					inputs[i].setAttribute('aria-expanded', 'false');
+					inputs[i].removeAttribute('aria-activedescendant');
+				}
+			}
+
+			/* v3.8.3 — «محمولهٔ» تازه: تا پاسخ برسد، سه ردیفِ اسکلت با
+			   ارتفاعِ ثابت نشان داده می‌شود تا کادر ناگهان نپرد. */
+			function skeleton() {
+				box.innerHTML = '<div class="tara-sr__head">در حال جست‌وجو…</div>'
+					+ '<div class="tara-sr__row is-skeleton" aria-hidden="true"><span class="tara-sr__sk tara-sr__sk--img"></span><span class="tara-sr__sk-lines"><span class="tara-sr__sk"></span><span class="tara-sr__sk tara-sr__sk--sm"></span></span></div>'
+					+ '<div class="tara-sr__row is-skeleton" aria-hidden="true"><span class="tara-sr__sk tara-sr__sk--img"></span><span class="tara-sr__sk-lines"><span class="tara-sr__sk"></span><span class="tara-sr__sk tara-sr__sk--sm"></span></span></div>'
+					+ '<div class="tara-sr__row is-skeleton" aria-hidden="true"><span class="tara-sr__sk tara-sr__sk--img"></span><span class="tara-sr__sk-lines"><span class="tara-sr__sk"></span><span class="tara-sr__sk tara-sr__sk--sm"></span></span></div>';
+				box.classList.add('is-open');
+				box.setAttribute('aria-busy', 'true');
+			}
+
+			function setActive(next) {
+				var rows = box.querySelectorAll('a.tara-sr__row');
+				if (!rows.length) { return; }
+				if (active > -1 && rows[active]) {
+					rows[active].classList.remove('is-active');
+				}
+				active = next;
+				if (active < 0) { active = rows.length - 1; }
+				if (active >= rows.length) { active = 0; }
+				for (var i = 0; i < rows.length; i++) {
+					var on = (i === active);
+					rows[i].classList.toggle('is-active', on);
+					rows[i].setAttribute('aria-selected', on ? 'true' : 'false');
+				}
+				var row = rows[active];
+				if (row) {
+					if (!row.id) { row.id = 'tara-sr-opt-' + active; }
+					for (var j = 0; j < inputs.length; j++) {
+						inputs[j].setAttribute('aria-activedescendant', row.id);
+					}
+					if (row.scrollIntoView) { row.scrollIntoView({ block: 'nearest' }); }
+				}
+			}
+
 			function render(data, q) {
 				var items = (data && data.items) || [];
+				active = -1;
 				if (!items.length) {
 					box.innerHTML = '<div class="tara-sr__empty">چیزی برای «' + esc(q) + '» پیدا نشد.</div>';
 					box.classList.add('is-open');
+					box.setAttribute('aria-busy', 'false');
+					status.textContent = 'نتیجه‌ای پیدا نشد.';
 					return;
 				}
 				var html = '<div class="tara-sr__head">نتایج جست‌وجو</div>';
 				for (var i = 0; i < items.length; i++) {
 					var it = items[i];
-					html += '<a class="tara-sr__row" role="option" href="' + esc(it.url) + '">'
-						+ (it.cover ? '<img src="' + esc(it.cover) + '" width="40" height="40" alt="" loading="lazy">' : '')
+					html += '<a class="tara-sr__row" role="option" aria-selected="false" id="tara-sr-opt-' + i + '" href="' + esc(it.url) + '">'
+						+ (it.cover ? '<img src="' + esc(it.cover) + '" width="40" height="40" alt="" loading="lazy" decoding="async">' : '')
 						+ '<span><span class="tara-sr__t">' + esc(it.title) + '</span>'
 						+ (it.artist ? '<span class="tara-sr__a">' + esc(it.artist) + '</span>' : '')
 						+ '</span></a>';
 				}
 				if (data && data.more) {
-					html += '<a class="tara-sr__row" href="' + esc(data.more) + '"><span class="tara-sr__t">همهٔ نتایج</span></a>';
+					html += '<a class="tara-sr__row tara-sr__row--more" role="option" aria-selected="false" href="' + esc(data.more) + '"><span class="tara-sr__t">همهٔ نتایج</span></a>';
 				}
 				box.innerHTML = html;
 				box.classList.add('is-open');
+				box.setAttribute('aria-busy', 'false');
+				status.textContent = items.length + ' نتیجه پیدا شد.';
 			}
 
 			function ask(value) {
 				var q = String(value || '').trim();
 				if (q.length < 2) { close(); return; }
+
+				if (cache[q]) {
+					render(cache[q], q);
+					return;
+				}
+
 				var mine = ++seq;
+				skeleton();
+
 				var url = '<?php echo esc_url_raw( $endpoint ); ?>?action=tara_search&nonce=<?php echo esc_js( $nonce ); ?>&q=' + encodeURIComponent(q);
 				var xhr = new XMLHttpRequest();
 				xhr.open('GET', url, true);
@@ -345,25 +442,68 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 					if (xhr.status !== 200) { close(); return; }
 					var payload = null;
 					try { payload = JSON.parse(xhr.responseText); } catch (e) { close(); return; }
-					render(payload && payload.data, q);
+					var data = payload && payload.data ? payload.data : { items: [] };
+					cache[q] = data;
+					render(data, q);
 				};
 				xhr.send();
 			}
 
 			inputs.forEach(function (input) {
 				input.setAttribute('autocomplete', 'off');
+				input.setAttribute('role', 'combobox');
+				input.setAttribute('aria-autocomplete', 'list');
+				input.setAttribute('aria-expanded', 'false');
+				input.setAttribute('aria-controls', 'tara-search-results');
+				input.setAttribute('aria-haspopup', 'listbox');
+
 				input.addEventListener('input', function () {
 					var v = input.value;
+					input.setAttribute('aria-expanded', 'true');
 					window.clearTimeout(timer);
-					timer = window.setTimeout(function () { ask(v); }, 260);
+					/* v3.8.3 — ۲۵۰ms: هم تایپِ سریع را دست‌نخورده می‌گذارد و
+					   هم نسبت به ۲۶۰ms قبلی یک درخواست کمتر می‌فرستد. */
+					timer = window.setTimeout(function () { ask(v); }, 250);
 				});
+
 				input.addEventListener('keydown', function (ev) {
-					if (ev.key === 'Escape') { close(); }
+					var open = box.classList.contains('is-open');
+					if (ev.key === 'Escape' || ev.keyCode === 27) {
+						if (open) {
+							ev.preventDefault();
+							close();
+						}
+						return;
+					}
+					if (!open) { return; }
+					if (ev.key === 'ArrowDown' || ev.keyCode === 40) {
+						ev.preventDefault();
+						setActive(active + 1);
+					} else if (ev.key === 'ArrowUp' || ev.keyCode === 38) {
+						ev.preventDefault();
+						setActive(active - 1);
+					} else if (ev.key === 'Enter' || ev.keyCode === 13) {
+						var rows = box.querySelectorAll('a.tara-sr__row');
+						if (active > -1 && rows[active]) {
+							ev.preventDefault();
+							window.location.href = rows[active].getAttribute('href');
+						}
+					}
+				});
+
+				input.addEventListener('focus', function () {
+					if (input.value.trim().length >= 2 && box.innerHTML) {
+						box.classList.add('is-open');
+					}
 				});
 			});
 
 			document.addEventListener('click', function (ev) {
-				if (!box.contains(ev.target) && !ev.target.closest('#searches')) { close(); }
+				var node = ev.target;
+				if (!node || !node.closest) { return; }
+				if (!box.contains(node) && !node.closest('#searches') && !node.closest('#mobiles_header')) {
+					close();
+				}
 			});
 		})();
 		</script>

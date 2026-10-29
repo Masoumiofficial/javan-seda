@@ -100,7 +100,15 @@ t( 'ستاپ: اندازهٔ thumb1 = ۶۴۰×۳۶۰', isset( $GLOBALS['__img_si
    ====================================================================== */
 reset_state();
 taranehyar_assets();
-t( 'دارایی: style.css با نسخهٔ ۳.۶.۰', isset( $GLOBALS['__styles']['taranehyar-style'] ) && '3.6.0' === $GLOBALS['__styles']['taranehyar-style'][2], json_encode( array_keys( $GLOBALS['__styles'] ) ) );
+/* v3.8.3 — اگر نسخهٔ فشردهٔ style.css موجود و تازه باشد، همان با نسخهٔ
+   زمانِ فایل ثبت می‌شود؛ پس این‌جا خودِ ثبت و مسیر سنجیده می‌شود، نه عددِ ثابت. */
+t(
+	'دارایی: style.css (یا نسخهٔ فشردهٔ آن) با نسخهٔ کش ثبت می‌شود',
+	isset( $GLOBALS['__styles']['taranehyar-style'] )
+		&& preg_match( '#/style(\.min)?\.css$#', (string) $GLOBALS['__styles']['taranehyar-style'][0] )
+		&& '' !== (string) $GLOBALS['__styles']['taranehyar-style'][2],
+	json_encode( array_keys( $GLOBALS['__styles'] ) )
+);
 t( 'دارایی: icofont لود می‌شود', isset( $GLOBALS['__styles']['icofont'] ) );
 /* v3.7.8 — سبک‌بارسازی: owl (۹۰KB) فقط در صفحهٔ اصلی، و scripts.js دیگر
    وابستهٔ آن نیست؛ CSS خانه/هنرمند هم فقط در صفحهٔ خودش. */

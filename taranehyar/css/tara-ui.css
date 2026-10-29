@@ -585,6 +585,8 @@
 	border-color: currentColor transparent transparent transparent;
 }
 
+/* v3.8.3 — آیکونِ تمام‌صفحه حالا SVGِ درون‌خطی است (استانداردِ چهار گوشه).
+   این قاعده فقط برای سازگاری با مارک‌آپِ قدیمی مانده است؛ دیگر استفاده نمی‌شود. */
 .ty-icon-expand::before,
 .ty-icon-expand::after {
 	content: "";
@@ -596,6 +598,27 @@
 
 .ty-icon-expand::before { inset-inline-start: 1px; top: 1px; border-width: 2px 0 0 2px; }
 .ty-icon-expand::after { inset-inline-end: 1px; bottom: 1px; border-width: 0 2px 2px 0; }
+
+/* ---- آیکونِ تازهٔ تمام‌صفحه: چهار گوشهٔ رو‌به‌بیرون / رو‌به‌داخل ---- */
+.ty-video__ico {
+	display: block;
+	width: 18px;
+	height: 18px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2.2;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	pointer-events: none;
+}
+
+.ty-video__ico--collapse { display: none; }
+
+.ty-video.is-fullscreen [data-tara-video-fs] .ty-video__ico--expand,
+.ty-video.is-pseudofs [data-tara-video-fs] .ty-video__ico--expand { display: none; }
+
+.ty-video.is-fullscreen [data-tara-video-fs] .ty-video__ico--collapse,
+.ty-video.is-pseudofs [data-tara-video-fs] .ty-video__ico--collapse { display: block; }
 
 .ty-icon-pip::before {
 	content: "";
@@ -3571,4 +3594,71 @@ html[data-tara-night="1"] .rel_sing_bbt .artist_songs_page {
 @media (max-width: 480px) {
 	.ab-empty { padding: 24px 12px 28px; }
 	.ab-empty__search button { padding: 8px 10px; font-size: 11.5px; }
+}
+
+/* ==========================================================================
+   v3.8.3 — لوگوی حالت روز و شب
+   --------------------------------------------------------------------------
+   هر حالت لوگوی خودش را دارد و تعویض فقط یک قاعدهٔ CSS است؛ هیچ درخواستِ
+   تازه‌ای در لحظهٔ تغییرِ حالت ساخته نمی‌شود و لوگو لحظه‌ای خالی نمی‌شود.
+   اگر «لوگوی شب» در تنظیمات خالی باشد، تصویر دوم اصلاً چاپ نمی‌شود و
+   همین قواعد بی‌اثر می‌مانند.
+   ========================================================================== */
+.ab-logo__img--night { display: none; }
+
+body.night .ab-logo__img--day,
+html[data-tara-night="1"] .ab-logo__img--day { display: none !important; }
+
+body.night .ab-logo__img--night,
+html[data-tara-night="1"] .ab-logo__img--night { display: inline-block !important; }
+
+/* در حالت شب، لوگوی روز نباید جای خودش را نگه دارد (ترازِ سربرگ) */
+.logo_top figure,
+#mobiles_header .logo_mobiles figure { line-height: 0; }
+
+/* ==========================================================================
+   v3.8.3 — احترام به «کاهش حرکت» (prefers-reduced-motion)
+   --------------------------------------------------------------------------
+   کاربرانی که در سیستم‌عامل «کاهش انیمیشن» را روشن کرده‌اند (میگرن، اختلال
+   تعادل، صرفه‌جویی باتری) نباید اسلایدرِ خودکار، محو‌شدن‌ها و پرش‌های نرم
+   ببینند. این‌جا فقط پویایی کم می‌شود؛ هیچ چیدمانی عوض نمی‌شود.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: .001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: .001ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	.ty-hero-track { scroll-behavior: auto !important; }
+	.ty-hero-slide { transition: none !important; }
+	.ty-hero-slide__img { transition: none !important; transform: none !important; }
+	.ty-video.is-pseudofs .ty-video__stage { transition: none !important; }
+}
+
+/* ==========================================================================
+   v3.8.3 — خواناییِ حالت شب
+   --------------------------------------------------------------------------
+   چند متنِ ریز/کم‌رنگ در حالت شب زیرِ نسبتِ کنتراست ۴٫۵:۱ می‌افتادند
+   (خاکستری روی زمینهٔ تیره). این‌جا فقط رنگِ متن‌ها یک پله روشن‌تر می‌شود؛
+   هیچ اندازه و فاصله‌ای تغییر نمی‌کند.
+   ========================================================================== */
+.night .ty-player,
+.night .ty-track,
+.night .ty-chips,
+.night .ty-tracklist,
+.night .ty-dock {
+	--ty-muted: #c2c1cf;
+	--ty-text: #f0eff7;
+}
+
+.night :is(.ty-meta, .ty-player__meta, .ty-track__artist, .ty-player__sub, .ty-tracklist__meta) {
+	color: #c2c1cf !important;
+}
+
+html[data-tara-night="1"] :is(.ty-meta, .ty-player__meta, .ty-track__artist, .ty-player__sub) {
+	color: #c2c1cf !important;
 }

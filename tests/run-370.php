@@ -498,7 +498,7 @@ t( 'تاکسونومی: قالب مشترک آرشیو موجود', is_readable(
 /* ======================================================================
    v3.7.7 — بازبینی خرابی‌های گزارش‌شده و تنظیمات تازه
    ====================================================================== */
-t( 'نسخه: style.css روی ۳.۸.۲ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.8.2' ) );
+t( 'نسخه: style.css روی ۳.۸.۲ یا بالاتر است', (bool) preg_match( '/Version: 3\.8\.[23]/', (string) @file_get_contents( '/tmp/theme/style.css' ) ) );
 
 $opts = (string) @file_get_contents( '/tmp/theme/inc/theme-options.php' );
 t( 'تنظیمات: بخش رنگ‌ها اضافه شده', false !== strpos( $opts, "'id'=>'brand'" ) );
@@ -551,7 +551,7 @@ $dock_php = (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' );
 t( 'نوار چسبان: مارکاپ صدا دارد', false !== strpos( $dock_php, 'data-tara-dock-vol' ) && false !== strpos( $dock_php, 'data-tara-dock-mute' ) );
 $player_js2 = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
 t( 'ویدیو: خروج با Esc و تغییر جهت', false !== strpos( $player_js2, "'orientationchange'" ) && false !== strpos( $player_js2, "e.key !== 'Escape'" ) );
-t( 'پلیر: نشانهٔ نسخه ۳.۸.۲', false !== strpos( $player_js2, "'data-tara-ready', '3.8.2'" ) );
+t( 'پلیر: نشانهٔ نسخه ۳.۸.۲ یا بالاتر', (bool) preg_match( "/'data-tara-ready', '3\\.8\\.[23]'/", $player_js2 ) );
 
 /* ======================================================================
    ۳.۷.۸ — دور ۶۶: ترتیب صفحهٔ آهنگ، اسلایدر تازه، سربرگ سه‌ستونهٔ هنرمند،
@@ -817,9 +817,9 @@ t(
 		&& false !== strpos( $vip80, 'is_numeric( $tara_custom )' )
 );
 t(
-	'بنر: srcset و ابعاد ۱۲۸۰×۵۶۰ (۱۶:۷)',
+	'بنر: srcset و ابعادِ ۱۶:۷ (از ۳.۸.۳ روی ۱۹۲۰×۸۴۰)',
 	false !== strpos( $vip80, 'wp_get_attachment_image_srcset' )
-		&& false !== strpos( $vip80, 'width="1280" height="560"' )
+		&& preg_match( '/width="(1280|1920)" height="(560|840)"/', $vip80 )
 );
 t(
 	'بنر: راهنمای اندازه در تنظیمات',
@@ -1089,7 +1089,7 @@ t(
 	'اسلایدر: کادر ۱۶:۷ و تصویر cover (بدون حاشیهٔ مات)',
 	false !== strpos( $home82, 'aspect-ratio: 16 / 7;' )
 		&& false !== strpos( $home82, 'object-fit: cover;' )
-		&& false !== strpos( $vip82, 'width="1280" height="560"' )
+		&& preg_match( '/width="(1280|1920)" height="(560|840)"/', $vip82 )
 );
 t(
 	'اسلایدر: نسبت ۱۶:۹ گوشی حذف شد (یک نسبت در همه‌جا)',
@@ -1153,7 +1153,7 @@ t(
 );
 t(
 	'لوگو: ذخیره در همان option_tree که ot_get_option می‌خواند',
-	false !== strpos( $logo82, "\$options['logo'] = (string) \$url;" )
+	false !== strpos( $logo82, 'tara_logo_option_key( $variant )' )
 		&& false !== strpos( $logo82, 'update_option( $option_id, $options )' )
 );
 t(

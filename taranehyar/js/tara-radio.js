@@ -161,6 +161,25 @@
 		}
 	}
 
+	/* «هم‌ترازیِ سرعت» در فرهنگِ دی‌جی یعنی پیچِ صفحه هم کمی عوض شود؛
+	   با preservesPitch=false همان حسِ وینیل می‌آید. اگر مرورگر پشتیبانی
+	   نکند، بی‌صدا رد می‌شود و فقط سرعت عوض می‌شود. */
+	function setVinylPitch(el, on) {
+		if (!el) {
+			return;
+		}
+		var value = !on;
+		try {
+			if ('preservesPitch' in el) {
+				el.preservesPitch = value;
+			} else if ('mozPreservesPitch' in el) {
+				el.mozPreservesPitch = value;
+			} else if ('webkitPreservesPitch' in el) {
+				el.webkitPreservesPitch = value;
+			}
+		} catch (e) {}
+	}
+
 	/* =====================================================================
 	 * ۱) «فهرست من» — بین همهٔ صفحه‌ها مشترک است
 	 * ================================================================== */
@@ -243,8 +262,11 @@
 		this.state = 'idle';
 		this.fade = null;
 		this.duck = 1;
+		this.duckTarget = 1;
 		this.duckTimer = 0;
 		this.toastTimer = 0;
+		this.sayTimer = 0;
+		this.tone = null;
 		this.mixed = 0;
 		this.trackCount = 0;
 		this.playedSeconds = 0;
@@ -260,12 +282,14 @@
 		this.lastClockPaint = 0;
 		this.lastSecond = -1;
 		this.voice = null;
+		this.voiceBroken = false;
 		this.graph = null;
 		this.forcedPlain = false;
 		this.limit = Math.round(clamp(CONF.limit || 20, 4, 40));
 		this.xfade = Math.round(clamp(CONF.xfade === undefined ? 6 : CONF.xfade, 0, 16));
 		this.power = 'warm';
 		this.mode = root.getAttribute('data-radio-mode') || CONF.mode || 'mixed';
+		this.featured = root.getAttribute('data-radio-featured') === '1';
 		this.tax = root.getAttribute('data-radio-tax') || '';
 		this.term = Number(root.getAttribute('data-radio-term') || 0) || 0;
 	}
@@ -324,6 +348,7 @@
 			mineEmpty: pick('[data-radio-mine-empty]'),
 			mineCount: r.querySelectorAll('[data-radio-mine-count]'),
 			mineBtn: pick('[data-radio-mine]'),
+			say: pick('[data-radio-say]'),
 			vu: r.querySelectorAll('[data-radio-vu] i')
 		};
 	};
@@ -336,6 +361,9 @@
 		}
 		this.queue = uniqueTracks(data.tracks.map(normalize));
 		this.cursor = -1;
+		if (data.featured !== undefined) {
+			this.featured = !!data.featured;
+		}
 		this.limit = Math.round(clamp(Number(data.limit) || this.limit, 4, 40));
 
 		/* آهنگ‌های «فهرست من» اولِ صف می‌آیند تا رادیو با انتخابِ خودِ
@@ -401,6 +429,24 @@
 				}
 			});
 
+			/* بافرِ کند/شبکهٔ لرزان: هیچ‌وقت پخش را قطع نمی‌کنیم، فقط نشانگرِ
+			   «آماده‌سازی» را نشان می‌دهیم؛ اگر داده برسد خودش برمی‌گردد. */
+			el.addEventListener('waiting', function () {
+				if (i === self.active && self.state !== 'idle') {
+					self.root.classList.add('is-loading');
+				}
+			});
+
+			el.addEventListener('canplay', function () {
+				self.root.classList.remove('is-loading');
+			});
+
+			el.addEventListener('stalled', function () {
+				if (i === self.active && self.state !== 'idle') {
+					self.root.classList.add('is-loading');
+				}
+			});
+
 			host.appendChild(el);
 			allAudio.push(el);
 			self.decks.push(el);
@@ -456,7 +502,8 @@
 			+ '&limit=' + encodeURIComponent(String(this.limit))
 			+ '&exclude=' + encodeURIComponent(exclude.join(','))
 			+ (this.tax ? '&tax=' + encodeURIComponent(this.tax) : '')
-			+ (this.term ? '&term=' + encodeURIComponent(String(this.term)) : '');
+			+ (this.term ? '&term=' + encodeURIComponent(String(this.term)) : '')
+			+ (this.featured ? '&featured=1' : '');
 
 		return window.fetch(url, { credentials: 'same-origin' })
 			.then(function (res) {
@@ -636,6 +683,7 @@
 		this.updateMediaSession(track);
 		this.loop();
 		this.maybeAnnounce(track, true);
+		this.preloadNext();
 	};
 
 	Radio.prototype.advance = function (reason, seconds) {
@@ -699,10 +747,18 @@
 			return;
 		}
 
-		incoming.pause();
-		incoming.src = track.src;
+		/* اگر همان آهنگ از قبل کیو شده باشد، src دوباره ست نمی‌شود تا پخش
+		   از کشِ مرورگر و بلافاصله شروع شود. */
+		if (incoming.__preloaded !== track.src) {
+			incoming.pause();
+			incoming.src = track.src;
+			incoming.preload = 'auto';
+		}
 		incoming.volume = 0;
 		incoming.playbackRate = 1;
+		if (CONF.tempo) {
+			setVinylPitch(incoming, true);
+		}
 		if (this.graph) {
 			resetGraphDeck(this.graph.nodes[1 - this.active]);
 		}
@@ -726,6 +782,38 @@
 		}, dur + 160);
 
 		this.loop();
+	};
+
+	/* آهنگِ بعدی از قبل در دِکِ خالی آماده می‌شود؛ اگر روی CDN کند باشد هم
+	   میکس بدونِ وقفه اجرا می‌شود (همان کاری که یک دی‌جی با «کیو کردن»
+	   می‌کند). فقط در حالتِ پایدار انجام می‌شود تا با فید قاطی نشود. */
+	Radio.prototype.preloadNext = function () {
+		if (this.fade || this.state !== 'playing') {
+			return;
+		}
+		var next = null;
+		for (var i = this.cursor + 1; i < this.queue.length; i++) {
+			if (!this.isBad(this.queue[i])) {
+				next = this.queue[i];
+				break;
+			}
+		}
+		if (!next) {
+			return;
+		}
+		var idle = this.decks[1 - this.active];
+		if (!idle || idle.__preloaded === next.src) {
+			return;
+		}
+		try {
+			idle.pause();
+			idle.volume = 0;
+			idle.playbackRate = 1;
+			idle.src = next.src;
+			idle.preload = 'auto';
+			idle.load();
+			idle.__preloaded = next.src;
+		} catch (e) {}
 	};
 
 	Radio.prototype.finishFade = function () {
@@ -768,9 +856,14 @@
 			this.maybeAnnounce(nextTrack, false);
 		}
 
+		if (el) {
+			setVinylPitch(el, false);
+		}
+
 		this.paintQueue();
 		this.paintMeters();
 		this.paintState();
+		this.preloadNext();
 	};
 
 	Radio.prototype.toggle = function () {
@@ -989,22 +1082,33 @@
 		var inc = this.graph.nodes[1 - this.active];
 
 		try {
+			/* خروجی: باندِ بالا کم‌کم بسته می‌شود و باس در نیمهٔ راه پایین
+			   می‌آید — تا باسِ دو آهنگ رویِ هم نیفتد (bass swap). */
 			out.lp.frequency.cancelScheduledValues(t);
-			out.lp.frequency.setValueAtTime(Math.max(500, out.lp.frequency.value), t);
-			out.lp.frequency.exponentialRampToValueAtTime(480, t + d);
+			out.lp.frequency.setValueAtTime(Math.max(600, out.lp.frequency.value), t);
+			out.lp.frequency.exponentialRampToValueAtTime(520, t + d * 0.9);
 			out.shelf.gain.cancelScheduledValues(t);
 			out.shelf.gain.setValueAtTime(out.shelf.gain.value, t);
-			out.shelf.gain.linearRampToValueAtTime(-7, t + d);
+			out.shelf.gain.linearRampToValueAtTime(-2, t + d * 0.3);
+			out.shelf.gain.linearRampToValueAtTime(-9, t + d * 0.62);
+
+			/* اکو فقط در دُمِ میکس: بالا می‌رود و پیش از پایان برمی‌گردد،
+			   وگرنه صدای خروجی تا ∞ ادامه پیدا می‌کرد. */
 			out.send.gain.cancelScheduledValues(t);
 			out.send.gain.setValueAtTime(0, t);
-			out.send.gain.linearRampToValueAtTime(0.22, t + d * 0.75);
+			out.send.gain.linearRampToValueAtTime(0.06, t + d * 0.4);
+			out.send.gain.linearRampToValueAtTime(0.3, t + d * 0.85);
+			out.send.gain.linearRampToValueAtTime(0, t + d);
 
+			/* ورودی: باس پیش از پرشدنِ کاملِ فید برمی‌گردد؛ فیلترِ بالا هم
+			   در ۶۰٪ باز می‌شود تا آهنگِ تازه «کشف» شود. */
 			inc.lp.frequency.cancelScheduledValues(t);
-			inc.lp.frequency.setValueAtTime(900, t);
-			inc.lp.frequency.exponentialRampToValueAtTime(20000, t + d);
+			inc.lp.frequency.setValueAtTime(1000, t);
+			inc.lp.frequency.exponentialRampToValueAtTime(20000, t + d * 0.6);
 			inc.shelf.gain.cancelScheduledValues(t);
-			inc.shelf.gain.setValueAtTime(-9, t);
-			inc.shelf.gain.linearRampToValueAtTime(0, t + d * 0.8);
+			inc.shelf.gain.setValueAtTime(-11, t);
+			inc.shelf.gain.linearRampToValueAtTime(-4, t + d * 0.3);
+			inc.shelf.gain.linearRampToValueAtTime(0, t + d * 0.52);
 			inc.send.gain.cancelScheduledValues(t);
 			inc.send.gain.setValueAtTime(0, t);
 		} catch (e) {}
@@ -1086,6 +1190,15 @@
 			return;
 		}
 
+		/* کم‌کردنِ صدا در برابرِ وکال نرم است، نه پله‌ای: در هر فریم کمی
+		   به هدف نزدیک می‌شود (حملهٔ ~۱۲۰ms، رهاییِ ~۴۰۰ms). این همان چیزی
+		   است که در رادیوهای حرفه‌ای «ducking» نامیده می‌شود. */
+		var rate = this.duckTarget < this.duck ? 0.16 : 0.07;
+		this.duck += (this.duckTarget - this.duck) * rate;
+		if (Math.abs(this.duckTarget - this.duck) < 0.005) {
+			this.duck = this.duckTarget;
+		}
+
 		var duck = this.duck;
 		var gainOut = 1;
 		var gainIn = 0;
@@ -1142,6 +1255,16 @@
 
 	/* ---- معرفیِ صوتیِ ایستگاه ---- */
 
+	/* نامِ سایت هرگز حذف نمی‌شود: اگر متنی که مدیر نوشته {site} نداشته باشد،
+	   همین‌جا پیش از جمله گذاشته می‌شود. */
+	Radio.prototype.stationLine = function (text, track, next) {
+		var line = String(text || '');
+		if (line.indexOf('{site}') === -1) {
+			line = 'رادیو {site}؛ ' + line;
+		}
+		return line;
+	};
+
 	Radio.prototype.maybeAnnounce = function (track, first) {
 		var st = CONF.station || {};
 		if (!st.on) {
@@ -1152,11 +1275,16 @@
 			return;
 		}
 
-		var text = st.text || '';
+		var text = st.text || 'رادیو {site}؛ پخشِ پیوستهٔ آهنگ‌های فارسی.';
 		var next = this.queue[this.cursor + 1] || null;
+
+		/* یک‌بار از هر چهار معرفی، به‌جای شعارِ ثابت، آهنگِ بعدی معرفی می‌شود
+		   (هر دو حالت نامِ سایت را دارند). */
 		if (!first && st.names && st.next && this.trackCount % (every * 2) !== 0) {
 			text = st.next;
 		}
+
+		text = this.stationLine(text, track, next);
 		if (!text) {
 			return;
 		}
@@ -1177,7 +1305,59 @@
 			.replace(/\{genre\}/g, this.termName || '');
 	};
 
-	Radio.prototype.speak = function (text, track, next) {
+	/* نوشتهٔ معرفی روی کارت — اگر مرورگر گفتار نداشته باشد، دستِ‌کم
+	   «رادیو <نام سایت>» دیده می‌شود. */
+	Radio.prototype.paintSay = function (line) {
+		var node = this.refs.say;
+		if (!node) {
+			return;
+		}
+		node.textContent = line;
+		node.hidden = false;
+		window.clearTimeout(this.sayTimer);
+		this.sayTimer = window.setTimeout(function () {
+			node.hidden = true;
+		}, 7200);
+	};
+
+	/* نوایِ کوتاهِ ایستگاه (سه نت) — بدونِ فایلِ صوتی و بدونِ درخواستِ شبکه.
+	   اگر ساختِ AudioContext ممکن نبود، بی‌صدا رد می‌شود. */
+	Radio.prototype.chime = function () {
+		if (!CONF.chime) {
+			return;
+		}
+		var AC = window.AudioContext || window.webkitAudioContext;
+		if (!AC) {
+			return;
+		}
+		try {
+			if (!this.tone) {
+				this.tone = new AC();
+			}
+			var ctx = this.tone;
+			if (ctx.state === 'suspended' && ctx.resume) {
+				ctx.resume().catch(function () {});
+			}
+			var at = ctx.currentTime + 0.02;
+			var notes = [523.25, 659.25, 783.99];
+			notes.forEach(function (freq, i) {
+				var osc = ctx.createOscillator();
+				var gain = ctx.createGain();
+				osc.type = 'sine';
+				osc.frequency.value = freq;
+				var t0 = at + i * 0.16;
+				gain.gain.setValueAtTime(0.0001, t0);
+				gain.gain.exponentialRampToValueAtTime(0.16, t0 + 0.04);
+				gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.42);
+				osc.connect(gain);
+				gain.connect(ctx.destination);
+				osc.start(t0);
+				osc.stop(t0 + 0.5);
+			});
+		} catch (e) {}
+	};
+
+	Radio.prototype.speak = function (text, track, next, skipFile) {
 		var self = this;
 		var st = CONF.station || {};
 		var line = this.fillText(text, track, next);
@@ -1185,7 +1365,12 @@
 			return;
 		}
 
-		if (st.file) {
+		this.paintSay(line);
+		this.chime();
+
+		/* اگر فایلِ وکال یک‌بار خطا داد، دیگر تلاش نمی‌کنیم؛ وگرنه
+		   حلقهٔ بی‌پایانِ «فایل → خطا → فایل» می‌شد. */
+		if (st.file && !skipFile && !this.voiceBroken) {
 			this.playVoiceFile(st.file, line);
 			return;
 		}
@@ -1198,34 +1383,73 @@
 		utter.lang = 'fa-IR';
 		utter.rate = 0.98;
 		utter.pitch = 1;
+		utter.volume = 1;
 
-		try {
-			var voices = window.speechSynthesis.getVoices() || [];
-			var fa = voices.filter(function (v) {
-				return v && String(v.lang || '').toLowerCase().indexOf('fa') === 0;
-			});
-			if (fa.length) {
-				utter.voice = fa[0];
+		var pickVoice = function () {
+			try {
+				var voices = window.speechSynthesis.getVoices() || [];
+				if (!voices.length) {
+					return false;
+				}
+				var byLang = function (prefix) {
+					for (var i = 0; i < voices.length; i++) {
+						if (String(voices[i].lang || '').toLowerCase().indexOf(prefix) === 0) {
+							return voices[i];
+						}
+					}
+					return null;
+				};
+				var chosen = byLang('fa') || byLang('ar') || null;
+				if (chosen) {
+					utter.voice = chosen;
+				}
+				return true;
+			} catch (e) {
+				return false;
 			}
-		} catch (e) {}
-
-		utter.onstart = function () {
-			self.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
-		};
-		utter.onend = function () {
-			self.unduck();
-		};
-		utter.onerror = function () {
-			self.unduck();
 		};
 
-		try {
-			window.speechSynthesis.cancel();
-			window.speechSynthesis.speak(utter);
-			this.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
-			this.duckGuard(20000);
-		} catch (e) {
-			this.unduck();
+		/* در برخی مرورگرها فهرستِ صداها بعد از رویدادِ voiceschanged پر می‌شود؛
+		   پس یک‌بار مستقیم و یک‌بار پس از همان رویداد تلاش می‌کنیم. */
+		var ready = pickVoice();
+		var spoken = false;
+		var say = function () {
+			if (spoken) {
+				return;
+			}
+			spoken = true;
+			pickVoice();
+			utter.onstart = function () {
+				self.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
+			};
+			utter.onend = function () {
+				self.unduck();
+			};
+			utter.onerror = function () {
+				self.unduck();
+			};
+			try {
+				window.speechSynthesis.cancel();
+				window.speechSynthesis.speak(utter);
+				self.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
+				self.duckGuard(Math.max(6000, Math.min(24000, line.length * 110)));
+			} catch (e) {
+				self.unduck();
+			}
+		};
+
+		if (ready) {
+			window.setTimeout(say, 120);
+		} else {
+			try {
+				window.speechSynthesis.addEventListener('voiceschanged', function once() {
+					try {
+						window.speechSynthesis.removeEventListener('voiceschanged', once);
+					} catch (e) {}
+					say();
+				});
+			} catch (e) {}
+			window.setTimeout(say, 500);
 		}
 	};
 
@@ -1247,7 +1471,8 @@
 		};
 		voice.onerror = function () {
 			self.unduck();
-			self.speak(fallbackText, null, null);
+			self.voiceBroken = true;
+			self.speak(fallbackText, null, null, true);
 		};
 
 		try {
@@ -1258,6 +1483,7 @@
 			if (p && typeof p.catch === 'function') {
 				p.catch(function () {
 					self.unduck();
+					self.voiceBroken = true;
 				});
 			}
 			this.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
@@ -1268,12 +1494,12 @@
 	};
 
 	Radio.prototype.duckTo = function (value) {
-		this.duck = clamp(value, 0.02, 1);
+		this.duckTarget = clamp(value, 0.02, 1);
 		this.root.classList.add('is-talking');
 	};
 
 	Radio.prototype.unduck = function () {
-		this.duck = 1;
+		this.duckTarget = 1;
 		this.root.classList.remove('is-talking');
 		window.clearTimeout(this.duckTimer);
 	};
@@ -1428,7 +1654,7 @@
 
 		var img = document.createElement('img');
 		img.className = 'ty-radio__rowart';
-		img.src = track.cover || '';
+		img.src = track.cover || (window.TaraRadioFallbackCover || '');
 		img.width = 44;
 		img.height = 44;
 		img.alt = '';
@@ -1691,6 +1917,24 @@
 				return target && target.closest ? target.closest(sel) : null;
 			};
 			var btn;
+
+			var row = closest('[data-radio-id]');
+			if (row && !closest('[data-radio-play]') && !closest('a, button')) {
+				event.preventDefault();
+				var rid = row.getAttribute('data-radio-id');
+				var picked = null;
+				self.queue.forEach(function (item) {
+					if (String(item.id) === String(rid)) {
+						picked = item;
+					}
+				});
+				if (picked) {
+					self.play(picked);
+				} else {
+					self.play();
+				}
+				return;
+			}
 
 			if (closest('[data-radio-toggle]')) {
 				event.preventDefault();

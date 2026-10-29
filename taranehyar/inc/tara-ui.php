@@ -599,6 +599,11 @@ if ( ! function_exists( 'tara_track_row' ) ) {
 		if ( $args['current'] ) {
 			$classes .= ' is-current';
 		}
+		/* v3.9.1 — اگر دکمهٔ «افزودن به رادیو» چاپ می‌شود، ستونِ ششم لازم
+		   است؛ وگرنه دکمه به سطرِ دوم می‌افتد و ردیف دوخطی می‌شود. */
+		if ( '' !== (string) $src && function_exists( 'tara_radio_add_button' ) && function_exists( 'tara_radio_on' ) && tara_radio_on() ) {
+			$classes .= ' ty-track--radio';
+		}
 
 		ob_start();
 		?>

@@ -167,6 +167,10 @@ if ( ! function_exists( 'get_posts' ) ) {
 			$term = (int) $args['tax_query'][0]['terms'];
 			$ids  = isset( $GLOBALS['__fake_term_posts'][ $term ] ) ? $GLOBALS['__fake_term_posts'][ $term ] : array();
 		}
+		if ( ! empty( $args['meta_query'][0]['key'] ) && 'vip_song' === $args['meta_query'][0]['key'] ) {
+			$featured = isset( $GLOBALS['__featured_ids'] ) ? (array) $GLOBALS['__featured_ids'] : array();
+			$ids      = array_values( array_intersect( $ids, array_map( 'intval', $featured ) ) );
+		}
 		if ( ! empty( $args['post__not_in'] ) ) {
 			$ids = array_values( array_diff( $ids, array_map( 'intval', (array) $args['post__not_in'] ) ) );
 		}
@@ -606,6 +610,75 @@ t( 'سئو: شاخهٔ توضیحِ ژانر/حال‌وهوا', false !== strpo
 $robots_pos = strpos( $seo, 'function tara_seo_robots' );
 $robots     = false === $robots_pos ? '' : substr( $seo, $robots_pos, 2200 );
 t( 'سئو: تاکسونومیِ ژانر در فهرستِ noindex نیست', false === strpos( $robots, 'tara_genre' ) && false === strpos( $robots, 'tara_mood' ) );
+
+/* ======================================================================
+   ۶-ب) رادیوی «بهترین دی‌جی» — نسخهٔ ۳.۹.۱
+   ====================================================================== */
+/* --- نوارِ زمان راست‌به‌چپ --- */
+$box_rtl = tara_radio_box( array( 'context' => 'tax', 'tracks' => $tracks ) );
+t( 'نوارِ زمان: جهتِ راست‌به‌چپ دارد', false !== strpos( $box_rtl, 'data-radio-seek' ) && false !== strpos( $box_rtl, 'class="ty-radio__range ty-radio__range--seek" data-radio-seek' ) && (bool) preg_match( '/data-radio-seek[^>]*dir="rtl"/', $box_rtl ) );
+t( 'نوارِ زمان: دیگر dir=ltr روی seek نیست', ! preg_match( '/data-radio-seek[^>]*dir="ltr"/', $box_rtl ) );
+$css_radio = f( 'css/tara-radio.css' );
+t( 'نوارِ زمان: CSS هم rtl است', false !== strpos( $css_radio, '.ty-radio__range--seek { direction: rtl; }' ) );
+t( 'نوارِ زمان: خطِ پرشدن از راست رشد می‌کند', false !== strpos( $css_radio, 'linear-gradient(to left' ) && false !== strpos( $css_radio, 'inset-inline-start: 0;' ) );
+$js_txt = f( 'js/tara-radio.js' );
+t( 'نوارِ زمان: JS عرضِ fill را می‌نویسد', false !== strpos( $js_txt, "rail: pick('[data-radio-fill]')" ) && false !== strpos( $js_txt, 'refs.rail.style.width' ) );
+
+/* --- فشرده‌سازی و پنلِ تنظیماتِ دی‌جی --- */
+t( 'کارتِ صفحهٔ اصلی فشرده است', false !== strpos( tara_radio_box( array( 'context' => 'home', 'tracks' => $tracks ) ), 'ty-radio--compact' ) );
+t( 'کارتِ آرشیو فشرده نیست', false === strpos( $box_rtl, 'ty-radio--compact' ) );
+t( 'کنترل‌های حرفه‌ای داخلِ <details> هستند', false !== strpos( $box_rtl, 'class="ty-radio__adv" data-radio-adv' ) && false !== strpos( $box_rtl, '<summary class="ty-radio__more">' ) );
+t( 'تنظیماتِ دی‌جی در آرشیو بسته است', false === strpos( $box_rtl, 'data-radio-adv open' ) );
+t( 'تنظیماتِ دی‌جی در صفحهٔ رادیو باز است', false !== strpos( tara_radio_box( array( 'context' => 'page', 'tracks' => $tracks, 'sources' => true ) ), 'data-radio-adv open' ) );
+t( 'فشرده: آمار پنهان می‌شود', false === strpos( tara_radio_box( array( 'context' => 'home', 'tracks' => $tracks ) ), 'ty-radio__meter' ) );
+t( 'فشرده: متنِ بلندِ توضیح چاپ نمی‌شود', false === strpos( tara_radio_box( array( 'context' => 'home', 'tracks' => $tracks ) ), 'class="ty-radio__sub"' ) );
+t( 'شفاف‌سازی: شافل به پنل رفت', false !== strpos( $box_rtl, 'data-radio-shuffle' ) && false === strpos( preg_replace( '/<details.*?<\/details>/s', '', $box_rtl ), 'data-radio-shuffle' ) );
+t( 'کپشنِ معرفی در مارکاپ هست', false !== strpos( $box_rtl, 'data-radio-say' ) );
+
+/* --- نامِ سایت در معرفیِ صوتی --- */
+$defaults_390 = tara_radio_defaults();
+t( 'وکال: متنِ پیش‌فرض {site} دارد', false !== strpos( (string) $defaults_390['station_text'], '{site}' ) );
+t( 'وکال: متنِ «آهنگِ بعدی» هم {site} دارد', false !== strpos( (string) $defaults_390['station_next'], '{site}' ) );
+t( 'وکال: JS در نبودِ {site} خودش نام را می‌گذارد', false !== strpos( $js_txt, "line.indexOf('{site}') === -1" ) && false !== strpos( $js_txt, "'رادیو {site}؛ ' + line" ) );
+t( 'وکال: نوشتهٔ معرفی روی کارت چاپ می‌شود', false !== strpos( $js_txt, 'paintSay' ) );
+t( 'وکال: نُتِ ایستگاه (chime) هست', false !== strpos( $js_txt, 'Radio.prototype.chime' ) && isset( tara_radio_settings()['chime'] ) );
+t( 'وکال: حلقهٔ فایلِ خراب بسته شد', false !== strpos( $js_txt, 'voiceBroken' ) );
+
+/* --- کیفیتِ میکس --- */
+t( 'میکس: ducking نرم (هدف) دارد', false !== strpos( $js_txt, 'duckTarget' ) );
+t( 'میکس: آماده‌سازیِ آهنگِ بعدی زودتر', false !== strpos( $js_txt, 'preloadNext' ) );
+t( 'میکس: پیچِ وینیل در هم‌ترازیِ سرعت', false !== strpos( $js_txt, 'preservesPitch' ) );
+t( 'میکس: تابعِ چیدمانِ ضدِ تکرار موجود است', function_exists( 'tara_radio_interleave' ) );
+$order = tara_radio_interleave( array( 601, 602, 604 ) );
+t( 'میکس: خوانندهٔ یکسان پشتِ‌سرِهم نمی‌آید', array( 601, 604, 602 ) === array_map( 'intval', $order ), implode( ',', $order ) );
+
+/* --- بخش ویژه --- */
+$GLOBALS['__featured_ids'] = array( 606, 604 );
+$GLOBALS['__trans']        = array();
+$feat = tara_radio_tracks( array( 'pool' => 'featured', 'limit' => 10 ) );
+$feat_ids = array_map( 'intval', wp_list_pluck_simple( array_map( function ( $t ) { return (object) array( 'term_id' => $t['id'] ); }, $feat ) ) );
+t( 'ویژه: فقط آهنگ‌های بخش ویژه می‌آیند', ! empty( $feat ) && ! array_diff( $feat_ids, array( 606, 604 ) ) );
+$GLOBALS['__featured_ids'] = array();
+$GLOBALS['__trans']        = array();
+$fallback = tara_radio_tracks( array( 'pool' => 'featured', 'limit' => 10 ) );
+t( 'ویژه: بی‌آهنگِ ویژه ⇒ برگشت به همهٔ آهنگ‌ها', count( $fallback ) >= 4 );
+$home_html = tara_radio_home_section();
+t( 'صفحهٔ اصلی: نشانِ «منتخبِ ویژه»', false !== strpos( $home_html, 'منتخبِ ویژه' ) );
+t( 'صفحهٔ اصلی: بخش فشرده است', false !== strpos( $home_html, 'ty-radio--compact' ) );
+t( 'صفحهٔ اصلی: فقط یک <h2> (بدونِ سربرگِ تکراری)', 1 === preg_match_all( '/<h2\b/', $home_html ) );
+t( 'صفحهٔ اصلی: نشانِ «زنده» در سربرگِ بیرونی', false !== strpos( $home_html, 'ty-radio-home__live' ) );
+t( 'صفحهٔ اصلی: کارت برچسبِ دسترس‌پذیری دارد', (bool) preg_match( '/ty-radio--compact[^>]*aria-label="رادیو /s', $home_html ) );
+$GLOBALS['__featured_ids'] = array( 606, 604 );
+
+/* --- تنظیمات تازه --- */
+$opts_390 = f( 'inc/theme-options.php' );
+t( 'تنظیمات: کلید «فقط ویژه در خانه»', false !== strpos( $opts_390, "'id'=>'radio_home_featured'" ) );
+t( 'تنظیمات: کلید «نوای ایستگاه»', false !== strpos( $opts_390, "'id'=>'radio_chime'" ) );
+t( 'تنظیمات: پیش‌فرضِ نوای ایستگاه روشن', 'on' === tara_radio_defaults()['chime'] );
+t( 'تنظیمات: پیش‌فرضِ «فقط ویژه» روشن', 'on' === tara_radio_defaults()['home_featured'] );
+
+/* --- ردیفِ آهنگ با دکمهٔ رادیو --- */
+t( 'ردیف: کلاس چیدمانِ شش‌ستونه', false !== strpos( f( 'inc/tara-ui.php' ), "' ty-track--radio'" ) && false !== strpos( $css_radio, '.ty-track--radio' ) );
 
 /* ======================================================================
    ۷) دارایی‌ها

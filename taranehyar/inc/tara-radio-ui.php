@@ -122,7 +122,15 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 	/**
 	 * کارتِ اصلیِ رادیو/دی‌جی.
 	 *
-	 * @param array $args context|title|subtitle|taxonomy|term_id|mode|tracks|limit|class|sources.
+	 * چیدمانِ تازه (۳.۹.۱) — «کم‌حجم در نگاهِ اول، کامل در صورتِ نیاز»:
+	 *   • همیشه دیده می‌شود: کاور، نام آهنگ/خواننده، نوارِ زمان، سه دکمهٔ
+	 *     اصلی (قبلی/پخش/بعدی) و دکمهٔ «تنظیماتِ دی‌جی».
+	 *   • داخلِ «تنظیماتِ دی‌جی» (details): طولِ میکس، شدت، منبعِ آهنگ‌ها،
+	 *     فهرستِ من و خروجیِ جلسه. در صفحهٔ رادیو پیش‌فرض باز است.
+	 *   • صفحهٔ اصلی: حالتِ `compact` — سربرگِ کوتاه، بدونِ آمار و بدونِ
+	 *     متنِ توضیح؛ صف هم کوتاه‌تر است تا اسکرولِ گوشی کم شود.
+	 *
+	 * @param array $args context|title|subtitle|taxonomy|term_id|mode|tracks|limit|class|sources|compact|featured.
 	 * @return string
 	 */
 	function tara_radio_box( $args = array() ) {
@@ -145,6 +153,9 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 				'class'      => '',
 				'sources'    => false,
 				'hide_empty' => false,
+				'compact'    => null,
+				'featured'   => false,
+				'adv_open'   => null,
 			)
 		);
 
@@ -153,6 +164,12 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 			$args['mode'] = 'mixed';
 		}
 
+		/* صفحهٔ اصلی به‌طورِ پیش‌فرض فشرده است؛ صفحهٔ رادیو کامل. */
+		$compact = ( null === $args['compact'] ) ? ( 'home' === $args['context'] ) : (bool) $args['compact'];
+
+		/* دکمهٔ «تنظیماتِ دی‌جی» فقط در صفحهٔ رادیو باز است. */
+		$adv_open = ( null === $args['adv_open'] ) ? ( 'page' === $args['context'] ) : (bool) $args['adv_open'];
+
 		if ( empty( $args['tracks'] ) ) {
 			$args['tracks'] = tara_radio_tracks(
 				array(
@@ -160,6 +177,7 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 					'term_id'  => (int) $args['term_id'],
 					'mode'     => (string) $args['mode'],
 					'limit'    => (int) $args['limit'],
+					'pool'     => ! empty( $args['featured'] ) ? 'featured' : '',
 				)
 			);
 		}
@@ -174,14 +192,15 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 		$site   = (string) get_bloginfo( 'name' );
 
 		$title = '' !== $args['title'] ? $args['title'] : ( '' !== $ctx['term_name'] ? 'میکس زندهٔ «' . $ctx['term_name'] . '»' : 'رادیو ' . $site );
-		$sub   = '' !== $args['subtitle'] ? $args['subtitle'] : 'دی‌جی خودکارِ ترانه یار: آهنگ‌ها با کراس‌فید، هم‌ترازیِ سرعت و معرفیِ صوتیِ سایت پخش می‌شوند.';
+		$sub   = '' !== $args['subtitle'] ? $args['subtitle'] : 'دی‌جی خودکارِ ' . $site . ': آهنگ‌ها با کراس‌فید و هم‌ترازیِ سرعت به هم می‌چسبند؛ بینشان هم سایت معرفی می‌شود.';
 
 		$payload = array(
-			'tracks' => $tracks,
-			'mode'   => (string) $args['mode'],
-			'tax'    => (string) $args['taxonomy'],
-			'term'   => (int) $args['term_id'],
-			'limit'  => max( 4, min( 40, (int) $args['limit'] ) ),
+			'tracks'   => $tracks,
+			'mode'     => (string) $args['mode'],
+			'tax'      => (string) $args['taxonomy'],
+			'term'     => (int) $args['term_id'],
+			'limit'    => max( 4, min( 40, (int) $args['limit'] ) ),
+			'featured' => ! empty( $args['featured'] ),
 		);
 		$json = wp_json_encode( $payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP );
 		if ( ! is_string( $json ) ) {
@@ -189,12 +208,17 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 		}
 
 		$classes = 'ty-radio ty-radio--' . sanitize_html_class( (string) $args['context'] );
+		if ( $compact ) {
+			$classes .= ' ty-radio--compact';
+		}
 		if ( '' !== (string) $args['class'] ) {
 			$classes .= ' ' . sanitize_html_class( (string) $args['class'] );
 		}
 
 		$xfade = (int) tara_radio_option( 'xfade', 6 );
 		$xfade = max( 0, min( 16, $xfade ) );
+
+		$queue_rows = $compact ? 5 : 8;
 
 		ob_start();
 		?>
@@ -204,29 +228,40 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 			data-radio-tax="<?php echo esc_attr( (string) $args['taxonomy'] ); ?>"
 			data-radio-term="<?php echo esc_attr( (int) $args['term_id'] ); ?>"
 			data-radio-mode="<?php echo esc_attr( (string) $args['mode'] ); ?>"
-			dir="rtl" aria-labelledby="<?php echo esc_attr( $uid ); ?>-title">
+			data-radio-featured="<?php echo ! empty( $args['featured'] ) ? '1' : '0'; ?>"
+			dir="rtl" <?php echo $compact ? 'aria-label="رادیو ' . esc_attr( $site ) . '"' : 'aria-labelledby="' . esc_attr( $uid ) . '-title"'; ?>>
 
 			<script type="application/json" class="ty-radio__data"><?php echo $json; // phpcs:ignore WordPress.Security.EscapeOutput -- JSONِ ساختهٔ خودمان، HEX_TAG شده ?></script>
 
 			<span class="ty-radio__aura" aria-hidden="true"></span>
 			<span class="ty-radio__scan" aria-hidden="true"></span>
 
-			<header class="ty-radio__head">
-				<div class="ty-radio__ident">
-					<span class="ty-radio__live">
-						<span class="ty-radio__pulse" aria-hidden="true"></span>
-						رادیو <?php echo esc_html( $site ); ?>
-						<em>زنده</em>
-					</span>
-					<h2 class="ty-radio__title" id="<?php echo esc_attr( $uid ); ?>-title"><?php echo esc_html( $title ); ?></h2>
-					<p class="ty-radio__sub"><?php echo esc_html( $sub ); ?></p>
-				</div>
-				<ul class="ty-radio__meter">
-					<li><span>جلسه</span><strong data-radio-session>۰:۰۰</strong></li>
-					<li><span>میکس</span><strong data-radio-mixed>۰</strong></li>
-					<li><span>در صف</span><strong data-radio-queued><?php echo esc_html( tara_radio_fa( count( $tracks ) ) ); ?></strong></li>
-				</ul>
-			</header>
+			<?php
+			/* در حالتِ فشرده (صفحهٔ اصلی) سربرگِ داخلی چاپ نمی‌شود: سربرگِ
+			   بیرونیِ بخش («رادیو …» + نشانِ «منتخبِ ویژه») همین کار را می‌کند
+			   و دو <h2> پشتِ‌سرِ‌هم هم برای خوانندهٔ صفحه و هم برای سئو بد بود. */
+			if ( ! $compact ) :
+				?>
+				<header class="ty-radio__head">
+					<div class="ty-radio__ident">
+						<span class="ty-radio__live">
+							<span class="ty-radio__pulse" aria-hidden="true"></span>
+							رادیو <?php echo esc_html( $site ); ?>
+							<em>زنده</em>
+						</span>
+						<h2 class="ty-radio__title" id="<?php echo esc_attr( $uid ); ?>-title"><?php echo esc_html( $title ); ?></h2>
+					</div>
+					<ul class="ty-radio__meter">
+						<li><span>جلسه</span><strong data-radio-session>۰:۰۰</strong></li>
+						<li><span>میکس</span><strong data-radio-mixed>۰</strong></li>
+						<li><span>در صف</span><strong data-radio-queued><?php echo esc_html( tara_radio_fa( count( $tracks ) ) ); ?></strong></li>
+					</ul>
+				</header>
+			<?php endif; ?>
+
+			<?php if ( ! $compact ) : ?>
+				<p class="ty-radio__sub"><?php echo esc_html( $sub ); ?></p>
+			<?php endif; ?>
 
 			<div class="ty-radio__deck">
 				<div class="ty-radio__artwrap">
@@ -254,12 +289,16 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 						<span class="ty-radio__artist" data-radio-artist><?php echo esc_html( ! empty( $first['artist'] ) ? (string) $first['artist'] : '' ); ?></span>
 					</div>
 
+					<?php
+					/* نوارِ زمان: در راست‌به‌چپ هم «خط پر شدن» و هم «دستهٔ» نوار
+					   از راست به چپ حرکت می‌کنند (dir="rtl" روی خودِ range). */
+					?>
 					<div class="ty-radio__seek">
-						<div class="ty-radio__rail" data-radio-rail aria-hidden="true">
+						<div class="ty-radio__rail" aria-hidden="true">
 							<span class="ty-radio__buffer" data-radio-buffer></span>
 							<span class="ty-radio__fill" data-radio-fill></span>
 						</div>
-						<input type="range" class="ty-radio__range" data-radio-seek min="0" max="1000" step="1" value="0" aria-label="جای پخش" dir="ltr">
+						<input type="range" class="ty-radio__range ty-radio__range--seek" data-radio-seek min="0" max="1000" step="1" value="0" aria-label="جای پخش" dir="rtl">
 						<span class="ty-radio__time" data-radio-time dir="ltr">۰:۰۰ / ۰:۰۰</span>
 					</div>
 
@@ -271,46 +310,60 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 							<span class="ty-radio__spin" aria-hidden="true"></span>
 						</button>
 						<button type="button" class="ty-radio__tbtn" data-radio-next aria-label="قطعهٔ بعد"><i class="icofont-caret-left" aria-hidden="true"></i></button>
-						<button type="button" class="ty-radio__tbtn ty-radio__tbtn--ghost" data-radio-shuffle aria-label="شافل و منبعِ تازه"><i class="icofont-random" aria-hidden="true"></i></button>
 					</div>
 
-					<div class="ty-radio__mixer">
-						<label class="ty-radio__ctrl" for="<?php echo esc_attr( $uid ); ?>-xfade">
-							<span class="ty-radio__ctrl-label">طول میکس</span>
-							<strong class="ty-radio__ctrl-val" data-radio-xfade-val><?php echo esc_html( tara_radio_fa( $xfade ) . ' ثانیه' ); ?></strong>
-							<input type="range" id="<?php echo esc_attr( $uid ); ?>-xfade" class="ty-radio__range ty-radio__range--mix" data-radio-xfade min="0" max="16" step="1" value="<?php echo esc_attr( (string) $xfade ); ?>" dir="ltr">
-						</label>
-						<div class="ty-radio__power" role="group" aria-label="شدت میکس">
-							<button type="button" data-radio-power="calm" aria-pressed="false">آرام</button>
-							<button type="button" data-radio-power="warm" aria-pressed="true">دی‌جی</button>
-							<button type="button" data-radio-power="club" aria-pressed="false">باشگاهی</button>
+					<p class="ty-radio__say" data-radio-say aria-live="polite" hidden></p>
+
+					<details class="ty-radio__adv" data-radio-adv<?php echo $adv_open ? ' open' : ''; ?>>
+						<summary class="ty-radio__more">
+							<i class="icofont-options" aria-hidden="true"></i>
+							<span>تنظیمات دی‌جی</span>
+							<em>طول میکس، منبع و فهرست من</em>
+						</summary>
+
+						<div class="ty-radio__advbody">
+							<div class="ty-radio__mixer">
+								<label class="ty-radio__ctrl" for="<?php echo esc_attr( $uid ); ?>-xfade">
+									<span class="ty-radio__ctrl-label">طول میکس</span>
+									<strong class="ty-radio__ctrl-val" data-radio-xfade-val><?php echo esc_html( tara_radio_fa( $xfade ) . ' ثانیه' ); ?></strong>
+									<input type="range" id="<?php echo esc_attr( $uid ); ?>-xfade" class="ty-radio__range ty-radio__range--mix" data-radio-xfade min="0" max="16" step="1" value="<?php echo esc_attr( (string) $xfade ); ?>" dir="ltr">
+								</label>
+								<div class="ty-radio__power" role="group" aria-label="شدت میکس">
+									<button type="button" data-radio-power="calm" aria-pressed="false">آرام</button>
+									<button type="button" data-radio-power="warm" aria-pressed="true">دی‌جی</button>
+									<button type="button" data-radio-power="club" aria-pressed="false">باشگاهی</button>
+								</div>
+							</div>
+
+							<?php if ( ! empty( $args['sources'] ) ) : ?>
+								<div class="ty-radio__sources" role="group" aria-label="منبع آهنگ‌های رادیو">
+									<?php foreach ( $modes as $mode_key => $mode_label ) : ?>
+										<button type="button" class="ty-radio__source<?php echo ( $mode_key === $args['mode'] ) ? ' is-active' : ''; ?>"
+											data-radio-source="<?php echo esc_attr( $mode_key ); ?>" aria-pressed="<?php echo ( $mode_key === $args['mode'] ) ? 'true' : 'false'; ?>">
+											<?php echo esc_html( $mode_label ); ?>
+										</button>
+									<?php endforeach; ?>
+								</div>
+							<?php endif; ?>
+
+							<div class="ty-radio__tools">
+								<button type="button" class="ty-radio__tool" data-radio-mine aria-expanded="false" aria-controls="<?php echo esc_attr( $uid ); ?>-mine">
+									<i class="icofont-heart-alt" aria-hidden="true"></i>
+									فهرست من <b data-radio-mine-count>۰</b>
+								</button>
+								<button type="button" class="ty-radio__tool" data-radio-shuffle>
+									<i class="icofont-random" aria-hidden="true"></i>
+									شافل
+								</button>
+								<button type="button" class="ty-radio__tool" data-radio-export>
+									<i class="icofont-download" aria-hidden="true"></i>
+									فهرست جلسه
+								</button>
+							</div>
 						</div>
-					</div>
-
-					<div class="ty-radio__tools">
-						<button type="button" class="ty-radio__tool" data-radio-mine aria-expanded="false" aria-controls="<?php echo esc_attr( $uid ); ?>-mine">
-							<i class="icofont-heart-alt" aria-hidden="true"></i>
-							فهرست من <b data-radio-mine-count>۰</b>
-						</button>
-						<button type="button" class="ty-radio__tool" data-radio-export>
-							<i class="icofont-download" aria-hidden="true"></i>
-							فهرست جلسه
-						</button>
-						<span class="ty-radio__hint">میکس در مرورگرِ خودت ساخته می‌شود؛ هیچ صدایی از سرور پخش نمی‌شود.</span>
-					</div>
+					</details>
 				</div>
 			</div>
-
-			<?php if ( ! empty( $args['sources'] ) ) : ?>
-				<div class="ty-radio__sources" role="group" aria-label="منبع آهنگ‌های رادیو">
-					<?php foreach ( $modes as $mode_key => $mode_label ) : ?>
-						<button type="button" class="ty-radio__source<?php echo ( $mode_key === $args['mode'] ) ? ' is-active' : ''; ?>"
-							data-radio-source="<?php echo esc_attr( $mode_key ); ?>" aria-pressed="<?php echo ( $mode_key === $args['mode'] ) ? 'true' : 'false'; ?>">
-							<?php echo esc_html( $mode_label ); ?>
-						</button>
-					<?php endforeach; ?>
-				</div>
-			<?php endif; ?>
 
 			<div class="ty-radio__timeline">
 				<header class="ty-radio__tlhead">
@@ -318,7 +371,7 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 					<span class="ty-radio__tlmeta" data-radio-queue-meta><?php echo esc_html( tara_radio_fa( count( $tracks ) ) . ' آهنگ در نوبت' ); ?></span>
 				</header>
 				<ol class="ty-radio__queue" data-radio-queue>
-					<?php echo tara_radio_queue_rows( $tracks, 8 ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین تابع، escape شده ?>
+					<?php echo tara_radio_queue_rows( $tracks, $queue_rows ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین تابع، escape شده ?>
 				</ol>
 				<p class="ty-radio__empty" data-radio-empty<?php echo empty( $tracks ) ? '' : ' hidden'; ?>>
 					برای این بخش هنوز آهنگی با فایل صوتی ثبت نشده است. یک آهنگ به رادیو اضافه کنید تا صف ساخته شود.
@@ -346,7 +399,12 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 
 if ( ! function_exists( 'tara_radio_home_section' ) ) {
 	/**
-	 * بخشِ «رادیو» در صفحهٔ اصلی — با سربرگ و لینک صفحهٔ رادیو.
+	 * بخشِ «رادیو» در صفحهٔ اصلی.
+	 *
+	 * از ۳.۹.۱: فقط آهنگ‌هایی که در «بخش ویژه» (اسلایدرِ ویژه) گذاشته شده‌اند
+	 * وارد صفِ خانه می‌شوند و کارت فشرده است (بدونِ آمار و متنِ بلند) تا
+	 * در گوشی فضای کمی بگیرد. اگر هیچ آهنگِ ویژه‌ای نبود، رادیو با همان
+	 * منبعِ عمومی کار می‌کند تا بخش خالی نماند.
 	 *
 	 * @return string
 	 */
@@ -355,7 +413,17 @@ if ( ! function_exists( 'tara_radio_home_section' ) ) {
 			return '';
 		}
 
-		$tracks = tara_radio_tracks( array( 'mode' => (string) tara_radio_option( 'mode', 'mixed' ), 'limit' => 16 ) );
+		$featured_only = ( 'on' === (string) tara_radio_option( 'home_featured', 'on' ) );
+		$pool          = $featured_only ? 'featured' : '';
+		$mode          = (string) tara_radio_option( 'mode', 'mixed' );
+
+		$tracks = tara_radio_tracks(
+			array(
+				'mode'  => $mode,
+				'limit' => 12,
+				'pool'  => $pool,
+			)
+		);
 		if ( empty( $tracks ) ) {
 			return '';
 		}
@@ -366,11 +434,12 @@ if ( ! function_exists( 'tara_radio_home_section' ) ) {
 		?>
 		<section class="ty-radio-home tarlanweb_center" dir="rtl">
 			<div class="ty-radio-home__head">
-				<div>
-					<span class="ty-radio-home__eyebrow"><i class="icofont-sound-wave-alt" aria-hidden="true"></i> پخشِ پیوستهٔ زنده</span>
-					<h2 class="ty-radio-home__title">رادیو ترانه یار</h2>
-					<p class="ty-radio-home__sub">یک ایستگاهِ همیشه‌روشن: دی‌جیِ خودکار، میکسِ نامحسوس و معرفیِ صوتیِ سایت بین آهنگ‌ها.</p>
-				</div>
+				<h2 class="ty-radio-home__title">
+					<i class="icofont-sound-wave-alt" aria-hidden="true"></i>
+					رادیو <?php echo esc_html( get_bloginfo( 'name' ) ); ?>
+					<span class="ty-radio-home__flag"><?php echo $featured_only ? 'منتخبِ ویژه' : 'زنده'; ?></span>
+				</h2>
+				<span class="ty-radio-home__live" aria-hidden="true"><span class="ty-radio__pulse"></span>زنده</span>
 				<?php if ( '' !== $page ) : ?>
 					<a class="ty-radio-home__more" href="<?php echo esc_url( $page ); ?>">صفحهٔ رادیو <i class="icofont-thin-left" aria-hidden="true"></i></a>
 				<?php endif; ?>
@@ -380,9 +449,11 @@ if ( ! function_exists( 'tara_radio_home_section' ) ) {
 				array(
 					'context'    => 'home',
 					'title'      => 'ایستگاهِ همیشه‌روشن',
-					'subtitle'   => 'بدونِ انتخابِ آهنگ: صف خودش تازه می‌شود و میکس ادامه پیدا می‌کند.',
-					'limit'      => 16,
+					'limit'      => 12,
 					'tracks'     => $tracks,
+					'compact'    => true,
+					'featured'   => (bool) $pool,
+					'adv_open'   => false,
 					'hide_empty' => true,
 				)
 			);
@@ -444,6 +515,8 @@ if ( ! function_exists( 'tara_radio_shortcode' ) ) {
 				'mode'     => '',
 				'limit'    => 0,
 				'sources'  => 'yes',
+				'compact'  => 'no',
+				'featured' => 'no',
 			),
 			(array) $atts,
 			'tara_radio'
@@ -457,6 +530,8 @@ if ( ! function_exists( 'tara_radio_shortcode' ) ) {
 				'mode'     => '' !== (string) $atts['mode'] ? (string) $atts['mode'] : (string) tara_radio_option( 'mode', 'mixed' ),
 				'limit'    => (int) $atts['limit'] ? (int) $atts['limit'] : (int) tara_radio_option( 'limit', 20 ),
 				'sources'  => in_array( strtolower( (string) $atts['sources'] ), array( 'yes', '1', 'on', 'true' ), true ),
+				'compact'  => in_array( strtolower( (string) $atts['compact'] ), array( 'yes', '1', 'on', 'true' ), true ),
+				'featured' => in_array( strtolower( (string) $atts['featured'] ), array( 'yes', '1', 'on', 'true' ), true ),
 			)
 		);
 	}

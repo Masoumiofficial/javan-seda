@@ -56,9 +56,11 @@ if ( ! function_exists( 'tara_radio_defaults' ) ) {
 			'station_text'   => 'رادیو {site}؛ پخشِ پیوستهٔ آهنگ‌های فارسی. گوش کنید.',
 			'station_file'   => '',        // فایلِ صوتیِ آمادهٔ وکال (اختیاری)
 			'station_names'  => 'on',      // نامیدنِ آهنگِ بعدی
-			'station_next'   => 'بعدی: {title} از {artist}.',
+			'station_next'   => 'بعدی: {title} از {artist}؛ رادیو {site}.',
+			'chime'          => 'on',      // نوایِ کوتاهِ ایستگاه پیش از وکال
 			'autostart'      => '',        // پخشِ خودکار در صفحهٔ رادیو (مرورگرها اغلب می‌بندند)
 			'home'           => 'on',      // کارتِ رادیو در صفحهٔ اصلی
+			'home_featured'  => 'on',      // فقط آهنگ‌های «بخش ویژه» در صفحهٔ اصلی
 			'archives'       => 'on',      // دی‌جی‌باکس در آرشیو ژانر/حال‌وهوا
 		);
 
@@ -149,6 +151,7 @@ if ( ! function_exists( 'tara_radio_settings' ) ) {
 			'cue'       => max( 0, min( 30, (int) tara_radio_option( 'cue', 0 ) ) ),
 			'limit'     => $limit,
 			'duck'      => max( 0, min( 90, (int) tara_radio_option( 'duck', 35 ) ) ) / 100,
+			'chime'     => ( 'on' === (string) tara_radio_option( 'chime', 'on' ) ),
 			'autostart' => ( 'on' === (string) tara_radio_option( 'autostart', '' ) ),
 			'site'      => (string) get_bloginfo( 'name' ),
 			'station'   => array(
@@ -229,12 +232,19 @@ if ( ! function_exists( 'tara_radio_track' ) ) {
 			return null;
 		}
 
+		/* اگر آهنگ کاور نداشت، به‌جای <img> شکسته همان تصویرِ جانشینِ
+		   خودِ قالب می‌آید؛ این‌طور کارت هیچ‌وقت جای خالی/آیکونِ شکسته ندارد. */
+		$cover = (string) tara_track_cover( $post_id, 'thumb2' );
+		if ( '' === trim( $cover ) ) {
+			$cover = get_template_directory_uri() . '/images/nomusics.jpg';
+		}
+
 		return array(
 			'id'       => $post_id,
 			'title'    => (string) tara_track_title( $post_id ),
 			'artist'   => (string) tara_track_artist( $post_id ),
 			'src'      => (string) $src,
-			'cover'    => (string) tara_track_cover( $post_id, 'thumb2' ),
+			'cover'    => $cover,
 			'link'     => (string) get_permalink( $post_id ),
 			'duration' => (int) tara_radio_duration( $post_id ),
 		);
@@ -257,6 +267,7 @@ if ( ! function_exists( 'tara_radio_query_ids' ) ) {
 				'term_id'  => 0,
 				'exclude'  => array(),
 				'limit'    => 20,
+				'pool'     => '',
 			)
 		);
 
@@ -271,6 +282,19 @@ if ( ! function_exists( 'tara_radio_query_ids' ) ) {
 			'fields'                 => 'ids',
 			'post__not_in'           => array_map( 'absint', (array) $args['exclude'] ),
 		);
+
+		/* «بخش ویژه» = همان آهنگ‌هایی که با تیکِ vip_song در اسلایدرِ ویژه
+		   گذاشته شده‌اند. رادیوی صفحهٔ اصلی پیش‌فرض فقط از همین‌ها ساخته
+		   می‌شود تا خانه دقیقاً همان چیزی باشد که مدیر انتخاب کرده است. */
+		if ( 'featured' === $args['pool'] ) {
+			$query['meta_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery -- لازم است
+				array(
+					'key'     => 'vip_song',
+					'value'   => '1',
+					'compare' => 'LIKE',
+				),
+			);
+		}
 
 		if ( '' !== $args['taxonomy'] && (int) $args['term_id'] > 0 && taxonomy_exists( $args['taxonomy'] ) ) {
 			$query['tax_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery -- لازم است
@@ -345,6 +369,7 @@ if ( ! function_exists( 'tara_radio_ids' ) ) {
 				'mode'     => 'mixed',
 				'limit'    => 20,
 				'exclude'  => array(),
+				'pool'     => '',
 			)
 		);
 
@@ -363,6 +388,7 @@ if ( ! function_exists( 'tara_radio_ids' ) ) {
 			'mode'    => (string) $args['mode'],
 			'limit'   => $limit,
 			'exclude' => $exclude,
+			'pool'    => (string) $args['pool'],
 		);
 
 		if ( $cache ) {
@@ -424,11 +450,100 @@ if ( ! function_exists( 'tara_radio_ids' ) ) {
 			}
 		}
 
+		if ( count( $ids ) > 2 ) {
+			$ids = tara_radio_interleave( $ids );
+		}
+
+		/* اگر «بخش ویژه» خالی بود، رادیو نباید خاموش شود؛ همان منبعِ
+		   عمومی جایگزین می‌شود (یک‌بار، بدونِ حلقه). */
+		if ( empty( $ids ) && 'featured' === $args['pool'] ) {
+			return tara_radio_ids( array_merge( $args, array( 'pool' => '' ) ) );
+		}
+
 		if ( $cache ) {
 			set_transient( tara_radio_cache_key( $cache_args ), $ids, 3 * MINUTE_IN_SECONDS );
 		}
 
 		return $ids;
+	}
+}
+
+if ( ! function_exists( 'tara_radio_artist_id' ) ) {
+	/**
+	 * شناسهٔ خوانندهٔ یک آهنگ (۰ = نامعلوم).
+	 *
+	 * @param int $post_id شناسه.
+	 * @return int
+	 */
+	function tara_radio_artist_id( $post_id ) {
+		$tax = function_exists( 'tara_artist_tax' ) ? tara_artist_tax() : 'artist';
+		if ( ! function_exists( 'get_the_terms' ) ) {
+			return 0;
+		}
+		$terms = get_the_terms( (int) $post_id, $tax );
+		if ( is_array( $terms ) && ! empty( $terms ) && isset( $terms[0]->term_id ) ) {
+			return (int) $terms[0]->term_id;
+		}
+		return 0;
+	}
+}
+
+if ( ! function_exists( 'tara_radio_interleave' ) ) {
+	/**
+	 * چیدمانِ هوشمندِ صف: تا جای ممکن دو آهنگِ پشتِ‌سرِهم از یک خواننده نیاید.
+	 *
+	 * چرا؟ شنوندهٔ رادیو بعد از دو دقیقه اگر دو قطعهٔ متوالی از یک هنرمند
+	 * بشنود، حس می‌کند صف دستی چیده شده. این تابع با یک انتخابِ حریصانه
+	 * (O(n²) روی حداکثر ۴۰ آهنگ) ترتیب را بازمی‌چیند و ترتیبِ اصلی را
+	 * تا جایی که ممکن است نگه می‌دارد.
+	 *
+	 * @param int[] $ids شناسه‌ها.
+	 * @return int[]
+	 */
+	function tara_radio_interleave( $ids ) {
+		$pool = array_values( array_map( 'absint', (array) $ids ) );
+		if ( count( $pool ) < 3 ) {
+			return $pool;
+		}
+
+		if ( function_exists( 'update_object_term_cache' ) ) {
+			update_object_term_cache( $pool, 'post' );
+		}
+
+		$artist = array();
+		foreach ( $pool as $post_id ) {
+			$artist[ $post_id ] = tara_radio_artist_id( $post_id );
+		}
+
+		$out     = array();
+		$last    = 0;
+		$has_last = false;
+
+		while ( ! empty( $pool ) ) {
+			$pick     = null;
+			$pick_idx = 0;
+
+			foreach ( $pool as $i => $post_id ) {
+				$a = $artist[ $post_id ];
+				if ( ! $has_last || 0 === $a || $a !== $last ) {
+					$pick     = $post_id;
+					$pick_idx = $i;
+					break;
+				}
+			}
+
+			if ( null === $pick ) {
+				$pick     = $pool[0];
+				$pick_idx = 0;
+			}
+
+			$out[]    = $pick;
+			$last     = $artist[ $pick ];
+			$has_last = true;
+			array_splice( $pool, $pick_idx, 1 );
+		}
+
+		return $out;
 	}
 }
 
@@ -448,6 +563,7 @@ if ( ! function_exists( 'tara_radio_tracks' ) ) {
 				'mode'     => (string) tara_radio_option( 'mode', 'mixed' ),
 				'limit'    => (int) tara_radio_option( 'limit', 20 ),
 				'exclude'  => array(),
+				'pool'     => '',
 			)
 		);
 		$tracks = array();
@@ -514,6 +630,8 @@ if ( ! function_exists( 'tara_radio_ajax' ) ) {
 			}
 		}
 
+		$featured = ! empty( $_GET['featured'] ) && '1' === (string) wp_unslash( $_GET['featured'] );
+
 		$tracks = tara_radio_tracks(
 			array(
 				'taxonomy' => $taxonomy,
@@ -521,6 +639,7 @@ if ( ! function_exists( 'tara_radio_ajax' ) ) {
 				'mode'     => $mode,
 				'limit'    => $limit,
 				'exclude'  => $exclude,
+				'pool'     => $featured ? 'featured' : '',
 			)
 		);
 
@@ -530,6 +649,7 @@ if ( ! function_exists( 'tara_radio_ajax' ) ) {
 				'mode'   => $mode,
 				'tax'    => $taxonomy,
 				'term'   => $term_id,
+				'featured' => $featured,
 				'empty'  => empty( $tracks ),
 			)
 		);

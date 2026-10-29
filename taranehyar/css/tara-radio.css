@@ -464,7 +464,7 @@
 
 .ty-radio__buffer { background: rgba(255, 255, 255, 0.16); }
 .ty-radio__fill {
-	background: linear-gradient(90deg, var(--rd-a1), var(--rd-a3));
+	background: linear-gradient(to left, var(--rd-a1), var(--rd-a3));
 	box-shadow: 0 0 16px rgba(34, 211, 238, 0.45);
 }
 
@@ -474,6 +474,11 @@
 	background: transparent;
 	direction: ltr;
 }
+
+/* نوارِ زمان در راست‌به‌چپ: کمینه سمتِ راست و بیشینه سمتِ چپ؛ پس هم
+   دستهٔ نوار و هم خطِ پرشدن از راست به چپ حرکت می‌کنند. (پیش از این
+   دسته برعکس می‌رفت و با خط هم‌جهت نبود.) */
+.ty-radio__range--seek { direction: rtl; }
 
 .ty-radio__seek .ty-radio__range {
 	position: absolute;
@@ -998,15 +1003,15 @@
 /* =========================================================================
    ۱۰) بخشِ صفحهٔ اصلی
    ====================================================================== */
-.ty-radio-home { margin: 30px auto; }
+.ty-radio-home { margin: 26px auto; }
 
 .ty-radio-home__head {
 	display: flex;
 	flex-wrap: wrap;
-	align-items: flex-end;
+	align-items: center;
 	justify-content: space-between;
-	gap: 10px 20px;
-	margin-bottom: 12px;
+	gap: 8px 16px;
+	margin-bottom: 10px;
 }
 
 .ty-radio-home__eyebrow {
@@ -1022,11 +1027,32 @@
 .ty-radio-home__eyebrow i { font-size: 15px; }
 
 .ty-radio-home__title {
-	margin: 6px 0 4px;
-	font-size: clamp(19px, 2.2vw, 26px);
+	display: inline-flex;
+	align-items: center;
+	gap: 9px;
+	margin: 0;
+	font-size: clamp(16px, 2vw, 22px);
 	font-weight: 700;
-	line-height: 1.5;
+	line-height: 1.6;
 	color: var(--ty-ink, var(--ab-text, #111));
+}
+
+.ty-radio-home__title i { color: var(--ty-accent, var(--ab-blue, #185adb)); font-size: 1.1em; }
+
+.ty-radio-home__flag {
+	padding: 3px 9px;
+	border-radius: 999px;
+	background: var(--ty-accent-soft, rgba(24, 90, 219, 0.1));
+	color: var(--ty-accent, var(--ab-blue, #185adb));
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.2px;
+}
+
+body.night .ty-radio-home__flag,
+html[data-tara-night="1"] .ty-radio-home__flag {
+	background: rgba(34, 211, 238, 0.14);
+	color: #9be9f7;
 }
 
 .ty-radio-home__sub {
@@ -1463,10 +1489,239 @@ html[data-tara-night="1"] .ty-radio-page__steps li {
 	.ty-radio-add--single:hover { transform: none; }
 }
 
-/* در گوشی، ردیف آهنگ سه‌ستونه است (تاریخ و برچسب پنهان می‌شوند)؛ دکمهٔ
-   «افزودن به رادیو» باید ستونِ چهارم را بگیرد تا به سطر دوم نیفتد. */
 @media (max-width: 640px) {
-	.ty-track { grid-template-columns: 34px 42px minmax(0, 1fr) auto; }
-	.ty-track .ty-radio-add { margin-inline-start: 0; }
 	.ty-radio-add--row { width: 28px; height: 28px; }
+}
+
+/* =========================================================================
+   ۱۷) «تنظیماتِ دی‌جی» و حالتِ فشرده — v3.9.1
+   ---------------------------------------------------------------------
+   هدف: کارت در نگاهِ اول کوچک و روشن باشد؛ کنترل‌های حرفه‌ای (طولِ میکس،
+   شدت، منبع، فهرستِ من، خروجی) یک لایه عقب‌تر بروند و فضای گوشی را
+   نگیرند. هیچ قابلیتی حذف نشده؛ فقط «جمع» شده است.
+   ====================================================================== */
+.ty-radio__adv {
+	margin-top: 4px;
+	border-top: 1px solid var(--rd-line);
+	padding-top: 2px;
+}
+
+.ty-radio__more {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px 2px 4px;
+	margin: 0;
+	cursor: pointer;
+	list-style: none;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--rd-text);
+	user-select: none;
+}
+
+.ty-radio__more::-webkit-details-marker { display: none; }
+.ty-radio__more::marker { content: ""; }
+
+.ty-radio__more i {
+	font-size: 15px;
+	color: var(--rd-a3);
+	transition: transform 0.25s ease;
+}
+
+.ty-radio__more em {
+	font-style: normal;
+	font-weight: 500;
+	font-size: 11px;
+	color: var(--rd-muted);
+	margin-inline-start: auto;
+	text-align: end;
+}
+
+.ty-radio__more::after {
+	content: "";
+	width: 8px;
+	height: 8px;
+	margin-inline-start: 6px;
+	border-inline-end: 1.8px solid var(--rd-muted);
+	border-block-end: 1.8px solid var(--rd-muted);
+	transform: rotate(45deg);
+	transition: transform 0.25s ease;
+	flex: 0 0 auto;
+}
+
+.ty-radio__adv[open] > .ty-radio__more::after { transform: rotate(-135deg); }
+.ty-radio__adv[open] > .ty-radio__more em { opacity: 0; }
+
+.ty-radio__advbody {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 10px 0 4px;
+	animation: rd-adv 0.28s ease both;
+}
+
+@keyframes rd-adv {
+	from { opacity: 0; transform: translateY(-4px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+.ty-radio__adv .ty-radio__sources { margin: 0; }
+.ty-radio__adv .ty-radio__tools { margin-top: 2px; }
+
+/* ---- حالتِ فشرده (صفحهٔ اصلی) ---- */
+.ty-radio--compact {
+	padding: 16px clamp(13px, 2.6vw, 22px) 16px;
+	border-radius: 22px;
+	margin: 0 0 6px;
+}
+
+.ty-radio--compact .ty-radio__head { margin-bottom: 12px; gap: 8px; }
+.ty-radio--compact .ty-radio__title { font-size: clamp(15px, 2vw, 19px); margin: 8px 0 0; }
+.ty-radio--compact .ty-radio__live { font-size: 10px; padding: 4px 10px; }
+.ty-radio--compact .ty-radio__deck {
+	grid-template-columns: clamp(112px, 22vw, 168px) minmax(0, 1fr);
+	gap: 14px;
+	align-items: start;
+}
+.ty-radio--compact .ty-radio__artwrap { border-radius: 18px; max-width: 168px; }
+.ty-radio--compact .ty-radio__start-ico { width: 52px; height: 52px; font-size: 20px; }
+.ty-radio--compact .ty-radio__start-txt { display: none; }
+.ty-radio--compact .ty-radio__vu { height: 30px; inset-inline: 7px; bottom: 7px; gap: 2px; }
+.ty-radio--compact .ty-radio__console { gap: 10px; }
+.ty-radio--compact .ty-radio__song { font-size: 15px; }
+.ty-radio--compact .ty-radio__artist { font-size: 11.5px; }
+.ty-radio--compact .ty-radio__seek { padding-top: 0; gap: 9px; }
+.ty-radio--compact .ty-radio__time { min-width: 68px; font-size: 10px; }
+.ty-radio--compact .ty-radio__seek .ty-radio__range { width: calc(100% - 78px); }
+.ty-radio--compact .ty-radio__tbtn { width: 38px; height: 38px; font-size: 15px; }
+.ty-radio--compact .ty-radio__tbtn--main { width: 50px; height: 50px; font-size: 19px; }
+.ty-radio--compact .ty-radio__transport { gap: 10px; }
+.ty-radio--compact .ty-radio__timeline { margin-top: 14px; }
+.ty-radio--compact .ty-radio__queue { max-height: 168px; grid-template-columns: 1fr; }
+.ty-radio--compact .ty-radio__row { padding: 5px 7px; gap: 8px; }
+.ty-radio--compact .ty-radio__rowart { width: 32px; height: 32px; border-radius: 9px; }
+.ty-radio--compact .ty-radio__rowmeta strong { font-size: 11.5px; }
+.ty-radio--compact .ty-radio__rowmeta em { font-size: 10px; }
+.ty-radio--compact .ty-radio__tlhead { margin-bottom: 6px; }
+.ty-radio--compact .ty-radio__tlhead h3 { font-size: 12.5px; }
+
+/* در گوشی، کارتِ فشرده یک‌ستونه اما کم‌ارتفاع می‌شود: کاور کوچک می‌ماند
+   و کنترل‌ها کنارش می‌نشینند (نه زیرِ هم). */
+@media (max-width: 560px) {
+	.ty-radio--compact .ty-radio__deck { grid-template-columns: 96px minmax(0, 1fr); gap: 12px; }
+	.ty-radio--compact .ty-radio__artwrap { max-width: 96px; border-radius: 16px; }
+	.ty-radio--compact .ty-radio__start-ico { width: 44px; height: 44px; font-size: 17px; }
+	.ty-radio--compact .ty-radio__vu { display: none; }
+	.ty-radio--compact .ty-radio__head { margin-bottom: 10px; }
+	.ty-radio--compact .ty-radio__queue { max-height: 132px; }
+	.ty-radio--compact .ty-radio__timeline { margin-top: 10px; }
+	.ty-radio--compact.ty-radio { padding: 14px 12px 13px; }
+	.ty-radio--compact .ty-radio__more em { display: none; }
+	.ty-radio--compact .ty-radio__transport { gap: 8px; }
+	.ty-radio--compact .ty-radio__tbtn { width: 34px; height: 34px; font-size: 13px; }
+	.ty-radio--compact .ty-radio__tbtn--main { width: 44px; height: 44px; font-size: 17px; }
+}
+
+/* ---- نوشتهٔ معرفی (وقتی گفتار در دسترس نیست، دستِ‌کم دیده می‌شود) ---- */
+.ty-radio__say {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 2px 0 0;
+	padding: 9px 13px;
+	border-radius: 12px;
+	border: 1px solid rgba(34, 211, 238, 0.32);
+	background: rgba(34, 211, 238, 0.09);
+	color: #d9fbff;
+	font-size: 11.5px;
+	line-height: 1.9;
+	animation: rd-say 0.3s ease both;
+}
+
+.ty-radio__say::before {
+	content: "";
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: var(--rd-a3);
+	box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.18);
+	flex: 0 0 auto;
+	animation: rd-saypulse 1.6s ease-in-out infinite;
+}
+
+@keyframes rd-saypulse {
+	0% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.45); }
+	70% { box-shadow: 0 0 0 7px rgba(34, 211, 238, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(34, 211, 238, 0); }
+}
+
+.ty-radio__say[hidden] { display: none; }
+
+@keyframes rd-say {
+	from { opacity: 0; transform: translateY(-3px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ty-radio__advbody,
+	.ty-radio__say { animation: none !important; }
+	.ty-radio__more i,
+	.ty-radio__more::after { transition: none !important; }
+}
+
+.ty-radio-home__live {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 10px;
+	border-radius: 999px;
+	font-size: 10.5px;
+	font-weight: 700;
+	color: #b3143b;
+	background: rgba(244, 63, 94, 0.1);
+	border: 1px solid rgba(244, 63, 94, 0.28);
+	margin-inline-start: auto;
+}
+
+body.night .ty-radio-home__live,
+html[data-tara-night="1"] .ty-radio-home__live {
+	color: #ffd9e2;
+	background: rgba(244, 63, 94, 0.16);
+	border-color: rgba(244, 63, 94, 0.34);
+}
+
+.ty-radio-home__live .ty-radio__pulse {
+	position: static;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #e11d48;
+	animation: rd-live 1.6s ease-in-out infinite;
+}
+
+@keyframes rd-live {
+	0%, 100% { opacity: 1; transform: scale(1); }
+	50% { opacity: 0.45; transform: scale(0.78); }
+}
+
+@media (max-width: 560px) {
+	.ty-radio-home__live { display: none; }
+}
+
+/* =========================================================================
+   ۱۸) ردیفِ آهنگ با دکمهٔ «افزودن به رادیو» — v3.9.1
+   ---------------------------------------------------------------------
+   `.ty-track` پنج ستون دارد (پخش | کاور | متن | برچسب | تاریخ). با دکمهٔ
+   رادیو، ستونِ ششم لازم است؛ بدونِ آن، دکمه به سطرِ دوم می‌افتاد.
+   ====================================================================== */
+.ty-track--radio {
+	grid-template-columns: 38px 48px minmax(0, 1fr) auto auto auto;
+}
+
+.ty-track--radio .ty-radio-add { margin-inline-start: 0; }
+
+@media (max-width: 640px) {
+	.ty-track--radio { grid-template-columns: 34px 42px minmax(0, 1fr) auto; }
+	.ty-track--radio .ty-track__cover { display: none; }
 }

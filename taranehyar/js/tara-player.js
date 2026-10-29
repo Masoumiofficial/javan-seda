@@ -1508,12 +1508,83 @@
 		}, true);
 
 		var header = document.getElementById('header');
-		if (header) {
+		var mheader = document.getElementById('mobiles_header');
+		if (header || mheader) {
+			/* v3.11.0 — هدر با اسکرول به پایین پنهان می‌شود و با برگشتن به بالا
+			   دوباره می‌آید (درخواستِ صریح: فضای خواندنِ صفحهٔ آهنگ بیشتر شود).
+			   آستانه‌ها عمدی‌اند: تا ۱۶۰ پیکسل هیچ‌وقت پنهان نمی‌شود تا کاربر
+			   تازه‌وارد حسِ «هدرِ گم‌شده» نگیرد، و حرکتِ کمتر از ۶ پیکسل
+			   (لرزشِ انگشت/ترک‌پد) نادیده گرفته می‌شود. */
+			var lastY = window.scrollY || 0;
+			var ticking = false;
+			/* v3.11.0 — دکمهٔ «باز/بستنِ منو»ی گوشی هم همان کلاس را می‌گیرد
+			   (منوی کشویی داخلِ هدرِ موبایل است؛ پنهان‌شدنِ هدر با منوی باز
+			   یعنی ناپدید شدنِ خودِ منو — این حالت را مسدود می‌کنیم). */
+			var menuOpen = function () {
+				var veil = document.querySelector('.bodydeactive');
+				return !!(veil && window.getComputedStyle(veil).display !== 'none');
+			};
+			var setHidden = function (on) {
+				if (header) {
+					header.classList.toggle('is-hidden', on);
+				}
+				if (mheader && !menuOpen()) {
+					mheader.classList.toggle('is-hidden', on);
+				} else if (mheader) {
+					mheader.classList.remove('is-hidden');
+				}
+			};
 			var onChange = function () {
-				header.classList.toggle('is-stuck', window.scrollY > 40);
+				var y = Math.max(0, window.scrollY || 0);
+				if (header) {
+					header.classList.toggle('is-stuck', y > 40);
+				}
+
+				if (Math.abs(y - lastY) > 6) {
+					var goingDown = y > lastY;
+					if (goingDown && y > 160) {
+						setHidden(true);
+					} else if (!goingDown) {
+						setHidden(false);
+					}
+					lastY = y;
+				}
+
+				if (y <= 8) {
+					setHidden(false);
+					lastY = y;
+				}
+
+				ticking = false;
+			};
+			var onScroll = function () {
+				if (ticking) {
+					return;
+				}
+				ticking = true;
+				window.requestAnimationFrame(onChange);
 			};
 			onChange();
-			window.addEventListener('scroll', onChange, { passive: true });
+			window.addEventListener('scroll', onScroll, { passive: true });
+
+			/* باز شدنِ منو یا فوکوس روی هدر باید همیشه هدر را برگرداند */
+			if (header) {
+				header.addEventListener('focusin', function () {
+					header.classList.remove('is-hidden');
+				});
+			}
+			if (mheader) {
+				mheader.addEventListener('focusin', function () {
+					mheader.classList.remove('is-hidden');
+				});
+				/* باز شدنِ منو با کلیک روی همبرگر ⇒ هدر فوراً برگردد */
+				mheader.addEventListener('click', function (event) {
+					var burger = event.target.closest ? event.target.closest('.navicon') : null;
+					if (burger) {
+						mheader.classList.remove('is-hidden');
+					}
+				});
+			}
 		}
 
 		var top = document.querySelector('.top_page');
@@ -1643,7 +1714,7 @@
 
 		/* نشانهٔ سلامت برای عیب‌یابی: اگر این صفت روی <html> نبود، یعنی همین فایل
 		   اجرا نشده است (کش/CDN/خطای اسکریپت). */
-		document.documentElement.setAttribute('data-tara-ready', '3.10.1');
+		document.documentElement.setAttribute('data-tara-ready', '3.11.0');
 
 		/* v3.7.7 — وقتی کاربر با دکمهٔ Esc یا ژست بومی از تمام‌صفحه بیرون
 		   می‌آید، کلاس‌ها و قفل چرخش باید پاک شوند؛ وگرنه صفحه سیاه/

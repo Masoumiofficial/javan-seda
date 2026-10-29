@@ -515,6 +515,12 @@
 			}
 			return;
 		}
+		if (closest(t, '[data-tara-tg-refresh]')) {
+			event.preventDefault();
+			window.location.reload();
+			return;
+		}
+
 		if (closest(t, '[data-tara-tg-unlink]')) {
 			event.preventDefault();
 			post({ do: 'tg-unlink' }).then(function (json) {
@@ -605,20 +611,18 @@
 						msg(form, (json.data && json.data.message) || 'ذخیره نشد.');
 						return;
 					}
-					var avatar = (form.querySelector('input[name="avatar"]') || {}).value || '';
-					return post({ do: 'avatar-url', url: avatar }).then(function (res) {
-						setBusy(save, false);
-						msg(form, (CFG.labels && CFG.labels.saved) || 'ذخیره شد.', 'ok');
-						toast((CFG.labels && CFG.labels.saved) || 'ذخیره شد.', 'ok');
-						var img = q('[data-tara-avatar-img]');
-						if (img && res.success && res.data && res.data.url) {
-							img.src = res.data.url;
-						}
-						var head = q('.ty-acct-head__title');
-						if (head && json.data && json.data.name) {
-							head.textContent = json.data.name;
-						}
-					});
+					/* v3.11.0 — تصویر جدا و با فایل آپلود می‌شود؛ این فرم فقط نام و توضیح را می‌فرستد. */
+					setBusy(save, false);
+					msg(form, (CFG.labels && CFG.labels.saved) || 'ذخیره شد.', 'ok');
+					toast((CFG.labels && CFG.labels.saved) || 'ذخیره شد.', 'ok');
+					var nameNode = q('.ty-acct__name');
+					if (nameNode && json.data && json.data.name) {
+						nameNode.textContent = json.data.name;
+					}
+					var txtNode = q('.ty-acct-btn--desktop .ty-acct-btn__txt');
+					if (txtNode && json.data && json.data.name) {
+						txtNode.textContent = json.data.name;
+					}
 				})
 				.catch(function () {
 					setBusy(save, false);
@@ -929,8 +933,11 @@
 				if (box) {
 					box.hidden = false;
 				}
-				if (link && json.data.deeplink) {
-					link.href = json.data.deeplink;
+				/* v3.11.0 — «رفتن به ربات» فقط بعد از ساختِ کد و به‌عنوانِ گامِ بعد
+				   ظاهر می‌شود (پیش از این دو دکمهٔ هم‌وزن بود و کاربر سردرگم می‌شد).
+				   لینک آگاهانه ساده است (`t.me/<bot>`) چون ربات کد را از متنِ چت
+				   می‌خواند، نه از پارامترِ start. */
+				if (link) {
 					link.hidden = false;
 				}
 				copy(json.data.code);
@@ -963,8 +970,113 @@
 
 	/* ------------------------------------------------------- شروع */
 
+	/* ------------------------------------------------------------------
+	 * v3.11.0 — آپلودِ تصویرِ پروفایل
+	 * فایل به همان نقطهٔ پایانیِ AJAX با FormData می‌رود و بعد از موفقیت،
+	 * پیش‌نمایشِ پنل و تصویرِ کوچکِ هدر با هم عوض می‌شوند.
+	 * ---------------------------------------------------------------- */
+	function avatarMessage(text, kind) {
+		var box = q('[data-tara-avatar-msg]');
+		if (!box) {
+			return;
+		}
+		box.textContent = text || '';
+		box.className = 'ty-acct-form__msg' + (kind ? ' is-' + kind : '');
+	}
+
+	function paintAvatar(url) {
+		if (!url) {
+			return;
+		}
+		var main = q('[data-tara-avatar-img]');
+		if (main) {
+			main.src = url;
+		}
+		var preview = q('[data-tara-avatar-preview]');
+		if (preview) {
+			preview.src = url;
+		}
+		var heads = q('[data-tara-avatar-head]');
+		if (heads) {
+			heads.src = url;
+		}
+		var btnImg = q('.ty-acct-btn--desktop .ty-acct-btn__img, .ty-acct-btn--mobile .ty-acct-btn__img');
+		if (btnImg) {
+			btnImg.src = url;
+		}
+	}
+
+	function uploadAvatar(file) {
+		if (!file) {
+			return;
+		}
+		if (!/^image\//.test(file.type || '')) {
+			avatarMessage('فقط فایلِ تصویری پذیرفته می‌شود.', 'err');
+			return;
+		}
+		if (file.size > 2 * 1024 * 1024) {
+			avatarMessage('حجمِ تصویر باید کمتر از ۲ مگابایت باشد.', 'err');
+			return;
+		}
+
+		var form = new FormData();
+		form.append('action', 'tara_account');
+		form.append('nonce', NONCE);
+		form.append('do', 'avatar');
+		form.append('avatar', file, file.name || 'avatar.jpg');
+
+		avatarMessage((CFG.labels && CFG.labels.sending) || 'در حال ارسال…');
+
+		window
+			.fetch(API, { method: 'POST', credentials: 'same-origin', body: form })
+			.then(function (res) {
+				return res.json();
+			})
+			.then(function (json) {
+				if (!json || !json.success) {
+					avatarMessage((json && json.data && json.data.message) || 'آپلود انجام نشد.', 'err');
+					return;
+				}
+				paintAvatar(json.data && json.data.url);
+				avatarMessage('تصویرِ پروفایل عوض شد.', 'ok');
+				toast('تصویرِ پروفایل عوض شد.', 'ok');
+			})
+			.catch(function () {
+				avatarMessage((CFG.labels && CFG.labels.error) || 'خطا', 'err');
+			});
+	}
+
 	function boot() {
 		modal = q('#ty-acct-modal');
+
+		/* انتخابِ فایل ⇒ آپلودِ فوری */
+		doc.addEventListener('change', function (event) {
+			var input = event.target;
+			if (input && input.matches && input.matches('[data-tara-avatar-file]')) {
+				uploadAvatar(input.files && input.files[0]);
+			}
+		});
+
+		/* حذفِ تصویر */
+		doc.addEventListener('click', function (event) {
+			var btn = closest(event.target, '[data-tara-avatar-remove]');
+			if (!btn) {
+				return;
+			}
+			event.preventDefault();
+			btn.classList.add('is-busy');
+			post({ do: 'avatar-remove' })
+				.then(function (json) {
+					btn.classList.remove('is-busy');
+					if (json.success) {
+						paintAvatar(json.data && json.data.url);
+						avatarMessage('تصویر برداشته شد.', 'ok');
+					}
+				})
+				.catch(function () {
+					btn.classList.remove('is-busy');
+				});
+		});
 		if (modal && (window.location.hash === '#login' || window.location.search.indexOf('login=1') !== -1)) {
 			openModal();
 		}

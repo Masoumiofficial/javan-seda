@@ -76,6 +76,8 @@ if ( ! function_exists( 'tara_acc_defaults' ) ) {
 			'tg_token'       => '',              // توکنِ ۶۴رقمیِ REST برای ربات
 			'tg_code_ttl'    => 600,             // عمرِ کدِ اتصال به ربات
 			'tg_song'        => 'on',            // دکمهٔ «مشاهده در ربات» زیرِ لینک‌های دانلود
+			'help_url'       => '',              // لینکِ «راهنمای ورود و ثبت‌نام»
+			'help_text'      => 'راهنمای ورود',   // متنِ همان لینک
 		);
 
 		return apply_filters( 'tara_acc_defaults', $defaults );
@@ -865,6 +867,110 @@ if ( ! function_exists( 'tara_acc_avatar_url' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_acc_avatar_upload' ) ) {
+	/**
+	 * ذخیرهٔ تصویرِ پروفایلِ آپلودی (v3.11.0).
+	 *
+	 * چرا فایل و نه آدرس: کاربر گفت «آدرسِ تصویر را بردار و امکانِ آپلود بگذار».
+	 * فایل در کتابخانهٔ رسانه ذخیره می‌شود (wp_handle_upload + media_handle_upload)
+	 * و شناسهٔ پیوست در متای `tara_avatar` می‌نشیند؛ آدرسِ قبلی هم پاک می‌شود تا
+	 * تصویرِ تازه همیشه مقدم باشد.
+	 *
+	 * @param int   $user_id  شناسهٔ کاربر.
+	 * @param array $file     یک عضو از $_FILES.
+	 * @return string|WP_Error آدرسِ تصویر یا خطا.
+	 */
+	function tara_acc_avatar_upload( $user_id, $file ) {
+		$user_id = (int) $user_id;
+		if ( $user_id <= 0 ) {
+			return new WP_Error( 'tara_avatar_user', 'کاربر پیدا نشد.' );
+		}
+		if ( ! is_array( $file ) || empty( $file['tmp_name'] ) || ! isset( $file['error'] ) || 0 !== (int) $file['error'] ) {
+			return new WP_Error( 'tara_avatar_file', 'فایلی انتخاب نشده یا ارسالِ آن کامل نشد.' );
+		}
+
+		$max = (int) apply_filters( 'tara_acc_avatar_max_bytes', 2 * 1024 * 1024 );
+		if ( isset( $file['size'] ) && (int) $file['size'] > $max ) {
+			return new WP_Error( 'tara_avatar_size', 'حجمِ تصویر باید کمتر از ۲ مگابایت باشد.' );
+		}
+
+		$allowed = (array) apply_filters( 'tara_acc_avatar_mimes', array( 'jpg|jpeg|jpe' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif' ) );
+
+		/* پسوند و نوعِ واقعیِ فایل بررسی می‌شود؛ فقط تصویر. */
+		$check = function_exists( 'wp_check_filetype_and_ext' ) ? wp_check_filetype_and_ext( $file['tmp_name'], isset( $file['name'] ) ? $file['name'] : '' ) : array( 'type' => '' );
+		if ( empty( $check['type'] ) || 0 !== strpos( (string) $check['type'], 'image/' ) ) {
+			return new WP_Error( 'tara_avatar_type', 'فقط فایلِ تصویری (JPG، PNG، WebP یا GIF) پذیرفته می‌شود.' );
+		}
+
+		if ( ! function_exists( 'media_handle_upload' ) ) {
+			$core = defined( 'ABSPATH' ) ? ABSPATH . 'wp-admin/includes/' : '';
+			foreach ( array( 'file.php', 'media.php', 'image.php' ) as $tara_core_file ) {
+				if ( '' !== $core && is_readable( $core . $tara_core_file ) ) {
+					require_once $core . $tara_core_file;
+				}
+			}
+		}
+
+		if ( ! function_exists( 'media_handle_upload' ) ) {
+			return new WP_Error( 'tara_avatar_env', 'کتابخانهٔ رسانهٔ وردپرس در دسترس نیست.' );
+		}
+
+		$_FILES['tara_avatar_tmp'] = $file;
+
+		$attachment_id = media_handle_upload(
+			'tara_avatar_tmp',
+			0,
+			array(),
+			array( 'test_form' => false, 'mimes' => $allowed )
+		);
+
+		unset( $_FILES['tara_avatar_tmp'] );
+
+		if ( function_exists( 'is_wp_error' ) && is_wp_error( $attachment_id ) ) {
+			return new WP_Error( 'tara_avatar_save', $attachment_id->get_error_message() );
+		}
+
+		$attachment_id = (int) $attachment_id;
+		if ( $attachment_id <= 0 ) {
+			return new WP_Error( 'tara_avatar_save', 'ذخیرهٔ تصویر انجام نشد.' );
+		}
+
+		/* تصویرِ قبلی اگر خودمان آپلود کرده بودیم، از کتابخانهٔ رسانه هم برداشته
+		   می‌شود تا فایل‌های بی‌استفاده روی هاست انبار نشوند. */
+		$previous = (int) get_user_meta( $user_id, 'tara_avatar', true );
+		if ( $previous > 0 && $previous !== $attachment_id && function_exists( 'wp_delete_attachment' ) ) {
+			if ( (int) get_post_meta( $previous, '_tara_avatar_of', true ) === $user_id ) {
+				wp_delete_attachment( $previous, true );
+			}
+		}
+
+		update_user_meta( $user_id, 'tara_avatar', $attachment_id );
+		delete_user_meta( $user_id, 'tara_avatar_url' );
+
+		if ( function_exists( 'update_post_meta' ) ) {
+			update_post_meta( $attachment_id, '_tara_avatar_of', $user_id );
+		}
+
+		return tara_acc_avatar_url( $user_id, 160 );
+	}
+}
+
+if ( ! function_exists( 'tara_acc_avatar_remove' ) ) {
+	/**
+	 * برداشتنِ تصویرِ پروفایل (بازگشت به تصویرِ پیش‌فرض/گراواتار).
+	 *
+	 * @param int $user_id شناسهٔ کاربر.
+	 * @return string آدرسِ تصویرِ جایگزین.
+	 */
+	function tara_acc_avatar_remove( $user_id ) {
+		$user_id = (int) $user_id;
+		delete_user_meta( $user_id, 'tara_avatar' );
+		delete_user_meta( $user_id, 'tara_avatar_url' );
+
+		return tara_acc_avatar_url( $user_id, 160 );
+	}
+}
+
 if ( ! function_exists( 'tara_acc_profile_url' ) ) {
 	/**
 	 * آدرسِ پنلِ کاربری (با تبِ دلخواه).
@@ -1572,6 +1678,8 @@ if ( ! function_exists( 'tara_acc_unread' ) ) {
 		}
 		if ( tara_acc_feature( 'notifs' ) ) {
 			$count += count( tara_acc_feed( $user_id, array( 'since' => (int) tara_acc_meta( $user_id, 'feed_seen', 0 ), 'limit' => 20 ) ) );
+			/* v3.11.0 — اعلان‌های مدیر هم در شمارندهٔ پیام‌های نو حساب می‌شوند. */
+			$count += tara_acc_notice_unseen( $user_id );
 		}
 		return max( 0, $count );
 	}
@@ -1595,6 +1703,9 @@ if ( ! function_exists( 'tara_acc_notifs_read' ) ) {
 		}
 		tara_acc_save( $user_id, 'notifs', $list );
 		tara_acc_save( $user_id, 'feed_seen', time() );
+		if ( function_exists( 'tara_acc_notice_mark' ) ) {
+			tara_acc_notice_mark( $user_id );
+		}
 	}
 }
 
@@ -1746,6 +1857,195 @@ if ( ! function_exists( 'tara_acc_user_by_tg' ) ) {
 			return (int) $users[0]->ID;
 		}
 		return 0;
+	}
+}
+
+if ( ! function_exists( 'tara_acc_notice_on' ) ) {
+	/** آیا بخشِ «اعلان‌های مدیر» روشن است؟ (پیش‌فرض: روشن) */
+	function tara_acc_notice_on() {
+		return 'on' === (string) ot_get_option( 'notice_on', 'on' );
+	}
+}
+
+if ( ! function_exists( 'tara_acc_notice_title' ) ) {
+	/**
+	 * عنوانِ بخشِ اعلان‌ها از تنظیماتِ قالب.
+	 *
+	 * @return string
+	 */
+	function tara_acc_notice_title() {
+		$title = trim( (string) ot_get_option( 'notice_title', '' ) );
+
+		return '' !== $title ? $title : 'اعلان‌ها و بروزرسانی‌ها';
+	}
+}
+
+if ( ! function_exists( 'tara_acc_notice_date' ) ) {
+	/**
+	 * تاریخِ آخرین بروزرسانی (متنِ آزاد از تنظیمات).
+	 *
+	 * @return string
+	 */
+	function tara_acc_notice_date() {
+		return trim( (string) ot_get_option( 'notice_date', '' ) );
+	}
+}
+
+if ( ! function_exists( 'tara_acc_notice_list' ) ) {
+	/**
+	 * فهرستِ اعلان‌های مدیر از تنظیماتِ قالب → «اعلان‌ها و بروزرسانی‌ها».
+	 *
+	 * هر خط یک اعلان است و «|» متن را از لینک جدا می‌کند. خروجی همیشه
+	 * یک آرایهٔ مرتب است (تازه‌ترین بالا نمی‌آید؛ ترتیبِ نوشتن حفظ می‌شود)
+	 * تا مدیر دقیقاً همان چیزی را ببیند که نوشته است.
+	 *
+	 * @return array فهرستی از array( 'n' => متن، 'u' => لینک ).
+	 */
+	function tara_acc_notice_list() {
+		if ( ! tara_acc_notice_on() ) {
+			return array();
+		}
+
+		$raw = (string) ot_get_option( 'notice_text', '' );
+		if ( '' === trim( $raw ) ) {
+			return array();
+		}
+
+		$out   = array();
+		$lines = preg_split( '/\r\n|\r|\n/', $raw );
+		foreach ( (array) $lines as $line ) {
+			$line = trim( $line );
+			if ( '' === $line ) {
+				continue;
+			}
+
+			$url = '';
+			if ( false !== strpos( $line, '|' ) ) {
+				$parts = explode( '|', $line, 2 );
+				$line  = trim( $parts[0] );
+				$url   = trim( $parts[1] );
+			}
+
+			if ( '' === $line ) {
+				continue;
+			}
+
+			$out[] = array(
+				'n' => $line,
+				'u' => '' !== $url ? (string) esc_url_raw( $url ) : '',
+			);
+
+			if ( count( $out ) >= 20 ) {
+				break; // سقفِ سالم برای جلوگیری از فهرستِ بی‌پایان
+			}
+		}
+
+		return (array) apply_filters( 'tara_acc_notice_list', $out );
+	}
+}
+
+if ( ! function_exists( 'tara_acc_notice_count' ) ) {
+	/**
+	 * تعدادِ اعلان‌های مدیر (برای شمارندهٔ «نخوانده» در پنل).
+	 *
+	 * @return int
+	 */
+	function tara_acc_notice_count() {
+		return count( tara_acc_notice_list() );
+	}
+}
+
+if ( ! function_exists( 'tara_acc_notice_sig' ) ) {
+	/**
+	 * اثرِ انگشتِ فهرستِ اعلان‌ها؛ برای فهمیدنِ «اعلانِ تازه آمده یا نه».
+	 *
+	 * @return string
+	 */
+	function tara_acc_notice_sig() {
+		$items = tara_acc_notice_list();
+		if ( empty( $items ) ) {
+			return '';
+		}
+		$flat = array();
+		foreach ( $items as $row ) {
+			$flat[] = $row['n'] . '|' . $row['u'];
+		}
+
+		return substr( md5( implode( "\n", $flat ) ), 0, 16 );
+	}
+}
+
+if ( ! function_exists( 'tara_acc_notice_unseen' ) ) {
+	/**
+	 * تعدادِ اعلان‌های مدیر که کاربر هنوز ندیده (۰ = همه دیده شده).
+	 *
+	 * @param int $user_id شناسهٔ کاربر.
+	 * @return int
+	 */
+	function tara_acc_notice_unseen( $user_id = 0 ) {
+		$user_id = tara_acc_uid( $user_id );
+		$sig     = tara_acc_notice_sig();
+		if ( $user_id <= 0 || '' === $sig ) {
+			return 0;
+		}
+		if ( 'on' !== (string) ot_get_option( 'notice_badge', 'on' ) ) {
+			return 0;
+		}
+		if ( (string) tara_acc_meta( $user_id, 'notice_seen', '' ) === $sig ) {
+			return 0;
+		}
+
+		return tara_acc_notice_count();
+	}
+}
+
+if ( ! function_exists( 'tara_acc_notice_mark' ) ) {
+	/**
+	 * ثبتِ «اعلان‌ها دیده شد» برای همین نسخه از اعلان‌ها.
+	 *
+	 * @param int $user_id شناسهٔ کاربر.
+	 * @return void
+	 */
+	function tara_acc_notice_mark( $user_id = 0 ) {
+		$user_id = tara_acc_uid( $user_id );
+		$sig     = tara_acc_notice_sig();
+		if ( $user_id <= 0 || '' === $sig ) {
+			return;
+		}
+		tara_acc_save( $user_id, 'notice_seen', $sig );
+	}
+}
+
+if ( ! function_exists( 'tara_acc_help_url' ) ) {
+	/**
+	 * آدرسِ «راهنمای ورود و ثبت‌نام» از تنظیماتِ قالب.
+	 *
+	 * قبلاً یک لینکِ ثابت به جست‌وجوی سایت (`/?s=`) بود؛ حالا مدیر هر آدرسی
+	 * بگذارد (برگهٔ راهنما، ویدیوی آموزش، پستِ پرسش‌های رایج…) و اگر خالی
+	 * باشد، لینک اصلاً چاپ نمی‌شود تا چیزی به مقصدِ بی‌ربط نرود.
+	 *
+	 * @return string
+	 */
+	function tara_acc_help_url() {
+		$url = (string) tara_acc_opt( 'help_url' );
+		if ( '' === trim( $url ) ) {
+			return '';
+		}
+
+		return (string) esc_url_raw( $url );
+	}
+}
+
+if ( ! function_exists( 'tara_acc_help_text' ) ) {
+	/**
+	 * متنِ لینکِ راهنما (پیش‌فرض: «راهنمای ورود»).
+	 *
+	 * @return string
+	 */
+	function tara_acc_help_text() {
+		$text = trim( (string) tara_acc_opt( 'help_text' ) );
+
+		return '' !== $text ? $text : 'راهنمای ورود';
 	}
 }
 
@@ -2173,6 +2473,31 @@ if ( ! function_exists( 'tara_acc_ajax' ) ) {
 				break;
 
 			/* ---------- تصویرِ پروفایل ---------- */
+			/* v3.11.0 — آپلودِ تصویرِ پروفایل (فایل، نه آدرس). */
+			case 'avatar':
+				$user_id = tara_acc_require_login();
+				if ( ! $user_id ) {
+					return;
+				}
+				if ( ! tara_acc_feature( 'avatar' ) ) {
+					tara_acc_json_error( 'تغییرِ تصویرِ پروفایل در تنظیماتِ سایت خاموش است.' );
+				}
+				$file = isset( $_FILES['avatar'] ) ? $_FILES['avatar'] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- فایل از media_handle_upload می‌گذرد
+				$res  = tara_acc_avatar_upload( (int) $user_id, $file );
+				if ( function_exists( 'is_wp_error' ) && is_wp_error( $res ) ) {
+					tara_acc_json_error( $res->get_error_message() );
+				}
+				wp_send_json_success( array( 'url' => $res ) );
+				break;
+
+			case 'avatar-remove':
+				$user_id = tara_acc_require_login();
+				if ( ! $user_id ) {
+					return;
+				}
+				wp_send_json_success( array( 'url' => tara_acc_avatar_remove( (int) $user_id ) ) );
+				break;
+
 			case 'avatar-url':
 				$user_id = tara_acc_require_login();
 				if ( ! $user_id ) {

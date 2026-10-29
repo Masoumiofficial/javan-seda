@@ -137,13 +137,13 @@ update_option(
 update_option( 'option_tree', array( 'logo' => 'x', 'index_ct' => 'y' ) );
 
 $sections = taranehyar_panel_sections();
-t( 'بخش‌ها: دوازده بخش (با «رادیو و دی‌جی»، «حساب کاربری»، «دربارهٔ سایت»، «رنگ‌ها» و «توسعه دهنده»)', 12 === count( $sections ), (string) count( $sections ) );
+t( 'بخش‌ها: سیزده بخش (با «رادیو و دی‌جی»، «حساب کاربری»، «اعلان‌ها»، «دربارهٔ سایت»، «رنگ‌ها» و «توسعه دهنده»)', 13 === count( $sections ), (string) count( $sections ) );
 
 $by_id = array();
 foreach ( $sections as $section ) {
 	$by_id[ $section['id'] ] = $section;
 }
-t( 'بخش‌ها: شناسه‌های هم‌نام با فهرست تنظیمات', array( 'general', 'brand', 'homes', 'dl_pages', 'ab_ui', 'radio', 'account', 'footer', 'socials', 'ads1', 'about', 'dev' ) === array_keys( $by_id ) );
+t( 'بخش‌ها: شناسه‌های هم‌نام با فهرست تنظیمات', array( 'general', 'brand', 'homes', 'dl_pages', 'ab_ui', 'radio', 'account', 'notices', 'footer', 'socials', 'ads1', 'about', 'dev' ) === array_keys( $by_id ) );
 t( 'بخش‌ها: شمارش گزینه‌های «همگانی»', 2 === $by_id['general']['count'], (string) $by_id['general']['count'] );
 t( 'بخش‌ها: بخش بدون گزینه صفر است', 0 === $by_id['ads1']['count'] );
 
@@ -184,7 +184,7 @@ t( 'نما: پوشش wrap و dir=rtl', false !== strpos( $html, 'class="wrap ty-
 t( 'نما: نام قالب در سربرگ', false !== strpos( $html, '<h1>ترانه یار</h1>' ) );
 t( 'نما: نسخه در نشان', false !== strpos( $html, 'نسخهٔ 3.6.0' ) );
 t( 'نما: چهار کارت آمار', 4 === substr_count( $html, 'class="ty-stat"' ) );
-t( 'نما: دوازده کارت تنظیمات', 12 === substr_count( $html, 'ty-card--link' ), (string) substr_count( $html, 'ty-card--link' ) );
+t( 'نما: سیزده کارت تنظیمات', 13 === substr_count( $html, 'ty-card--link' ), (string) substr_count( $html, 'ty-card--link' ) );
 t( 'نما: لینک تب‌های OptionTree', false !== strpos( $html, 'page=ot-theme-options&section=ab_ui#section_ab_ui' ) );
 t( 'نما: بررسی سلامت', false !== strpos( $html, 'بررسی سلامت' ) );
 t( 'نما: میان‌بُرها', false !== strpos( $html, 'میان‌بُرها' ) );

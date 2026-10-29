@@ -41,6 +41,15 @@
 .ab-social:hover,.ab-social:focus{border-color:var(--ab-blue);background:var(--ab-blue-soft);color:var(--ab-blue-accent);text-decoration:none}
 .ab-social:hover .ab-social__icon,.ab-social:focus .ab-social__icon{background:var(--ab-blue);color:var(--ab-white)}
 .ab-social:hover .ab-social__arrow,.ab-social:focus .ab-social__arrow{color:var(--ab-blue-accent)}
+
+/* v3.11.0 — «ما را دنبال کنید» در صفحهٔ آهنگ وسط‌چین می‌شود:
+   عنوان، خطِ راهنما و ردیفِ دکمه‌ها/آیکون‌ها همه در یک محور. */
+.single_content_box .ab-social-box__head{justify-content:center;text-align:center;gap:6px}
+.single_content_box .ab-social-box__head>i{margin-left:0}
+.single_content_box .ab-social-box__hint{margin-right:0;width:100%;text-align:center}
+.single_content_box .ab-social-box__row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;text-align:center}
+.single_content_box .ab-social{margin:0}
+
 /* --- نوار چسبانِ پخش (کنترل همان <audio id="audio"> قالب) — 3.2.4 --- */
 /* رنگ‌ها از متغیرهای قالب می‌آیند؛ `.night` همان متغیرها را بازنویسی می‌کند
    ⇒ نوار در حالت شب خودکار تیره می‌شود (مشکل «سفید ماندن» از همین‌جا رفع شد).

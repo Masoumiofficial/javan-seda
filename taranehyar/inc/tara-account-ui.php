@@ -244,8 +244,8 @@ if ( ! function_exists( 'tara_acc_modal' ) ) {
 					<form class="ty-acct-form" data-tara-form="phone" novalidate>
 						<label class="ty-acct-field">
 							<span class="ty-acct-field__label">شمارهٔ موبایل</span>
-							<span class="ty-acct-field__box">
-								<span class="ty-acct-field__pre">+۹۸</span>
+							<span class="ty-acct-field__box ty-acct-field__box--phone">
+								<span class="ty-acct-field__pre" aria-hidden="true">+۹۸</span>
 								<input type="tel" inputmode="numeric" autocomplete="tel-national" name="phone" dir="ltr"
 									placeholder="09121234567" maxlength="13" aria-describedby="ty-acct-phone-hint" required>
 								<?php echo tara_acc_icon( 'phone', 'ty-acct-field__ico' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
@@ -318,7 +318,16 @@ if ( ! function_exists( 'tara_acc_modal' ) ) {
 					<div class="ty-acct-modal__foot">
 						<button type="button" class="ty-acct-link" data-tara-mode="password" <?php echo $allow_password ? '' : 'hidden'; ?>>ورود با رمزِ عبور</button>
 						<button type="button" class="ty-acct-link" data-tara-mode="phone" hidden>ورود با پیامک</button>
-						<a class="ty-acct-modal__help" href="<?php echo esc_url( home_url( '/?s=' ) ); ?>">راهنما</a>
+						<?php
+						/* v3.11.0 — لینکِ راهنما از تنظیمات می‌آید (پیش‌تر ثابت و به
+						   جست‌وجوی سایت بود). خالی ⇒ لینک چاپ نمی‌شود. */
+						$tara_help_url = function_exists( 'tara_acc_help_url' ) ? tara_acc_help_url() : '';
+						if ( '' !== $tara_help_url ) :
+							?>
+							<a class="ty-acct-modal__help" href="<?php echo esc_url( $tara_help_url ); ?>" target="_blank" rel="noopener">
+								<?php echo esc_html( function_exists( 'tara_acc_help_text' ) ? tara_acc_help_text() : 'راهنمای ورود' ); ?>
+							</a>
+						<?php endif; ?>
 					</div>
 
 					<p class="ty-acct-modal__terms">با ورود، قواعدِ سایت و نگه‌داریِ شماره برای ورود را می‌پذیرید. شماره هیچ‌جا عمومی نمایش داده نمی‌شود.</p>
@@ -562,28 +571,63 @@ if ( ! function_exists( 'tara_acc_login_card' ) ) {
 	/**
 	 * کارتِ «وارد شوید» برای کاربرِ مهمان.
 	 *
+	 * v3.11.0 — دو حالتِ جدا: `login` (ورودِ کاربرِ قبلی) و `register`
+	 * (ثبت‌نامِ تازه). متن‌ها و عنوان فرق می‌کنند ولی هر دو یک مسیرِ امنِ
+	 * پیامکی دارند؛ برای همین هیچ فرمِ دومی ساخته نشده و همان مودال باز می‌شود.
+	 *
+	 * @param array $args mode (login|register)، class.
 	 * @return string
 	 */
-	function tara_acc_login_card() {
+	function tara_acc_login_card( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'mode'  => 'login',
+				'class' => '',
+			)
+		);
+		$mode = 'register' === (string) $args['mode'] ? 'register' : 'login';
+		$site = (string) get_bloginfo( 'name' );
+		$help = function_exists( 'tara_acc_help_url' ) ? tara_acc_help_url() : '';
+
+		$class = 'ty-acct-guest ty-acct-guest--' . $mode;
+		if ( '' !== (string) $args['class'] ) {
+			$class .= ' ' . sanitize_html_class( (string) $args['class'] );
+		}
+
+		if ( 'register' === $mode ) {
+			$title = 'ساختِ حساب در ' . $site;
+			$sub   = 'همین حالا با شمارهٔ موبایل حساب بسازید؛ نه رمزی لازم است نه ایمیلی. کدِ پیامکی را وارد کنید و تمام.';
+			$cta   = 'ثبت‌نام با شمارهٔ موبایل';
+		} else {
+			$title = 'حسابِ شما در ' . $site;
+			$sub   = 'با شمارهٔ موبایل در چند ثانیه وارد شوید: آهنگ‌ها را ذخیره کنید، پلی‌لیست بسازید، خواننده‌های محبوبتان را دنبال کنید و آهنگ‌های تازه‌شان را از دست ندهید.';
+			$cta   = 'ورود با شمارهٔ موبایل';
+		}
+
 		ob_start();
 		?>
-		<div class="ty-acct-guest">
+		<div class="<?php echo esc_attr( $class ); ?>" data-tara-login-card="<?php echo esc_attr( $mode ); ?>">
 			<div class="ty-acct-guest__art" aria-hidden="true">
 				<span class="ty-acct-guest__disc"><?php echo tara_acc_icon( 'music' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 			</div>
-			<h1 class="ty-acct-guest__title">حسابِ شما در <?php echo esc_html( get_bloginfo( 'name' ) ); ?></h1>
-			<p class="ty-acct-guest__sub">
-				با شمارهٔ موبایل در چند ثانیه وارد شوید: آهنگ‌ها را ذخیره کنید، پلی‌لیست بسازید،
-				خواننده‌های محبوبتان را دنبال کنید و آهنگ‌های تازه‌شان را از دست ندهید.
-			</p>
+			<h1 class="ty-acct-guest__title"><?php echo esc_html( $title ); ?></h1>
+			<p class="ty-acct-guest__sub"><?php echo esc_html( $sub ); ?></p>
 			<ul class="ty-acct-guest__list">
 				<li><?php echo tara_acc_icon( 'heart' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>علاقه‌مندی‌ها و پلی‌لیست‌های خودتان</span></li>
 				<li><?php echo tara_acc_icon( 'user' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>دنبال‌کردنِ خواننده‌ها و فیدِ آهنگ‌های تازه</span></li>
 				<li><?php echo tara_acc_icon( 'telegram' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>اتصال به رباتِ تلگرام برای اعلان‌ها</span></li>
 			</ul>
 			<button type="button" class="ty-acct-submit ty-acct-submit--wide" data-tara-open="account">
-				<span class="ty-acct-submit__txt">ورود / ثبت‌نام با شمارهٔ موبایل</span>
+				<span class="ty-acct-submit__txt"><?php echo esc_html( $cta ); ?></span>
 			</button>
+			<?php if ( '' !== $help ) : ?>
+				<p class="ty-acct-guest__help">
+					<a href="<?php echo esc_url( $help ); ?>" target="_blank" rel="noopener">
+						<?php echo esc_html( function_exists( 'tara_acc_help_text' ) ? tara_acc_help_text() : 'راهنمای ورود' ); ?>
+					</a>
+				</p>
+			<?php endif; ?>
 			<p class="ty-acct-guest__note">بدونِ رمز، بدونِ ایمیل، بدونِ فرمِ طولانی.</p>
 		</div>
 		<?php
@@ -608,7 +652,11 @@ if ( ! function_exists( 'tara_acc_panel' ) ) {
 		}
 
 		$tab    = tara_acc_current_tab();
-		$tabs   = tara_acc_tabs();
+		$tabs = tara_acc_tabs();
+		/* v3.11.0 — با باز شدنِ تبِ «پیام‌ها»، اعلان‌های مدیر «دیده‌شده» می‌شوند. */
+		if ( 'notifs' === $tab && function_exists( 'tara_acc_notice_mark' ) ) {
+			tara_acc_notice_mark( $user_id );
+		}
 		$counts = tara_acc_counts( $user_id );
 		$name   = (string) get_user_meta( $user_id, 'nickname', true );
 		$bio    = (string) get_user_meta( $user_id, 'description', true );
@@ -623,7 +671,7 @@ if ( ! function_exists( 'tara_acc_panel' ) ) {
 			<aside class="ty-acct__side">
 				<div class="ty-acct__me">
 					<span class="ty-acct__ava">
-						<img src="<?php echo esc_url( $avatar ); ?>" width="88" height="88" alt="" loading="lazy">
+						<img src="<?php echo esc_url( $avatar ); ?>" width="88" height="88" alt="" loading="lazy" data-tara-avatar-head>
 					</span>
 					<h1 class="ty-acct__name"><?php echo esc_html( '' !== $name ? $name : 'شنونده' ); ?></h1>
 					<?php if ( '' !== $phone ) : ?>
@@ -686,6 +734,8 @@ if ( ! function_exists( 'tara_acc_panel' ) ) {
 						break;
 					default:
 						echo tara_acc_tab_overview( $user_id ); // phpcs:ignore WordPress.Security.EscapeOutput
+						/* v3.11.0 — نوارِ کوتاهِ اعلان‌های مدیر در پیشخوان. */
+						echo tara_acc_notice_card( array( 'compact' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
 				}
 				?>
 			</div>
@@ -1124,6 +1174,57 @@ if ( ! function_exists( 'tara_acc_tab_history' ) ) {
 
 /* ---- تب ۶: پیام‌ها ---- */
 
+if ( ! function_exists( 'tara_acc_notice_card' ) ) {
+	/**
+	 * کارتِ «اعلان‌ها و بروزرسانی‌ها» (v3.11.0).
+	 *
+	 * متن‌ها از تنظیماتِ قالب می‌آیند (بخشِ «اعلان‌ها و بروزرسانی‌ها») و
+	 * همان‌جا برای همهٔ شنونده‌ها یک‌سان‌اند؛ هر اعلان می‌تواند لینک داشته باشد.
+	 *
+	 * @param array $args compact (نمای فشرده)، title.
+	 * @return string
+	 */
+	function tara_acc_notice_card( $args = array() ) {
+		$args = wp_parse_args( $args, array( 'compact' => false ) );
+
+		$items = function_exists( 'tara_acc_notice_list' ) ? tara_acc_notice_list() : array();
+		if ( empty( $items ) ) {
+			return '';
+		}
+
+		$title = function_exists( 'tara_acc_notice_title' ) ? tara_acc_notice_title() : 'اعلان‌ها و بروزرسانی‌ها';
+		$date  = function_exists( 'tara_acc_notice_date' ) ? tara_acc_notice_date() : '';
+
+		ob_start();
+		?>
+		<div class="ty-acct-notices<?php echo $args['compact'] ? ' ty-acct-notices--compact' : ''; ?>">
+			<div class="ty-acct-notices__head">
+				<span class="ty-acct-notices__ico"><?php echo tara_acc_icon( 'bell' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<div>
+					<h3 class="ty-acct-notices__title"><?php echo esc_html( $title ); ?></h3>
+					<?php if ( '' !== $date ) : ?>
+						<p class="ty-acct-notices__date">آخرین بروزرسانی: <?php echo esc_html( $date ); ?></p>
+					<?php endif; ?>
+				</div>
+			</div>
+			<ul class="ty-acct-notices__list">
+				<?php foreach ( $items as $row ) : ?>
+					<li class="ty-acct-notices__item">
+						<span class="ty-acct-notices__dot" aria-hidden="true"></span>
+						<?php if ( '' !== $row['u'] ) : ?>
+							<a href="<?php echo esc_url( $row['u'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $row['n'] ); ?></a>
+						<?php else : ?>
+							<span><?php echo esc_html( $row['n'] ); ?></span>
+						<?php endif; ?>
+					</li>
+				<?php endforeach; ?>
+			</ul>
+		</div>
+		<?php
+		return (string) ob_get_clean();
+	}
+}
+
 if ( ! function_exists( 'tara_acc_tab_notifs' ) ) {
 	/**
 	 * پیام‌ها و اعلان‌ها.
@@ -1147,6 +1248,11 @@ if ( ! function_exists( 'tara_acc_tab_notifs' ) ) {
 					<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-read-all>خوانده‌شدنِ همه</button>
 				<?php endif; ?>
 			</header>
+
+			<?php
+			/* v3.11.0 — اعلان‌های مدیر (از تنظیماتِ قالب) بالای پیام‌های شخصی. */
+			echo tara_acc_notice_card(); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+			?>
 
 			<?php if ( ! empty( $list ) ) : ?>
 				<ul class="ty-acct-notifs">
@@ -1219,44 +1325,86 @@ if ( ! function_exists( 'tara_acc_tab_telegram' ) ) {
 				</div>
 			</header>
 
-			<div class="ty-acct-tg">
-				<span class="ty-acct-tg__ico"><?php echo tara_acc_icon( 'telegram' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+			<?php
+			/* v3.11.0 — بازطراحیِ «اتصال به ربات»: پیش از این دو دکمهٔ هم‌وزن
+			   («ساختِ کدِ اتصال» و «رفتن به ربات») کنارِ هم بودند و کاربر نمی‌دانست
+			   کدام را بزند. حالا فقط یک مسیرِ روشن وجود دارد:
+			   ۱) کد بگیر  ۲) کد را در ربات بفرست. دکمهٔ «رفتن به ربات» فقط بعد از
+			   ساختِ کد و به‌شکلِ «گامِ بعد» نشان داده می‌شود. */
+			?>
+			<div class="ty-acct-tg<?php echo $tg_id > 0 ? ' is-linked' : ''; ?>">
+				<div class="ty-acct-tg__hero">
+					<span class="ty-acct-tg__ico"><?php echo tara_acc_icon( 'telegram' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+					<div class="ty-acct-tg__intro">
+						<h3 class="ty-acct-tg__title">
+							<?php echo $tg_id > 0 ? 'تلگرام به حساب شما وصل است' : 'حسابِ تلگرام را به سایت وصل کنید'; ?>
+						</h3>
+						<p class="ty-acct-tg__sub">
+							<?php if ( $tg_id > 0 ) : ?>
+								<?php echo '' !== $tg_user ? '<span dir="ltr">@' . esc_html( $tg_user ) . '</span> · ' : ''; ?>
+								از همین حساب می‌توانید آهنگ‌ها را در ربات ذخیره و دانلود کنید.
+								<?php if ( $at > 0 ) : ?>
+									<span class="ty-acct-tg__since">اتصال از <?php echo esc_html( tara_acc_date( $at, 'j F Y' ) ); ?></span>
+								<?php endif; ?>
+							<?php else : ?>
+								با اتصالِ حساب، ربات شما را می‌شناسد؛ علاقه‌مندی‌ها و پلی‌لیست‌ها بین سایت و تلگرام یکی می‌شوند.
+							<?php endif; ?>
+						</p>
+					</div>
+				</div>
 
 				<?php if ( $tg_id > 0 ) : ?>
-					<h3 class="ty-acct-tg__title">وصل است ✔</h3>
-					<p class="ty-acct-tg__sub">
-						تلگرامِ شما به این حساب وصل است<?php echo '' !== $tg_user ? ' (<span dir="ltr">@' . esc_html( $tg_user ) . '</span>)' : ''; ?>.
-						<?php if ( $at > 0 ) : ?>
-							از <?php echo esc_html( tara_acc_date( $at, 'j F Y' ) ); ?>.
-						<?php endif; ?>
-					</p>
 					<div class="ty-acct-tg__btns">
 						<?php if ( '' !== $bot ) : ?>
-							<a class="ty-acct-btn2" href="<?php echo esc_url( 'https://t.me/' . $bot ); ?>" target="_blank" rel="noopener nofollow">بازکردنِ ربات</a>
+							<a class="ty-acct-btn2" href="<?php echo esc_url( 'https://t.me/' . $bot ); ?>" target="_blank" rel="noopener nofollow">
+								<?php echo tara_acc_icon( 'telegram' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+								بازکردنِ ربات در تلگرام
+							</a>
 						<?php endif; ?>
 						<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-tg-unlink>قطعِ اتصال</button>
 					</div>
+
 				<?php else : ?>
-					<h3 class="ty-acct-tg__title">هنوز وصل نیست</h3>
-					<p class="ty-acct-tg__sub">مرحله‌ها ساده است: کد را بگیرید، در ربات بفرستید، تمام.</p>
-					<ol class="ty-acct-tg__steps">
-						<li><span>۱</span> دکمهٔ «ساختِ کدِ اتصال» را بزنید.</li>
-						<li><span>۲</span> ربات را باز کنید و همان کد را بفرستید (یا روی لینکِ مستقیم بزنید).</li>
-						<li><span>۳</span> همین صفحه را تازه کنید؛ وضعیت «وصل است» می‌شود.</li>
-					</ol>
-					<div class="ty-acct-tg__btns">
-						<button type="button" class="ty-acct-btn2" data-tara-tg-code>ساختِ کدِ اتصال</button>
-						<?php if ( '' !== $bot ) : ?>
-							<a class="ty-acct-btn2 ty-acct-btn2--ghost" href="<?php echo esc_url( 'https://t.me/' . $bot ); ?>" target="_blank" rel="noopener nofollow">رفتن به ربات</a>
-						<?php else : ?>
-							<span class="ty-acct-tg__hint">نامِ ربات هنوز در تنظیمات قالب وارد نشده است.</span>
-						<?php endif; ?>
+					<div class="ty-acct-tg__steps">
+						<div class="ty-acct-tg__step">
+							<span class="ty-acct-tg__num">۱</span>
+							<div>
+								<b>کدِ اتصال را بگیرید</b>
+								<small>هشت‌حرفی و یک‌بارمصرف؛ خودکار کپی می‌شود.</small>
+							</div>
+						</div>
+						<div class="ty-acct-tg__step">
+							<span class="ty-acct-tg__num">۲</span>
+							<div>
+								<b>همان کد را در چتِ ربات بفرستید</b>
+								<small>ربات لینک را می‌شناسد و اتصال را تأیید می‌کند.</small>
+							</div>
+						</div>
 					</div>
+
+					<div class="ty-acct-tg__btns">
+						<button type="button" class="ty-acct-btn2 ty-acct-btn2--primary" data-tara-tg-code>
+							<?php echo tara_acc_icon( 'copy' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+							ساختِ کدِ اتصال
+						</button>
+						<a class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-tg-link hidden href="<?php echo esc_url( 'https://t.me/' . ( '' !== $bot ? $bot : 'ahangbanbot' ) ); ?>" target="_blank" rel="noopener nofollow">
+							رفتن به ربات
+							<i class="icofont-thin-left" aria-hidden="true"></i>
+						</a>
+					</div>
+
+					<?php if ( '' === $bot ) : ?>
+						<p class="ty-acct-tg__hint">نامِ ربات هنوز در تنظیماتِ قالب وارد نشده است؛ با مدیرِ سایت تماس بگیرید.</p>
+					<?php endif; ?>
+
 					<div class="ty-acct-tg__code" data-tara-tg-box hidden>
-						<span class="ty-acct-tg__codeval" data-tara-tg-value dir="ltr"></span>
-						<button type="button" class="ty-acct-mini" data-tara-tg-copy aria-label="کپیِ کد"><?php echo tara_acc_icon( 'copy' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
-						<a class="ty-acct-link" data-tara-tg-link hidden href="#" target="_blank" rel="noopener nofollow">بازکردنِ ربات با همین کد</a>
-						<span class="ty-acct-tg__ttl">این کد ۱۰ دقیقه معتبر است.</span>
+						<span class="ty-acct-tg__code-lbl">کدِ اتصالِ شما</span>
+						<div class="ty-acct-tg__code-row">
+							<span class="ty-acct-tg__codeval" data-tara-tg-value dir="ltr"></span>
+							<button type="button" class="ty-acct-mini" data-tara-tg-copy aria-label="کپیِ کد"><?php echo tara_acc_icon( 'copy' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
+						</div>
+						<p class="ty-acct-tg__ttl">این کد ۱۰ دقیقه معتبر است. بعد از فرستادنش در ربات، دکمهٔ زیر را بزنید.</p>
+						<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost ty-acct-btn2--wide" data-tara-tg-refresh>اتصال برقرار شد؟ بررسی کن</button>
 					</div>
 				<?php endif; ?>
 			</div>
@@ -1299,13 +1447,31 @@ if ( ! function_exists( 'tara_acc_tab_profile' ) ) {
 					<div class="ty-acct-profile__meta">
 						<p class="ty-acct-profile__phone">شمارهٔ شما: <b dir="ltr"><?php echo esc_html( tara_acc_phone_pretty( $phone ) ); ?></b></p>
 						<p class="ty-acct-profile__note">شماره قابلِ تغییر نیست و هیچ‌جا عمومی نشان داده نمی‌شود.</p>
-						<label class="ty-acct-field ty-acct-field--inline">
-							<span class="ty-acct-field__label">آدرسِ تصویرِ پروفایل</span>
-							<span class="ty-acct-field__box">
-								<input type="url" name="avatar" dir="ltr" placeholder="https://…" value="<?php echo esc_attr( (string) get_user_meta( (int) $user_id, 'tara_avatar_url', true ) ); ?>">
-								<?php echo tara_acc_icon( 'link', 'ty-acct-field__ico' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-							</span>
-						</label>
+
+						<?php
+						/* v3.11.0 — تصویر از فایل انتخاب می‌شود، نه از آدرسِ اینترنتی.
+						   با «انتخابِ عکس» فایل بلافاصله آپلود و پیش‌نمایش جایگزین می‌شود. */
+						if ( tara_acc_feature( 'avatar' ) ) :
+							?>
+							<div class="ty-acct-avatar" data-tara-avatar-box>
+								<span class="ty-acct-avatar__label">تصویرِ پروفایل</span>
+								<div class="ty-acct-avatar__row">
+									<span class="ty-acct-avatar__preview">
+										<img src="<?php echo esc_url( $avatar ); ?>" width="72" height="72" alt="" data-tara-avatar-preview>
+									</span>
+									<div class="ty-acct-avatar__btns">
+										<label class="ty-acct-btn2 ty-acct-btn2--file">
+											<?php echo tara_acc_icon( 'camera' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+											<span>انتخابِ عکس</span>
+											<input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif" data-tara-avatar-file hidden>
+										</label>
+										<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-avatar-remove>حذفِ تصویر</button>
+									</div>
+								</div>
+								<p class="ty-acct-avatar__hint">JPG، PNG یا WebP · حداکثر ۲ مگابایت · بهترین نتیجه با تصویرِ مربعی</p>
+								<p class="ty-acct-form__msg" role="status" aria-live="polite" data-tara-avatar-msg></p>
+							</div>
+						<?php endif; ?>
 					</div>
 				</div>
 

@@ -113,7 +113,7 @@ t( 'myfunctions.php: لایهٔ متای صفحهٔ اصلی require شده', fa
 t( 'myfunctions.php: کارتِ هنرمند require شده', false !== strpos( $myf, 'inc/ab-artist-cards.php' ) );
 
 $style_css = file_get_contents( '/tmp/theme/style.css' );
-t( 'style.css: نسخه ۳.۵.x یا بالاتر', (bool) preg_match( '/Version:\s*3\.(5|6|7|8|9|10)\.[0-9]+/', $style_css ), substr( $style_css, 0, 200 ) );
+t( 'style.css: نسخه ۳.۵.x یا بالاتر', (bool) preg_match( '/Version:\s*3\.(5|6|7|8|9|1[01])\.[0-9]+/', $style_css ), substr( $style_css, 0, 200 ) );
 
 $css = file_get_contents( '/tmp/theme/css/ab-352.css' );
 t( 'CSS: بلوک کارتِ هنرمند', false !== strpos( $css, '.artist_boxs a.ab-artist-card' ) );

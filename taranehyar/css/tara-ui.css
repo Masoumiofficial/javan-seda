@@ -1250,6 +1250,26 @@ body.has-tara-dock { padding-bottom: 76px; }
 
 	#mobiles_header .search_mobile_box { left: 64px; }
 
+	/* v3.11.0 — هدرِ گوشی هم با اسکرولِ رو به پایین پنهان می‌شود و با
+	   برگشتن به بالا/بازکردنِ منو برمی‌گردد (هم‌رفتار با هدرِ دسکتاپ). */
+	/* توجه: هیچ‌جا `will-change: transform` یا `filter` روی هدرِ گوشی نگذارید؛
+	   هر کدام «جرم مرجع» می‌سازند و منوی کشوییِ fixed داخلِ هدر را به
+	   ارتفاعِ هدر گیر می‌اندازند (همان باگِ کشیِ ۳.۳.۳). transform فقط
+	   وقتی مقدار می‌گیرد که منو بسته است. */
+	#mobiles_header {
+		transition: transform .28s ease, box-shadow .28s ease;
+	}
+
+	#mobiles_header.is-hidden {
+		transform: translateY(-100%);
+		box-shadow: none;
+		pointer-events: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		#mobiles_header { transition: none; }
+	}
+
 	/* آیکون ذره‌بین: مرکزِ دایره، بدون جابه‌جاییِ خطِ مبنای فونت */
 	#mobiles_header .search_mobile_box > i {
 		display: inline-flex;
@@ -2825,6 +2845,25 @@ a.ty-person__chip:hover {
 		background: color-mix(in srgb, var(--ab-charcoal, #16121f) 96%, transparent);
 	}
 
+	/* v3.11.0 — اسکرول به پایین: هدر از بالا بیرون می‌رود؛ اسکرول به بالا:
+	   همان‌جا برمی‌گردد. ترنزیشن روی transform است تا با sticky نسوزد. */
+	#header {
+		will-change: transform;
+		transition: padding .2s ease, box-shadow .2s ease, background .2s ease, transform .3s ease;
+	}
+
+	#header.is-hidden {
+		transform: translateY(calc(-100% - 12px));
+		box-shadow: none;
+	}
+
+	/* وقتی هدر پنهان است، هیچ کلیکی نگیرد */
+	#header.is-hidden { pointer-events: none; }
+
+	@media (prefers-reduced-motion: reduce) {
+		#header { transition: padding .2s ease, box-shadow .2s ease, background .2s ease; }
+	}
+
 	#header .logo_top img {
 		transition: max-height .2s ease, transform .2s ease;
 		max-height: 46px;
@@ -3807,4 +3846,167 @@ html[data-tara-night="1"] .ty-bot-song__note {
 	.ty-bot-song__btn:hover {
 		transform: none;
 	}
+}
+
+/* =========================================================================
+   ۲۱) سیستمِ دکمهٔ واحد — v3.11.0
+   ---------------------------------------------------------------
+   مالک گفت: «دیزاینِ دکمهٔ مشاهده در تلگرام خوب است؛ همین زبانِ بصری را
+   برای بقیهٔ دکمه‌های سایت (لینک‌های دانلود و…) هم استفاده کن.»
+   اصولِ مشترک (همان دکمهٔ ربات):
+     · شعاعِ بزرگ (۱۴–۱۸px) · حاشیهٔ نازکِ آبیِ کم‌رنگ
+     · پس‌زمینهٔ گرادیانِ ملایم روی سطحِ صفحه
+     · آیکون در یک «چیپِ» گرادیانیِ مربعی سمت راست
+     · متنِ درشت + برچسبِ ریزِ کم‌رنگ در انتها
+     · سایهٔ نرم و بالا آمدنِ ۱px در هاور
+   ====================================================================== */
+.dl_links_box {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+	gap: 10px;
+	margin: 16px 0 8px;
+	text-align: start;
+}
+
+.dl_links_box .clear,
+.dl_linksv_box .clear { display: none; }
+
+.dl_links_box a,
+.dl_linksv_box a {
+	float: none;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	height: auto;
+	min-height: 60px;
+	margin: 0;
+	padding: 10px 14px;
+	border-radius: 16px;
+	border: 1px solid rgba(24, 90, 219, 0.22);
+	background:
+		linear-gradient(135deg, rgba(24, 90, 219, 0.10), rgba(124, 58, 237, 0.10)),
+		var(--ab-surface, #fff);
+	color: var(--ab-text, #2a2a2a);
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.7;
+	text-align: start;
+	box-shadow: 0 10px 26px -20px rgba(24, 90, 219, 0.7);
+	transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.dl_links_box a i,
+.dl_linksv_box a i {
+	display: grid;
+	place-items: center;
+	flex: 0 0 auto;
+	width: 40px;
+	height: 40px;
+	margin: 0;
+	border-radius: 13px;
+	background: linear-gradient(140deg, #2aabee, #185adb);
+	color: #fff;
+	font-size: 17px;
+	box-shadow: 0 8px 18px -12px rgba(24, 90, 219, 0.9);
+}
+
+/* برچسبِ کیفیّت در انتهای دکمه — همان نقشِ «note» در دکمهٔ ربات */
+.dl_links_box a::after,
+.dl_linksv_box a::after {
+	margin-inline-start: auto;
+	padding: 3px 9px;
+	border-radius: 999px;
+	font-size: 10px;
+	font-weight: 800;
+	letter-spacing: 0.2px;
+	color: var(--ab-blue-accent, #185adb);
+	background: rgba(24, 90, 219, 0.10);
+	white-space: nowrap;
+	direction: ltr;
+}
+
+.dl_link_128::after { content: "MP3 · 128"; }
+.dl_links_320::after { content: "MP3 · 320"; }
+.dl_linksv_box a::after { content: "MP4"; }
+
+.dl_links_box a:hover,
+.dl_linksv_box a:hover,
+.night .dl_links_box a:hover,
+.night .dl_linksv_box a:hover {
+	transform: translateY(-1px);
+	border-color: rgba(24, 90, 219, 0.45);
+	background:
+		linear-gradient(135deg, rgba(24, 90, 219, 0.16), rgba(124, 58, 237, 0.14)),
+		var(--ab-surface, #fff);
+	color: var(--ab-text, #2a2a2a);
+	box-shadow: 0 16px 34px -22px rgba(24, 90, 219, 0.85);
+}
+
+.dl_links_box a:focus-visible,
+.dl_linksv_box a:focus-visible {
+	outline: 2px solid var(--ab-blue, #185adb);
+	outline-offset: 2px;
+}
+
+.dl_linksv_box { margin: 10px 0 16px; }
+.dl_linksv_box ul {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+	gap: 10px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.dl_linksv_box ul li { width: auto; padding: 0; display: block; list-style: none; }
+
+/* حالت شب — گرادیان و سطح تیره */
+.night .dl_links_box a,
+.night .dl_linksv_box a,
+html[data-tara-night="1"] .dl_links_box a,
+html[data-tara-night="1"] .dl_linksv_box a {
+	border-color: rgba(255, 255, 255, 0.14);
+	background:
+		linear-gradient(135deg, rgba(24, 90, 219, 0.28), rgba(124, 58, 237, 0.22)),
+		rgba(255, 255, 255, 0.04);
+	color: #eef0f6;
+}
+
+.night .dl_links_box a:hover,
+.night .dl_linksv_box a:hover,
+html[data-tara-night="1"] .dl_links_box a:hover,
+html[data-tara-night="1"] .dl_linksv_box a:hover { color: #fff; }
+
+.night .dl_links_box a::after,
+.night .dl_linksv_box a::after,
+html[data-tara-night="1"] .dl_links_box a::after,
+html[data-tara-night="1"] .dl_linksv_box a::after {
+	color: #cfe0ff;
+	background: rgba(255, 255, 255, 0.12);
+}
+
+@media (max-width: 600px) {
+	.dl_links_box,
+	.dl_linksv_box ul { grid-template-columns: 1fr; gap: 8px; }
+	.dl_links_box a,
+	.dl_linksv_box a { min-height: 54px; padding: 9px 12px; font-size: 12.5px; gap: 10px; }
+	.dl_links_box a i,
+	.dl_linksv_box a i { width: 36px; height: 36px; border-radius: 11px; font-size: 16px; }
+}
+
+/* — همان سیستمِ دکمه برای دکمهٔ کوچکِ دانلودِ پلیر (`.download_box`) — */
+.download_box a {
+	border-radius: 10px;
+	background: linear-gradient(140deg, #2aabee, #185adb);
+	border: 1px solid rgba(24, 90, 219, 0.35);
+	font-weight: 700;
+	box-shadow: 0 8px 18px -14px rgba(24, 90, 219, 0.9);
+	transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+
+.download_box a:hover,
+.download_box a:focus-visible {
+	transform: translateY(-1px);
+	background: linear-gradient(140deg, #37b4f2, #2064e8);
+	box-shadow: 0 12px 22px -14px rgba(24, 90, 219, 0.95);
 }

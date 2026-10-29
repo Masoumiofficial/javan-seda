@@ -404,6 +404,12 @@ function taranehyar_panel_sections() {
 			'desc'  => 'ورود با پیامک، پنل کاربری، علاقه‌مندی، پلی‌لیست و اتصال به رباتِ تلگرام.',
 		),
 		array(
+			'id'    => 'notices',
+			'title' => 'اعلان‌ها و بروزرسانی‌ها',
+			'icon'  => 'dashicons-megaphone',
+			'desc'  => 'پیام‌ها و خبرهایی که در پنلِ کاربری به همهٔ شنونده‌ها نشان داده می‌شود.',
+		),
+		array(
 			'id'    => 'footer',
 			'title' => 'پانوشت',
 			'icon'  => 'dashicons-editor-insertmore',

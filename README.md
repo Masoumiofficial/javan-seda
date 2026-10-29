@@ -5,18 +5,18 @@
 هنرمند، ژانر و حال‌وهوا، مودِ شب، **حسابِ کاربری با ورودِ پیامکی**، **دکمهٔ
 «مشاهده در ربات تلگرام» روی هر آهنگ** و پنلِ تنظیماتِ فارسی.
 
-## ⬇️ دانلودِ آخرین نسخه (۳.۱۰.۱)
+## ⬇️ دانلودِ آخرین نسخه (۳.۱۱.۰)
 
 | چه چیزی | لینک |
 | --- | --- |
-| **دانلودِ مستقیمِ بستهٔ قالب** — فقط پوشهٔ `taranehyar/` | **<https://raw.githubusercontent.com/Masoumiofficial/javan-seda/v3.10.1/artifacts/taranehyar-3.10.1.zip>** |
-| صفحهٔ فایل در گیت‌هاب (دکمهٔ «Download raw file») | <https://github.com/Masoumiofficial/javan-seda/blob/v3.10.1/artifacts/taranehyar-3.10.1.zip> |
-| کلِ مخزن در تگِ ۳.۱۰.۱ | <https://github.com/Masoumiofficial/javan-seda/archive/refs/tags/v3.10.1.zip> |
-| ریلیز و یادداشت‌های نسخه | <https://github.com/Masoumiofficial/javan-seda/releases/tag/v3.10.1> |
-| پیش‌نمایشِ آفلاین (تک‌فایل، مارکاپِ واقعیِ قالب) | <https://github.com/Masoumiofficial/javan-seda/blob/v3.10.1/docs/preview-3.10.1.html> |
+| **دانلودِ مستقیمِ بستهٔ قالب** — فقط پوشهٔ `taranehyar/` | **<https://raw.githubusercontent.com/Masoumiofficial/javan-seda/v3.11.0/artifacts/taranehyar-3.11.0.zip>** |
+| صفحهٔ فایل در گیت‌هاب (دکمهٔ «Download raw file») | <https://github.com/Masoumiofficial/javan-seda/blob/v3.11.0/artifacts/taranehyar-3.11.0.zip> |
+| کلِ مخزن در تگِ ۳.۱۱.۰ | <https://github.com/Masoumiofficial/javan-seda/archive/refs/tags/v3.11.0.zip> |
+| ریلیز و یادداشت‌های نسخه | <https://github.com/Masoumiofficial/javan-seda/releases/tag/v3.11.0> |
+| پیش‌نمایشِ آفلاین (تک‌فایل، مارکاپِ واقعیِ قالب) | <https://github.com/Masoumiofficial/javan-seda/blob/v3.11.0/docs/preview-3.11.0.html> |
 
-`taranehyar-3.10.1.zip` · ۱۷۸ فایل · ۲٬۲۵۸٬۷۵۶ بایت
-`sha256 242bbcd9c8a2ba86ff72acc252d2d7e070cdff33375c40ce45c1829226c3c3c2`
+`taranehyar-3.11.0.zip` · ۱۷۸ فایل · ۲٬۲۷۷٬۵۸۸ بایت
+`sha256 ed065ffc3234d84a40ede863a191052a88c6259a6a4c8d66135769df57b2e701`
 
 ## نصب
 
@@ -30,7 +30,7 @@
 
 ## مستندات
 
-- یادداشتِ نسخه‌ها: [`docs/`](docs/) — آخرینش [`docs/CHANGES_v3.10.1.md`](docs/CHANGES_v3.10.1.md)
+- یادداشتِ نسخه‌ها: [`docs/`](docs/) — آخرینش [`docs/CHANGES_v3.11.0.md`](docs/CHANGES_v3.11.0.md)
 - چک‌لیستِ راه‌اندازی: [`docs/GO-LIVE-CHECKLIST.md`](docs/GO-LIVE-CHECKLIST.md)
 - کارایی: [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md)
 - پوستهٔ فرزند: [`docs/CHILD-THEME.md`](docs/CHILD-THEME.md)

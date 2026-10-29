@@ -1,6 +1,12 @@
 <?php get_header(''); ?>
 <?php get_template_part('inc/breadcrumbs'); ?>
-<?php if((ot_get_option('ads_bt') !="") || (ot_get_option('adsjs_bt') !="")){ ?>
+<?php
+/* v3.11.0 — کادرِ تبلیغ فقط وقتی چاپ می‌شود که واقعاً محتوا داشته باشد.
+   قبلاً یک مقدارِ خالی/فاصله باعث می‌شد `#ads_top` با padding چاپ شود و
+   بالای تیتر یک نوارِ خالیِ اضافه بماند (شکایتِ «فضای خالیِ بالای عنوان»). */
+$tara_ads_bt = trim( (string) ot_get_option( 'ads_bt' ) . (string) ot_get_option( 'adsjs_bt' ) );
+if ( '' !== $tara_ads_bt ) {
+	?>
 <div id="ads_top">
 <?php echo ot_get_option('ads_bt'); ?><?php echo ot_get_option('adsjs_bt'); ?>
 <div class="clear"></div>
@@ -322,7 +328,14 @@ if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw 
 				<button type="button" class="music_lyrics_copy" id="taranehyar_lyrics_copy" aria-label="کپی متن ترانه"><i class="icofont-quote-left" aria-hidden="true"></i><span class="lbl">کپی متن ترانه</span></button>
 			</div>
 		</div>
-		<div class="music_lyrics_text" id="taranehyar_lyrics_text"><?php echo $taranehyar_lyrics_html; // خروجی با wp_kses_post یا esc_html پاک‌سازی شده است. ?></div>
+		<div class="music_lyrics_fold" data-tara-lyrics-fold>
+			<div class="music_lyrics_text is-folded" id="taranehyar_lyrics_text"><?php echo $taranehyar_lyrics_html; // خروجی با wp_kses_post یا esc_html پاک‌سازی شده است. ?></div>
+			<?php /* v3.11.0 — ترانه‌های بلند فقط ۱–۲ خط دیده می‌شوند و با دکمهٔ «بیشتر بخوانید» باز می‌شوند. */ ?>
+			<button type="button" class="music_lyrics_more" id="taranehyar_lyrics_more" aria-expanded="false" aria-controls="taranehyar_lyrics_text" hidden>
+				<span class="lbl">بیشتر بخوانید</span>
+				<i class="icofont-thin-down" aria-hidden="true"></i>
+			</button>
+		</div>
 		<?php
 		if ( $taranehyar_lyrics_schema && ! function_exists( 'tara_music_schema' ) ) {
 		/* v3.2.2 — اگر inc/ab-credits.php نصب باشد، schema از همان فایل و در wp_head چاپ می‌شود
@@ -413,6 +426,48 @@ if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw 
 				}, 2200);
 			});
 		});
+	})();
+
+	/* v3.11.0 — باز/بستنِ متنِ ترانه: فقط وقتی متن از یک‌دو خط بلندتر است،
+	   دکمه دیده می‌شود. حالتِ بسته هیچ محتوایی را برای موتورِ جست‌وجو پنهان نمی‌کند
+	   (فقط ارتفاعِ دید را کم می‌کند)، پس SEO آسیب نمی‌بیند. */
+	(function () {
+		var box = document.getElementById('taranehyar_lyrics_text');
+		var more = document.getElementById('taranehyar_lyrics_more');
+		if (!box || !more) { return; }
+
+		var label = more.querySelector('.lbl');
+		var open = false;
+
+		function measure() {
+			box.classList.remove('is-folded');
+			var full = box.scrollHeight;
+			box.classList.add('is-folded');
+			var clipped = box.clientHeight;
+			/* آستانهٔ ۸ پیکسل: متن‌های کوتاه دکمه نمی‌گیرند. */
+			more.hidden = full - clipped < 8;
+		}
+
+		function toggle(state) {
+			open = state;
+			box.classList.toggle('is-folded', !open);
+			more.setAttribute('aria-expanded', open ? 'true' : 'false');
+			if (label) { label.textContent = open ? 'کمتر بخوانید' : 'بیشتر بخوانید'; }
+			more.classList.toggle('is-open', open);
+			if (!open && box.getBoundingClientRect().top < 0) {
+				box.scrollIntoView({ block: 'center', behavior: 'smooth' });
+			}
+		}
+
+		more.addEventListener('click', function () {
+			toggle(!open);
+		});
+
+		measure();
+		window.addEventListener('resize', measure);
+		if (document.fonts && document.fonts.ready) {
+			document.fonts.ready.then(measure).catch(function () {});
+		}
 	})();
 	</script>
 	<?php

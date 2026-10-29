@@ -87,6 +87,11 @@ update_term_meta( 42, 'tara_followers', 64 );
 set_acc( 'tg_bot', 'ahangbanbot' );
 set_acc( 'sms', 'dev' );
 
+/* v3.11.0 — اعلان‌های مدیر از تنظیماتِ قالب (برای دیدنِ کارتِ اعلان‌ها در پیش‌نمایش) */
+$GLOBALS['__options']['option_tree']['notice_on']    = 'on';
+$GLOBALS['__options']['option_tree']['notice_text']  = "نسخهٔ تازهٔ پنلِ کاربری منتشر شد؛ حالا می‌توانید عکسِ پروفایل بگذارید.\nمیکسِ تازهٔ «شب‌های آرام» در رادیو | https://ex/radio\nرباتِ تلگرام حالا آهنگ‌های ذخیره‌شده را هم نشان می‌دهد.";
+$GLOBALS['__options']['option_tree']['notice_date']  = '۱۴۰۴/۰۸/۰۷';
+
 /* ---------- چاپ ---------- */
 
 echo "<!--TARA:MODAL-->\n";
@@ -113,6 +118,24 @@ echo "<!--SNIP:SEP-->\n";
 echo tara_acc_like_button( 701 ); // phpcs:ignore
 echo "<!--SNIP:SEP-->\n";
 echo tara_acc_bot_song_button( 701 ); // phpcs:ignore
+echo "<!--SNIP:SEP-->\n";
+wp_set_current_user( 0 );
+echo tara_acc_login_card( array( 'mode' => 'login' ) ); // phpcs:ignore
+echo "<!--SNIP:SEP-->\n";
+echo tara_acc_login_card( array( 'mode' => 'register' ) ); // phpcs:ignore
+echo "<!--SNIP:SEP-->\n";
+wp_set_current_user( $tara_demo );
+echo tara_acc_notice_card(); // phpcs:ignore
+echo "<!--SNIP:SEP-->\n";
+/* تبِ «تلگرام» در حالتِ «هنوز وصل نیست» — برای دیدنِ دو گام و یک دکمه */
+$tara_tg_backup = get_user_meta( $tara_demo, 'tara_tg_id', true );
+delete_user_meta( $tara_demo, 'tara_tg_id' );
+delete_user_meta( $tara_demo, 'tara_tg_user' );
+delete_user_meta( $tara_demo, 'tara_tg_at' );
+echo '<div class="ty-acct__main">' . tara_acc_tab_telegram( $tara_demo ) . '</div>'; // phpcs:ignore
+if ( '' !== $tara_tg_backup ) {
+	update_user_meta( $tara_demo, 'tara_tg_id', $tara_tg_backup );
+}
 echo "//TARA:SNIPPETS\n";
 
 echo "<!--TARA:TABS-->\n";

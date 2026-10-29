@@ -709,7 +709,11 @@ t( 'پنل: بدونِ هشدار PHP', false === stripos( $panel, 'warning:' ) 
 wp_set_current_user( 0 );
 $login = tara_acc_login_card();
 t( 'کارتِ ورود: دکمهٔ بازکردنِ مودال', false !== strpos( $login, 'data-tara-open="account"' ) );
-t( 'کارتِ ورود: دکمهٔ ورود با موبایل', false !== strpos( $login, 'ورود / ثبت‌نام با شمارهٔ موبایل' ) );
+t( 'کارتِ ورود: دکمهٔ ورود با موبایل', false !== strpos( $login, 'ورود با شمارهٔ موبایل' ) );
+$login_reg = tara_acc_login_card( array( 'mode' => 'register' ) );
+t( 'کارتِ ورود: حالتِ ثبت‌نام جدا', false !== strpos( $login_reg, 'ثبت‌نام با شمارهٔ موبایل' ) );
+t( 'کارتِ ورود: حالتِ ورود، متنِ ثبت‌نام ندارد', false === strpos( $login, 'ثبت‌نام با شمارهٔ موبایل' ) );
+t( 'کارتِ ورود: متنِ مسیرِ مدیریتی حذف شده', false === strpos( $login, 'حساب مدیریتی' ) );
 
 /* ======================================================================
    ۱۴) برگه‌ها، فایل‌ها و سیم‌کشیِ ظاهری
@@ -832,6 +836,90 @@ unset( $_GET['tab'] );
 /* قالبِ برگه‌ها واقعاً شورت‌کد را صدا می‌زنند */
 t( 'برگهٔ حساب: شورت‌کد یا پنلِ مستقیم', false !== strpos( f( 'page-account.php' ), 'tara_acc_panel' ) || false !== strpos( f( 'page-account.php' ), 'tara_account' ) );
 t( 'برگهٔ ورود: کارتِ ورود', false !== strpos( f( 'page-login.php' ), 'tara_acc_login_card' ) || false !== strpos( f( 'page-login.php' ), 'tara_login' ) );
+
+/* ======================================================================
+   ۱۶) تغییرهای نسخهٔ ۳.۱۱.۰
+   ====================================================================== */
+
+/* — آپلودِ تصویرِ پروفایل به‌جای آدرسِ اینترنتی — */
+$ui = f( 'inc/tara-account-ui.php' );
+$data = f( 'inc/tara-account.php' );
+$js = f( 'js/tara-account.js' );
+$css = f( 'css/tara-account.css' );
+$opts = f( 'inc/theme-options.php' );
+$single = f( 'single.php' );
+$style = f( 'style.css' );
+$tail = f( 'taxonomy-artist.php' );
+$css_artist = f( 'css/tara-artist.css' );
+$css_ui = f( 'css/tara-ui.css' );
+
+t( 'آواتار: فیلدِ آدرسِ تصویر حذف شده', false === strpos( $ui, 'name="avatar" dir="ltr"' ) );
+t( 'آواتار: ورودیِ فایل هست', false !== strpos( $ui, 'data-tara-avatar-file' ) && false !== strpos( $ui, 'accept="image/jpeg' ) );
+t( 'آواتار: دکمهٔ حذفِ تصویر', false !== strpos( $ui, 'data-tara-avatar-remove' ) );
+t( 'آواتار: تابعِ آپلود', function_exists( 'tara_acc_avatar_upload' ) );
+t( 'آواتار: تابعِ حذف', function_exists( 'tara_acc_avatar_remove' ) );
+t( 'آواتار: مسیرِ AJAX دارد', false !== strpos( $data, "case 'avatar':" ) && false !== strpos( $data, "case 'avatar-remove':" ) );
+t( 'آواتار: JS با FormData می‌فرستد', false !== strpos( $js, 'new FormData()' ) && false !== strpos( $js, "form.append('do', 'avatar')" ) );
+t( 'آواتار: محدودیتِ ۲ مگابایت', false !== strpos( $data, '2 * 1024 * 1024' ) && false !== strpos( $js, '2 * 1024 * 1024' ) );
+t( 'آواتار: فقط تصویر پذیرفته می‌شود', false !== strpos( $data, 'image/' ) && false !== strpos( $data, 'wp_check_filetype_and_ext' ) );
+t( 'آواتار: استایلِ آپلود', false !== strpos( $css, '.ty-acct-avatar__preview' ) );
+
+/* — اعلان‌ها: هم پنل هم تنظیمات — */
+t( 'اعلان: گزینه‌های تنظیمات', false !== strpos( $opts, "'id'=>'notice_text'" ) && false !== strpos( $opts, "'id'=>'notice_on'" ) );
+t( 'اعلان: بخشِ تنظیمات ثبت شده', false !== strpos( $opts, "array('id'=>'notices'" ) );
+t( 'اعلان: خواندنِ فهرست', function_exists( 'tara_acc_notice_list' ) );
+t( 'اعلان: کارتِ پنل', function_exists( 'tara_acc_notice_card' ) );
+t( 'اعلان: در تبِ پیام‌ها', false !== strpos( $ui, 'echo tara_acc_notice_card();' ) );
+t( 'اعلان: در پیشخوان', false !== strpos( $ui, "tara_acc_notice_card( array( 'compact' => true ) )" ) );
+t( 'اعلان: شمارندهٔ نخوانده', false !== strpos( $data, 'tara_acc_notice_unseen' ) );
+$notice = tara_acc_notice_card();
+t( 'اعلان: کارت رندر می‌شود', false !== strpos( $notice, 'ty-acct-notices' ) || '' === tara_acc_notice_sig() );
+t( 'اعلان: استایل', false !== strpos( $css, '.ty-acct-notices__item' ) );
+
+/* — آمارِ اینستاگرامیِ هنرمند — */
+t( 'هنرمند: ردیفِ آمارِ تازه', false !== strpos( $tail, 'ty-artist__stats--ig' ) );
+t( 'هنرمند: دنبال‌کننده', false !== strpos( $tail, 'tara_acc_follower_count' ) );
+t( 'هنرمند: بازدید', false !== strpos( $tail, 'tara_artist_total_views' ) );
+t( 'هنرمند: استایلِ ردیف', false !== strpos( $css_artist, '.ty-artist__stats--ig' ) );
+
+/* — متنِ ترانه: باز/بستن — */
+t( 'ترانه: دکمهٔ بیشتر بخوانید', false !== strpos( $single, 'taranehyar_lyrics_more' ) );
+t( 'ترانه: حالتِ بسته', false !== strpos( $single, 'music_lyrics_text is-folded' ) );
+t( 'ترانه: استایلِ محو', false !== strpos( $style, '.music_lyrics_text.is-folded::after' ) );
+t( 'ترانه: استایلِ دکمه', false !== strpos( $style, '.music_lyrics_more' ) );
+
+/* — دکمه‌های وسط‌چین و «ما را دنبال کنید» — */
+t( 'صفحهٔ آهنگ: دکمه‌های حساب وسط‌چین', false !== strpos( $css, 'justify-content: center;' ) && false !== strpos( $css, '.single_content_box .ty-acct-actions' ) );
+t( 'شبکه‌های اجتماعی: وسط‌چین', false !== strpos( $style, '.single_content_box .ab-social-box__row' ) );
+t( 'شبکه‌های اجتماعی: کپیِ ab-ui هم هم‌سان است', false !== strpos( f( 'css/ab-ui.css' ), '.single_content_box .ab-social-box__row' ) );
+
+/* — سیستمِ دکمهٔ واحد — */
+t( 'دکمه‌ها: سیستمِ واحدِ لینک‌های دانلود', false !== strpos( $css_ui, 'سیستمِ دکمهٔ واحد' ) && false !== strpos( $css_ui, '.dl_links_box a,' ) );
+t( 'دکمه‌ها: برچسبِ کیفیت', false !== strpos( $css_ui, '.dl_links_320::after' ) );
+
+/* — هدر — */
+t( 'هدر: کلاسِ پنهان', false !== strpos( $css_ui, '#header.is-hidden' ) && false !== strpos( $css_ui, '#mobiles_header.is-hidden' ) );
+t( 'هدر: منطقِ اسکرول', false !== strpos( f( 'js/tara-player.js' ), "classList.toggle('is-hidden', on)" ) );
+
+/* — تلگرام — */
+t( 'تلگرام: دو گام و یک دکمه', false !== strpos( $ui, 'ty-acct-tg__step' ) && false !== strpos( $ui, 'data-tara-tg-refresh' ) );
+t( 'تلگرام: دکمهٔ «رفتن به ربات» پیش از کد پنهان است', false !== strpos( $ui, 'data-tara-tg-link hidden' ) );
+t( 'تلگرام: لینکِ start=tara_ دیگر در رابط نیست', false === strpos( $ui, 'start=tara_' ) );
+
+/* — ورود/ثبت‌نامِ جدا — */
+$login_page = f( 'page-login.php' );
+t( 'ورود/ثبت‌نام: دو تب', false !== strpos( $login_page, 'ty-login-tabs__tab' ) && false !== strpos( $login_page, "add_query_arg( 'mode', 'register'" ) );
+t( 'ورود/ثبت‌نام: بدونِ لینکِ مسیرِ مدیریتی', false === strpos( $login_page, 'wp-login' ) && false === strpos( $login_page, 'حسابِ مدیریتی' ) );
+t( 'ورود/ثبت‌نام: استایلِ تب‌ها', false !== strpos( $css, '.ty-login-tabs__tab.is-active' ) );
+t( 'ورود/ثبت‌نام: لینکِ راهنما از تنظیمات', false !== strpos( $opts, "'id'=>'account_help_url'" ) );
+
+/* — منوی حساب در موبایل — */
+t( 'موبایل: منوی قرصیِ افقی', false !== strpos( $css, 'scroll-snap-type: x proximity' ) );
+t( 'موبایل: دکمهٔ حساب هم‌شکلِ دو آیکون', false !== strpos( $css, '#mobiles_header .ty-acct-slot--mobile' ) && false !== strpos( $css, 'left: 118px' ) );
+
+/* — فضای خالیِ بالای تیتر — */
+t( 'صفحهٔ آهنگ: کادرِ تبلیغِ خالی چاپ نمی‌شود', false !== strpos( $single, '$tara_ads_bt = trim(' ) );
+t( 'صفحهٔ آهنگ: فاصلهٔ نوارِ مسیر', false !== strpos( $style, '.single #breadcrumbs_container' ) );
 
 /* ======================================================================
    نتیجه

@@ -25,7 +25,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DUMP_PATH = '/tmp/dump.html'
-OUT = os.path.join(ROOT, 'docs', 'preview-3.10.1.html')
+OUT = os.path.join(ROOT, 'docs', 'preview-3.11.0.html')
 CSS_PATH = os.path.join(ROOT, 'taranehyar', 'css', 'tara-account.min.css')
 JS_PATH = os.path.join(ROOT, 'taranehyar', 'js', 'tara-account.js')
 
@@ -34,9 +34,11 @@ def build_dump():
 	"""اگر دامپ نیست یا کهنه است، از نو بساز."""
 	need = True
 	try:
-		need = os.path.getmtime(DUMP_PATH) < os.path.getmtime(
-			os.path.join(ROOT, 'taranehyar', 'inc', 'tara-account-ui.php')
+		stamp = max(
+			os.path.getmtime(os.path.join(ROOT, 'taranehyar', 'inc', 'tara-account-ui.php')),
+			os.path.getmtime(os.path.join(ROOT, 'taranehyar', 'inc', 'tara-account.php')),
 		)
+		need = os.path.getmtime(DUMP_PATH) < stamp
 	except OSError:
 		need = True
 	if not need:
@@ -179,6 +181,10 @@ def main():
 		'__S_FOLLOW__': finish(snips[2]),
 		'__S_LIKE__': finish(snips[3]),
 		'__S_BOT__': finish(snips[4]),
+		'__S_LOGIN__': finish(snips[5]),
+		'__S_REGISTER__': finish(snips[6]),
+		'__S_NOTICES__': finish(snips[7]),
+		'__S_TG_OFF__': finish(snips[8]),
 	}
 	for key, value in parts.items():
 		page = page.replace(key, value)

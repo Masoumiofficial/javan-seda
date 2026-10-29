@@ -101,6 +101,7 @@ if ( ! function_exists( 'tara_settings_shell_sections' ) ) {
 			'ab_ui'   => array( 'title' => 'ظاهر و رفتار ترانه یار', 'icon' => 'dashicons-admin-appearance', 'hint' => 'پلیر، کارت‌ها، مود شب و جزئیات ظاهری همین قالب' ),
 			'radio'   => array( 'title' => 'رادیو و دی‌جی', 'icon' => 'dashicons-controls-volumeon', 'hint' => 'میکس خودکار، وکال معرفی سایت، منبع آهنگ‌ها و صفحهٔ رادیو' ),
 			'account' => array( 'title' => 'حساب کاربری و ورود', 'icon' => 'dashicons-admin-users', 'hint' => 'ورود با پیامک، پنل کاربری، علاقه‌مندی و اتصال به ربات تلگرام' ),
+			'notices' => array( 'title' => 'اعلان‌ها و بروزرسانی‌ها', 'icon' => 'dashicons-megaphone', 'hint' => 'پیام‌های مدیر که در پنلِ کاربری به همه نشان داده می‌شود' ),
 			'footer'  => array( 'title' => 'پانوشت', 'icon' => 'dashicons-editor-insertmore', 'hint' => 'متن، دسته‌ها و کپی‌رایت پایین سایت' ),
 			'socials' => array( 'title' => 'شبکه‌های اجتماعی', 'icon' => 'dashicons-share', 'hint' => 'آدرس اینستاگرام، تلگرام و بقیه' ),
 			'ads1'    => array( 'title' => 'تبلیغات', 'icon' => 'dashicons-megaphone', 'hint' => 'کدهای تبلیغاتی بالای سایت و کنار مطالب' ),

@@ -647,22 +647,30 @@ $taranehyar_social_icons = array(
 				<p class="ty-artist__latin" lang="en" dir="ltr"><?php echo esc_html( $taranehyar_latin ); ?></p>
 			<?php endif; ?>
 
-			<ul class="ty-artist__stats">
-				<?php foreach ( array( 'audio', 'album', 'video' ) as $taranehyar_key ) : ?>
-					<?php $taranehyar_count = count( $taranehyar_buckets[ $taranehyar_key ] ); ?>
-					<?php if ( $taranehyar_count > 0 ) : ?>
-						<li>
-							<strong><?php echo esc_html( tara_number_fa( $taranehyar_count ) ); ?></strong>
-							<span><?php echo esc_html( isset( $taranehyar_resume_labels[ $taranehyar_key ] ) ? $taranehyar_resume_labels[ $taranehyar_key ] : $taranehyar_key ); ?></span>
-						</li>
-					<?php endif; ?>
-				<?php endforeach; ?>
-				<?php if ( ! empty( $taranehyar_genre_terms ) ) : ?>
-					<li class="ty-artist__stats-wide">
-						<strong><?php echo esc_html( tara_number_fa( count( $taranehyar_genre_terms ) ) ); ?></strong>
-						<span>ژانر</span>
-					</li>
-				<?php endif; ?>
+			<?php
+			/* v3.11.0 — ردیفِ آمارِ اینستاگرامی: دنبال‌کننده · بازدید · اثر.
+			   مثل پروفایلِ اینستاگرام، اعداد درشت و برچسب‌ها ریز، زیرِ نام.
+			   سه عددِ خواسته‌شده در یک ردیف؛ «اثر» مجموعِ صدا/آلبوم/ویدیو است. */
+			$taranehyar_followers = function_exists( 'tara_acc_follower_count' ) ? (int) tara_acc_follower_count( (int) $taranehyar_term->term_id ) : 0;
+			$taranehyar_views     = function_exists( 'tara_artist_total_views' ) ? (int) tara_artist_total_views( $taranehyar_term ) : 0;
+			$taranehyar_works     = 0;
+			foreach ( array( 'audio', 'album', 'video' ) as $taranehyar_key ) {
+				$taranehyar_works += count( $taranehyar_buckets[ $taranehyar_key ] );
+			}
+			?>
+			<ul class="ty-artist__stats ty-artist__stats--ig">
+				<li>
+					<strong><?php echo esc_html( tara_number_fa( $taranehyar_followers ) ); ?></strong>
+					<span>دنبال‌کننده</span>
+				</li>
+				<li>
+					<strong><?php echo esc_html( tara_number_fa( $taranehyar_views ) ); ?></strong>
+					<span>بازدید</span>
+				</li>
+				<li>
+					<strong><?php echo esc_html( tara_number_fa( $taranehyar_works ) ); ?></strong>
+					<span>اثر</span>
+				</li>
 			</ul>
 
 			<?php if ( ! empty( $taranehyar_genre_terms ) || ! empty( $taranehyar_mood_terms ) ) : ?>

@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.10.1
+Version: 3.11.0
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -1318,11 +1318,30 @@ text-align: center;word-wrap: break-word;overflow-wrap: anywhere;}
 .music_lyrics_text p{margin: 0 0 14px 0;}
 .music_lyrics_text p:last-child{margin-bottom: 0;}
 .music_lyrics_text strong,.music_lyrics_text b{color: var(--ab-blue-accent);}
+/* v3.11.0 — ترانهٔ بلند: در حالتِ بسته فقط ۱–۲ خط، با محوِ نرم در پایین و
+   دکمهٔ «بیشتر بخوانید / کمتر بخوانید». متن در HTML کامل است (SEO). */
+.music_lyrics_fold{position: relative;}
+.music_lyrics_text{position: relative;}
+.music_lyrics_text.is-folded{max-height: calc(2em * 2.15 + 18px);overflow: hidden;}
+.music_lyrics_text.is-folded::after{content: "";position: absolute;inset-inline: 0;bottom: 0;height: 46px;
+pointer-events: none;background: linear-gradient(to bottom, rgba(255,255,255,0), var(--ab-surface));}
+.night .music_lyrics_text.is-folded::after{background: linear-gradient(to bottom, rgba(0,0,0,0), var(--ab-surface));}
+.music_lyrics_more{display: flex;align-items: center;justify-content: center;gap: 7px;
+margin: 0 auto 18px;padding: 9px 20px;border-radius: 999px;cursor: pointer;
+font-size: 12.5px;font-weight: 700;line-height: 1;
+color: var(--ab-blue-accent);background: var(--ab-blue-soft);
+border: 1px solid transparent;transition: background .2s ease,color .2s ease,border-color .2s ease;}
+.music_lyrics_more[hidden]{display: none;}
+.music_lyrics_more i{font-size: 15px;transition: transform .25s ease;}
+.music_lyrics_more.is-open i{transform: rotate(180deg);}
+.music_lyrics_more:hover,.music_lyrics_more:focus-visible{background: var(--ab-blue);color: #fff;border-color: var(--ab-blue);}
 /* حالت شب با بازنویسی متغیرها در .night انجام می‌شود؛ نیازی به قاعدهٔ جداگانه نیست. */
 @media (max-width: 767px){
 .music_lyrics_head{padding: 13px 12px 12px 12px;}
 .music_lyrics_title{font-size: 15px;}
 .music_lyrics_text{padding: 14px 12px 18px 12px;font-size: 14px;line-height: 2;}
+.music_lyrics_text.is-folded{max-height: calc(2em * 2 + 14px);}
+.music_lyrics_more{font-size: 12px;padding: 8px 16px;margin-bottom: 14px;}
 }
 .single_content_box .music_box_player{height: auto;background: transparent;padding: 0;margin: 30px 0 0 0;}
 .single_content_box .music_box_player .play-list{width: 100%;position: relative;left: 0;top: 0;z-index: 888;padding: 0;background: transparent;border-radius: 0;}
@@ -2708,6 +2727,15 @@ body.ab-has-mh{padding-top:90px;}
 .ab-social:hover,.ab-social:focus{border-color:var(--ab-blue);background:var(--ab-blue-soft);color:var(--ab-blue-accent);text-decoration:none}
 .ab-social:hover .ab-social__icon,.ab-social:focus .ab-social__icon{background:var(--ab-blue);color:var(--ab-white)}
 .ab-social:hover .ab-social__arrow,.ab-social:focus .ab-social__arrow{color:var(--ab-blue-accent)}
+
+/* v3.11.0 — «ما را دنبال کنید» در صفحهٔ آهنگ وسط‌چین می‌شود:
+   عنوان، خطِ راهنما و ردیفِ دکمه‌ها/آیکون‌ها همه در یک محور. */
+.single_content_box .ab-social-box__head{justify-content:center;text-align:center;gap:6px}
+.single_content_box .ab-social-box__head>i{margin-left:0}
+.single_content_box .ab-social-box__hint{margin-right:0;width:100%;text-align:center}
+.single_content_box .ab-social-box__row{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;text-align:center}
+.single_content_box .ab-social{margin:0}
+
 /* --- نوار چسبانِ پخش (کنترل همان <audio id="audio"> قالب) — 3.2.4 --- */
 /* رنگ‌ها از متغیرهای قالب می‌آیند؛ `.night` همان متغیرها را بازنویسی می‌کند
    ⇒ نوار در حالت شب خودکار تیره می‌شود (مشکل «سفید ماندن» از همین‌جا رفع شد).
@@ -3748,4 +3776,30 @@ html[data-tara-night="1"] #mobiles_header .logo_mobiles img.ab-logo__img--night 
 
 html[data-tara-night="1"] {
 	--ab-muted: #C6C6D3;
+}
+
+/* ============================================================================================
+   بلوک ۳۰ (نسخۀ 3.11.0) — «فضای خالیِ زیاد بالای عنوانِ آهنگ» (شکایتِ مالک)
+   ------------------------------------------------------------------------------------------
+   چه دیده می‌شد: نوارِ خاکستریِ مسیر (breadcrumbs) → یک نوارِ سفیدِ خالی → تیتر.
+   علت‌ها: margin-bottom:۲۵px نوارِ مسیر + paddingِ بالای کارت + نوارِ خالیِ تبلیغ.
+   راه‌حل: نوارِ مسیر به کارت می‌چسبد، paddingِ بالای کارت کم می‌شود و کادرِ تبلیغِ
+   خالی اصلاً چاپ نمی‌شود (در single.php). هیچ محتوایی پنهان نمی‌شود.
+   ========================================================================================== */
+.single #breadcrumbs_container{
+	margin-bottom: 0;
+	padding: 9px 0;
+	border-radius: var(--ab-radius-m) var(--ab-radius-m) 0 0;
+}
+.single #breadcrumbs{font-size: 12px;line-height: 1.9;margin: 0;}
+.single .single_posts.tarlanweb_post_box{padding-top: 16px}
+.single .single_posts > header{margin: 0 0 var(--ab-space-3)}
+.single .tarlanweb_post_box header{margin: 0 0 12px}
+.single #ads_top{padding: 8px 0}
+.single #ads_top:empty{display: none}
+@media (max-width: 600px){
+	.single #breadcrumbs_container{padding: 7px 0}
+	.single .single_posts.tarlanweb_post_box{padding-top: 13px}
+	.single .tarlanweb_post_box header{margin-bottom: 10px}
+	.single .tarlanweb_post_box header h1{font-size: 17px;line-height: 1.65;padding-bottom: 8px}
 }

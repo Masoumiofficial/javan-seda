@@ -19,8 +19,12 @@ if ( function_exists( 'tara_logo_img' ) ) {
    با صفحه‌کلید هم کار می‌کنند، aria-expanded دارند و صفحه‌خوان می‌داند چه‌اند.
    پیش از این فقط با لمس کار می‌کردند و هیچ برچسبی هم نداشتند. */ ?>
 <button type="button" class="navicon" aria-label="منوی سایت" aria-expanded="false" aria-controls="ab-mobile-drawer"><i class="responsive-menu-button-inner" aria-hidden="true"></i></button>
+<button type="button" class="circle_hlink search_mobile_box" aria-label="جست‌وجو" aria-expanded="false" aria-controls="searches_mobile"><i class="icofont-search" aria-hidden="true"></i></button>
 <?php
-/* v3.10.0 — دکمهٔ حساب در نوار بالای موبایل: ورود یا تصویرِ کاربر. */
+/* v3.11.0 — دکمهٔ حساب در نوار بالای موبایل، **کنارِ آیکون جست‌وجو** و با همان
+   ظاهرِ دو آیکونِ دیگر: دایرهٔ ۴۶px با گرادیانِ تیره و حلقهٔ نازکِ روشن.
+   پیش از این در جای دیگری بود و با آن دو هم‌شکل نبود؛ حالا سه دایرهٔ
+   یک‌اندازه کنارِ هم می‌نشینند (لوگو سمتِ راست، آیکون‌ها سمتِ چپ). */
 if ( function_exists( 'tara_acc_button' ) ) {
 	$tara_acc_mobile_btn = tara_acc_button( 'mobile' );
 	if ( '' !== $tara_acc_mobile_btn ) {
@@ -29,7 +33,6 @@ if ( function_exists( 'tara_acc_button' ) ) {
 	unset( $tara_acc_mobile_btn );
 }
 ?>
-<button type="button" class="circle_hlink search_mobile_box" aria-label="جست‌وجو" aria-expanded="false" aria-controls="searches_mobile"><i class="icofont-search" aria-hidden="true"></i></button>
 <form class="searches_mobile" id="searches_mobile" method="get" role="search" action="<?php echo esc_url( home_url() ); ?>">
 <label class="screen-reader-text" for="lsds_mobile">جست‌وجو در سایت</label>
 <input id="lsds_mobile" class="meta searchfield" name="s" data-swplive="true" placeholder="کلمه مورد نظر ..." type="search" autocomplete="off" enterkeyhint="search">

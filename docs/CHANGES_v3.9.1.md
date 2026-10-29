@@ -5,6 +5,11 @@
 | **بستهٔ آمادهٔ قالب** (فقط پوشهٔ `taranehyar/`، همان zipی که باید در `wp-content/themes/` باز شود) | <https://raw.githubusercontent.com/Masoumiofficial/javan-seda/v3.9.1/artifacts/taranehyar-3.9.1.zip> |
 | **کلِ مخزن در همین تگ** (قالب + آزمون‌ها + مستندات) | <https://github.com/Masoumiofficial/javan-seda/archive/refs/tags/v3.9.1.zip> |
 | **پیش‌نمایشِ زندهٔ همین نسخه** (تک‌فایل، آفلاین، صدا داخلِ خودش) | [`docs/preview-3.9.1.html`](preview-3.9.1.html) |
+| **صفحهٔ فایل در گیت‌هاب** (دکمهٔ «Download raw file») | <https://github.com/Masoumiofficial/javan-seda/blob/v3.9.1/artifacts/taranehyar-3.9.1.zip> |
+
+> نکته: فایلِ zip در مسیرِ `artifacts/` داخلِ خودِ مخزن نگه داشته می‌شود و با تگ
+> `v3.9.1` قفل شده است؛ یعنی لینکِ مستقیمِ بالا همیشه همین بایت‌ها را می‌دهد و با
+> انتشارِ نسخه‌های بعدی عوض نمی‌شود.
 
 بستهٔ آماده: ۱۷۱ فایل · ۲٬۱۹۳٬۵۱۲ بایت · `sha256 7ff5dde0ffdda0bcdbe27447027db09f65542692f9908d8bb515cd24d828fb13`
 

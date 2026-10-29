@@ -318,7 +318,7 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 						<summary class="ty-radio__more">
 							<i class="icofont-options" aria-hidden="true"></i>
 							<span>تنظیمات دی‌جی</span>
-							<em>طول میکس، منبع و فهرست من</em>
+							<em>طول میکس، منبع و ابزارها</em>
 						</summary>
 
 						<div class="ty-radio__advbody">
@@ -347,10 +347,16 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 							<?php endif; ?>
 
 							<div class="ty-radio__tools">
+								<?php
+								/* v3.10.1 — «فهرست من» فقط وقتی معنی دارد که دکمهٔ
+								   «افزودن به رادیو» هم به کاربر نشان داده شود. */
+								if ( ! function_exists( 'tara_radio_user_add_on' ) || tara_radio_user_add_on() ) :
+									?>
 								<button type="button" class="ty-radio__tool" data-radio-mine aria-expanded="false" aria-controls="<?php echo esc_attr( $uid ); ?>-mine">
 									<i class="icofont-heart-alt" aria-hidden="true"></i>
 									فهرست من <b data-radio-mine-count>۰</b>
 								</button>
+								<?php endif; ?>
 								<button type="button" class="ty-radio__tool" data-radio-shuffle>
 									<i class="icofont-random" aria-hidden="true"></i>
 									شافل

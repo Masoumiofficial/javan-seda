@@ -1452,6 +1452,62 @@ if ( ! function_exists( 'tara_acc_single_actions' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_acc_bot_song_button' ) ) {
+	/**
+	 * دکمهٔ «مشاهده در ربات تلگرام» برای یک آهنگ.
+	 *
+	 * کاربر با یک لمس از سایت به همان آهنگ در ربات می‌رود
+	 * (`https://t.me/<bot>?start=song_<id>`) و آنجا پخش، دانلود و
+	 * ذخیره‌کردن در علاقه‌مندی‌ها را دارد. ربات هم با همان حسابِ تلگرامی
+	 * که قبلاً به سایت وصل کرده شناخته می‌شود.
+	 *
+	 * @param int   $post_id شناسهٔ آهنگ (۰ = آهنگِ جاری).
+	 * @param array $args    متن‌ها و کلاس.
+	 * @return string
+	 */
+	function tara_acc_bot_song_button( $post_id = 0, $args = array() ) {
+		$post_id = (int) $post_id;
+		if ( 0 === $post_id ) {
+			$post_id = (int) get_the_ID();
+		}
+		$url = function_exists( 'tara_acc_bot_song_url' ) ? tara_acc_bot_song_url( $post_id ) : '';
+		if ( '' === $url ) {
+			return '';
+		}
+
+		$args = wp_parse_args(
+			$args,
+			array(
+				'class' => '',
+				'label' => 'مشاهده در ربات تلگرام',
+				'note'  => 'پخش، دانلود و ذخیره در تلگرام — بدونِ باز کردنِ سایت',
+			)
+		);
+
+		$class = 'ty-bot-song__btn';
+		if ( '' !== (string) $args['class'] ) {
+			$class .= ' ' . sanitize_html_class( (string) $args['class'] );
+		}
+
+		$html  = '<div class="ty-bot-song">';
+		$html .= '<a class="' . esc_attr( $class ) . '" href="' . esc_url( $url ) . '" target="_blank" rel="noopener nofollow"'
+			. ' data-tara-bot-song="' . esc_attr( $post_id ) . '">';
+		$html .= '<span class="ty-bot-song__ico" aria-hidden="true">' . tara_acc_icon( 'telegram' ) . '</span>';
+		$html .= '<span class="ty-bot-song__body">';
+		$html .= '<span class="ty-bot-song__title">' . esc_html( $args['label'] ) . '</span>';
+		if ( '' !== (string) $args['note'] ) {
+			$html .= '<span class="ty-bot-song__note">' . esc_html( $args['note'] ) . '</span>';
+		}
+		$html .= '</span>';
+		$html .= '<span class="ty-bot-song__arrow" aria-hidden="true">'
+			. '<svg class="ty-acct__svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"/></svg>'
+			. '</span>';
+		$html .= '</a></div>';
+
+		return $html;
+	}
+}
+
 if ( ! function_exists( 'tara_acc_playlist_picker' ) ) {
 	/**
 	 * مودالِ «افزودن به پلی‌لیست» (یک‌بار در پاصفحه).

@@ -25,7 +25,7 @@ import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DUMP_PATH = '/tmp/dump.html'
-OUT = os.path.join(ROOT, 'docs', 'preview-3.10.0.html')
+OUT = os.path.join(ROOT, 'docs', 'preview-3.10.1.html')
 CSS_PATH = os.path.join(ROOT, 'taranehyar', 'css', 'tara-account.min.css')
 JS_PATH = os.path.join(ROOT, 'taranehyar', 'js', 'tara-account.js')
 
@@ -55,6 +55,11 @@ def build_dump():
 def main():
 	build_dump()
 	css = io.open(CSS_PATH, encoding='utf-8').read()
+	# CSSِ عمومیِ قالب (`tara-ui`) هم درون‌خطی می‌شود تا دکمه‌های تازه
+	# (مثلِ «مشاهده در ربات تلگرام») با استایلِ واقعی دیده شوند.
+	ui_css_path = os.path.join(ROOT, 'taranehyar', 'css', 'tara-ui.min.css')
+	if os.path.isfile(ui_css_path):
+		css = io.open(ui_css_path, encoding='utf-8').read() + '\n' + css
 	js = io.open(JS_PATH, encoding='utf-8').read().replace('</script>', '<\\/script>')
 	dump = io.open(DUMP_PATH, encoding='utf-8').read()
 
@@ -173,6 +178,7 @@ def main():
 		'__S_HEADER__': finish(snips[1]),
 		'__S_FOLLOW__': finish(snips[2]),
 		'__S_LIKE__': finish(snips[3]),
+		'__S_BOT__': finish(snips[4]),
 	}
 	for key, value in parts.items():
 		page = page.replace(key, value)

@@ -75,6 +75,7 @@ if ( ! function_exists( 'tara_acc_defaults' ) ) {
 			'tg_bot'         => '',              // نام‌کاربریِ ربات بدونِ @
 			'tg_token'       => '',              // توکنِ ۶۴رقمیِ REST برای ربات
 			'tg_code_ttl'    => 600,             // عمرِ کدِ اتصال به ربات
+			'tg_song'        => 'on',            // دکمهٔ «مشاهده در ربات» زیرِ لینک‌های دانلود
 		);
 
 		return apply_filters( 'tara_acc_defaults', $defaults );
@@ -1748,6 +1749,60 @@ if ( ! function_exists( 'tara_acc_user_by_tg' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_acc_bot_user' ) ) {
+	/**
+	 * نامِ کاربریِ رباتِ تلگرام (بدونِ @).
+	 *
+	 * اگر در تنظیمات خالی باشد، رباتِ رسمیِ همین سایت (`ahangbanbot`) برمی‌گردد
+	 * تا دکمهٔ «مشاهده در ربات» و لینکِ اتصال از روزِ اول کار کنند؛ مدیر با
+	 * گذاشتنِ نامِ دلخواه در تنظیمات قالب، آن را عوض می‌کند.
+	 *
+	 * @return string
+	 */
+	function tara_acc_bot_user() {
+		$bot = preg_replace( '/[^A-Za-z0-9_]/', '', (string) tara_acc_opt( 'tg_bot' ) );
+		if ( '' === $bot ) {
+			$bot = 'ahangbanbot';
+		}
+
+		return (string) apply_filters( 'tara_acc_bot_user', $bot );
+	}
+}
+
+if ( ! function_exists( 'tara_acc_bot_song_url' ) ) {
+	/**
+	 * لینکِ دیپ‌لینکِ آهنگ در ربات تلگرام.
+	 *
+	 * قالبِ قراردادِ ربات: `start=song_<شناسهٔ نوشته>` — همان چیزی که
+	 * کانال/ربات برای هر آهنگ می‌سازد و در `handlers/start.py` با
+	 * `song_([1-9][0-9]*)` خوانده می‌شود.
+	 *
+	 * @param int $post_id شناسهٔ آهنگ.
+	 * @return string خالی اگر دکمه در تنظیمات خاموش باشد یا شناسه نامعتبر باشد.
+	 */
+	function tara_acc_bot_song_url( $post_id = 0 ) {
+		$post_id = (int) $post_id;
+		if ( $post_id < 0 ) {
+			return '';
+		}
+		if ( 0 === $post_id ) {
+			$post_id = (int) get_the_ID();
+		}
+		if ( $post_id <= 0 ) {
+			return '';
+		}
+		if ( ! in_array( strtolower( (string) tara_acc_opt( 'tg_song', 'on' ) ), array( 'on', '1', 'true', 'yes' ), true ) ) {
+			return '';
+		}
+		$bot = tara_acc_bot_user();
+		if ( '' === $bot ) {
+			return '';
+		}
+
+		return 'https://t.me/' . $bot . '?start=song_' . $post_id;
+	}
+}
+
 if ( ! function_exists( 'tara_acc_link_code' ) ) {
 	/**
 	 * ساختِ کدِ اتصال به ربات (۸ کاراکترِ بی‌ابهام).
@@ -1774,7 +1829,7 @@ if ( ! function_exists( 'tara_acc_link_code' ) ) {
 		$ttl = max( 120, min( 1800, (int) tara_acc_opt( 'tg_code_ttl', 600 ) ) );
 		set_transient( 'tara_link_' . $code, $user_id, $ttl );
 
-		$bot = preg_replace( '/[^A-Za-z0-9_]/', '', (string) tara_acc_opt( 'tg_bot' ) );
+		$bot = tara_acc_bot_user();
 
 		return array(
 			'code'     => $code,

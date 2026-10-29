@@ -391,10 +391,50 @@ t( 'ربات: حسابِ دوم وصل شد', is_int( $other ) && $other === (in
 t( 'ربات: از حسابِ اول جدا شد', '' === (string) get_user_meta( $uid, 'tara_tg_id', true ) );
 t( 'ربات: تنها یک حساب برای هر تلگرام', (int) $uid_b === (int) tara_acc_user_by_tg( 555001 ) );
 
-/* بدونِ نامِ ربات، لینک خالی است */
+/* v3.10.1 — بدونِ نامِ ربات، رباتِ پیش‌فرضِ سایت استفاده می‌شود */
 set_acc( 'tg_bot', '' );
 $link3 = tara_acc_link_code( $uid );
-t( 'ربات: بدونِ نامِ ربات، لینک خالی است', is_array( $link3 ) && '' === $link3['deeplink'] );
+t( 'ربات: بدونِ نام در تنظیمات ⇒ رباتِ پیش‌فرض', is_array( $link3 ) && 'https://t.me/ahangbanbot?start=tara_' . $link3['code'] === $link3['deeplink'] );
+t( 'ربات: نامِ ربات با فیلتر هم قابلِ تغییر است', 'ahangbanbot' === tara_acc_bot_user() );
+
+/* ======================================================================
+   ۱۰-۲) دکمهٔ «مشاهده در ربات تلگرام» (v3.10.1)
+   ====================================================================== */
+
+set_acc( 'tg_bot', 'ahangbanbot' );
+t( 'دکمهٔ ربات: لینکِ دیپ‌لینکِ آهنگ', 'https://t.me/ahangbanbot?start=song_701' === tara_acc_bot_song_url( 701 ) );
+set_acc( 'tg_bot', 'mybottest' );
+t( 'دکمهٔ ربات: رباتِ دلخواه از تنظیمات', 'https://t.me/mybottest?start=song_5917' === tara_acc_bot_song_url( 5917 ) );
+set_acc( 'tg_bot', 'ahangbanbot' );
+t( 'دکمهٔ ربات: شناسهٔ منفی ⇒ خالی', '' === tara_acc_bot_song_url( -5 ) );
+t( 'دکمهٔ ربات: دکمهٔ شناسهٔ منفی ⇒ خالی', '' === tara_acc_bot_song_button( -5 ) );
+$GLOBALS['__the_id'] = 701;
+t( 'دکمهٔ ربات: شناسهٔ صفر = آهنگِ جاری', 'https://t.me/ahangbanbot?start=song_701' === tara_acc_bot_song_url( 0 ) );
+$GLOBALS['__the_id'] = 0;
+$GLOBALS['__queried_id'] = 0;
+
+$bot_btn = tara_acc_bot_song_button( 701 );
+t( 'دکمهٔ ربات: مارکاپ با کلاسِ تازه', false !== strpos( $bot_btn, 'ty-bot-song__btn' ) );
+t( 'دکمهٔ ربات: لینک در href', false !== strpos( $bot_btn, 'href="https://t.me/ahangbanbot?start=song_701"' ) );
+t( 'دکمهٔ ربات: متنِ «مشاهده در ربات تلگرام»', false !== strpos( $bot_btn, 'مشاهده در ربات تلگرام' ) );
+t( 'دکمهٔ ربات: در تبِ تازه و بی‌ارجاع', false !== strpos( $bot_btn, 'target="_blank"' ) && false !== strpos( $bot_btn, 'rel="noopener nofollow"' ) );
+t( 'دکمهٔ ربات: نشانهٔ شناسهٔ آهنگ', false !== strpos( $bot_btn, 'data-tara-bot-song="701"' ) );
+t( 'دکمهٔ ربات: متنِ دلخواه', false !== strpos( tara_acc_bot_song_button( 701, array( 'label' => 'بازکردن در تلگرام' ) ), 'بازکردن در تلگرام' ) );
+
+set_acc( 'tg_song', 'off' );
+t( 'دکمهٔ ربات: خاموش‌کردن از تنظیمات', '' === tara_acc_bot_song_button( 701 ) && '' === tara_acc_bot_song_url( 701 ) );
+set_acc( 'tg_song', 'on' );
+
+/* صفحهٔ آهنگ: دکمه در جای دکمهٔ رادیو، و رادیو فقط با گزینهٔ روشن */
+$single_src = f( 'single.php' );
+t( 'صفحهٔ آهنگ: دکمهٔ ربات چاپ می‌شود', false !== strpos( $single_src, 'tara_acc_bot_song_button( get_the_ID() )' ) );
+t( 'صفحهٔ آهنگ: دکمهٔ رادیو پیش‌فرض پنهان است', false !== strpos( $single_src, 'tara_radio_user_add_on()' ) );
+t( 'تنظیمات: کلیدِ account_tg_song', false !== strpos( f( 'inc/theme-options.php' ), "'id'=>'account_tg_song'" ) );
+$ui_src = f( 'inc/tara-account-ui.php' );
+t( 'دکمهٔ ربات: در لایهٔ مارکاپ تعریف شده', false !== strpos( $ui_src, 'function tara_acc_bot_song_button(' ) );
+$css_ui = f( 'css/tara-ui.css' );
+t( 'دکمهٔ ربات: استایل در tara-ui.css', false !== strpos( $css_ui, '.ty-bot-song__btn' ) );
+t( 'دکمهٔ ربات: استایلِ حالتِ شب', false !== strpos( $css_ui, 'html[data-tara-night="1"] .ty-bot-song__btn' ) );
 reset_acc();
 
 /* ======================================================================

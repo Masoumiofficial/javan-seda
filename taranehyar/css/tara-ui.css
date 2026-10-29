@@ -3674,3 +3674,137 @@ html[data-tara-night="1"] #mobiles_header .logo_mobiles img.ab-logo__img--night 
 html[data-tara-night="1"] :is(.ty-meta, .ty-player__meta, .ty-track__artist, .ty-player__sub) {
 	color: #c2c1cf !important;
 }
+
+/* =========================================================================
+   ۲۰) دکمهٔ «مشاهده در ربات تلگرام» — v3.10.1
+   زیرِ لینک‌های دانلودِ صفحهٔ آهنگ می‌نشیند (جای دکمهٔ حذف‌شدهٔ رادیو).
+   تمامِ استایل روی متغیرهای --ty-* سوار است تا در حالتِ شب هم درست بماند.
+   ====================================================================== */
+.ty-bot-song {
+	display: flex;
+	justify-content: center;
+	margin: 18px 0 4px;
+	clear: both;
+}
+
+.ty-bot-song__btn {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	width: 100%;
+	max-width: 460px;
+	padding: 12px 16px;
+	border-radius: 18px;
+	border: 1px solid rgba(24, 90, 219, 0.22);
+	background:
+		linear-gradient(135deg, rgba(24, 90, 219, 0.10), rgba(124, 58, 237, 0.10)),
+		var(--ty-surface, #ffffff);
+	color: var(--ty-ink, #0f172a);
+	text-decoration: none;
+	box-shadow: 0 10px 26px -18px rgba(24, 90, 219, 0.65);
+	transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.ty-bot-song__btn:hover,
+.ty-bot-song__btn:focus-visible {
+	transform: translateY(-1px);
+	border-color: rgba(24, 90, 219, 0.45);
+	box-shadow: 0 16px 34px -20px rgba(24, 90, 219, 0.8);
+	color: var(--ty-ink, #0f172a);
+}
+
+.ty-bot-song__btn:active {
+	transform: scale(0.995);
+}
+
+.ty-bot-song__ico {
+	display: grid;
+	place-items: center;
+	flex: 0 0 auto;
+	width: 42px;
+	height: 42px;
+	border-radius: 14px;
+	color: #fff;
+	background: linear-gradient(140deg, #2aabee, #185adb);
+	box-shadow: 0 8px 18px -10px rgba(24, 90, 219, 0.85);
+}
+
+.ty-bot-song__ico .ty-acct__svg {
+	width: 21px;
+	height: 21px;
+}
+
+.ty-bot-song__body {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+	text-align: start;
+}
+
+.ty-bot-song__title {
+	font-size: 13.5px;
+	font-weight: 800;
+	line-height: 1.7;
+}
+
+.ty-bot-song__note {
+	font-size: 11px;
+	line-height: 1.75;
+	color: var(--ty-muted, #5b6472);
+}
+
+.ty-bot-song__arrow {
+	margin-inline-start: auto;
+	display: inline-flex;
+	color: var(--ty-accent, #185adb);
+	opacity: 0.85;
+}
+
+/* حالت شب — هر دو سازوکارِ قالب پوشش داده می‌شود */
+.night .ty-bot-song__btn,
+html[data-tara-night="1"] .ty-bot-song__btn {
+	background:
+		linear-gradient(135deg, rgba(24, 90, 219, 0.22), rgba(124, 58, 237, 0.20)),
+		rgba(255, 255, 255, 0.04);
+	border-color: rgba(255, 255, 255, 0.14);
+	color: #f4f4f5;
+}
+
+.night .ty-bot-song__note,
+html[data-tara-night="1"] .ty-bot-song__note {
+	color: #b9bcc9;
+}
+
+@media (max-width: 520px) {
+	.ty-bot-song__btn {
+		padding: 11px 13px;
+		border-radius: 16px;
+		gap: 10px;
+	}
+
+	.ty-bot-song__ico {
+		width: 38px;
+		height: 38px;
+		border-radius: 12px;
+	}
+
+	.ty-bot-song__title {
+		font-size: 12.8px;
+	}
+
+	.ty-bot-song__note {
+		font-size: 10.5px;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ty-bot-song__btn {
+		transition: none;
+	}
+
+	.ty-bot-song__btn:hover {
+		transform: none;
+	}
+}

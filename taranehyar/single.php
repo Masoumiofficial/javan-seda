@@ -522,9 +522,15 @@ if ( $taranehyar_download_title && ( $tara_dl_audio || $tara_dl_video ) ) {
 </div>
 <?php endif; ?>
 <?php
-/* v3.9.0 — «افزودن به رادیو»: این آهنگ را به فهرستِ شخصیِ رادیو در مرورگر
-   همین کاربر اضافه می‌کند (بدونِ حساب کاربری و بدونِ ذخیره در دیتابیس). */
-if ( function_exists( 'tara_radio_add_button' ) && function_exists( 'tara_radio_on' ) && tara_radio_on() ) {
+/* v3.10.1 — «مشاهده در ربات تلگرام»: دکمهٔ «افزودن به رادیو» از این‌جا
+   برداشته شد (درخواستِ صریح: کاربر آن را نبیند) و جایش یک دکمهٔ مفیدتر
+   نشست که همان آهنگ را در رباتِ آهنگ‌بان باز می‌کند
+   (`?start=song_<id>`). اگر مدیر دکمهٔ رادیو را از تنظیمات روشن کند،
+   تابعِ رادیو دوباره دکمه‌اش را زیرِ همین دکمه چاپ می‌کند. */
+if ( function_exists( 'tara_acc_bot_song_button' ) ) {
+	echo tara_acc_bot_song_button( get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+}
+if ( function_exists( 'tara_radio_add_button' ) && function_exists( 'tara_radio_user_add_on' ) && tara_radio_user_add_on() ) {
 	echo tara_radio_add_button( get_the_ID(), array( 'class' => 'ty-radio-add ty-radio-add--single' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی escape شده
 }
 ?>

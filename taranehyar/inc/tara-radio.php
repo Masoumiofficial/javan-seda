@@ -62,6 +62,7 @@ if ( ! function_exists( 'tara_radio_defaults' ) ) {
 			'home'           => 'on',      // کارتِ رادیو در صفحهٔ اصلی
 			'home_featured'  => 'on',      // فقط آهنگ‌های «بخش ویژه» در صفحهٔ اصلی
 			'archives'       => 'on',      // دی‌جی‌باکس در آرشیو ژانر/حال‌وهوا
+			'user_add'       => 'off',     // دکمهٔ «افزودن به رادیو» برای کاربران
 		);
 
 		return apply_filters( 'tara_radio_defaults', $defaults );
@@ -91,6 +92,27 @@ if ( ! function_exists( 'tara_radio_option' ) ) {
 		}
 
 		return $value;
+	}
+}
+
+if ( ! function_exists( 'tara_radio_user_add_on' ) ) {
+	/**
+	 * آیا دکمهٔ «افزودن به رادیو» به کاربر نشان داده شود؟
+	 *
+	 * از نسخهٔ ۳.۱۰.۱ پیش‌فرض **خاموش** است: دکمه در صفحهٔ آهنگ و روی ردیف‌های
+	 * فهرست دیده نمی‌شود تا صفحهٔ آهنگ شلوغ نشود. رادیو خودش سرِ جایش کار
+	 * می‌کند و صف را از قواعدِ تنظیمات می‌سازد. اگر مدیر خواست، از تنظیمات
+	 * قالب → «رادیو و دی‌جی» روشنش می‌کند.
+	 *
+	 * @return bool
+	 */
+	function tara_radio_user_add_on() {
+		$value = tara_radio_option( 'user_add', 'off' );
+		if ( function_exists( 'tara_opt_on' ) ) {
+			return (bool) tara_opt_on( 'radio_user_add', false );
+		}
+
+		return in_array( strtolower( (string) $value ), array( 'on', '1', 'true', 'yes' ), true );
 	}
 }
 
@@ -773,7 +795,7 @@ if ( ! function_exists( 'tara_radio_add_button' ) ) {
 	 * @return string
 	 */
 	function tara_radio_add_button( $post_id = 0, $args = array() ) {
-		if ( ! tara_radio_on() ) {
+		if ( ! tara_radio_on() || ! tara_radio_user_add_on() ) {
 			return '';
 		}
 

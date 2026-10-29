@@ -555,12 +555,25 @@ $GLOBALS['__options']['option_tree']['radio_on'] = 'off';
 t( 'مارکاپ: رادیو خاموش ⇒ خروجی خالی', '' === tara_radio_box( array( 'tracks' => $tracks ) ) );
 unset( $GLOBALS['__options']['option_tree']['radio_on'] );
 
-/* دکمهٔ افزودن */
+/* دکمهٔ افزودن — v3.10.1: پیش‌فرض پنهان است (کاربر دکمه‌ای نمی‌بیند) */
+t( 'دکمهٔ افزودن: پیش‌فرض خاموش (کاربر نمی‌بیند)', '' === tara_radio_add_button( 601 ) );
+t( 'دکمهٔ افزودن: کلیدِ user_add پیش‌فرض off', 'off' === (string) tara_radio_option( 'user_add' ) );
+t( 'دکمهٔ افزودن: صحنهٔ آهنگ وقتی خاموش است دکمه ندارد', false === strpos( tara_radio_box( array( 'tracks' => $tracks ) ), 'data-tara-radio-add' ) );
+
+/* روشن‌کردنِ گزینه، دکمه را برمی‌گرداند */
+$GLOBALS['__options']['option_tree']['radio_user_add'] = 'on';
 $add = tara_radio_add_button( 601 );
-t( 'دکمهٔ افزودن: data-tara-radio-add', false !== strpos( $add, 'data-tara-radio-add' ) );
-t( 'دکمهٔ افزودن: دادهٔ آهنگ جاسازی شده', false !== strpos( $add, 'data-radio-track=' ) && false !== strpos( $add, '601.mp3' ) );
-t( 'دکمهٔ افزودن: آهنگِ بدونِ صدا ⇒ خالی', '' === tara_radio_add_button( 603 ) );
-t( 'دکمهٔ افزودن: label دسترس‌پذیر', false !== strpos( $add, 'aria-label=' ) );
+t( 'دکمهٔ افزودن (روشن): data-tara-radio-add', false !== strpos( $add, 'data-tara-radio-add' ) );
+t( 'دکمهٔ افزودن (روشن): دادهٔ آهنگ جاسازی شده', false !== strpos( $add, 'data-radio-track=' ) && false !== strpos( $add, '601.mp3' ) );
+t( 'دکمهٔ افزودن (روشن): آهنگِ بدونِ صدا ⇒ خالی', '' === tara_radio_add_button( 603 ) );
+t( 'دکمهٔ افزودن (روشن): label دسترس‌پذیر', false !== strpos( $add, 'aria-label=' ) );
+unset( $GLOBALS['__options']['option_tree']['radio_user_add'] );
+
+/* تنظیمات قالب: کلیدِ تازه ثبت شده است */
+$radio_opts = f( 'inc/theme-options.php' );
+t( 'تنظیمات: کلیدِ radio_user_add', false !== strpos( $radio_opts, "'id'=>'radio_user_add'" ) );
+t( 'تنظیمات: پیش‌فرضِ radio_user_add خاموش است', (bool) preg_match( "/'id'=>'radio_user_add'.{0,1200}?'std'=>'off'/s", $radio_opts ) );
+t( 'رادیو: help تبِ «فهرست من» با دکمهٔ خاموش هم چاپ می‌شود بدونِ خطا', '' !== tara_radio_box( array( 'tracks' => $tracks ) ) );
 
 /* ======================================================================
    ۶) سربرگِ ترم و سئو

@@ -245,10 +245,10 @@ if ( ! function_exists( 'tara_sidebar' ) ) {
 if ( ! function_exists( 'tara_expected_hashes' ) ) {
 	function tara_expected_hashes() {
 	return array(
-		'single.php'                => '842ac08fca601bf9ad3fe787ced0074b26ce94c4f02c4ec3652f4f1a3fdcadb9',
+		'single.php'                => '09b3b9ed71018e7c6baf98fbfdfca69d5798f153ceadd82ca3105abc1add5aea',
 		'page.php'                  => 'eed2370a3205d53f58bf0d5721275ae8896daf6c32e862403d9fe3a2982aac50',
 		'myfunctions.php'           => '8fb802cea2d4de0dfad598f9ce536c2148ccb0983c221f52d61ce0480935e9db',
-		'style.css'                 => '7233b02cec72b56666d3ed170face5cc2693108e90811f0ddaa7bfaf510d43a3',
+		'style.css'                 => 'c6fa1ffa41b7b8d8b9f901472e3e9ecb85cd1e35b918262d88cbf77bcef50dc0',
 		'footer.php'                => '1abadbdc8c45e760a622cb7557638adf3f5427f22b68fd7ee34e5774dec78d35',
 		'header.php'                => 'ceb4e5701bb38570828be9867f5c5b55141d16f145c5b29c9148d79edd51caed',
 		'home.php'                  => '0e60c37cb7a58dc2f615d3461065ded985a87c3dbe85575f51e39110a656eb3c',
@@ -261,7 +261,7 @@ if ( ! function_exists( 'tara_expected_hashes' ) ) {
 		'inc/ab-perf.php'           => 'dc305da6590c6b4002214f7db71412c0d11965f9a024c3e77ea35517f85234f4',
 		'inc/ab-seo.php'            => '83cd9e3cf2a81e93599a0f93598c15120ba7efbc49cd1c33bee5415528b305c0',
 		'inc/ab-controls.php'       => 'eed236181fe745999f0c150e4cec8c2e8c6b6daf3b52bf4e98a2347f60851176',
-		'inc/theme-options.php'     => '234a71be0c6d238fcea2e070a3764b02043cd758d0fda24ad227589c6b3ef9f8',
+		'inc/theme-options.php'     => '7a7f17f107228e901071a3e3ea0a0d3134a9b764db1a30f9bfdbf16f3bfc2df2',
 		'taxonomy-artist.php'       => 'ed759ba2e19ac3bbeba6551d596900189b4d8a388ed083ba983159fcb44a6bc6',
 		'taxonomy-singer.php'       => '38ed6b25f0146a900e1c580a85d64698497caf73c561abbadc0e9e4d245f9fce',
 		'inc/ab-tax-artist.php'     => '8aaa995ae6658ecbb7a2dd1ea32afc5c881edfaf1abc1594e89ee3a4c1bba9b0',

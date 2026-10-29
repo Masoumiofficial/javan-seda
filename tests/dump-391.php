@@ -111,6 +111,8 @@ echo "<!--SNIP:SEP-->\n";
 echo tara_acc_follow_button( 41 ); // phpcs:ignore
 echo "<!--SNIP:SEP-->\n";
 echo tara_acc_like_button( 701 ); // phpcs:ignore
+echo "<!--SNIP:SEP-->\n";
+echo tara_acc_bot_song_button( 701 ); // phpcs:ignore
 echo "//TARA:SNIPPETS\n";
 
 echo "<!--TARA:TABS-->\n";

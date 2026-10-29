@@ -123,7 +123,10 @@ if ( ! function_exists( 'tara_social_box' ) ) {
 				$label = $net[2];
 			}
 			$host = trim( preg_replace( '#/+$#', '', preg_replace( '/^https?:\/\//', '', preg_replace( '/\?.*$/', '', (string) $url ) ) ) );
+			/* v3.8.2 — `aria-label` اضافه شد: در گوشی فقط آیکون دیده می‌شود و
+			   بدون این برچسب، لینک برای صفحه‌خوان «لینکِ بی‌نام» بود. */
 			$items[] = '<a class="ab-social ab-social--' . esc_attr( $net[3] ) . '" href="' . esc_url( $url ) . '"'
+				. ' aria-label="' . esc_attr( $label ) . '" title="' . esc_attr( $label ) . '"'
 				. ' target="_blank" rel="noreferrer noopener nofollow">'
 				. '<span class="ab-social__icon"><i class="' . esc_attr( $net[4] ) . '" aria-hidden="true"></i></span>'
 				. '<span class="ab-social__txt">'

@@ -498,7 +498,7 @@ t( 'تاکسونومی: قالب مشترک آرشیو موجود', is_readable(
 /* ======================================================================
    v3.7.7 — بازبینی خرابی‌های گزارش‌شده و تنظیمات تازه
    ====================================================================== */
-t( 'نسخه: style.css روی ۳.۸.۱ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.8.1' ) );
+t( 'نسخه: style.css روی ۳.۸.۲ است', false !== strpos( (string) @file_get_contents( '/tmp/theme/style.css' ), 'Version: 3.8.2' ) );
 
 $opts = (string) @file_get_contents( '/tmp/theme/inc/theme-options.php' );
 t( 'تنظیمات: بخش رنگ‌ها اضافه شده', false !== strpos( $opts, "'id'=>'brand'" ) );
@@ -551,7 +551,7 @@ $dock_php = (string) @file_get_contents( '/tmp/theme/inc/tara-ui.php' );
 t( 'نوار چسبان: مارکاپ صدا دارد', false !== strpos( $dock_php, 'data-tara-dock-vol' ) && false !== strpos( $dock_php, 'data-tara-dock-mute' ) );
 $player_js2 = (string) @file_get_contents( '/tmp/theme/js/tara-player.js' );
 t( 'ویدیو: خروج با Esc و تغییر جهت', false !== strpos( $player_js2, "'orientationchange'" ) && false !== strpos( $player_js2, "e.key !== 'Escape'" ) );
-t( 'پلیر: نشانهٔ نسخه ۳.۸.۱', false !== strpos( $player_js2, "'data-tara-ready', '3.8.1'" ) );
+t( 'پلیر: نشانهٔ نسخه ۳.۸.۲', false !== strpos( $player_js2, "'data-tara-ready', '3.8.2'" ) );
 
 /* ======================================================================
    ۳.۷.۸ — دور ۶۶: ترتیب صفحهٔ آهنگ، اسلایدر تازه، سربرگ سه‌ستونهٔ هنرمند،
@@ -636,9 +636,10 @@ t(
 );
 t( 'اسلایدر: اسلایدها پشت‌سرهم در flow (بدون position:absolute)', false !== strpos( $home79, '.ty-hero-slide {' ) && false === strpos( $home79, 'inset: 0;\n\tdisplay: block;\n\tmargin: 0;' ) );
 t(
-	'اسلایدر: جاوااسکریپت روی scrollLeft کار می‌کند (و RTL را می‌فهمد)',
-	false !== strpos( $hero_js79, 'Math.abs(root.scrollLeft)' )
-		&& false !== strpos( $hero_js79, 'rtlNegative' )
+	/* v3.8.2 — شاخص از هندسهٔ واقعی گرفته می‌شود، نه از فرمولِ مدلِ RTL */
+	'اسلایدر: شاخص و پرش از هندسهٔ واقعی (getBoundingClientRect)',
+	false !== strpos( $hero_js79, 'function offsetOf(' )
+		&& false !== strpos( $hero_js79, 'getBoundingClientRect().left' )
 		&& false !== strpos( $hero_js79, 'scrollToIndex' )
 		&& false === strpos( $hero_js79, 'classList.remove(\'is-active\')' )
 );
@@ -695,14 +696,24 @@ $single710 = (string) @file_get_contents( '/tmp/theme/single.php' );
 $shell710 = (string) @file_get_contents( '/tmp/theme/inc/admin-settings-shell.php' );
 
 t(
-	'اسلایدر: دو لایهٔ تصویر (پس‌زمینهٔ بلور + تصویر کامل)',
-	false !== strpos( $vip710, 'ty-hero-slide__bg' )
-		&& false !== strpos( $vip710, 'ty-hero-slide__img' )
-		&& false !== strpos( $home710, 'object-fit: contain' )
-		&& false !== strpos( $home710, 'filter: blur(18px)' )
+	'اسلایدر: یک تصویر با cover و بدون لایهٔ بلورِ تکراری',
+	false !== strpos( $vip710, 'ty-hero-slide__img' )
+		&& false === strpos( $vip710, 'ty-hero-slide__bg' )
+		&& false !== strpos( $home710, 'object-fit: cover' )
+		&& false === strpos( $home710, 'object-fit: contain' )
+		&& false === strpos( $home710, 'filter: blur(18px)' )
 );
-t( 'اسلایدر: لایهٔ پشت برای صفحه‌خوان پنهان است', false !== strpos( $vip710, 'aria-hidden="true" loading="lazy"' ) );
-t( 'اسلایدر: نسبت گوشی ۱۶:۹ (بدون برش)', false !== strpos( $home710, '.ty-hero-slide__media { aspect-ratio: 16 / 9; }' ) && false === strpos( $home710, 'aspect-ratio: 5 / 4' ) );
+t(
+	'اسلایدر: کادرِ لینک‌دار (هر اسلاید به صفحهٔ آهنگ)',
+	false !== strpos( $vip710, 'class="ty-hero-slide__media" href="<?php the_permalink(); ?>"' )
+		&& false !== strpos( $home710, '.ty-hero-slide__media:focus-visible' )
+);
+t(
+	'اسلایدر: نسبت واحد ۱۶:۷ در همهٔ دستگاه‌ها',
+	false !== strpos( $home710, 'aspect-ratio: 16 / 7;' )
+		&& false === strpos( $home710, 'aspect-ratio: 16 / 9' )
+		&& false === strpos( $home710, 'aspect-ratio: 5 / 4' )
+);
 t( 'اسلایدر: نشانگرهای گوشی ۳۰px (ناحیهٔ لمس کافی)', false !== strpos( $home710, '.ty-hero-dot { width: 30px; height: 30px; padding: 11px; }' ) );
 
 t(
@@ -777,14 +788,14 @@ t(
 		&& false === strpos( $home80, 'direction: ltr; /* فقط برای ریاضیات' )
 );
 t(
-	'اسلایدر: هر دو مدل scrollLeft در RTL پوشش داده شد',
-	false !== strpos( $herojs80, 'rtlNegative = root.scrollLeft < 0' )
-		&& false !== strpos( $herojs80, '(total - 1) - Math.round(root.scrollLeft / w)' )
-		&& false !== strpos( $herojs80, '-i * w' )
+	'اسلایدر: بدون پروبِ شکنندهٔ scrollLeft (مدلِ RTL حدس زده نمی‌شود)',
+	false === strpos( $herojs80, 'rtlNegative' )
+		&& false === strpos( $herojs80, 'root.scrollLeft = -1' )
+		&& false !== strpos( $herojs80, 'root.scrollLeft + offsetOf(i)' )
 );
 t(
 	'اسلایدر: کلید جهت در RTL برعکس می‌شود',
-	false !== strpos( $herojs80, 'step = -step;' )
+	false !== strpos( $herojs80, "event.key === 'ArrowRight' ? -1 : 1" )
 );
 t(
 	'اسلایدر: اسلاید پنهان با inert از مسیر Tab بیرون است',
@@ -923,13 +934,18 @@ t(
 		&& false !== strpos( $hero81, 'if (target > total - 1) { target = 0; }' )
 );
 t(
-	'اسلایدر: کشیدن با ماوس (pointer) و مسدودکردن کلیکِ بعد از کشیدن',
+	'اسلایدر: کشیدن با ماوس، بدون قفل‌کردنِ کلیکِ ساده (لینک‌ها کار کنند)',
 	false !== strpos( $hero81, "event.pointerType !== 'mouse'" )
-		&& false !== strpos( $hero81, 'setPointerCapture' )
-		&& false !== strpos( $hero81, 'root.scrollLeft = drag.start - dx;' )
+		&& false !== strpos( $hero81, 'if (Math.abs(dx) < 6) {' )
+		&& false !== strpos( $hero81, 'root.setPointerCapture(event.pointerId)' )
+		&& false !== strpos( $hero81, 'setScroll(drag.start - dx)' )
 		&& false !== strpos( $hero81, 'suppressClick' )
 		&& false !== strpos( $home81, '.ty-hero-track.is-dragging' )
 		&& false !== strpos( $home81, 'cursor: grab' )
+);
+t(
+	'اسلایدر: pointerdown دیگر پیش از کشیدن capture نمی‌گیرد',
+	false !== strpos( $hero81, '/* هیچ capture‌ای این‌جا گرفته نمی‌شود؛ وگرنه یک کلیکِ ساده هم' )
 );
 t(
 	'اسلایدر: snap-stop حذف شد (پرشِ چند اسلایدی گیر نمی‌کند)',
@@ -968,12 +984,12 @@ t(
 
 /* --- نوار بالای موبایل، منو، اموجی شب --- */
 t(
-	'موبایل: دکمه‌های منو/جست‌وجو ۴۶px، وسط‌چین و دکمه‌مانند',
+	'موبایل: دکمه‌های منو/جست‌وجو دایرهٔ ۴۶px و وسط‌چین',
 	false !== strpos( $ui81, 'width: 46px;' )
 		&& false !== strpos( $ui81, 'top: 50%;' )
 		&& false !== strpos( $ui81, '#mobiles_header .search_mobile_box { left: 64px; }' )
-		&& false !== strpos( $ui81, 'border-radius: 15px;' )
-		&& false !== strpos( $ui81, 'linear-gradient(160deg, #191c24 0%, #0b0d12 100%)' )
+		&& false !== strpos( $ui81, 'border-radius: 50%;' )
+		&& false !== strpos( $ui81, 'linear-gradient(160deg, #23262f 0%, #0a0c11 100%)' )
 );
 t(
 	'موبایل: لوگو هم وسطِ عمودی نوار',
@@ -1029,6 +1045,132 @@ t(
 	'دانلود: کلاس‌های لینک (۱۲۸/۳۲۰) دست‌نخورده',
 	false !== strpos( $single81, "'music128' => array( 'دانلود  آهنگ با کیفیت 128', 'dl_link_128' )" )
 		&& false !== strpos( $single81, "'music320' => array( ' دانلود آهنگ با کیفیت 320', 'dl_links_320' )" )
+);
+
+/* ======================================================================
+   ۳.۸.۲ — دور ۷۱
+   اسلایدر (هندسهٔ واقعی، لینک، ۱۶:۷)، همبرگرِ وسطِ دایره، «ما را دنبال
+   کنید» آیکونی در گوشی، پلیر ویدیوی استاندارد، کاور بزرگ‌ترِ دسکتاپ،
+   راست‌چینیِ پلیر و کارتِ لوگو در پنل.
+   ====================================================================== */
+$home82  = (string) @file_get_contents( '/tmp/theme/css/tara-home.css' );
+$ui82    = (string) @file_get_contents( '/tmp/theme/css/tara-ui.css' );
+$abu82   = (string) @file_get_contents( '/tmp/theme/css/ab-ui.css' );
+$style82 = (string) @file_get_contents( '/tmp/theme/style.css' );
+$hero82  = (string) @file_get_contents( '/tmp/theme/js/hero-slider.js' );
+$vip82   = (string) @file_get_contents( '/tmp/theme/inc/vip_slider.php' );
+$logo82  = (string) @file_get_contents( '/tmp/theme/inc/ab-logo-setting.php' );
+$view82  = (string) @file_get_contents( '/tmp/theme/inc/admin-panel-views.php' );
+$post82  = (string) @file_get_contents( '/tmp/theme/inc/ab-post-extras.php' );
+$panel82 = (string) @file_get_contents( '/tmp/theme/css/admin-panel.css' );
+
+/* --- اسلایدر: هندسه، لینک، نسبت --- */
+t(
+	'اسلایدر: شاخص = نزدیک‌ترین اسلاید (بدون فرمولِ RTL)',
+	false !== strpos( $hero82, 'function index() {' )
+		&& false !== strpos( $hero82, 'var distance = Math.abs(offsetOf(i));' )
+		&& false === strpos( $hero82, 'Math.round(root.scrollLeft / w)' )
+);
+t(
+	'اسلایدر: پرش = scrollLeft + فاصلهٔ واقعی اسلاید',
+	false !== strpos( $hero82, 'var left = root.scrollLeft + offsetOf(i);' )
+);
+t(
+	'اسلایدر: capture فقط بعد از ۶px کشیدن گرفته می‌شود',
+	false !== strpos( $hero82, 'if (Math.abs(dx) < 6) {' )
+		&& false !== strpos( $hero82, 'drag.moved = true;' )
+);
+t(
+	'اسلایدر: هر اسلاید یک لینک واقعی به صفحهٔ آهنگ',
+	false !== strpos( $vip82, '<a class="ty-hero-slide__media" href="<?php the_permalink(); ?>"' )
+		&& false !== strpos( $vip82, 'aria-label="<?php echo esc_attr(' )
+);
+t(
+	'اسلایدر: کادر ۱۶:۷ و تصویر cover (بدون حاشیهٔ مات)',
+	false !== strpos( $home82, 'aspect-ratio: 16 / 7;' )
+		&& false !== strpos( $home82, 'object-fit: cover;' )
+		&& false !== strpos( $vip82, 'width="1280" height="560"' )
+);
+t(
+	'اسلایدر: نسبت ۱۶:۹ گوشی حذف شد (یک نسبت در همه‌جا)',
+	false === strpos( $home82, '16 / 9' )
+);
+
+/* --- همبرگرِ وسطِ دایره --- */
+t(
+	'موبایل: خط‌های همبرگر با inset/margin:auto در مرکز دایره',
+	preg_match( '/#mobiles_header \.responsive-menu-button-inner\s*\{[^}]*inset:\s*0;[^}]*margin:\s*auto;/s', $ui82 )
+		&& false !== strpos( $ui82, 'right: auto; left: 0; }' )
+);
+t(
+	'موبایل: دکمه‌ها دایره‌اند (نه مربعِ گوشه‌گرد)',
+	false !== strpos( $ui82, 'border-radius: 50%;' )
+);
+
+/* --- ما را دنبال کنید --- */
+t(
+	'دنبال‌کردن: در گوشی فقط آیکونِ گرد ۴۴px',
+	false !== strpos( $abu82, '.ab-social{' )
+		&& false !== strpos( $abu82, 'width:44px;height:44px;margin:0;padding:0;border-radius:50%;' )
+		&& false !== strpos( $abu82, '.ab-social__txt,.ab-social__arrow{position:absolute;' )
+		&& false !== strpos( $style82, '.ab-social__txt,.ab-social__arrow{position:absolute;' )
+);
+t(
+	'دنبال‌کردن: لینک‌ها aria-label گرفتند (آیکونِ بی‌نام نه)',
+	false !== strpos( $post82, "aria-label=\"' . esc_attr( \$label ) . '\"" )
+);
+
+/* --- پلیر ویدیو و آهنگ --- */
+t(
+	'ویدیو: حداکثر عرض ۸۶۰px و وسط‌چین (کاور کل صفحه را نمی‌گیرد)',
+	false !== strpos( $ui82, 'max-width: 860px;' )
+		&& false !== strpos( $ui82, 'margin: 22px auto;' )
+);
+t(
+	'ویدیو: پوستر کادر را پر می‌کند (بدون نوارِ خالی)',
+	preg_match( '/\.ty-video__poster\s*\{[^}]*object-fit:\s*cover;[^}]*object-position:\s*center;[^}]*opacity:\s*\.9;/s', $ui82 )
+);
+t(
+	'ویدیو: حالت تمام‌صفحه از سقفِ ۸۶۰px آزاد می‌شود',
+	preg_match( '/\.ty-video\.is-fullscreen,[^{]*\{[^}]*max-width:\s*none;/s', $ui82 )
+);
+t(
+	'پلیر: کاور دسکتاپ ۱۹۲px',
+	false !== strpos( $ui82, 'width: 192px;' )
+);
+t(
+	'پلیر: راست‌چینیِ صریح برای کارت/سرتیتر/ترابری/نوار ویدیو',
+	preg_match( '/\.ty-player__transport,\s*\.ty-video__bar\s*\{\s*text-align:\s*right;/s', $ui82 )
+);
+
+/* --- کارت لوگو --- */
+t(
+	'لوگو: کارت آپلود/آدرس/بازگردانی در پنل',
+	false !== strpos( $logo82, 'function tara_logo_card()' )
+		&& false !== strpos( $logo82, 'name="tara_logo_file"' )
+		&& false !== strpos( $logo82, 'name="tara_logo_url"' )
+		&& false !== strpos( $logo82, 'name="tara_logo_reset"' )
+);
+t(
+	'لوگو: ذخیره در همان option_tree که ot_get_option می‌خواند',
+	false !== strpos( $logo82, "\$options['logo'] = (string) \$url;" )
+		&& false !== strpos( $logo82, 'update_option( $option_id, $options )' )
+);
+t(
+	'لوگو: امنیت (nonce + manage_options + media_handle_upload)',
+	false !== strpos( $logo82, "check_admin_referer( 'tara_save_logo' )" )
+		&& false !== strpos( $logo82, "current_user_can( 'manage_options' )" )
+		&& false !== strpos( $logo82, "media_handle_upload( 'tara_logo_file', 0 )" )
+);
+t(
+	'لوگو: کارت در پیشخوان پنل رندر می‌شود',
+	false !== strpos( $view82, 'tara_logo_card()' )
+		&& false !== strpos( $view82, 'tara_logo_notice()' )
+);
+t(
+	'لوگو: استایل کارت در CSS پنل',
+	false !== strpos( $panel82, '.ty-logo-card {' )
+		&& false !== strpos( $panel82, '.ty-logo-card__preview' )
 );
 
 /* ======================================================================

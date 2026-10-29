@@ -71,6 +71,16 @@
 		var(--ty-surface);
 }
 
+/* v3.8.2 — راست‌چینیِ صریحِ پلیر.
+   کارت `dir="rtl"` دارد، ولی بخشی از کنترل‌ها (نوار زمان/ابزارها) در
+   بعضی مرورگرها به `text-align` ارثیِ والد تکیه می‌کردند و روی بعضی
+   قالب‌ها چپ می‌شدند. این‌جا صریح شده است. */
+.ty-player,
+.ty-player__head,
+.ty-player__labels,
+.ty-player__transport,
+.ty-video__bar { text-align: right; }
+
 .ty-player:focus-within {
 	border-color: color-mix(in srgb, var(--ty-accent) 35%, var(--ty-line));
 }
@@ -98,9 +108,12 @@
    تعداد درخواست‌ها بالا نمی‌رود چون تصویر بزرگ فقط هنگام باز شدن پاپ‌آپ لود می‌شود. */
 /* v3.7.8 — کاورِ جانشین: فقط وقتی آهنگ فایل صوتی ندارد (پلیر چاپ نمی‌شود).
    همان دکمهٔ دوربین روی آن هم کار می‌کند. */
+/* v3.8.2 — کاورِ جانشین (آهنگی که فایل صوتی ندارد) هم عرضِ صفحه را
+   نمی‌گیرد؛ همان اندازهٔ استانداردِ کاورِ آهنگ، وسط‌چین. */
 .ty-cover-fallback {
 	position: relative;
-	margin: 0 0 16px;
+	max-width: 420px;
+	margin: 0 auto 16px;
 	border-radius: 18px;
 	overflow: hidden;
 	line-height: 0;
@@ -1176,18 +1189,23 @@ body.has-tara-dock { padding-bottom: 76px; }
    ---------------------------------------------------------------------
    کاربر (با اسکرین‌شات) گفت دکمهٔ منو و جست‌وجو «خیلی کوچک‌اند و افتاده‌اند
    در گوشهٔ بالا». پیش از این دو مربع ۴۰×۴۰ با گوشهٔ ۴px و چسبیده به لبهٔ
-   بالا بودند (margin-top ثابت ۱۲px روی هدر ۷۰px ⇒ نامتوازن). حالا:
-     • ۴۶×۴۶ (ناحیهٔ لمس استاندارد) با گوشهٔ ۱۵px و گرادیانِ تیره
-     • دقیقاً وسطِ عمودیِ نوار (absolute + translateY)
-     • فاصلهٔ ۱۰px از لبه و ۶۴px از هم ⇒ دیگر «افتاده در گوشه» نیستند
-     • آیکون ۲۱px، خط‌های همبرگر ۲۲px و روشن‌تر
-   روی دستگاه لمسی hover بی‌معناست، پس فقط :active کوچک می‌شود. */
+   بالا بودند (margin-top ثابت ۱۲px روی هدر ۷۰px ⇒ نامتوازن).
+
+   v3.8.2 — شکلِ «دایرهٔ مشکی» به درخواست کاربر:
+     • دو دکمهٔ گردِ ۴۶px با گرادیانِ تیره و حلقهٔ نازکِ روشن
+     • دقیقاً وسطِ عمودیِ نوار، ۱۰px از لبه و ۶۲px از هم
+     • آیکون ذره‌بین ۲۰px و خط‌های همبرگر ۲۲px، هر دو در مرکزِ هندسیِ دایره
+   توجه: قاعدهٔ بالا `left/top/right/bottom: 0; margin: auto` دارد و
+   نسخهٔ ۳.۸.۱ فقط `left`/`top` را عوض می‌کرد؛ چون `right:0` سر جایش بود،
+   در RTL همان `right` برنده می‌شد و آیکون از مرکز بیرون می‌زد. حالا با
+   `inset: 0; margin: auto` هر چهار لبه بازنویسی می‌شوند. */
 @media (max-width: 800px) {
 	#mobiles_header .navicon,
 	#mobiles_header .search_mobile_box {
 		position: absolute;
 		top: 50%;
 		left: 10px;
+		right: auto;
 		transform: translateY(-50%);
 		display: inline-flex;
 		align-items: center;
@@ -1196,24 +1214,34 @@ body.has-tara-dock { padding-bottom: 76px; }
 		height: 46px;
 		margin: 0;
 		float: none;
-		border-radius: 15px;
-		border: 1px solid rgba(255, 255, 255, .14);
-		background: linear-gradient(160deg, #191c24 0%, #0b0d12 100%);
+		border-radius: 50%;
+		border: 1px solid rgba(255, 255, 255, .16);
+		background: linear-gradient(160deg, #23262f 0%, #0a0c11 100%);
 		color: #fff;
-		font-size: 21px;
+		font-size: 20px;
 		line-height: 1;
-		box-shadow: 0 8px 18px -12px rgba(0, 0, 0, .95), inset 0 1px 0 rgba(255, 255, 255, .09);
+		box-shadow: 0 10px 20px -12px rgba(0, 0, 0, .95), inset 0 1px 0 rgba(255, 255, 255, .10);
 		-webkit-tap-highlight-color: transparent;
 		transition: transform .16s ease, box-shadow .16s ease;
 	}
 
 	#mobiles_header .search_mobile_box { left: 64px; }
 
+	/* آیکون ذره‌بین: مرکزِ دایره، بدون جابه‌جاییِ خطِ مبنای فونت */
+	#mobiles_header .search_mobile_box > i {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		line-height: 1;
+	}
+
 	/* در شب همان دکمه، یک پله روشن‌تر تا از پس‌زمینهٔ تیره جدا شود */
 	.night #mobiles_header .navicon,
 	.night #mobiles_header .search_mobile_box {
-		background: linear-gradient(160deg, #262a35 0%, #12141b 100%);
-		border-color: rgba(255, 255, 255, .20);
+		background: linear-gradient(160deg, #2c303a 0%, #14161d 100%);
+		border-color: rgba(255, 255, 255, .22);
 	}
 
 	#mobiles_header .navicon:active,
@@ -1227,7 +1255,7 @@ body.has-tara-dock { padding-bottom: 76px; }
 		outline-offset: 2px;
 	}
 
-	/* خط‌های همبرگر: وسطِ دکمه، روشن و ۲۲px */
+	/* خط‌های همبرگر: دقیقاً وسطِ دایره، روشن و ۲۲px */
 	#mobiles_header .responsive-menu-button-inner,
 	#mobiles_header .responsive-menu-button-inner::before,
 	#mobiles_header .responsive-menu-button-inner::after {
@@ -1238,13 +1266,17 @@ body.has-tara-dock { padding-bottom: 76px; }
 	}
 
 	#mobiles_header .responsive-menu-button-inner {
-		top: 50%;
-		left: 50%;
-		margin: -1px 0 0 -11px;
+		position: absolute;
+		inset: 0;
+		margin: auto;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
 	}
 
-	#mobiles_header .responsive-menu-button-inner::before { bottom: -6px; }
-	#mobiles_header .responsive-menu-button-inner::after { top: -6px; }
+	#mobiles_header .responsive-menu-button-inner::before { bottom: -6px; right: auto; left: 0; }
+	#mobiles_header .responsive-menu-button-inner::after { top: -6px; right: auto; left: 0; }
 
 	/* نوار جست‌وجوی کشویی هم دقیقاً به ارتفاع نوار باشد؛ پیش از این ۶۵px
 	   روی هدرِ ۷۰px بود و یک نوار ۵ پیکسلیِ خالی زیرش می‌ماند. */
@@ -1437,12 +1469,14 @@ body.has-tara-dock { padding-bottom: 76px; }
 @media (min-width: 783px) {
 	.ty-player {
 		padding: 24px 26px;
-		gap: 24px;
+		gap: 26px;
 	}
 
+	/* v3.8.2 — کاربر گفت کاورِ پلیر در دسکتاپ «کمی بزرگ‌تر» باشد؛
+	   ۱۶۸ → ۱۹۲px (هم‌اندازه با نسبتِ استانداردِ کاورِ آهنگ در فهرست‌ها). */
 	.ty-player__art {
-		width: 168px;
-		height: 168px;
+		width: 192px;
+		height: 192px;
 	}
 
 	.ty-player__img { border-radius: 16px; }
@@ -2079,14 +2113,24 @@ body.has-tara-modal { overflow: hidden; }
 /* =========================================================================
    ۱۰) پلیر ویدیو — نسخهٔ ۳.۷.۳
    ====================================================================== */
+/* v3.8.2 — پلیر ویدیو «استاندارد» شد.
+   -------------------------------------------------------------------------
+   کاربر گفت کاورِ پلیر ویدیو «کل صفحه را گرفته». ریشه: پلیر تمامِ عرضِ
+   ستونِ محتوا را می‌گرفت و با نسبتِ ۱۶:۹ روی دسکتاپِ ۱۲۰۰px یعنی کادری
+   ≈۶۷۵px بلند — تقریباً تمامِ ارتفاعِ یک لپ‌تاپ.
+   حالا حداکثر عرض ۸۶۰px و وسط‌چین است (≈۴۸۴px ارتفاع با همان نسبت)،
+   مثل هر پلیر استانداردِ دیگری. در گوشی همان ۱۰۰٪ عرض می‌ماند.
+   متن و کنترل‌ها هم صریحاً راست‌چین‌اند (قبلاً به dir ارثی تکیه داشتند). */
 .ty-video {
-	margin: 22px 0;
+	max-width: 860px;
+	margin: 22px auto;
 	border: 1px solid var(--ty-line, #e6e8ee);
 	border-radius: 18px;
 	background: #0d0b16;
 	overflow: hidden;
 	box-shadow: 0 20px 44px -34px rgba(15, 12, 30, .9);
 	direction: rtl;
+	text-align: right;
 }
 
 .ty-video__stage {
@@ -2128,15 +2172,20 @@ body.has-tara-modal { overflow: hidden; }
 	inset: 0;
 	width: 100%;
 	height: 100%;
+	/* v3.8.2 — پوستر تمامِ کادر را پر می‌کند (بدون نوارِ خالی/محو در دو طرف).
+	   کادر هم به ۱۶:۹ و عرضِ حداکثر ۸۶۰px محدود شده، پس دیگر «کل صفحه» را
+	   نمی‌گیرد. اگر پوسترِ مربعی باشد، فقط لبه‌های بالا/پایین بریده می‌شود. */
 	object-fit: cover;
-	opacity: .72;
+	object-position: center;
+	opacity: .9;
 }
 
 .ty-video__cover::after {
 	content: "";
 	position: absolute;
 	inset: 0;
-	background: linear-gradient(180deg, rgba(13, 11, 22, .10) 0%, rgba(13, 11, 22, .72) 100%);
+	/* گرادیان سبک‌تر از قبل تا پوسترِ `contain` تیره و «محو» نشود */
+	background: linear-gradient(180deg, rgba(13, 11, 22, 0) 45%, rgba(13, 11, 22, .62) 100%);
 }
 
 .ty-video__bigplay {
@@ -3085,6 +3134,9 @@ body.has-tara-dock .top_page {
 	position: fixed;
 	inset: 0;
 	z-index: 999999;
+	/* v3.8.2 — پلیر در حالت عادی max-width:860px دارد؛ در تمام‌صفحه باید
+	   آزاد شود، وگرنه «تمام‌صفحه» فقط ۸۶۰px وسطِ سیاهی می‌شد. */
+	max-width: none;
 	width: 100vw;
 	height: 100vh;
 	height: 100dvh;

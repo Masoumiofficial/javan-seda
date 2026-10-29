@@ -116,21 +116,18 @@ if ( $tara_fixbvip ) {
 						aria-roledescription="slide"
 						aria-label="<?php echo esc_attr( $tara_slide . ' از ' . $tara_slide_total ); ?>"
 						aria-hidden="<?php echo ( 1 === $tara_slide ) ? 'false' : 'true'; ?>">
-						<a class="ty-hero-slide__media" href="<?php the_permalink(); ?>">
+						<a class="ty-hero-slide__media" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr( '' !== $tara_vip_song ? $tara_vip_song : get_the_title() ); ?>">
 							<?php
-							/* v3.7.10 — دو لایهٔ تصویر، بدون درخواست اضافه (همان آدرس، از کش):
-							   ۱) لایهٔ پشت: همان تصویر با `cover` و بلورِ تیره ⇒ پس‌زمینهٔ
-							      تمام‌قاب که هیچ ناحیهٔ خالی/سفیدی نمی‌گذارد.
-							   ۲) لایهٔ رو: تصویر با `contain` ⇒ هیچ متنی از کاور مدیر بریده
-							      نمی‌شود. پیش از این `cover` روی کاورهای پهن، «MEGA MIX» را از
-							      دو طرف می‌برید (در اسکرین‌شاتِ کاربر دیده می‌شد).
-							   لایهٔ پشت aria-hidden و alt خالی است تا صفحه‌خوان دوبار نخواند. */
+							/* v3.8.2 — یک تصویر، نه دو.
+							   از ۳.۷.۱۰ این‌جا دو <img> با یک آدرس بود: یکی بلورشده در
+							   پس‌زمینه و یکی `contain` در رو. کارِ لایهٔ پشت پر کردنِ
+							   نوارهای خالیِ contain بود؛ ولی همان نوارها همان «حاشیهٔ
+							   ماتِ» ناخوشایندی بودند که کاربر دید. حالا کادر دقیقاً ۱۶:۷
+							   است (نسبتِ استانداردِ بنر) و تصویر با `cover` تمامِ کادر را
+							   پر می‌کند؛ پس لایهٔ دوم هم بی‌مصرف شد و حذف شد (DOM
+							   سبک‌تر، یک درخواست کمتر برای مرورگرهای بدون کش). */
+							$tara_img_attrs = 'width="1280" height="560"';
 							?>
-							<?php $tara_img_attrs = 'width="1280" height="560"'; ?>
-							<img class="ty-hero-slide__bg" src="<?php echo esc_url( $tara_image ); ?>"
-								<?php if ( '' !== $tara_srcset ) { ?>srcset="<?php echo esc_attr( $tara_srcset ); ?>" sizes="(max-width: 782px) 100vw, (max-width: 1340px) 94vw, 1240px"<?php } ?>
-								<?php echo $tara_img_attrs; // phpcs:ignore WordPress.Security.EscapeOutput -- ثابت ?>
-								alt="" aria-hidden="true" loading="lazy" decoding="async" draggable="false">
 							<img class="ty-hero-slide__img" src="<?php echo esc_url( $tara_image ); ?>"
 								<?php if ( '' !== $tara_srcset ) { ?>srcset="<?php echo esc_attr( $tara_srcset ); ?>" sizes="(max-width: 782px) 100vw, (max-width: 1340px) 94vw, 1240px"<?php } ?>
 								<?php echo $tara_img_attrs; // phpcs:ignore WordPress.Security.EscapeOutput -- ثابت ?>
@@ -141,12 +138,6 @@ if ( $tara_fixbvip ) {
 								fetchpriority="<?php echo esc_attr( $tara_priority ); ?>">
 						</a>
 
-						<?php
-						/* v3.7.5 — به درخواست کاربر، همهٔ متن‌های روی اسلاید (برچسبِ بالای
-						   کارت، عنوان/نام خواننده و دکمهٔ شنیدن) حذف شد. اسلاید حالا فقط
-						   کاورِ تمام‌عرض است و کل کارت را می‌پوشاند؛ کلیک روی تصویر همان
-						   لینک صفحهٔ آهنگ است. */
-						?>
 					</article>
 					<?php
 				endwhile;

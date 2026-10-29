@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.8.1' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.8.2' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -543,6 +543,14 @@ if ( is_admin() ) {
 		require_once $taranehyar_panel;
 	}
 	unset( $taranehyar_panel );
+
+	/* v3.8.2 — کارتِ «لوگو سایت» در پیشخوان پنل (آپلود/آدرس/بازگردانی).
+	   قبل از افزونهٔ پنل لازم نیست؛ فقط باید در is_admin() باشد. */
+	$taranehyar_logo = TARANEHYAR_DIR . '/inc/ab-logo-setting.php';
+	if ( is_readable( $taranehyar_logo ) ) {
+		require_once $taranehyar_logo;
+	}
+	unset( $taranehyar_logo );
 
 	/* پوستهٔ تازهٔ صفحهٔ تنظیمات (۳.۷.۰) — فقط ظاهر و جست‌وجو؛ نه ذخیره‌سازی */
 	$taranehyar_shell = TARANEHYAR_DIR . '/inc/admin-settings-shell.php';

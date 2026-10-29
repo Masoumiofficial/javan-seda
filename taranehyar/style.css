@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.8.1
+Version: 3.8.2
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -2763,11 +2763,29 @@ a.ab-sp__title:hover,a.ab-sp__title:focus{color:var(--ab-blue-accent);text-decor
 .night .ab-sp-track{background:rgba(255,255,255,.14)}
 .night .ab-sp-thumb{background:#2c2c2c}
 @media (max-width:767px){
-	.ab-social-box__row{padding:9px 9px 10px}
-	.ab-social{display:flex;width:100%;margin:0 0 7px}
+	/* v3.8.2 — «ما را دنبال کنید» در گوشی فقط آیکون شد.
+	   ------------------------------------------------------------------
+	   کاربر گفت چهار ردیفِ تمام‌عرض با متن و آدرس، صفحهٔ آهنگ را در گوشی
+	   شلوغ می‌کند؛ یا آیکون‌ها بمانند یا اسلایدی شود. این‌جا نسخهٔ آیکونی
+	   انتخاب شد (سبک‌تر از یک اسلایدر و بدون JS): چهار دکمهٔ گردِ ۴۴px که
+	   در یک ردیف می‌نشینند و اگر جا نشد، خودشان اسکرول افقی می‌شوند.
+	   متن و آدرس با `sr-only` برای صفحه‌خوان باقی می‌ماند و خودِ لینک هم
+	   `aria-label` دارد؛ پس هیچ اطلاعاتی حذف نشده، فقط دیده نمی‌شود. */
+	.ab-social-box__row{
+		display:flex;flex-wrap:nowrap;gap:8px;padding:10px;
+		overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;
+	}
+	.ab-social-box__row::-webkit-scrollbar{display:none;width:0;height:0}
+	.ab-social{
+		display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+		width:44px;height:44px;margin:0;padding:0;border-radius:50%;
+		background:var(--ab-blue-soft);border:1px solid var(--ab-line);
+	}
 	.ab-social:last-child{margin-bottom:0}
-	.ab-social__txt em{max-width:none}
-	.ab-social__arrow{margin-right:auto}
+	.ab-social__icon{width:100%;height:100%;margin:0;border-radius:50%;background:transparent;font-size:19px}
+	.ab-social__txt,.ab-social__arrow{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
+	.ab-social-box__head{padding:10px 12px}
+	.ab-social-box__hint{display:none}
 	.ab-sp__in{padding:3px 8px}
 	.ab-sp-thumb,.ab-sp-thumb img{width:30px;height:30px}
 	.ab-sp-play{width:28px;height:28px;margin:0 5px;font-size:12px}

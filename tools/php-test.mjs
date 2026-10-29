@@ -48,7 +48,7 @@ for (const js of ['admin-panel.js']) {
   files.push({ parent: '/tmp/theme/js', name: js, url: 'file://' + path.join(theme, 'js', js) });
 }
 /* فایل‌های تازهٔ ۳.۷.۰ — آزمون run-370 */
-for (const name of ['tara-taxonomies.php', 'tara-ui.php', 'tara-critical.php', 'tara-brand.php', 'admin-settings-shell.php', 'tax-listing.php', 'ab-credits.php', 'vip_slider.php', 'ab-seo.php']) {
+for (const name of ['tara-taxonomies.php', 'tara-ui.php', 'tara-critical.php', 'tara-brand.php', 'admin-settings-shell.php', 'tax-listing.php', 'ab-credits.php', 'vip_slider.php', 'ab-seo.php', 'ab-logo-setting.php', 'ab-post-extras.php']) {
   files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
 }
 for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-settings.css', 'ab-glass.css', 'ab-ui.css']) {

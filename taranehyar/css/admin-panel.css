@@ -527,3 +527,85 @@
 .ty-tax__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ty-tax__body strong { font-size: 13px; font-weight: 700; }
 .ty-tax__body em { font-style: normal; font-size: 11px; color: var(--ty-muted); }
+
+/* =====================================================================
+   v3.8.2 — کارتِ «لوگوی سایت» در پیشخوان
+   ---------------------------------------------------------------------
+   دو ستون: پیش‌نمایشِ لوگوی فعلی (روی شطرنجیِ شفافیت) و فرمِ آپلود.
+   در گوشی یک ستون می‌شود. همه‌چیز با توکن‌های خودِ پنل تا در حالت
+   شب/روشن همان‌قدر خوانا باشد.
+   ================================================================== */
+.ty-logo-card {
+	display: grid;
+	grid-template-columns: 260px minmax(0, 1fr);
+	gap: 20px;
+	align-items: start;
+	margin-bottom: 26px;
+}
+
+.ty-logo-card__preview {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	min-height: 120px;
+	padding: 16px;
+	border: 1px solid var(--ty-line);
+	border-radius: 14px;
+	background-color: #fff;
+	background-image:
+		linear-gradient(45deg, #f1f1f4 25%, transparent 25%, transparent 75%, #f1f1f4 75%),
+		linear-gradient(45deg, #f1f1f4 25%, transparent 25%, transparent 75%, #f1f1f4 75%);
+	background-size: 16px 16px;
+	background-position: 0 0, 8px 8px;
+	text-align: center;
+}
+
+.ty-logo-card__preview img {
+	display: block;
+	max-width: 100%;
+	max-height: 72px;
+	width: auto;
+	height: auto;
+	object-fit: contain;
+}
+
+.ty-logo-card__preview .ty-pill { background: rgba(255, 255, 255, .92); border: 1px solid var(--ty-line); }
+
+.ty-logo-card__form { display: grid; gap: 12px; }
+
+.ty-logo-card__row { display: grid; gap: 6px; margin: 0; }
+
+.ty-logo-card__row label { font-size: 12.5px; font-weight: 700; color: var(--ty-ink); }
+
+.ty-logo-card__row input[type="file"],
+.ty-logo-card__row input[type="url"] {
+	width: 100%;
+	padding: 8px 10px;
+	border: 1px solid var(--ty-line);
+	border-radius: 10px;
+	background: #fff;
+	font-size: 12.5px;
+	line-height: 1.8;
+}
+
+.ty-logo-card__row input[type="url"]:focus,
+.ty-logo-card__row input[type="file"]:focus {
+	outline: 2px solid var(--ty-accent);
+	outline-offset: 1px;
+}
+
+.ty-logo-card__actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 2px 0 0; }
+
+.ty-logo-card__hint {
+	margin: 0;
+	font-size: 11.5px;
+	line-height: 1.9;
+	color: var(--ty-muted);
+}
+
+@media (max-width: 782px) {
+	.ty-logo-card { grid-template-columns: minmax(0, 1fr); }
+	.ty-logo-card__preview { min-height: 96px; }
+}

@@ -18,6 +18,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /* -------------------------------------------------------------------------
+ * ۰) لوگو — یک منبعِ واحد برای سربرگ، کشوی موبایل و کارتِ پنل (v3.8.2)
+ * ----------------------------------------------------------------------
+ * پیش از این `ot_get_option('logo')` مستقیم در دو قالب چاپ می‌شد؛ اگر مقدار
+ * خالی بود `src=""` تولید می‌شد (مرورگر همان صفحه را به‌جای تصویر می‌خواست).
+ * حالا همیشه یک آدرسِ معتبر برمی‌گردد: تنظیمات → وگرنه لوگوی پیش‌فرضِ قالب.
+ * ---------------------------------------------------------------------- */
+
+if ( ! function_exists( 'tara_logo_default' ) ) {
+	/**
+	 * لوگوی پیش‌فرضِ قالب.
+	 *
+	 * @return string
+	 */
+	function tara_logo_default() {
+		return trailingslashit( get_template_directory_uri() ) . 'images/logo.png';
+	}
+}
+
+if ( ! function_exists( 'tara_logo_url' ) ) {
+	/**
+	 * آدرس لوگوی فعلی (هرگز خالی).
+	 *
+	 * @return string
+	 */
+	function tara_logo_url() {
+		$value = function_exists( 'ot_get_option' ) ? ot_get_option( 'logo', '' ) : '';
+		if ( function_exists( 'tara_media_url' ) ) {
+			$value = tara_media_url( $value );
+		} elseif ( is_array( $value ) ) {
+			$value = isset( $value['url'] ) && is_string( $value['url'] ) ? $value['url'] : '';
+		}
+		$value = is_string( $value ) ? trim( $value ) : '';
+
+		return '' !== $value ? $value : tara_logo_default();
+	}
+}
+
+/* -------------------------------------------------------------------------
  * ۱) خواندن داده‌های آهنگ — همیشه با fallback به متای ساده
  * ---------------------------------------------------------------------- */
 

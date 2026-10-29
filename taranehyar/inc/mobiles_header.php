@@ -1,6 +1,6 @@
 <header id="mobiles_header">
 <div class="logo_mobiles"><figure>
-<a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( ot_get_option('logo') ); ?>" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" title="<?php echo ot_get_option('head_h1'); ?>" width="150" height="40"></a>
+<a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( function_exists( 'tara_logo_url' ) ? tara_logo_url() : ot_get_option( 'logo' ) ); ?>" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" title="<?php echo ot_get_option('head_h1'); ?>" width="150" height="40"></a>
 </figure>
 </div>
 <?php /* v3.8.0 — دکمهٔ منو و جست‌وجوی موبایل از <div> به <button> تبدیل شدند:
@@ -17,7 +17,7 @@
 <div class="bodydeactive"></div>
 <div class="mobiles_menu" role="dialog" aria-modal="true" aria-label="منوی سایت" aria-hidden="true">
 <div class="top_logo_title">
-<a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( ot_get_option('logo') ); ?>" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" width="150" height="40"></a>
+<a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( function_exists( 'tara_logo_url' ) ? tara_logo_url() : ot_get_option( 'logo' ) ); ?>" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" width="150" height="40"></a>
 <div class="clear"></div>
 </div>
 <?php

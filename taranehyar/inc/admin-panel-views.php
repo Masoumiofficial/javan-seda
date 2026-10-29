@@ -91,6 +91,17 @@ function taranehyar_render_dashboard() {
 			</div>
 		</div>
 
+		<?php
+		/* v3.8.2 — لوگوی سایت: آپلود/آدرس/بازگردانی، همان‌جا در پیشخوان.
+		   اگر فایلِ کارت نباشد (نسخهٔ قدیمی)، بی‌صدا رد می‌شود. */
+		if ( function_exists( 'tara_logo_notice' ) ) {
+			tara_logo_notice();
+		}
+		if ( function_exists( 'tara_logo_card' ) ) {
+			tara_logo_card();
+		}
+		?>
+
 		<div class="ty-stats">
 			<div class="ty-stat">
 				<span class="dashicons dashicons-format-audio"></span>

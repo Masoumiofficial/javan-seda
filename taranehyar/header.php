@@ -22,8 +22,10 @@ if ( function_exists( 'wp_get_document_title' ) && ! ( function_exists( 'current
 <?php if ( '' !== (string) ot_get_option( 'favicon' ) ) : ?>
 <link rel="shortcut icon" type="image/x-icon" href="<?php echo esc_url( ot_get_option('favicon') ); ?>">
 <?php endif; ?>
-<?php if ( '' !== (string) ot_get_option( 'logo' ) ) : ?>
-<link rel="apple-touch-icon" href="<?php echo esc_url( ot_get_option('logo') ); ?>">
+<?php /* v3.8.2 — آیکون اپل همان لوگو است؛ دیگر هیچ‌جا src خالی ساخته نمی‌شود
+   (tara_logo_url همیشه آدرس معتبر می‌دهد: تنظیمات → لوگوی پیش‌فرض قالب). */ ?>
+<?php if ( function_exists( 'tara_logo_url' ) && '' !== (string) tara_logo_url() ) : ?>
+<link rel="apple-touch-icon" href="<?php echo esc_url( tara_logo_url() ); ?>">
 <?php endif; ?>
 <?php wp_enqueue_script("jquery"); wp_head('');
 if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
@@ -75,7 +77,7 @@ if ( $darks_std ) { ?>
 <header id="header">
 <div class="tarlanweb_center">
 <?php if(is_home()){ ?> <h1 class="h1_hidden_home"><?php echo esc_html( ot_get_option('head_h1') ); ?></h1> <?php } ?>
-<div class="logo_top"><figure><a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( ot_get_option('logo') ); ?>" width="150" height="40" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" title="<?php echo ot_get_option('head_h1'); ?>"></a></figure></div>
+<div class="logo_top"><figure><a href="<?php echo esc_url( home_url() ); ?>"><img src="<?php echo esc_url( function_exists( 'tara_logo_url' ) ? tara_logo_url() : ot_get_option( 'logo' ) ); ?>" width="150" height="40" alt="<?php echo esc_attr( ot_get_option('head_h1') ); ?>" title="<?php echo ot_get_option('head_h1'); ?>"></a></figure></div>
 <nav class="menu_right">
 <?php wp_nav_menu(array('theme_location'=>'top_menu','menu_id'=>'tara-menu','container'=>'')); ?>
 <div class="clear"></div>

@@ -60,6 +60,8 @@ if ( ! function_exists( 'tara_radio_defaults' ) ) {
 			'chime'          => 'on',      // نوایِ کوتاهِ ایستگاه پیش از وکال
 			'autostart'      => '',        // پخشِ خودکار در صفحهٔ رادیو (مرورگرها اغلب می‌بندند)
 			'home'           => 'on',      // کارتِ رادیو در صفحهٔ اصلی
+			'artist'         => 'on',      // دی‌جی اختصاصی هنرمند
+			'artist_player'  => 'on',      // پلیر مستقل فهرست آثار هنرمند
 			'home_featured'  => 'on',      // فقط آهنگ‌های «بخش ویژه» در صفحهٔ اصلی
 			'archives'       => 'on',      // دی‌جی‌باکس در آرشیو ژانر/حال‌وهوا
 			'user_add'       => 'off',     // دکمهٔ «افزودن به رادیو» برای کاربران
@@ -293,6 +295,14 @@ if ( ! function_exists( 'tara_radio_query_ids' ) ) {
 			)
 		);
 
+		/* آرشیو نامعتبر هرگز به صف عمومی تبدیل نشود. */
+		if ( '' !== $args['taxonomy'] || (int) $args['term_id'] > 0 ) {
+			if ( '' === $args['taxonomy'] || (int) $args['term_id'] < 1 || ! taxonomy_exists( $args['taxonomy'] ) ) { return array(); }
+			$term = get_term( (int) $args['term_id'], $args['taxonomy'] );
+			if ( ! $term || is_wp_error( $term ) || $term->taxonomy !== $args['taxonomy'] ) { return array(); }
+		}
+		$artist_tax = function_exists( 'tara_artist_tax' ) ? tara_artist_tax() : 'artist';
+		$is_artist = '' !== $args['taxonomy'] && $args['taxonomy'] === $artist_tax;
 		$limit = max( 1, min( 60, (int) $args['limit'] ) );
 		$query = array(
 			'post_type'              => 'post',
@@ -318,12 +328,21 @@ if ( ! function_exists( 'tara_radio_query_ids' ) ) {
 			);
 		}
 
+		if ( $is_artist ) {
+			/* همان نگاشت صفحه هنرمند؛ اخبار، بیوگرافی و ویدیو وارد رادیو نشوند. */
+			$type_map = apply_filters( 'tara_artist_type_map', array( 'mp3' => 'audio', 'audio' => 'audio', 'ahang' => 'audio', 'آهنگ' => 'audio', 'آهنگ جدید' => 'audio', 'song' => 'audio', 'mp4' => 'video', 'video' => 'video', 'musicvideo' => 'video', 'music-video' => 'video', 'موزیک ویدیو' => 'video', 'موزیک‌ویدیو' => 'video', 'کلیپ' => 'video', 'album' => 'album', 'آلبوم' => 'album' ) );
+			$audio_types = array_keys( array_filter( (array) $type_map, function ( $type ) { return 'audio' === $type; } ) );
+			if ( empty( $audio_types ) ) { return array(); }
+			$query['meta_query'][] = array( 'key' => 'musics_type', 'value' => $audio_types, 'compare' => 'IN' );
+		}
+
 		if ( '' !== $args['taxonomy'] && (int) $args['term_id'] > 0 && taxonomy_exists( $args['taxonomy'] ) ) {
 			$query['tax_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery -- لازم است
 				array(
 					'taxonomy' => $args['taxonomy'],
 					'field'    => 'term_id',
 					'terms'    => (int) $args['term_id'],
+					'include_children' => ! $is_artist,
 				),
 			);
 		}
@@ -395,6 +414,12 @@ if ( ! function_exists( 'tara_radio_ids' ) ) {
 			)
 		);
 
+		if ( '' !== $args['taxonomy'] || (int) $args['term_id'] > 0 ) {
+			if ( '' === $args['taxonomy'] || (int) $args['term_id'] < 1 || ! taxonomy_exists( $args['taxonomy'] ) ) { return array(); }
+			$term = get_term( (int) $args['term_id'], $args['taxonomy'] );
+			if ( ! $term || is_wp_error( $term ) || $term->taxonomy !== $args['taxonomy'] ) { return array(); }
+		}
+
 		$modes = tara_radio_modes();
 		if ( ! isset( $modes[ $args['mode'] ] ) ) {
 			$args['mode'] = 'mixed';
@@ -447,7 +472,7 @@ if ( ! function_exists( 'tara_radio_ids' ) ) {
 		$pick = array_values( array_unique( array_map( 'absint', $pick ) ) );
 
 		/* اگر «داغ» یا منبعِ انتخابی کم آورد، با جدیدترین‌ها پر می‌کنیم. */
-		if ( count( $pick ) < $fetch ) {
+		if ( count( $pick ) < $fetch && ( ! function_exists( 'tara_artist_tax' ) || $args['taxonomy'] !== tara_artist_tax() ) ) {
 			$fill = tara_radio_query_ids(
 				'new',
 				array_merge(
@@ -472,7 +497,7 @@ if ( ! function_exists( 'tara_radio_ids' ) ) {
 			}
 		}
 
-		if ( count( $ids ) > 2 ) {
+		if ( count( $ids ) > 2 && ( ! function_exists( 'tara_artist_tax' ) || $args['taxonomy'] !== tara_artist_tax() ) ) {
 			$ids = tara_radio_interleave( $ids );
 		}
 
@@ -620,16 +645,15 @@ if ( ! function_exists( 'tara_radio_ajax' ) ) {
 
 		$taxonomy = isset( $_GET['tax'] ) ? sanitize_key( wp_unslash( $_GET['tax'] ) ) : '';
 		$allowed  = function_exists( 'tara_music_taxonomy_ids' ) ? tara_music_taxonomy_ids() : array();
-		if ( '' !== $taxonomy && ! in_array( $taxonomy, $allowed, true ) ) {
-			$taxonomy = '';
-		}
-
+		if ( function_exists( 'tara_artist_tax' ) ) { $allowed[] = tara_artist_tax(); }
 		$term_id = isset( $_GET['term'] ) ? absint( $_GET['term'] ) : 0;
-		if ( $term_id ) {
-			$term = get_term( $term_id );
-			if ( ! $term || is_wp_error( $term ) || ( '' !== $taxonomy && $term->taxonomy !== $taxonomy ) ) {
-				$term_id  = 0;
-				$taxonomy = '';
+		if ( isset( $_GET['tax'] ) || isset( $_GET['term'] ) ) {
+			if ( '' === $taxonomy || ! in_array( $taxonomy, $allowed, true ) || ! $term_id || ! taxonomy_exists( $taxonomy ) ) {
+				wp_send_json_error( array( 'message' => 'آرشیو رادیو نامعتبر است.' ), 400 );
+			}
+			$term = get_term( $term_id, $taxonomy );
+			if ( ! $term || is_wp_error( $term ) || $term->taxonomy !== $taxonomy ) {
+				wp_send_json_error( array( 'message' => 'هنرمند یا آرشیو پیدا نشد.' ), 400 );
 			}
 		}
 
@@ -702,6 +726,10 @@ if ( ! function_exists( 'tara_radio_page_wanted' ) ) {
 	function tara_radio_page_wanted() {
 		if ( ! tara_radio_on() ) {
 			return false;
+		}
+
+		if ( function_exists( 'is_tax' ) && function_exists( 'tara_artist_tax' ) && is_tax( tara_artist_tax() ) && 'on' === (string) tara_radio_option( 'artist', 'on' ) ) {
+			return true;
 		}
 
 		if ( tara_radio_is_tax_page() && 'on' === (string) tara_radio_option( 'archives', 'on' ) ) {

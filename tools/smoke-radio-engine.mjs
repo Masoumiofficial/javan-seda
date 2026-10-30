@@ -5,14 +5,14 @@ import assert from 'node:assert/strict';
 const code = fs.readFileSync('taranehyar/js/tara-radio.js', 'utf8');
 const songs = [1,2,3].map(id => ({id,title:'track '+id,src:`https://example.org/${id}.mp3`,link:`https://example.org/song/${id}`}));
 const markup = (tracks=songs) => `<section data-tara-radio data-radio-mode="mixed"><script class="ty-radio__data" type="application/json">${JSON.stringify({tracks})}</script><div data-radio-audio></div><div data-radio-queue></div><span data-radio-state></span><span data-radio-toast></span><button data-radio-toggle></button></section>`;
-async function setup(html=markup()) {
+async function setup(html=markup(), beforeBoot=()=>{}) {
  const dom = new JSDOM(`<!doctype html><body>${html}</body>`, {url:'https://example.org/',runScripts:'outside-only'});
  const w=dom.window; let rafId=0;
  w.requestAnimationFrame=()=>++rafId; w.cancelAnimationFrame=()=>{};
  w.TaraRadio={api:'/ajax',nonce:'n',config:{xfade:4}};
  w.Audio=function(){const el=w.document.createElement('audio');el._paused=true;el._reject=false;el.pause=function(){this._paused=true;};el.load=function(){};el.play=function(){if(this._reject){this._reject=false;return Promise.reject(new Error('blocked'));} this._paused=false;return Promise.resolve();};return el;};
  w.fetch=()=>Promise.resolve({json:()=>Promise.resolve({success:true,data:{tracks:[]}})});
- w.eval(code); w.document.dispatchEvent(new w.Event('DOMContentLoaded')); return {w,dom,radio:w.TaraRadioEngine.instances[0]};
+ beforeBoot(w); w.eval(code); w.document.dispatchEvent(new w.Event('DOMContentLoaded')); return {w,dom,radio:w.TaraRadioEngine.instances[0]};
 }
 const flush=()=>new Promise(r=>setTimeout(r,0));
 {
@@ -99,6 +99,30 @@ const flush=()=>new Promise(r=>setTimeout(r,0));
  assert.equal(r.xfade,9); assert.equal(r.root.querySelector('[data-radio-xfade-val]').textContent,'۹ ثانیه');
  const power=r.root.querySelector('[data-radio-power=club]'); power.click();
  assert.equal(r.xfade,12); assert.equal(power.getAttribute('aria-pressed'),'true');
+ dom.window.close();
+}
+{
+ const artist=markup().replace('data-radio-mode="mixed"','data-radio-context="artist" data-radio-tax="artist" data-radio-term="31" data-radio-mode="new"');
+ const foreign={id:88,title:'other artist',src:'https://example.org/88.mp3'};
+ const {w,dom,radio:r}=await setup(artist,w=>w.localStorage.setItem('tara:radio:mine',JSON.stringify([foreign])));
+ assert.deepEqual(Array.from(r.queue,t=>t.id),[1,2,3],'artist radio ignores global personal list');
+ assert.equal(r.addToQueue(foreign),false,'global add cannot inject a foreign track');
+ let requested=''; w.fetch=url=>{requested=url; return Promise.resolve({json:()=>Promise.resolve({success:true,data:{tracks:[songs[1],songs[0]]}})});};
+ r.history=[songs[0]]; r.setMode('views'); await flush(); await flush();
+ assert(requested.includes('tax=artist') && requested.includes('term=31') && requested.includes('mode=views'));
+ assert(!requested.includes('exclude=1'),'mode change may include previously heard tracks');
+ assert.deepEqual(Array.from(r.queue,t=>t.id),[2,1]);
+ dom.window.close();
+}
+{
+ const html=markup([]).replace('data-radio-mode="mixed"','data-radio-context="artist" data-radio-tax="artist" data-radio-term="32" data-radio-mode="new"');
+ const {dom,radio:r}=await setup(html); assert.equal(r.queue.length,0); assert.equal(r.addToQueue(songs[0]),false); dom.window.close();
+}
+{
+ const {w,dom,radio:r}=await setup();
+ const legacy=w.document.createElement('audio'); legacy._paused=false; legacy.pause=function(){this._paused=true;}; w.document.body.appendChild(legacy);
+ r.play(); await flush(); assert.equal(legacy._paused,true,'DJ stops ordinary player');
+ legacy.dispatchEvent(new w.Event('play',{bubbles:true})); assert.equal(r.state,'paused','ordinary player stops DJ');
  dom.window.close();
 }
 console.log('radio engine queue, crossfade, pause, source race and CDN fallback: passed');

@@ -9,4 +9,10 @@ assert(!src.includes('ty-artist__bio-news'), 'repeated biography and latest bloc
 assert(!src.includes('$taranehyar_full_bio'), 'no dangling variable or duplicate lower description');
 assert(src.includes('هنرمندان مشابه'), 'related artists retained');
 assert(src.includes('tara_player('), 'existing artist player retained');
+const playerBlock=src.slice(src.indexOf('<!-- ۲) رادیو'),src.indexOf('<!-- ۲٫۵)'));
+assert(playerBlock.includes("tara_radio_option( 'artist_player', 'on' )"), 'artist player switch gates actual player');
+assert(playerBlock.includes("tara_radio_option( 'artist', 'on' )"), 'artist DJ has separate switch');
+const opts=fs.readFileSync('taranehyar/inc/theme-options.php','utf8');
+for (const id of ['radio_home','indpl','radio_artist','radio_artist_player']) assert(opts.includes("'id'=>'"+id+"'"), 'manager option '+id);
+
 console.log('artist biography and player structure: passed');

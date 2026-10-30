@@ -718,7 +718,7 @@ $taranehyar_social_icons = array(
 			   باشد و سربرگ سه‌ستونهٔ درخواستی شکل بگیرد. */ ?>
 
 			<div class="ty-artist__actions">
-				<?php if ( ! empty( $taranehyar_radio_tracks ) ) : ?>
+				<?php if ( ! empty( $taranehyar_radio_tracks ) && ( ! function_exists( 'tara_radio_option' ) || 'on' === (string) tara_radio_option( 'artist_player', 'on' ) ) ) : ?>
 					<button type="button" class="ty-artist__cta" data-tara-play="0">
 						<span class="ty-icon-play" aria-hidden="true"></span>
 						پخش همه (رادیو)
@@ -787,17 +787,21 @@ $taranehyar_social_icons = array(
 	</header>
 
 	<!-- ۲) رادیو ------------------------------------------------------- -->
-	<?php if ( ! empty( $taranehyar_radio_tracks ) ) : ?>
+	<?php if ( ! empty( $taranehyar_radio_tracks ) && ( ! function_exists( 'tara_radio_option' ) || 'on' === (string) tara_radio_option( 'artist_player', 'on' ) ) ) : ?>
 		<?php
 		echo tara_player( // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین قالب، escape شده در تابع
 			array(
 				'tracks'   => $taranehyar_radio_tracks,
-				'title'    => 'رادیو ' . $taranehyar_term->name,
+				'title'    => 'پلیر ' . $taranehyar_term->name,
 				'cover'    => $taranehyar_cover,
 				'context'  => 'artist',
 			)
 		);
 		?>
+	<?php endif; ?>
+
+	<?php if ( function_exists( 'tara_radio_box' ) && function_exists( 'tara_radio_option' ) && 'on' === (string) tara_radio_option( 'artist', 'on' ) ) : ?>
+		<?php echo tara_radio_box( array( 'context' => 'artist', 'title' => 'رادیو ' . $taranehyar_term->name, 'subtitle' => 'دی‌جی اختصاصی با آهنگ‌های همین هنرمند', 'taxonomy' => $taranehyar_term->taxonomy, 'term_id' => (int) $taranehyar_term->term_id, 'mode' => 'new', 'sources' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی قالب ?>
 	<?php endif; ?>
 
 	<!-- ۲٫۵) فهرست آهنگ‌ها با ترتیب مستقل ------------------------------ -->

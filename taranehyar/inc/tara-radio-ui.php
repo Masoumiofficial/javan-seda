@@ -159,9 +159,18 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 			)
 		);
 
+		if ( 'artist' === $args['context'] ) {
+			$artist_tax = function_exists( 'tara_artist_tax' ) ? tara_artist_tax() : '';
+			$artist_term = ( $artist_tax && $args['taxonomy'] === $artist_tax && (int) $args['term_id'] > 0 ) ? get_term( (int) $args['term_id'], $artist_tax ) : null;
+			if ( ! $artist_term || is_wp_error( $artist_term ) || $artist_term->taxonomy !== $artist_tax ) { return ''; }
+		}
+
 		$modes = tara_radio_modes();
+		if ( 'artist' === $args['context'] ) {
+			$modes = array_intersect_key( $modes, array_flip( array( 'new', 'views', 'random' ) ) );
+		}
 		if ( ! isset( $modes[ $args['mode'] ] ) ) {
-			$args['mode'] = 'mixed';
+			$args['mode'] = 'artist' === $args['context'] ? 'new' : 'mixed';
 		}
 
 		/* صفحهٔ اصلی به‌طورِ پیش‌فرض فشرده است؛ صفحهٔ رادیو کامل. */
@@ -353,7 +362,7 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 						<?php
 						/* v3.10.1 — «فهرست من» فقط وقتی معنی دارد که دکمهٔ
 						   «افزودن به رادیو» هم به کاربر نشان داده شود. */
-						if ( ! function_exists( 'tara_radio_user_add_on' ) || tara_radio_user_add_on() ) :
+						if ( 'artist' !== $args['context'] && ( ! function_exists( 'tara_radio_user_add_on' ) || tara_radio_user_add_on() ) ) :
 							?>
 						<button type="button" class="ty-radio__tool" data-radio-mine aria-expanded="false" aria-controls="<?php echo esc_attr( $uid ); ?>-mine">
 							<i class="icofont-heart-alt" aria-hidden="true"></i>
@@ -382,7 +391,7 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 				</ol>
 				<button type="button" class="ty-list-more" data-tara-radio-more aria-expanded="false" hidden>نمایش بیشتر</button>
 				<p class="ty-radio__empty" data-radio-empty<?php echo empty( $tracks ) ? '' : ' hidden'; ?>>
-					برای این بخش هنوز آهنگی با فایل صوتی ثبت نشده است. یک آهنگ به رادیو اضافه کنید تا صف ساخته شود.
+					برای این بخش هنوز آهنگی با فایل صوتی ثبت نشده است.
 				</p>
 			</div>
 

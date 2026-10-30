@@ -295,6 +295,7 @@
 		this.limit = Math.round(clamp(CONF.limit || 20, 4, 40));
 		this.xfade = Math.round(clamp(CONF.xfade === undefined ? 6 : CONF.xfade, 0, 16));
 		this.power = 'warm';
+		this.artistScoped = root.getAttribute('data-radio-context') === 'artist';
 		this.mode = root.getAttribute('data-radio-mode') || CONF.mode || 'mixed';
 		this.featured = root.getAttribute('data-radio-featured') === '1';
 		this.tax = root.getAttribute('data-radio-tax') || '';
@@ -375,7 +376,7 @@
 
 		/* آهنگ‌های «فهرست من» اولِ صف می‌آیند تا رادیو با انتخابِ خودِ
 		   کاربر شروع شود؛ بعد صفِ خودکار ادامه می‌یابد. */
-		var mine = mineList();
+		var mine = this.artistScoped ? [] : mineList();
 		if (mine.length) {
 			var mineIds = trackIds(mine);
 			this.queue = uniqueTracks(mine.concat(this.queue.filter(function (t) {
@@ -1821,7 +1822,7 @@
 
 	Radio.prototype.paintMine = function () {
 		var refs = this.refs;
-		var list = mineList();
+		var list = this.artistScoped ? [] : mineList();
 		each(refs.mineCount, function (node) {
 			node.textContent = faNum(list.length);
 		});
@@ -1940,6 +1941,7 @@
 		var self = this;
 		if (this.queue.length) { this.sourceBackup = { queue: this.queue.slice(), cursor: this.cursor, mode: this.mode }; }
 		this.mode = mode;
+		if (this.artistScoped) { this.history = []; }
 		this.queueEpoch++;
 		this.refillPromise = null;
 		this.refilling = false;
@@ -2021,6 +2023,7 @@
 	};
 
 	Radio.prototype.addToQueue = function (track) {
+		if (this.artistScoped) { return false; }
 		var t = normalize(track);
 		if (!t) {
 			return false;

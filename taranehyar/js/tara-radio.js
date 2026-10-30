@@ -276,12 +276,19 @@
 		this.raf = 0;
 		this.rafPending = false;
 		this.refilling = false;
+		this.refillPromise = null;
+		this.queueEpoch = 0;
+		this.sourceBackup = null;
+		this.playToken = 0;
+		this.crossfadeRetryAt = 0;
+		this.announceTimer = 0;
 		this.waitingNext = false;
 		this.seeking = false;
 		this.lastMeterPaint = 0;
 		this.lastClockPaint = 0;
 		this.lastSecond = -1;
 		this.voice = null;
+		this.speechUtterance = null;
 		this.voiceBroken = false;
 		this.graph = null;
 		this.forcedPlain = false;
@@ -410,20 +417,20 @@
 			el.volume = 0;
 
 			el.addEventListener('ended', function () {
-				if (i === self.active && self.state === 'playing') {
+				if (self.decks[i] === el && i === self.active && self.state === 'playing') {
 					self.advance('ended');
 				}
 			});
 
 			el.addEventListener('error', function () {
-				if (!el.getAttribute('src')) {
+				if (self.decks[i] !== el || !el.getAttribute('src')) {
 					return;
 				}
 				self.onDeckError(i);
 			});
 
 			el.addEventListener('playing', function () {
-				if (i === self.active) {
+				if (self.decks[i] === el && i === self.active && (self.state === 'playing' || self.state === 'fading')) {
 					self.root.classList.remove('is-loading');
 					self.root.classList.add('is-playing');
 				}
@@ -432,17 +439,17 @@
 			/* بافرِ کند/شبکهٔ لرزان: هیچ‌وقت پخش را قطع نمی‌کنیم، فقط نشانگرِ
 			   «آماده‌سازی» را نشان می‌دهیم؛ اگر داده برسد خودش برمی‌گردد. */
 			el.addEventListener('waiting', function () {
-				if (i === self.active && self.state !== 'idle') {
+				if (self.decks[i] === el && i === self.active && self.state !== 'idle') {
 					self.root.classList.add('is-loading');
 				}
 			});
 
 			el.addEventListener('canplay', function () {
-				self.root.classList.remove('is-loading');
+				if (self.decks[i] === el && i === self.active) { self.root.classList.remove('is-loading'); }
 			});
 
 			el.addEventListener('stalled', function () {
-				if (i === self.active && self.state !== 'idle') {
+				if (self.decks[i] === el && i === self.active && self.state !== 'idle') {
 					self.root.classList.add('is-loading');
 				}
 			});
@@ -481,19 +488,20 @@
 		return null;
 	};
 
-	Radio.prototype.ensureQueue = function () {
+	Radio.prototype.ensureQueue = function (force) {
 		var self = this;
 
-		if (this.cursor + 1 < this.queue.length) {
+		if (!force && this.queue.slice(this.cursor + 1).some(function (track) { return !this.isBad(track); }, this)) {
 			return Promise.resolve(true);
 		}
-		if (this.refilling) {
-			return Promise.resolve(false);
+		if (this.refillPromise) {
+			return this.refillPromise;
 		}
 		if (!API || !window.fetch) {
 			return Promise.resolve(false);
 		}
 		this.refilling = true;
+		var epoch = this.queueEpoch;
 
 		var exclude = trackIds(this.history).concat(trackIds(this.queue)).slice(-120);
 		var url = API + (API.indexOf('?') === -1 ? '?' : '&') + 'action=tara_radio'
@@ -505,29 +513,38 @@
 			+ (this.term ? '&term=' + encodeURIComponent(String(this.term)) : '')
 			+ (this.featured ? '&featured=1' : '');
 
-		return window.fetch(url, { credentials: 'same-origin' })
+		var request = window.fetch(url, { credentials: 'same-origin' })
 			.then(function (res) {
 				return res.json();
 			})
 			.then(function (json) {
-				self.refilling = false;
+				if (epoch !== self.queueEpoch) { return false; }
 				if (!json || !json.success || !json.data || !Array.isArray(json.data.tracks)) {
 					return false;
 				}
 				var fresh = uniqueTracks(json.data.tracks.map(normalize)).filter(function (t) {
-					return !self.isBad(t);
+					return !self.isBad(t) && !self.queue.some(function (existing) { return String(existing.id) === String(t.id); });
 				});
 				if (!fresh.length) {
 					return false;
 				}
 				self.queue = self.queue.concat(fresh);
+				if (self.cursor > 120) {
+					var trim = self.cursor - 60;
+					self.queue.splice(0, trim);
+					self.cursor -= trim;
+				}
 				self.paintQueue();
 				return true;
 			})
 			.catch(function () {
-				self.refilling = false;
 				return false;
+			}).then(function (result) {
+				if (self.refillPromise === request) { self.refilling = false; self.refillPromise = null; }
+				return result;
 			});
+		this.refillPromise = request;
+		return request;
 	};
 
 	/* ---- پخش ---- */
@@ -579,7 +596,8 @@
 			target = (this.cursor >= 0 ? this.queue[this.cursor] : null) || this.pickFirst();
 		}
 
-		if (!target || this.isBad(target)) {
+		if (target && this.isBad(target)) { target = this.nextTrack(); }
+		if (!target) {
 			this.toast(L.empty || 'آهنگی برای پخش پیدا نشد.');
 			this.ensureQueue().then(function (ok) {
 				if (ok) {
@@ -598,7 +616,8 @@
 			return;
 		}
 
-		var idx = this.queue.indexOf(target);
+		this.cancelFade();
+		var idx = this.queue.findIndex(function (item) { return String(item.id) === String(target.id); });
 		if (idx === -1) {
 			this.queue.splice(this.cursor + 1, 0, target);
 			idx = this.cursor + 1;
@@ -606,6 +625,7 @@
 		this.cursor = idx;
 
 		pauseOthers(this);
+		if (this.graph && !sameOrigin(target.src)) { this.destroyGraph(false); }
 		if (CONF.fx && !this.graph && !this.forcedPlain && sameOrigin(target.src)) {
 			this.buildGraph();
 		}
@@ -657,7 +677,9 @@
 			el.addEventListener('loadedmetadata', onMeta);
 		}
 
-		var promise = el.play();
+		var token = ++this.playToken;
+		var promise;
+		try { promise = el.play(); } catch (err) { promise = Promise.reject(err); }
 		this.softStart = now();
 		this.duck = 1;
 		this.trackCount++;
@@ -670,11 +692,9 @@
 
 		if (promise && typeof promise.catch === 'function') {
 			promise.catch(function () {
-				self.root.classList.remove('is-loading');
-				self.state = 'paused';
-				self.root.classList.remove('is-playing');
-				self.toast('برای پخش، یک‌بار روی دکمهٔ پخش بزنید.');
-				self.paintState();
+				if (token !== self.playToken || self.current() !== el) { return; }
+				self.pause();
+				self.toast('پخش شروع نشد؛ دوباره روی دکمهٔ پخش بزنید.');
 			});
 		}
 
@@ -688,6 +708,7 @@
 
 	Radio.prototype.advance = function (reason, seconds) {
 		var self = this;
+		if (this.fade) { this.cancelFade(); }
 
 		if (this.waitingNext) {
 			return;
@@ -696,16 +717,20 @@
 		var next = this.nextTrack();
 		if (!next) {
 			this.waitingNext = true;
+			var epoch = this.queueEpoch;
+			var token = this.playToken;
 			this.ensureQueue().then(function (ok) {
 				self.waitingNext = false;
+				if (epoch !== self.queueEpoch || token !== self.playToken) { return; }
 				if (!ok) {
 					self.recycle();
 				}
 				var after = self.nextTrack();
 				if (after) {
 					self.crossTo(after, reason === 'ended' ? 0 : seconds);
-				} else if (reason === 'user') {
-					self.toast('صف تمام شد؛ آهنگ تازه‌ای پیدا نشد.');
+				} else {
+					if (reason !== 'user') { self.pause(); }
+					self.toast('صف تمام شد؛ آهنگ قابل پخشی پیدا نشد.');
 				}
 			});
 			return;
@@ -716,6 +741,12 @@
 
 	Radio.prototype.crossTo = function (track, seconds) {
 		var self = this;
+		if (this.graph && !sameOrigin(track.src)) {
+			this.destroyGraph(false);
+			pauseOthers(this);
+			this.startDeck(track, 0);
+			return;
+		}
 		var cur = this.current();
 		var want = typeof seconds === 'number' ? seconds : this.xfade;
 		var dur = want * 1000;
@@ -763,23 +794,37 @@
 			resetGraphDeck(this.graph.nodes[1 - this.active]);
 		}
 
-		var p = incoming.play();
-		if (p && typeof p.catch === 'function') {
-			p.catch(function () {});
-		}
-
 		this.pending = normalize(track);
 		this.state = 'fading';
-		this.fade = { start: now(), dur: dur };
+		this.fade = { start: now(), dur: dur, waiting: true };
+		var fade = this.fade;
 		this.root.classList.add('is-fading');
-		this.animateGraph(dur);
 		this.paintState();
-
-		window.setTimeout(function () {
-			if (self.fade) {
-				self.finishFade();
+		var failed = function () {
+			if (self.fade !== fade) { return; }
+			self.cancelFade();
+			self.crossfadeRetryAt = now() + 5000;
+			self.toast('آهنگ بعدی آماده نشد؛ پخش فعلی ادامه دارد.');
+			if (cur.ended) { self.advance('ended', 0); }
+		};
+		var ready = function () {
+			if (self.fade !== fade) { return; }
+			fade.waiting = false;
+			fade.start = now();
+			if (isFinite(cur.duration) && cur.duration > 0) {
+				fade.dur = Math.min(dur, Math.max(0, (cur.duration - cur.currentTime) * 1000));
 			}
-		}, dur + 160);
+			if (fade.dur < 350) { self.finishFade(); return; }
+			self.animateGraph(fade.dur);
+			window.setTimeout(function () {
+				if (self.fade === fade) { self.finishFade(); }
+			}, fade.dur + 160);
+		};
+		var p;
+		try { p = incoming.play(); } catch (err) { p = Promise.reject(err); }
+		if (p && typeof p.then === 'function') { p.then(ready, failed); }
+		else { ready(); }
+		window.setTimeout(function () { if (self.fade === fade && fade.waiting) { failed(); } }, 8000);
 
 		this.loop();
 	};
@@ -791,6 +836,14 @@
 		if (this.fade || this.state !== 'playing') {
 			return;
 		}
+		var remaining = this.queue.slice(this.cursor + 1).filter(function (track) { return !this.isBad(track); }, this).length;
+		if (remaining <= 2 && API && !this.refillPromise) {
+			var self = this;
+			var epoch = this.queueEpoch;
+			this.ensureQueue(true).then(function (ok) {
+				if (ok && epoch === self.queueEpoch && self.state === 'playing') { self.preloadNext(); }
+			});
+		}
 		var next = null;
 		for (var i = this.cursor + 1; i < this.queue.length; i++) {
 			if (!this.isBad(this.queue[i])) {
@@ -798,7 +851,7 @@
 				break;
 			}
 		}
-		if (!next) {
+		if (!next || (this.graph && !sameOrigin(next.src))) {
 			return;
 		}
 		var idle = this.decks[1 - this.active];
@@ -878,15 +931,40 @@
 		this.play();
 	};
 
+	/* لغو میکس هر دو دک و نشانگر صف را به آهنگ جاری برمی‌گرداند. */
+	Radio.prototype.cancelFade = function () {
+		if (!this.fade) { return; }
+		var incoming = this.decks[1 - this.active];
+		if (incoming) { incoming.pause(); incoming.volume = 0; incoming.playbackRate = 1; setVinylPitch(incoming, false); }
+		if (this.graph) {
+			resetGraphDeck(this.graph.nodes[this.active]);
+			resetGraphDeck(this.graph.nodes[1 - this.active]);
+		}
+		this.fade = null;
+		this.pending = null;
+		var currentId = this.nowId;
+		var index = this.queue.findIndex(function (item) { return String(item.id) === String(currentId); });
+		if (index !== -1) { this.cursor = index; }
+		if (this.state === 'fading') { this.state = 'playing'; }
+		this.root.classList.remove('is-fading');
+		this.paintState();
+	};
+
 	Radio.prototype.pause = function () {
 		if (this.state === 'playing' || this.state === 'fading') {
 			this.playedSeconds = this.sessionSeconds();
 			this.sessionStart = 0;
 		}
-		var el = this.current();
-		if (el) {
-			el.pause();
+		++this.playToken;
+		this.cancelFade();
+		each(this.decks, function (deck) { deck.pause(); deck.playbackRate = 1; });
+		window.clearTimeout(this.announceTimer);
+		if (this.voice) { this.voice.pause(); }
+		if (this.speechUtterance && window.speechSynthesis) {
+			this.speechUtterance = null;
+			window.speechSynthesis.cancel();
 		}
+		this.unduck();
 		if (this.state !== 'idle') {
 			this.state = 'paused';
 		}
@@ -897,6 +975,7 @@
 		this.root.classList.remove('is-fading');
 		this.paintState();
 		window.cancelAnimationFrame(this.raf);
+		this.rafPending = false;
 	};
 
 	Radio.prototype.resume = function () {
@@ -912,12 +991,23 @@
 		this.state = 'playing';
 		this.root.classList.add('is-playing');
 		this.sessionStart = now();
-		el.play().catch(function () {});
+		var self = this;
+		var token = ++this.playToken;
+		var attempt;
+		try { attempt = el.play(); } catch (err) { attempt = Promise.reject(err); }
+		if (attempt && typeof attempt.catch === 'function') {
+			attempt.catch(function () {
+				if (token !== self.playToken || self.current() !== el) { return; }
+				self.pause();
+				self.toast('پخش ادامه پیدا نکرد؛ دوباره تلاش کنید.');
+			});
+		}
 		this.paintState();
 		this.loop();
 	};
 
 	Radio.prototype.stop = function () {
+		this.pause();
 		this.state = 'idle';
 		this.nowId = null;
 		this.fade = null;
@@ -1005,6 +1095,7 @@
 				ctx.close();
 			} catch (e2) {}
 			this.forcedPlain = true;
+			this.resetDecks();
 			return;
 		}
 
@@ -1020,18 +1111,23 @@
 		this.root.classList.add('has-graph');
 
 		if (ctx.state === 'suspended' && ctx.resume) {
-			ctx.resume().catch(function () {});
+			var self = this;
+			ctx.resume().catch(function () {
+				if (self.graph && self.graph.ctx === ctx) { self.destroyGraph(); }
+			});
 		}
 	};
 
-	Radio.prototype.destroyGraph = function () {
-		var track = this.queue[this.cursor] || null;
+	Radio.prototype.destroyGraph = function (restart) {
+		var currentId = this.nowId;
+		var track = this.queue.find(function (item) { return String(item.id) === String(currentId); }) || this.queue[this.cursor] || null;
 		var at = 0;
 		var el = this.current();
 		if (el) {
 			at = el.currentTime || 0;
 		}
 		var wasPlaying = this.state === 'playing' || this.state === 'fading';
+		this.cancelFade();
 
 		if (this.graph) {
 			try {
@@ -1045,7 +1141,7 @@
 		var self = this;
 		this.resetDecks();
 
-		if (track && wasPlaying) {
+		if (restart !== false && track && wasPlaying) {
 			window.setTimeout(function () {
 				self.startDeck(track, at);
 			}, 80);
@@ -1053,6 +1149,7 @@
 	};
 
 	Radio.prototype.resetDecks = function () {
+		var oldDecks = this.decks.slice();
 		each(this.decks, function (el) {
 			try {
 				el.pause();
@@ -1066,9 +1163,7 @@
 		this.decks = [];
 		this.active = 0;
 		this.nowId = null;
-		allAudio = allAudio.filter(function (el) {
-			return this.decks.indexOf(el) !== -1;
-		}, this);
+		allAudio = allAudio.filter(function (el) { return oldDecks.indexOf(el) === -1; });
 		this.buildDecks();
 	};
 
@@ -1145,6 +1240,7 @@
 			}
 			self.tick();
 			if (self.state === 'playing' || self.state === 'fading') {
+				self.rafPending = true;
 				self.raf = window.requestAnimationFrame(frame);
 			}
 		};
@@ -1171,7 +1267,7 @@
 		}
 		this.paintVu();
 
-		if (this.state === 'playing' && !this.fade) {
+		if (this.state === 'playing' && !this.fade && now() >= this.crossfadeRetryAt) {
 			var dur = el.duration;
 			if (isFinite(dur) && dur > 0 && this.xfade > 0) {
 				var fade = Math.min(this.xfade, dur * 0.45);
@@ -1203,7 +1299,7 @@
 		var gainOut = 1;
 		var gainIn = 0;
 
-		if (this.fade) {
+		if (this.fade && !this.fade.waiting) {
 			var t = clamp((now() - this.fade.start) / this.fade.dur, 0, 1);
 			var e = smooth(t);
 			gainOut = Math.cos(e * Math.PI / 2);
@@ -1233,24 +1329,31 @@
 	/* ---- خطاها ---- */
 
 	Radio.prototype.onDeckError = function (index) {
-		var track = this.queue[this.cursor];
-
-		if (index === this.active && track) {
-			this.bad[String(track.id)] = true;
-			this.toast('این فایل پخش نشد؛ آهنگ بعدی می‌آید.');
-		}
-
-		if (this.graph && !this.forcedPlain) {
-			this.destroyGraph();
+		var self = this;
+		if (index !== this.active) {
+			var incoming = this.decks[index];
+			var failed = this.fade && this.pending ? this.pending : null;
+			if (!failed && incoming && incoming.__preloaded) {
+				failed = this.queue.find(function (item) { return item.src === incoming.__preloaded; });
+			}
+			if (failed) { this.bad[String(failed.id)] = true; }
+			if (incoming) { incoming.__preloaded = null; }
+			if (this.fade) {
+				this.cancelFade();
+				this.toast('فایل بعدی آماده نشد؛ پخش فعلی ادامه دارد.');
+				this.preloadNext();
+			}
 			return;
 		}
-
-		if (index === this.active && this.state !== 'idle') {
-			var self = this;
-			window.setTimeout(function () {
-				self.advance('error');
-			}, 350);
-		}
+		var id = this.nowId;
+		if (id !== null) { this.bad[String(id)] = true; }
+		if (this.state !== 'playing' && this.state !== 'fading') { return; }
+		this.cancelFade();
+		this.toast('این فایل پخش نشد؛ آهنگ بعدی می‌آید.');
+		var token = this.playToken;
+		window.setTimeout(function () {
+			if (token === self.playToken && (self.state === 'playing' || self.state === 'fading')) { self.advance('error', 0); }
+		}, 350);
 	};
 
 	/* ---- معرفیِ صوتیِ ایستگاه ---- */
@@ -1290,8 +1393,9 @@
 		}
 
 		var self = this;
-		window.setTimeout(function () {
-			self.speak(text, track, next);
+		window.clearTimeout(this.announceTimer);
+		this.announceTimer = window.setTimeout(function () {
+			if ((self.state === 'playing' || self.state === 'fading') && String(self.nowId) === String(track.id)) { self.speak(text, track, next); }
 		}, first ? 900 : 700);
 	};
 
@@ -1413,7 +1517,9 @@
 		   پس یک‌بار مستقیم و یک‌بار پس از همان رویداد تلاش می‌کنیم. */
 		var ready = pickVoice();
 		var spoken = false;
+		var speechToken = this.playToken;
 		var say = function () {
+			if (speechToken !== self.playToken || (self.state !== 'playing' && self.state !== 'fading')) { return; }
 			if (spoken) {
 				return;
 			}
@@ -1423,13 +1529,16 @@
 				self.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
 			};
 			utter.onend = function () {
+				if (self.speechUtterance === utter) { self.speechUtterance = null; }
 				self.unduck();
 			};
 			utter.onerror = function () {
+				if (self.speechUtterance === utter) { self.speechUtterance = null; }
 				self.unduck();
 			};
 			try {
 				window.speechSynthesis.cancel();
+				self.speechUtterance = utter;
 				window.speechSynthesis.speak(utter);
 				self.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
 				self.duckGuard(Math.max(6000, Math.min(24000, line.length * 110)));
@@ -1472,7 +1581,7 @@
 		voice.onerror = function () {
 			self.unduck();
 			self.voiceBroken = true;
-			self.speak(fallbackText, null, null, true);
+			if (self.state === 'playing' || self.state === 'fading') { self.speak(fallbackText, null, null, true); }
 		};
 
 		try {
@@ -1782,6 +1891,7 @@
 	/* ---- کنترل‌ها ---- */
 
 	Radio.prototype.prev = function () {
+		if (this.fade) { this.cancelFade(); }
 		if (!this.history.length) {
 			return;
 		}
@@ -1828,7 +1938,13 @@
 
 	Radio.prototype.setMode = function (mode) {
 		var self = this;
+		if (this.queue.length) { this.sourceBackup = { queue: this.queue.slice(), cursor: this.cursor, mode: this.mode }; }
 		this.mode = mode;
+		this.queueEpoch++;
+		this.refillPromise = null;
+		this.refilling = false;
+		var epoch = this.queueEpoch;
+		var token = this.playToken;
 		each(this.root.querySelectorAll('[data-radio-source]'), function (btn) {
 			var on = btn.getAttribute('data-radio-source') === mode;
 			btn.classList.toggle('is-active', on);
@@ -1840,10 +1956,25 @@
 		this.paintQueue();
 
 		this.ensureQueue().then(function (ok) {
+			if (epoch !== self.queueEpoch) { return; }
 			if (!ok) {
-				self.toast('منبع تازه‌ای پیدا نشد.');
+				if (self.sourceBackup) {
+					self.queue = self.sourceBackup.queue;
+					self.cursor = self.sourceBackup.cursor;
+					self.mode = self.sourceBackup.mode;
+					self.sourceBackup = null;
+					self.paintQueue();
+					each(self.root.querySelectorAll('[data-radio-source]'), function (btn) {
+						var on = btn.getAttribute('data-radio-source') === self.mode;
+						btn.classList.toggle('is-active', on);
+						btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+					});
+				}
+				self.toast('منبع تازه‌ای پیدا نشد؛ صف قبلی حفظ شد.');
 				return;
 			}
+			self.sourceBackup = null;
+			if (token !== self.playToken) { return; }
 			var track = self.nextTrack();
 			if (track) {
 				self.play(track);
@@ -1953,18 +2084,10 @@
 			}
 			if (closest('[data-radio-shuffle]')) {
 				event.preventDefault();
-				self.mode = 'random';
-				self.queue = [];
-				self.cursor = -1;
-				self.paintQueue();
-				self.ensureQueue().then(function (ok) {
-					if (ok) {
-						self.play();
-					}
-					self.toast(ok ? 'صف با ترتیبِ تصادفی تازه شد.' : 'الان نشد؛ دوباره بزنید.');
-				});
+				self.setMode('random');
 				return;
 			}
+
 			if ((btn = closest('[data-radio-play]'))) {
 				var id = btn.getAttribute('data-radio-play');
 				var track = null;

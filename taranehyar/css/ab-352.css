@@ -321,13 +321,12 @@
 	max-width: none;
 }
 
-/* دستگاه لمسی: بدون hover، عدد همیشه دیده می‌شود (همان رفتار کارت‌های آهنگ) */
+/* لمس اول آمار را نشان می‌دهد؛ لمس دوم به صفحهٔ هنرمند می‌رود. */
 @media (hover: none) {
-	.artist_boxs a.ab-artist-card .ab-card-stats {
-		opacity: 1;
-		background: transparent;
-		padding: 0;
-	}
+	.artist_boxs a.ab-artist-card:hover .ab-card-stats,
+	.artist_boxs a.ab-artist-card .ab-card-stats { opacity: 0; background: transparent; padding: 0; }
+	.artist_boxs a.ab-artist-card.is-revealed .ab-card-stats,
+	.artist_boxs a.ab-artist-card:focus-visible .ab-card-stats { opacity: 1; }
 }
 
 /* موبایل باریک: تصویر تمام‌عرضِ کارت مثل قبل */
@@ -527,3 +526,22 @@
 	}
 }
 /* انتهای بلوک ۳.۵.۴ */
+
+/* نشان در یک ردیف با نام و نیز در پایین وسط تصویر. انتخابگرهای دقیق،
+   قواعد قدیمی .artist_boxs a span را برای نشان خنثی می‌کنند. */
+.artist_boxs a.ab-artist-card .ab-artist-card__name--verified {
+	display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.artist_boxs a.ab-artist-card .ab-artist-card__name-text {
+	display:block;flex:0 1 auto;min-width:0;width:auto;margin:0;padding:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+}
+.artist_boxs a.ab-artist-card .ab-artist-card__name .ty-verified,
+.artist_boxs a.ab-artist-card .ab-artist-card__badge .ty-verified {
+	display:inline-flex;flex:0 0 auto;width:auto;max-width:none;margin:0;padding:0;overflow:visible;line-height:1;
+}
+.artist_boxs a.ab-artist-card .ab-artist-card__badge {
+	position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);z-index:3;
+	display:flex;align-items:center;justify-content:center;width:auto;max-width:none;
+	margin:0;padding:3px;overflow:visible;line-height:1;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.3);pointer-events:none;
+}
+.artist_boxs a.ab-artist-card .ab-artist-card__badge .ty-verified svg {display:block;width:20px;height:20px;max-width:none}

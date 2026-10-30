@@ -166,4 +166,18 @@
     button.addEventListener('click', function () { button.setAttribute('aria-expanded', button.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'); sync(); });
     window.addEventListener('resize', sync); sync();
   });
+
+  /* کارت هنرمند روی دستگاه بدون hover: لمس اول آمار، لمس دوم لینک. */
+  document.addEventListener('click', function (ev) {
+    if (!window.matchMedia || !window.matchMedia('(hover: none)').matches) { return; }
+    var card = ev.target && ev.target.closest ? ev.target.closest('.artist_boxs a.ab-artist-card') : null;
+    document.querySelectorAll('.artist_boxs a.ab-artist-card.is-revealed').forEach(function (other) {
+      if (other !== card) { other.classList.remove('is-revealed'); }
+    });
+    if (!card || !card.querySelector('.ab-card-stats') || ev.defaultPrevented || ev.detail === 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) { return; }
+    if (!card.classList.contains('is-revealed')) {
+      ev.preventDefault();
+      card.classList.add('is-revealed');
+    }
+  });
 })();

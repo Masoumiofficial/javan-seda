@@ -170,6 +170,7 @@ if ( ! function_exists( 'tara_artist_card' ) ) {
 		$views   = tara_artist_card_views( $term );
 		$alt     = '' !== $title ? $title : ( $term && isset( $term->name ) ? (string) $term->name : '' );
 		$has_num = ( $views > 0 && tara_artist_card_stats_on() );
+		$badge   = $term && function_exists( 'tara_artist_verified_badge' ) ? tara_artist_verified_badge( $term, array( 'size' => 'sm' ) ) : '';
 
 		$out  = '<a class="ab-artist-card" rel="noreferrer noopener" href="' . esc_url( $url ) . '">';
 		$out .= '<span class="ab-artist-card__media">';
@@ -179,8 +180,13 @@ if ( ! function_exists( 'tara_artist_card' ) ) {
 				. '<i class="icofont-eye-alt" aria-hidden="true"></i>' . esc_html( tara_artist_card_number( $views ) )
 				. '<span class="screen-reader-text">مجموع بازدید آثار</span></span></span></span>';
 		}
+		if ( '' !== $badge ) {
+			$out .= '<span class="ab-artist-card__badge" aria-hidden="true">' . $badge . '</span>';
+		}
 		$out .= '</span>';
-		$out .= '<span class="ab-artist-card__name">' . esc_html( $title ) . ( $term && function_exists( 'tara_artist_verified_badge' ) ? tara_artist_verified_badge( $term, array( 'size' => 'sm' ) ) : '' ) . '</span>';
+		$out .= '<span class="ab-artist-card__name' . ( '' !== $badge ? ' ab-artist-card__name--verified' : '' ) . '">';
+		$out .= '' !== $badge ? '<span class="ab-artist-card__name-text">' . esc_html( $title ) . '</span>' . $badge : esc_html( $title );
+		$out .= '</span>';
 		$out .= '</a>';
 
 		return $out;

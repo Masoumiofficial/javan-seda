@@ -1743,3 +1743,22 @@ html[data-tara-night="1"] .ty-radio-home__live {
 	.ty-track--radio { grid-template-columns: 34px 42px minmax(0, 1fr) auto; }
 	.ty-track--radio .ty-track__cover { display: none; }
 }
+
+/* تنظیمات دی‌جی تمام‌عرضِ کارت است، نه در ستون باریک کنار کاور. */
+.ty-radio > .ty-radio__adv { min-width: 0; margin-top: 16px; }
+.ty-radio__more:focus-visible { outline: 2px solid var(--rd-a3); outline-offset: 3px; border-radius: 6px; }
+@media (max-width: 640px) {
+	.ty-radio > .ty-radio__adv { margin-top: 12px; }
+	.ty-radio__more { min-height: 44px; box-sizing: border-box; padding: 8px 2px; }
+	.ty-radio__more em { display: none; }
+	.ty-radio__more::after { margin-inline-start: auto; }
+	.ty-radio__advbody { min-width: 0; gap: 10px; padding-top: 8px; }
+	.ty-radio__adv .ty-radio__mixer { display: flex; flex-direction: column; align-items: stretch; box-sizing: border-box; width: 100%; min-width: 0; gap: 12px; padding: 12px; }
+	.ty-radio__adv .ty-radio__ctrl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 8px; flex: none; width: 100%; min-width: 0; }
+	.ty-radio__adv .ty-radio__ctrl-val { min-width: 0; text-align: end; }
+	.ty-radio__adv .ty-radio__range--mix { grid-column: 1 / -1; box-sizing: border-box; width: 100%; min-width: 0; height: 36px; margin: 0; }
+	.ty-radio__adv .ty-radio__power { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); box-sizing: border-box; width: 100%; min-width: 0; }
+	.ty-radio__adv .ty-radio__power button { min-width: 0; min-height: 44px; padding: 6px 3px; white-space: normal; line-height: 1.5; }
+	.ty-radio__adv .ty-radio__sources, .ty-radio__adv .ty-radio__tools { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; gap: 8px; }
+	.ty-radio__adv .ty-radio__source, .ty-radio__adv .ty-radio__tool { box-sizing: border-box; display: flex; justify-content: center; align-items: center; min-width: 0; min-height: 44px; padding: 7px 6px; text-align: center; white-space: normal; overflow-wrap: anywhere; line-height: 1.6; }
+}

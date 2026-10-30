@@ -314,62 +314,63 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 
 					<p class="ty-radio__say" data-radio-say aria-live="polite" hidden></p>
 
-					<details class="ty-radio__adv" data-radio-adv<?php echo $adv_open ? ' open' : ''; ?>>
-						<summary class="ty-radio__more">
-							<i class="icofont-options" aria-hidden="true"></i>
-							<span>تنظیمات دی‌جی</span>
-							<em>طول میکس، منبع و ابزارها</em>
-						</summary>
-
-						<div class="ty-radio__advbody">
-							<div class="ty-radio__mixer">
-								<label class="ty-radio__ctrl" for="<?php echo esc_attr( $uid ); ?>-xfade">
-									<span class="ty-radio__ctrl-label">طول میکس</span>
-									<strong class="ty-radio__ctrl-val" data-radio-xfade-val><?php echo esc_html( tara_radio_fa( $xfade ) . ' ثانیه' ); ?></strong>
-									<input type="range" id="<?php echo esc_attr( $uid ); ?>-xfade" class="ty-radio__range ty-radio__range--mix" data-radio-xfade min="0" max="16" step="1" value="<?php echo esc_attr( (string) $xfade ); ?>" dir="ltr">
-								</label>
-								<div class="ty-radio__power" role="group" aria-label="شدت میکس">
-									<button type="button" data-radio-power="calm" aria-pressed="false">آرام</button>
-									<button type="button" data-radio-power="warm" aria-pressed="true">دی‌جی</button>
-									<button type="button" data-radio-power="club" aria-pressed="false">باشگاهی</button>
-								</div>
-							</div>
-
-							<?php if ( ! empty( $args['sources'] ) ) : ?>
-								<div class="ty-radio__sources" role="group" aria-label="منبع آهنگ‌های رادیو">
-									<?php foreach ( $modes as $mode_key => $mode_label ) : ?>
-										<button type="button" class="ty-radio__source<?php echo ( $mode_key === $args['mode'] ) ? ' is-active' : ''; ?>"
-											data-radio-source="<?php echo esc_attr( $mode_key ); ?>" aria-pressed="<?php echo ( $mode_key === $args['mode'] ) ? 'true' : 'false'; ?>">
-											<?php echo esc_html( $mode_label ); ?>
-										</button>
-									<?php endforeach; ?>
-								</div>
-							<?php endif; ?>
-
-							<div class="ty-radio__tools">
-								<?php
-								/* v3.10.1 — «فهرست من» فقط وقتی معنی دارد که دکمهٔ
-								   «افزودن به رادیو» هم به کاربر نشان داده شود. */
-								if ( ! function_exists( 'tara_radio_user_add_on' ) || tara_radio_user_add_on() ) :
-									?>
-								<button type="button" class="ty-radio__tool" data-radio-mine aria-expanded="false" aria-controls="<?php echo esc_attr( $uid ); ?>-mine">
-									<i class="icofont-heart-alt" aria-hidden="true"></i>
-									فهرست من <b data-radio-mine-count>۰</b>
-								</button>
-								<?php endif; ?>
-								<button type="button" class="ty-radio__tool" data-radio-shuffle>
-									<i class="icofont-random" aria-hidden="true"></i>
-									شافل
-								</button>
-								<button type="button" class="ty-radio__tool" data-radio-export>
-									<i class="icofont-download" aria-hidden="true"></i>
-									فهرست جلسه
-								</button>
-							</div>
-						</div>
-					</details>
 				</div>
 			</div>
+
+			<details class="ty-radio__adv" data-radio-adv<?php echo $adv_open ? ' open' : ''; ?>>
+				<summary class="ty-radio__more">
+					<i class="icofont-options" aria-hidden="true"></i>
+					<span>تنظیمات دی‌جی</span>
+					<em>طول میکس، منبع و ابزارها</em>
+				</summary>
+
+				<div class="ty-radio__advbody">
+					<div class="ty-radio__mixer">
+						<label class="ty-radio__ctrl" for="<?php echo esc_attr( $uid ); ?>-xfade">
+							<span class="ty-radio__ctrl-label">طول میکس</span>
+							<strong class="ty-radio__ctrl-val" data-radio-xfade-val><?php echo esc_html( tara_radio_fa( $xfade ) . ' ثانیه' ); ?></strong>
+							<input type="range" id="<?php echo esc_attr( $uid ); ?>-xfade" class="ty-radio__range ty-radio__range--mix" data-radio-xfade min="0" max="16" step="1" value="<?php echo esc_attr( (string) $xfade ); ?>" dir="ltr">
+						</label>
+						<div class="ty-radio__power" role="group" aria-label="شدت میکس">
+							<button type="button" data-radio-power="calm" aria-pressed="false">آرام</button>
+							<button type="button" data-radio-power="warm" aria-pressed="true">دی‌جی</button>
+							<button type="button" data-radio-power="club" aria-pressed="false">باشگاهی</button>
+						</div>
+					</div>
+
+					<?php if ( ! empty( $args['sources'] ) ) : ?>
+						<div class="ty-radio__sources" role="group" aria-label="منبع آهنگ‌های رادیو">
+							<?php foreach ( $modes as $mode_key => $mode_label ) : ?>
+								<button type="button" class="ty-radio__source<?php echo ( $mode_key === $args['mode'] ) ? ' is-active' : ''; ?>"
+									data-radio-source="<?php echo esc_attr( $mode_key ); ?>" aria-pressed="<?php echo ( $mode_key === $args['mode'] ) ? 'true' : 'false'; ?>">
+									<?php echo esc_html( $mode_label ); ?>
+								</button>
+							<?php endforeach; ?>
+						</div>
+					<?php endif; ?>
+
+					<div class="ty-radio__tools">
+						<?php
+						/* v3.10.1 — «فهرست من» فقط وقتی معنی دارد که دکمهٔ
+						   «افزودن به رادیو» هم به کاربر نشان داده شود. */
+						if ( ! function_exists( 'tara_radio_user_add_on' ) || tara_radio_user_add_on() ) :
+							?>
+						<button type="button" class="ty-radio__tool" data-radio-mine aria-expanded="false" aria-controls="<?php echo esc_attr( $uid ); ?>-mine">
+							<i class="icofont-heart-alt" aria-hidden="true"></i>
+							فهرست من <b data-radio-mine-count>۰</b>
+						</button>
+						<?php endif; ?>
+						<button type="button" class="ty-radio__tool" data-radio-shuffle>
+							<i class="icofont-random" aria-hidden="true"></i>
+							شافل
+						</button>
+						<button type="button" class="ty-radio__tool" data-radio-export>
+							<i class="icofont-download" aria-hidden="true"></i>
+							فهرست جلسه
+						</button>
+					</div>
+				</div>
+			</details>
 
 			<div class="ty-radio__timeline">
 				<header class="ty-radio__tlhead">

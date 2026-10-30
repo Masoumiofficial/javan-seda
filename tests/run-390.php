@@ -641,6 +641,12 @@ t( 'نوارِ زمان: JS عرضِ fill را می‌نویسد', false !== str
 t( 'کارتِ صفحهٔ اصلی فشرده است', false !== strpos( tara_radio_box( array( 'context' => 'home', 'tracks' => $tracks ) ), 'ty-radio--compact' ) );
 t( 'کارتِ آرشیو فشرده نیست', false === strpos( $box_rtl, 'ty-radio--compact' ) );
 t( 'کنترل‌های حرفه‌ای داخلِ <details> هستند', false !== strpos( $box_rtl, 'class="ty-radio__adv" data-radio-adv' ) && false !== strpos( $box_rtl, '<summary class="ty-radio__more">' ) );
+$home_box = tara_radio_box( array( 'context' => 'home', 'tracks' => $tracks ) );
+$page_box = tara_radio_box( array( 'context' => 'page', 'tracks' => $tracks, 'sources' => true ) );
+foreach ( array( 'خانه' => $home_box, 'صفحه رادیو' => $page_box, 'آرشیو' => $box_rtl ) as $context => $box ) {
+    t( 'پنل دی‌جی بعد از دک و تمام‌عرض: ' . $context, (bool) preg_match( '/class="ty-radio__say"[^>]*><\/p>\s*<\/div>\s*<\/div>\s*<details class="ty-radio__adv"/s', $box ) );
+    t( 'کنترل‌های دی‌جی حفظ شده‌اند: ' . $context, false !== strpos($box, 'data-radio-xfade') && false !== strpos($box, 'data-radio-power="warm"') && false !== strpos($box, 'data-radio-shuffle') );
+}
 t( 'تنظیماتِ دی‌جی در آرشیو بسته است', false === strpos( $box_rtl, 'data-radio-adv open' ) );
 t( 'تنظیماتِ دی‌جی در صفحهٔ رادیو باز است', false !== strpos( tara_radio_box( array( 'context' => 'page', 'tracks' => $tracks, 'sources' => true ) ), 'data-radio-adv open' ) );
 t( 'فشرده: آمار پنهان می‌شود', false === strpos( tara_radio_box( array( 'context' => 'home', 'tracks' => $tracks ) ), 'ty-radio__meter' ) );

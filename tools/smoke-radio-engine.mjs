@@ -91,4 +91,14 @@ const flush=()=>new Promise(r=>setTimeout(r,0));
  assert(!r.root.classList.contains('is-playing'),'late playing event does not override pause');
  dom.window.close();
 }
+{
+ const html = markup().replace('<button data-radio-toggle></button>', `<button data-radio-toggle></button><details class="ty-radio__adv"><summary>تنظیمات دی‌جی</summary><div class="ty-radio__advbody"><label><span data-radio-xfade-val></span><input type="range" min="0" max="16" value="6" data-radio-xfade></label><div data-radio-power-group><button data-radio-power="calm"></button><button data-radio-power="warm"></button><button data-radio-power="club"></button></div></div></details>`);
+ const {w,dom,radio:r}=await setup(html);
+ const details=r.root.querySelector('details'); assert.equal(details.parentNode,r.root); details.open=true; assert(details.open);
+ const slider=r.root.querySelector('[data-radio-xfade]'); slider.value='9'; slider.dispatchEvent(new w.Event('input',{bubbles:true}));
+ assert.equal(r.xfade,9); assert.equal(r.root.querySelector('[data-radio-xfade-val]').textContent,'۹ ثانیه');
+ const power=r.root.querySelector('[data-radio-power=club]'); power.click();
+ assert.equal(r.xfade,12); assert.equal(power.getAttribute('aria-pressed'),'true');
+ dom.window.close();
+}
 console.log('radio engine queue, crossfade, pause, source race and CDN fallback: passed');

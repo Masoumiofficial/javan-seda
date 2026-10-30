@@ -110,11 +110,13 @@ if ( ! function_exists( 'tara_verified_badge' ) ) {
 			$class .= ' ' . sanitize_html_class( (string) $args['class'] );
 		}
 
+		// Google Material Icons "verified" (Apache-2.0); notice and license in licenses/.
 		return '<span class="' . esc_attr( $class ) . '" role="img" aria-label="' . esc_attr( $args['title'] ) . '" title="' . esc_attr( $args['title'] ) . '">'
-			. '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">'
-			. '<path fill="currentColor" d="M12 1.5l2.15 1.75 2.75-.18 1.02 2.56 2.39 1.4-.79 2.65.79 2.65-2.39 1.4-1.02 2.56-2.75-.18L12 16.86l-2.15 1.75-2.75-.18-1.02-2.56-2.39-1.4.79-2.65-.79-2.65 2.39-1.4L7.1 3.07l2.75.18z" transform="translate(0 2)"/>'
-			. '<path d="M8.2 12l2.5 2.5 5.1-5.1" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+			. '<svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">'
+			. '<path fill="currentColor" d="M23 12l-2.44-2.79.34-3.69-3.61-.82L15.4 1.5 12 2.96 8.6 1.5 6.71 4.69 3.1 5.5l.34 3.7L1 12l2.44 2.79-.34 3.7 3.61.82L8.6 22.5l3.4-1.47 3.4 1.46 1.89-3.19 3.61-.82-.34-3.69z"/>'
+			. '<path d="m7.6 12.4 3 3 5.9-6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>'
 			. '</svg></span>';
+
 	}
 }
 

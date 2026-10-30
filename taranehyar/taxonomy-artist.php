@@ -756,14 +756,21 @@ $taranehyar_social_icons = array(
 		/* ستون سوم: بنر هنرمند اگر ثبت شده باشد؛ وگرنه همان تصویر پروفایل
 		   (حالت پیش‌فرض و سازگار با نسخهٔ قبل). */
 		?>
+		<?php $tara_portrait_badge = function_exists( 'tara_artist_verified_badge' ) ? tara_artist_verified_badge( $taranehyar_term, array( 'size' => 'lg' ) ) : ''; ?>
 		<figure class="ty-artist__portrait<?php echo ( '' !== $taranehyar_banner ) ? ' ty-artist__portrait--banner' : ''; ?>">
 			<?php if ( '' !== $taranehyar_banner ) : ?>
-				<img src="<?php echo esc_url( $taranehyar_banner ); ?>" width="1200" height="400" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" loading="eager" fetchpriority="high">
+				<img src="<?php echo esc_url( $taranehyar_banner ); ?>" width="1200" height="400" alt="" loading="eager" fetchpriority="high">
+				<div class="ty-artist__banner-avatar">
+					<img src="<?php echo esc_url( $taranehyar_cover ); ?>" width="120" height="120" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" loading="eager">
+					<?php if ( '' !== $tara_portrait_badge ) : ?>
+						<span class="ty-artist__portrait-verified" aria-hidden="true"><?php echo $tara_portrait_badge; // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی داخلی قالب ?></span>
+					<?php endif; ?>
+				</div>
 			<?php else : ?>
 				<img src="<?php echo esc_url( $taranehyar_cover ); ?>" width="240" height="240" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" loading="eager" fetchpriority="high">
-			<?php endif; ?>
-			<?php if ( function_exists( 'tara_artist_verified_badge' ) ) : ?>
-				<span class="ty-artist__portrait-verified"><?php echo tara_artist_verified_badge( $taranehyar_term, array( 'size' => 'lg' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+				<?php if ( '' !== $tara_portrait_badge ) : ?>
+					<span class="ty-artist__portrait-verified" aria-hidden="true"><?php echo $tara_portrait_badge; // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی داخلی قالب ?></span>
+				<?php endif; ?>
 			<?php endif; ?>
 			<?php if ( $taranehyar_found > 0 ) : ?>
 				<figcaption><?php echo esc_html( sprintf( '%s اثر در سایت', tara_number_fa( $taranehyar_found ) ) ); ?></figcaption>

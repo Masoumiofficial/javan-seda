@@ -1230,6 +1230,24 @@ html[data-tara-night="1"] .ty-radio-home__more {
 
 .ty-radio--page .ty-radio__deck { grid-template-columns: clamp(210px, 24vw, 300px) minmax(0, 1fr); }
 
+/* برگهٔ رادیو: قاعدهٔ دو ستونی بالا باید در عرض کم صریحاً خنثی شود.
+   فقط نمای کامل برگه/شورت‌کد را هدف می‌گیرد، نه کارت فشردهٔ خانه. */
+@media (max-width: 900px) {
+	.ty-radio--page .ty-radio__deck { grid-template-columns: minmax(0, 1fr); gap: 18px; }
+	.ty-radio--page .ty-radio__artwrap { max-width: 220px; }
+	.ty-radio--page .ty-radio__console { width: 100%; min-width: 0; }
+}
+@media (max-width: 640px) {
+	.ty-radio--page .ty-radio__artwrap { max-width: 170px; }
+	.ty-radio--page .ty-radio__head { gap: 12px; }
+	.ty-radio--page .ty-radio__ident { flex-basis: 100%; }
+	.ty-radio--page .ty-radio__title, .ty-radio--page .ty-radio__song { overflow-wrap: anywhere; }
+	.ty-radio--page .ty-radio__more em { display: none; }
+	.ty-radio--page .ty-radio__source { padding: 7px 11px; }
+	.ty-radio--page .ty-radio__queue { grid-template-columns: minmax(0, 1fr); }
+}
+
+
 .ty-radio--tax { margin-top: 0; }
 
 .ty-radio__audio { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }

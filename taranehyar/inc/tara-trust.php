@@ -112,8 +112,8 @@ if ( ! function_exists( 'tara_verified_badge' ) ) {
 
 		return '<span class="' . esc_attr( $class ) . '" role="img" aria-label="' . esc_attr( $args['title'] ) . '" title="' . esc_attr( $args['title'] ) . '">'
 			. '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false">'
-			. '<path fill="currentColor" d="M12 1.8l2.4 2 3.1-.3 1.2 2.9 2.7 1.6-1 3 1 3-2.7 1.6-1.2 2.9-3.1-.3-2.4 2-2.4-2-3.1.3-1.2-2.9L2.6 15.9l1-3-1-3 2.7-1.6L6.5 5.4l3.1.3z"/>'
-			. '<path fill="#fff" d="M10.6 15.6l-2.7-2.7 1.2-1.2 1.5 1.5 4-4 1.2 1.2z"/>'
+			. '<path fill="currentColor" d="M12 1.5l2.15 1.75 2.75-.18 1.02 2.56 2.39 1.4-.79 2.65.79 2.65-2.39 1.4-1.02 2.56-2.75-.18L12 16.86l-2.15 1.75-2.75-.18-1.02-2.56-2.39-1.4.79-2.65-.79-2.65 2.39-1.4L7.1 3.07l2.75.18z" transform="translate(0 2)"/>'
+			. '<path d="M8.2 12l2.5 2.5 5.1-5.1" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
 			. '</svg></span>';
 	}
 }

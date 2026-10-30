@@ -42,3 +42,26 @@
 @media(max-width:782px){.ty-artist__bio-news {grid-template-columns:1fr}}
 
 .ty-dm__status:not(:empty) {padding:8px 12px;margin:0;color:#b91c1c;background:#fef2f2}
+
+/* نمای تأیید هنرمند و اصلاح پنل */
+.ty-verified {flex:0 0 auto;justify-content:center;line-height:1;margin-inline-start:5px}
+.ty-verified svg {display:block;width:19px;height:19px;max-width:none;overflow:visible}
+.ty-artist__name .ty-verified {vertical-align:middle}
+.ty-artist__name .ty-verified svg {width:24px;height:24px}
+.ty-artist__portrait-verified {position:absolute;z-index:2;left:50%;bottom:10px;transform:translateX(-50%)}
+.ty-artist__portrait-verified .ty-verified {margin:0;padding:3px;border-radius:50%;background:#fff;box-shadow:0 3px 12px #0005}
+.ty-artist__portrait-verified .ty-verified svg {width:22px;height:22px}
+.ty-artist__portrait figcaption {bottom:auto;top:10px}
+.ty-dm-availability {display:inline-flex;flex-direction:column;align-items:flex-start;gap:3px;max-width:260px}
+.ty-dm-availability button:disabled {opacity:.65;cursor:not-allowed}
+.ty-dm-availability small {font-size:10px;line-height:1.7;color:#fff}
+.ty-acct__side {border-radius:20px;box-shadow:0 12px 32px rgba(24,55,102,.08)}
+.ty-acct__main,.ty-acct-head {border-radius:16px}
+.ty-acct__navlink {border-radius:12px;transition:background .18s ease,color .18s ease}
+.ty-acct__navlink.is-active {box-shadow:0 5px 16px rgba(24,90,219,.16)}
+.ty-hub__card {box-shadow:0 8px 26px rgba(24,55,102,.06)}
+.ty-hub__plan.is-vip {border-color:rgba(24,90,219,.42);background:rgba(24,90,219,.04)}
+.ty-hub__btn:focus-visible,.ty-dm-open:focus-visible {outline:2px solid #4c8bff;outline-offset:3px}
+@media(max-width:800px){#mobiles_header .ty-acct-btn--mobile .ty-acct__svg{color:inherit}#mobiles_header .logo_mobiles img{max-width:min(150px,calc(100vw - 180px))}}
+@media(max-width:400px){#mobiles_header .navicon,#mobiles_header .search_mobile_box{width:42px;height:42px}#mobiles_header .search_mobile_box{left:60px}}
+@media(max-width:350px){#mobiles_header .navicon,#mobiles_header .search_mobile_box{width:40px;height:40px}#mobiles_header .search_mobile_box{left:57px}#mobiles_header .logo_mobiles img{max-width:calc(100vw - 166px)}}

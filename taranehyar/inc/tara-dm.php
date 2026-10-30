@@ -530,7 +530,7 @@ if ( ! function_exists( 'tara_dm_button' ) ) {
 	 */
 	function tara_dm_button( $term_id, $args = array() ) {
 		$term_id = (int) $term_id;
-		if ( $term_id <= 0 || ! tara_dm_on() ) {
+		if ( $term_id <= 0 ) {
 			return '';
 		}
 		$args = wp_parse_args(
@@ -542,12 +542,14 @@ if ( ! function_exists( 'tara_dm_button' ) ) {
 		);
 
 		$owner = (int) tara_artist_term_user( $term_id );
-		if ( $owner <= 0 || ( function_exists( 'tara_artist_is_verified' ) && ! tara_artist_is_verified( $term_id ) ) ) {
-			return '';
+		if ( ! tara_dm_on() || ( function_exists( 'tara_acc_on' ) && ! tara_acc_on() ) || $owner <= 0 || ( function_exists( 'tara_artist_is_verified' ) && ! tara_artist_is_verified( $term_id ) ) ) {
+			return '<span class="ty-dm-availability"><button type="button" class="' . esc_attr( $args['class'] ) . ' ty-dm-open" disabled aria-describedby="ty-dm-unavailable">پیام مستقیم</button><small id="ty-dm-unavailable">پیام‌رسانی پس از فعال‌سازی و اتصال حساب تأییدشدهٔ هنرمند در دسترس است.</small></span>';
 		}
 
 		$logged = function_exists( 'is_user_logged_in' ) && is_user_logged_in();
-		if ( $logged && function_exists( 'get_current_user_id' ) && (int) get_current_user_id() === $owner ) { return ''; }
+		if ( $logged && function_exists( 'get_current_user_id' ) && (int) get_current_user_id() === $owner ) {
+			return '<a class="' . esc_attr( $args['class'] ) . '" href="' . esc_url( tara_acc_profile_url( 'messages' ) ) . '">دایرکت‌های من</a>';
+		}
 		if ( ! $logged ) {
 			return '<button type="button" class="' . esc_attr( $args['class'] ) . ' ty-dm-open" data-tara-open="account">'
 				. '<i class="icofont-ui-message" aria-hidden="true"></i> ' . esc_html( $args['label'] ) . '</button>';

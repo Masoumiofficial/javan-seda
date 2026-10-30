@@ -381,6 +381,17 @@ $taranehyar_limit = (int) apply_filters( 'tara_artist_posts_limit', -1 );
 /* ترتیب کوئری بر اساس ?sort= (مرتب‌سازی الفبایی بعد از کوئری و در PHP انجام می‌شود) */
 $taranehyar_orderby = ( 'old' === $taranehyar_sort ) ? 'ASC' : 'DESC';
 
+// خبر و بیوگرافی از فهرست آثار جدا می‌شوند.
+$taranehyar_editorial_categories = array();
+if ( function_exists( 'get_category_by_slug' ) ) {
+	foreach ( array( 'news', 'biography' ) as $taranehyar_editorial_slug ) {
+		$taranehyar_editorial_term = get_category_by_slug( $taranehyar_editorial_slug );
+		if ( $taranehyar_editorial_term && ! is_wp_error( $taranehyar_editorial_term ) ) {
+			$taranehyar_editorial_categories[] = (int) $taranehyar_editorial_term->term_id;
+		}
+	}
+}
+
 $taranehyar_query = new WP_Query(
 	array(
 		'post_type'           => 'post',
@@ -389,6 +400,7 @@ $taranehyar_query = new WP_Query(
 		'orderby'             => 'date',
 		'order'               => $taranehyar_orderby,
 		'ignore_sticky_posts' => true,
+		'category__not_in'    => $taranehyar_editorial_categories,
 		'tax_query'           => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 			array(
 				'taxonomy' => tara_artist_tax(),
@@ -748,6 +760,9 @@ $taranehyar_social_icons = array(
 			<?php else : ?>
 				<img src="<?php echo esc_url( $taranehyar_cover ); ?>" width="240" height="240" alt="<?php echo esc_attr( $taranehyar_term->name ); ?>" loading="eager" fetchpriority="high">
 			<?php endif; ?>
+			<?php if ( function_exists( 'tara_artist_verified_badge' ) ) : ?>
+				<span class="ty-artist__portrait-verified"><?php echo tara_artist_verified_badge( $taranehyar_term, array( 'size' => 'lg' ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
+			<?php endif; ?>
 			<?php if ( $taranehyar_found > 0 ) : ?>
 				<figcaption><?php echo esc_html( sprintf( '%s اثر در سایت', tara_number_fa( $taranehyar_found ) ) ); ?></figcaption>
 			<?php endif; ?>
@@ -853,12 +868,12 @@ $taranehyar_social_icons = array(
 			<?php else : ?>
 				<p class="ty-artist__bio ty-artist__bio--empty">بیوگرافیِ این هنرمند هنوز ثبت نشده است؛ از پنلِ هنرمند می‌توان برای تکمیلِ آن درخواست داد.</p>
 			<?php endif; ?>
+			<?php if ( '' !== $taranehyar_bio_link ) : ?><a class="ty-hub__link" href="<?php echo esc_url( $taranehyar_bio_link ); ?>">مطالعهٔ بیوگرافی کامل</a><?php endif; ?>
 		</div>
 		<aside class="ty-artist__news-col">
 			<header class="ty-artist__section-head"><h2>تازه‌ترین‌ها</h2></header>
 			<?php
 			$taranehyar_news = function_exists( 'get_posts' ) ? get_posts( array( 'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => 3, 'orderby' => 'date', 'order' => 'DESC', 'category_name' => 'news', 'tax_query' => array( array( 'taxonomy' => $taranehyar_term->taxonomy, 'field' => 'term_id', 'terms' => (int) $taranehyar_term->term_id ) ) ) ) : array();
-			if ( empty( $taranehyar_news ) ) { $taranehyar_news = array_slice( isset( $taranehyar_buckets['audio'] ) ? $taranehyar_buckets['audio'] : array(), 0, 3 ); }
 			?>
 			<?php if ( ! empty( $taranehyar_news ) ) : ?>
 				<ul class="ty-artist__news">
@@ -867,7 +882,7 @@ $taranehyar_social_icons = array(
 				<?php endforeach; ?>
 				</ul>
 			<?php else : ?>
-				<p class="ty-artist__bio ty-artist__bio--empty">هنوز خبر یا اثرِ تازه‌ای ثبت نشده است.</p>
+				<p class="ty-artist__bio ty-artist__bio--empty">هنوز خبری برای این هنرمند ثبت نشده است.</p>
 			<?php endif; ?>
 		</aside>
 	</section>
@@ -875,7 +890,7 @@ $taranehyar_social_icons = array(
 	<!-- ۴) درباره + هنرمندان مشابه ------------------------------------ -->
 	<div class="ty-artist__grid">
 		<?php $taranehyar_description = get_the_archive_description(); ?>
-		<?php if ( ! empty( $taranehyar_description ) ) : ?>
+		<?php if ( ! empty( $taranehyar_description ) && empty( $taranehyar_full_bio ) ) : ?>
 			<section class="ty-artist__card">
 				<h2>دربارهٔ <?php echo esc_html( $taranehyar_term->name ); ?></h2>
 				<div class="ty-artist__card-text"><?php echo wp_kses_post( $taranehyar_description ); ?></div>

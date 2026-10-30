@@ -614,6 +614,14 @@ $taranehyar_cover = '' !== $taranehyar_image_url
 	: ( function_exists( 'tara_artist_default_image' ) ? tara_artist_default_image() : get_template_directory_uri() . '/images/def-singer.webp' );
 
 $taranehyar_bio_short = function_exists( 'tara_artist_bio_short' ) ? tara_artist_bio_short( $taranehyar_term, false ) : '';
+/* اگر معرفی کوتاه ثبت نشده، خلاصه‌ای از توضیح ترم در سربرگ نگه داشته شود. */
+if ( '' === $taranehyar_bio_short && function_exists( 'term_description' ) ) {
+	$taranehyar_bio_description = trim( wp_strip_all_tags( (string) term_description( $taranehyar_term->term_id, $taranehyar_term->taxonomy ) ) );
+	if ( '' !== $taranehyar_bio_description ) {
+		$taranehyar_bio_short = wp_trim_words( $taranehyar_bio_description, 60, '…' );
+	}
+}
+
 /* v3.7.8 — بنر اختیاری سربرگ (ستون سوم). خالی ⇒ همان تصویر پروفایل. */
 $taranehyar_banner = function_exists( 'tara_artist_banner_url' ) ? tara_artist_banner_url( $taranehyar_term, 'full' ) : '';
 $taranehyar_bio_link  = function_exists( 'tara_artist_bio_link' ) ? tara_artist_bio_link( $taranehyar_term ) : '';
@@ -865,46 +873,9 @@ $taranehyar_social_icons = array(
 		</section>
 	<?php endif; ?>
 
-	<!-- ۳٫۵) بیوگرافیِ کامل + تازه‌ترین خبرها/آثار ----------------------- -->
-	<section class="ty-artist__section ty-artist__bio-news">
-		<div class="ty-artist__bio-col">
-			<header class="ty-artist__section-head"><h2>بیوگرافیِ <?php echo esc_html( $taranehyar_term->name ); ?></h2></header>
-			<?php $taranehyar_full_bio = function_exists( 'get_the_archive_description' ) ? get_the_archive_description() : ''; ?>
-			<?php if ( ! empty( $taranehyar_full_bio ) ) : ?>
-				<div class="ty-artist__card-text ty-artist__bio-full"><?php echo wp_kses_post( $taranehyar_full_bio ); ?></div>
-			<?php elseif ( '' !== $taranehyar_bio_short ) : ?>
-				<div class="ty-artist__card-text"><?php echo wpautop( esc_html( $taranehyar_bio_short ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
-			<?php else : ?>
-				<p class="ty-artist__bio ty-artist__bio--empty">بیوگرافیِ این هنرمند هنوز ثبت نشده است؛ از پنلِ هنرمند می‌توان برای تکمیلِ آن درخواست داد.</p>
-			<?php endif; ?>
-			<?php if ( '' !== $taranehyar_bio_link ) : ?><a class="ty-hub__link" href="<?php echo esc_url( $taranehyar_bio_link ); ?>">مطالعهٔ بیوگرافی کامل</a><?php endif; ?>
-		</div>
-		<aside class="ty-artist__news-col">
-			<header class="ty-artist__section-head"><h2>تازه‌ترین‌ها</h2></header>
-			<?php
-			$taranehyar_news = function_exists( 'get_posts' ) ? get_posts( array( 'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => 3, 'orderby' => 'date', 'order' => 'DESC', 'category_name' => 'news', 'tax_query' => array( array( 'taxonomy' => $taranehyar_term->taxonomy, 'field' => 'term_id', 'terms' => (int) $taranehyar_term->term_id ) ) ) ) : array();
-			?>
-			<?php if ( ! empty( $taranehyar_news ) ) : ?>
-				<ul class="ty-artist__news">
-				<?php foreach ( $taranehyar_news as $taranehyar_news_post ) : ?>
-					<li><a href="<?php echo esc_url( get_permalink( $taranehyar_news_post ) ); ?>"><?php echo esc_html( get_the_title( $taranehyar_news_post ) ); ?></a><time><?php echo esc_html( get_the_date( '', $taranehyar_news_post ) ); ?></time></li>
-				<?php endforeach; ?>
-				</ul>
-			<?php else : ?>
-				<p class="ty-artist__bio ty-artist__bio--empty">هنوز خبری برای این هنرمند ثبت نشده است.</p>
-			<?php endif; ?>
-		</aside>
-	</section>
 
 	<!-- ۴) درباره + هنرمندان مشابه ------------------------------------ -->
 	<div class="ty-artist__grid">
-		<?php $taranehyar_description = get_the_archive_description(); ?>
-		<?php if ( ! empty( $taranehyar_description ) && empty( $taranehyar_full_bio ) ) : ?>
-			<section class="ty-artist__card">
-				<h2>دربارهٔ <?php echo esc_html( $taranehyar_term->name ); ?></h2>
-				<div class="ty-artist__card-text"><?php echo wp_kses_post( $taranehyar_description ); ?></div>
-			</section>
-		<?php endif; ?>
 
 		<?php if ( '' !== $taranehyar_about ) : ?>
 			<section class="ty-artist__card<?php echo $taranehyar_about_wide ? ' ty-artist__card--wide' : ''; ?>">

@@ -37,9 +37,6 @@
 .ty-radio__queue.ty-list--collapsed {max-height:none;overflow:visible;grid-template-columns:1fr}
 .ty-radio__queue:not(.ty-list--collapsed) {max-height:340px;overflow-y:auto}
 .ty-list-more[hidden] {display:none!important}
-.ty-artist__bio-news {display:grid;grid-template-columns:2fr 1fr;gap:20px}
-.ty-artist__news {margin:0;padding:0;list-style:none}.ty-artist__news li {padding:8px 0;border-bottom:1px solid var(--ab-line,#ddd)}.ty-artist__news time {display:block;font-size:11px;opacity:.7}
-@media(max-width:782px){.ty-artist__bio-news {grid-template-columns:1fr}}
 
 .ty-dm__status:not(:empty) {padding:8px 12px;margin:0;color:#b91c1c;background:#fef2f2}
 

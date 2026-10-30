@@ -202,15 +202,15 @@ if ( ! function_exists( 'tara_media_url' ) ) {
 	 * @param mixed $value مقدار خام.
 	 * @return string
 	 */
-	function tara_media_url( $value ) {
+	function tara_media_url( $value, $preserve_scheme = false ) {
 		if ( is_string( $value ) ) {
 			$value = trim( $value );
 
 			/* متای قدیمی گاهی آرایهٔ سریال‌شده است */
-			if ( '' !== $value && ( '{' === $value[0] || '[' === $value[0] ) ) {
-				$maybe = maybe_unserialize( $value );
+			if ( '' !== $value ) {
+				$maybe = ( '{' === $value[0] || '[' === $value[0] ) ? json_decode( $value, true ) : ( 0 === strpos( $value, 'a:' ) && function_exists( 'maybe_unserialize' ) ? maybe_unserialize( $value ) : null );
 				if ( is_array( $maybe ) ) {
-					return tara_media_url( $maybe );
+					return tara_media_url( $maybe, $preserve_scheme );
 				}
 			}
 
@@ -221,33 +221,33 @@ if ( ! function_exists( 'tara_media_url' ) ) {
 			/* عدد خالص = شناسهٔ پیوست */
 			if ( ctype_digit( $value ) && function_exists( 'wp_get_attachment_url' ) ) {
 				$url = wp_get_attachment_url( (int) $value );
-				return $url ? tara_media_fix_scheme( $url ) : '';
+				return $url ? ( $preserve_scheme ? $url : tara_media_fix_scheme( $url ) ) : '';
 			}
 
-			return tara_media_fix_scheme( $value );
+			return $preserve_scheme && 0 !== strpos( $value, '//' ) ? $value : tara_media_fix_scheme( $value );
 		}
 
 		if ( is_numeric( $value ) && function_exists( 'wp_get_attachment_url' ) ) {
 			$url = wp_get_attachment_url( (int) $value );
-			return $url ? tara_media_fix_scheme( $url ) : '';
+			return $url ? ( $preserve_scheme ? $url : tara_media_fix_scheme( $url ) ) : '';
 		}
 
 		if ( is_array( $value ) ) {
 			foreach ( array( 'url', 'src', 'link' ) as $key ) {
 				if ( isset( $value[ $key ] ) && is_string( $value[ $key ] ) && '' !== trim( $value[ $key ] ) ) {
-					return tara_media_fix_scheme( $value[ $key ] );
+					return $preserve_scheme && 0 !== strpos( $value[ $key ], '//' ) ? $value[ $key ] : tara_media_fix_scheme( $value[ $key ] );
 				}
 			}
 			foreach ( array( 'ID', 'id', 'attachment_id' ) as $key ) {
 				if ( isset( $value[ $key ] ) && function_exists( 'wp_get_attachment_url' ) ) {
 					$url = wp_get_attachment_url( (int) $value[ $key ] );
 					if ( $url ) {
-						return tara_media_fix_scheme( $url );
+						return $preserve_scheme ? $url : tara_media_fix_scheme( $url );
 					}
 				}
 			}
 			if ( isset( $value[0] ) ) {
-				return tara_media_url( $value[0] );
+				return tara_media_url( $value[0], $preserve_scheme );
 			}
 		}
 
@@ -437,7 +437,7 @@ if ( ! function_exists( 'tara_music_value' ) ) {
 	 * @param int    $post_id شناسهٔ نوشته.
 	 * @return string
 	 */
-	function tara_music_value( $key, $post_id = 0 ) {
+	function tara_music_value( $key, $post_id = 0, $preserve_scheme = false ) {
 		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
 		if ( ! $post_id ) {
 			return '';
@@ -452,11 +452,11 @@ if ( ! function_exists( 'tara_music_value' ) ) {
 			$raw = get_post_meta( $post_id, $key, true );
 		}
 
-		if ( is_string( $raw ) && '' !== trim( $raw ) && ! in_array( $key, array( 'music320', 'music128', 'music', 'video480', 'video720', 'video1080' ), true ) ) {
+		if ( is_string( $raw ) && '' !== trim( $raw ) && ! in_array( $key, array( 'music320', 'music128', 'music', 'album128', 'album320', 'video480', 'video720', 'video1080' ), true ) ) {
 			return trim( $raw );
 		}
 
-		return tara_media_url( $raw );
+		return tara_media_url( $raw, $preserve_scheme );
 	}
 }
 

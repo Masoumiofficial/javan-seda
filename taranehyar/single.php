@@ -540,13 +540,13 @@ $tara_dl_video_meta = array(
 $tara_dl_audio = array();
 $tara_dl_video = array();
 foreach ( $tara_dl_audio_meta as $tara_dl_key => $tara_dl_meta ) {
-	$tara_dl_url = function_exists( 'tara_music_value' ) ? tara_music_value( $tara_dl_key ) : '';
+	$tara_dl_url = function_exists( 'tara_music_value' ) ? tara_music_value( $tara_dl_key, 0, true ) : '';
 	if ( '' !== $tara_dl_url ) {
 		$tara_dl_audio[ $tara_dl_key ] = array( $tara_dl_url, $tara_dl_meta[0], $tara_dl_meta[1] );
 	}
 }
 foreach ( $tara_dl_video_meta as $tara_dl_key => $tara_dl_label ) {
-	$tara_dl_url = function_exists( 'tara_music_value' ) ? tara_music_value( $tara_dl_key ) : '';
+	$tara_dl_url = function_exists( 'tara_music_value' ) ? tara_music_value( $tara_dl_key, 0, true ) : '';
 	if ( '' !== $tara_dl_url ) {
 		$tara_dl_video[ $tara_dl_key ] = array( $tara_dl_url, $tara_dl_label );
 	}
@@ -562,7 +562,7 @@ if ( $taranehyar_download_title && ( $tara_dl_audio || $tara_dl_video ) ) {
 ?>
 <div class="dl_links_box">
 <?php foreach ( $tara_dl_audio as $tara_dl_row ) : ?>
-<a class="<?php echo esc_attr( $tara_dl_row[2] ); ?>" href="<?php echo esc_url( $tara_dl_row[0] ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i><?php echo esc_html( $tara_dl_row[1] ); ?></a>
+<a class="<?php echo esc_attr( $tara_dl_row[2] ); ?> ty-download-link" href="<?php echo esc_url( $tara_dl_row[0] ); ?>" download rel="noopener" data-tara-download="audio"> <i class="icofont-download"></i><span><?php echo esc_html( $tara_dl_row[1] ); ?></span></a>
 <?php endforeach; ?>
 <div class="clear"></div>
 </div>
@@ -570,7 +570,7 @@ if ( $taranehyar_download_title && ( $tara_dl_audio || $tara_dl_video ) ) {
 <div class="dl_linksv_box">
 <ul>
 <?php foreach ( $tara_dl_video as $tara_dl_row ) : ?>
-<li><a href="<?php echo esc_url( $tara_dl_row[0] ); ?>" target="_blank" rel="noopener"> <i class="icofont-download"></i><?php echo esc_html( $tara_dl_row[1] ); ?></a></li>
+<li><a class="ty-download-link ty-download-link--video" href="<?php echo esc_url( $tara_dl_row[0] ); ?>" download rel="noopener" data-tara-download="video"> <i class="icofont-download"></i><span><?php echo esc_html( $tara_dl_row[1] ); ?></span></a></li>
 <?php endforeach; ?>
 </ul>
 <div class="clear"></div>

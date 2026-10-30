@@ -1283,7 +1283,11 @@ if ( ! function_exists( 'tara_acc_follow' ) ) {
 		$count = tara_acc_follower_count( $term_id );
 		$count += ( $target && ! $has ) ? 1 : 0;
 		$count -= ( ! $target && $has ) ? 1 : 0;
-		update_term_meta( $term_id, 'tara_followers', max( 0, $count ) );
+		if ( function_exists( 'tara_artist_followers_set' ) ) {
+			tara_artist_followers_set( $term_id, max( 0, $count ), '', 'follow' );
+		} else {
+			update_term_meta( $term_id, 'tara_followers', max( 0, $count ) );
+		}
 
 		return array(
 			'following' => $target,

@@ -53,6 +53,8 @@ if ( ! function_exists( 'tara_acc_icon' ) ) {
 			'play'     => '<path d="M8 5v14l11-7Z"/>',
 			'spark'    => '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M18 6l-2.5 2.5M8.5 15.5 6 18"/>',
 			'link'     => '<path d="M10 13a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7L11.5 5.5"/><path d="M14 11a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7L12.5 18.5"/>',
+			'chat'     => '<path d="M21 12a8 8 0 0 1-8 8H5l-2 2V12a8 8 0 0 1 8-8h2a8 8 0 0 1 8 8Z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>',
+			'mic'      => '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/>',
 			'copy'     => '<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/>',
 		);
 		$path = isset( $paths[ $name ] ) ? $paths[ $name ] : $paths['music'];
@@ -88,6 +90,7 @@ if ( ! function_exists( 'tara_acc_config' ) ) {
 		return array(
 			'api'      => function_exists( 'admin_url' ) ? admin_url( 'admin-ajax.php' ) : '',
 			'nonce'    => function_exists( 'wp_create_nonce' ) ? wp_create_nonce( 'tara_account' ) : '',
+			'dmNonce'  => function_exists( 'wp_create_nonce' ) ? wp_create_nonce( 'tara_dm' ) : '',
 			'logged'   => $user_id > 0,
 			'user'     => $user,
 			'url'      => array(
@@ -192,6 +195,15 @@ if ( ! function_exists( 'tara_acc_button' ) ) {
 				$html .= '<span class="ty-acct-btn__dot" aria-label="' . esc_attr( tara_acc_fa( $unread ) . ' پیامِ تازه' ) . '">' . esc_html( tara_acc_fa( $unread ) ) . '</span>';
 			}
 			$html .= '</a>';
+			if ( 'desktop' === (string) $context ) {
+				$menu = '<nav class="ty-acct-menu" aria-label="منوی حساب کاربری">';
+				foreach ( tara_acc_tabs() as $tkey => $tdata ) {
+					if ( empty( $tdata['on'] ) ) { continue; }
+					$menu .= '<a href="' . esc_url( tara_acc_profile_url( $tkey ) ) . '">' . tara_acc_icon( $tdata['icon'] ) . '<span>' . esc_html( $tdata['label'] ) . '</span></a>';
+				}
+				$menu .= '<button type="button" data-tara-logout>' . tara_acc_icon( 'logout' ) . '<span>خروج از حساب</span></button></nav>';
+				$html = '<div class="ty-acct-wrap">' . $html . $menu . '</div>';
+			}
 			return $html;
 		}
 
@@ -543,6 +555,8 @@ if ( ! function_exists( 'tara_acc_tabs' ) ) {
 			'follows'   => array( 'label' => 'خواننده‌ها', 'icon' => 'user', 'on' => tara_acc_feature( 'follows' ) ),
 			'history'   => array( 'label' => 'تاریخچهٔ شنیدن', 'icon' => 'clock', 'on' => tara_acc_feature( 'history' ) ),
 			'notifs'    => array( 'label' => 'پیام‌ها', 'icon' => 'bell', 'on' => tara_acc_feature( 'notifs' ) ),
+			'messages'  => array( 'label' => 'دایرکت‌ها', 'icon' => 'chat', 'on' => function_exists( 'tara_dm_on' ) ? tara_dm_on() : false ),
+			'artist'    => array( 'label' => 'پنل هنرمند', 'icon' => 'mic', 'on' => function_exists( 'tara_hub_on' ) ? tara_hub_on() : false ),
 			'telegram'  => array( 'label' => 'اتصال به ربات', 'icon' => 'telegram', 'on' => true ),
 			'profile'   => array( 'label' => 'مشخصات', 'icon' => 'edit', 'on' => true ),
 		);
@@ -728,6 +742,12 @@ if ( ! function_exists( 'tara_acc_panel' ) ) {
 						break;
 					case 'telegram':
 						echo tara_acc_tab_telegram( $user_id ); // phpcs:ignore WordPress.Security.EscapeOutput
+						break;
+					case 'messages':
+						echo function_exists( 'tara_dm_tab' ) ? tara_dm_tab( $user_id ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput
+						break;
+					case 'artist':
+						echo function_exists( 'tara_hub_tab_artist' ) ? tara_hub_tab_artist( $user_id ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput
 						break;
 					case 'profile':
 						echo tara_acc_tab_profile( $user_id ); // phpcs:ignore WordPress.Security.EscapeOutput

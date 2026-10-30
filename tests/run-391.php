@@ -681,8 +681,8 @@ t( 'اکشن: افزودن به پلی‌لیست', false !== strpos( $act, 'dat
 
 /* تب‌ها */
 $tabs = tara_acc_tabs();
-t( 'تب‌ها: هشت تب', 8 === count( $tabs ), (string) count( $tabs ) );
-t( 'تب‌ها: ترتیب', array( 'overview', 'favorites', 'playlists', 'follows', 'history', 'notifs', 'telegram', 'profile' ) === array_keys( $tabs ) );
+t( 'تب‌ها: ده تب', 10 === count( $tabs ), (string) count( $tabs ) );
+t( 'تب‌ها: ترتیب', array( 'overview', 'favorites', 'playlists', 'follows', 'history', 'notifs', 'messages', 'artist', 'telegram', 'profile' ) === array_keys( $tabs ) );
 $GLOBALS['__options']['option_tree']['account_history'] = 'off';
 t( 'تب‌ها: قابلیتِ خاموش، تبِ خاموش', empty( tara_acc_tabs()['history']['on'] ) );
 reset_acc();

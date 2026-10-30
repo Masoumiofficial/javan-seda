@@ -55,7 +55,7 @@ for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-se
   files.push({ parent: '/tmp/theme/css', name, url: 'file://' + path.join(theme, 'css', name) });
 }
 /* v3.10.0 — حسابِ کاربری، ورودِ پیامکی و ربات */
-for (const name of ['tara-account.php', 'tara-account-ui.php']) {
+for (const name of ['tara-account.php', 'tara-account-ui.php', 'tara-trust.php', 'tara-dm.php', 'tara-artisthub.php']) {
   files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
 }
 for (const name of ['page-account.php', 'page-login.php']) {

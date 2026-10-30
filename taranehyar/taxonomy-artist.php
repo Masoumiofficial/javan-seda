@@ -632,7 +632,7 @@ $taranehyar_social_icons = array(
 
 		<div class="ty-artist__identity">
 			<span class="ty-artist__eyebrow"><i class="icofont-radio-mic" aria-hidden="true"></i> صفحهٔ هنرمند</span>
-			<h1 class="ty-artist__name"><?php echo esc_html( $taranehyar_term->name ); ?></h1>
+			<h1 class="ty-artist__name"><?php echo esc_html( $taranehyar_term->name ); ?><?php echo function_exists( 'tara_artist_verified_badge' ) ? tara_artist_verified_badge( $taranehyar_term, array( 'size' => 'lg' ) ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?></h1>
 
 			<?php
 			/* v3.10.0 — «دنبال‌کردن» با شمارندهٔ واقعیِ دنبال‌کننده‌ها.
@@ -705,6 +705,9 @@ $taranehyar_social_icons = array(
 				<?php if ( '' !== $taranehyar_directory_url ) : ?>
 					<a class="ty-artist__ghost" href="<?php echo esc_url( $taranehyar_directory_url ); ?>">همهٔ هنرمندان</a>
 				<?php endif; ?>
+
+				<?php /* v3.12.0 — دایرکتِ مستقیم به هنرمندِ تأییدشده/وصل‌شده */ ?>
+				<?php if ( function_exists( 'tara_dm_button' ) ) { echo tara_dm_button( (int) $taranehyar_term->term_id ); } // phpcs:ignore WordPress.Security.EscapeOutput ?>
 
 				<span class="ty-artist__socials">
 					<?php foreach ( $taranehyar_social_icons as $taranehyar_field_key => $taranehyar_icon ) : ?>
@@ -837,6 +840,37 @@ $taranehyar_social_icons = array(
 			<p>اگر آثار این هنرمند در سایت هست، در ویرایش هر نوشته فیلد «هنرمند» را به همین نام انتخاب کنید.</p>
 		</section>
 	<?php endif; ?>
+
+	<!-- ۳٫۵) بیوگرافیِ کامل + تازه‌ترین خبرها/آثار ----------------------- -->
+	<section class="ty-artist__section ty-artist__bio-news">
+		<div class="ty-artist__bio-col">
+			<header class="ty-artist__section-head"><h2>بیوگرافیِ <?php echo esc_html( $taranehyar_term->name ); ?></h2></header>
+			<?php $taranehyar_full_bio = function_exists( 'get_the_archive_description' ) ? get_the_archive_description() : ''; ?>
+			<?php if ( ! empty( $taranehyar_full_bio ) ) : ?>
+				<div class="ty-artist__card-text ty-artist__bio-full"><?php echo wp_kses_post( $taranehyar_full_bio ); ?></div>
+			<?php elseif ( '' !== $taranehyar_bio_short ) : ?>
+				<div class="ty-artist__card-text"><?php echo wpautop( esc_html( $taranehyar_bio_short ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?></div>
+			<?php else : ?>
+				<p class="ty-artist__bio ty-artist__bio--empty">بیوگرافیِ این هنرمند هنوز ثبت نشده است؛ از پنلِ هنرمند می‌توان برای تکمیلِ آن درخواست داد.</p>
+			<?php endif; ?>
+		</div>
+		<aside class="ty-artist__news-col">
+			<header class="ty-artist__section-head"><h2>تازه‌ترین‌ها</h2></header>
+			<?php
+			$taranehyar_news = function_exists( 'get_posts' ) ? get_posts( array( 'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => 3, 'orderby' => 'date', 'order' => 'DESC', 'category_name' => 'news', 'tax_query' => array( array( 'taxonomy' => $taranehyar_term->taxonomy, 'field' => 'term_id', 'terms' => (int) $taranehyar_term->term_id ) ) ) ) : array();
+			if ( empty( $taranehyar_news ) ) { $taranehyar_news = array_slice( isset( $taranehyar_buckets['audio'] ) ? $taranehyar_buckets['audio'] : array(), 0, 3 ); }
+			?>
+			<?php if ( ! empty( $taranehyar_news ) ) : ?>
+				<ul class="ty-artist__news">
+				<?php foreach ( $taranehyar_news as $taranehyar_news_post ) : ?>
+					<li><a href="<?php echo esc_url( get_permalink( $taranehyar_news_post ) ); ?>"><?php echo esc_html( get_the_title( $taranehyar_news_post ) ); ?></a><time><?php echo esc_html( get_the_date( '', $taranehyar_news_post ) ); ?></time></li>
+				<?php endforeach; ?>
+				</ul>
+			<?php else : ?>
+				<p class="ty-artist__bio ty-artist__bio--empty">هنوز خبر یا اثرِ تازه‌ای ثبت نشده است.</p>
+			<?php endif; ?>
+		</aside>
+	</section>
 
 	<!-- ۴) درباره + هنرمندان مشابه ------------------------------------ -->
 	<div class="ty-artist__grid">

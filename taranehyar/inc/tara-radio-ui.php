@@ -376,9 +376,10 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 					<h3>صف میکس</h3>
 					<span class="ty-radio__tlmeta" data-radio-queue-meta><?php echo esc_html( tara_radio_fa( count( $tracks ) ) . ' آهنگ در نوبت' ); ?></span>
 				</header>
-				<ol class="ty-radio__queue" data-radio-queue>
+				<ol class="ty-radio__queue ty-list--collapsed" data-radio-queue>
 					<?php echo tara_radio_queue_rows( $tracks, $queue_rows ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی همین تابع، escape شده ?>
 				</ol>
+				<button type="button" class="ty-list-more" data-tara-radio-more aria-expanded="false" hidden>نمایش بیشتر</button>
 				<p class="ty-radio__empty" data-radio-empty<?php echo empty( $tracks ) ? '' : ' hidden'; ?>>
 					برای این بخش هنوز آهنگی با فایل صوتی ثبت نشده است. یک آهنگ به رادیو اضافه کنید تا صف ساخته شود.
 				</p>

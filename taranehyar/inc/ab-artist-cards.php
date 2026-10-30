@@ -180,7 +180,7 @@ if ( ! function_exists( 'tara_artist_card' ) ) {
 				. '<span class="screen-reader-text">مجموع بازدید آثار</span></span></span></span>';
 		}
 		$out .= '</span>';
-		$out .= '<span class="ab-artist-card__name">' . esc_html( $title ) . '</span>';
+		$out .= '<span class="ab-artist-card__name">' . esc_html( $title ) . ( $term && function_exists( 'tara_artist_verified_badge' ) ? tara_artist_verified_badge( $term, array( 'size' => 'sm' ) ) : '' ) . '</span>';
 		$out .= '</a>';
 
 		return $out;

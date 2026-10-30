@@ -29,6 +29,7 @@ array('id'=>'dl_pages','title'=>'صفحه دانلود آهنگ'),
 array('id'=>'ab_ui','title'=>'ترانه یار — ظاهر و رفتار'),
 array('id'=>'radio','title'=>'رادیو و دی‌جی'),
 array('id'=>'account','title'=>'حساب کاربری و ورود'),
+array('id'=>'artisthub','title'=>'پنل هنرمندان'),
 array('id'=>'notices','title'=>'اعلان‌ها و بروزرسانی‌ها'),
 array('id'=>'footer','title'=>'پانوشت'),
 array('id'=>'socials','title'=>'شبکه های اجتماعی'),
@@ -37,6 +38,13 @@ array('id'=>'about','title'=>'درباره سایت'),
 array('id'=>'dev','title'=>'توسعه دهنده'),
 ),
 'settings'=>array( 
+array('id'=>'artisthub_on','label'=>'پنل هنرمند','desc'=>'فعال‌سازی درخواست ارتقا و پنل هنرمند.','std'=>'on','type'=>'on-off','section'=>'artisthub'),
+array('id'=>'artist_dm_on','label'=>'پیام مستقیم','desc'=>'گفت‌وگوی کاربران با هنرمندان.','std'=>'on','type'=>'on-off','section'=>'artisthub'),
+array('id'=>'artist_verified_on','label'=>'نشان تأیید','desc'=>'نمایش نشان تأیید هنرمندان.','std'=>'on','type'=>'on-off','section'=>'artisthub'),
+array('id'=>'artisthub_std_price','label'=>'قیمت پخش عادی (تومان)','std'=>'0','type'=>'text','section'=>'artisthub'),
+array('id'=>'artisthub_vip_price','label'=>'قیمت پخش ویژه (تومان)','std'=>'490000','type'=>'text','section'=>'artisthub'),
+array('id'=>'artisthub_promo_price','label'=>'قیمت تبلیغات (تومان)','std'=>'290000','type'=>'text','section'=>'artisthub'),
+array('id'=>'artisthub_promo_discount','label'=>'تخفیف هر ۱۰۰۰ بازدید (تومان)','desc'=>'مبلغ تخفیف در درخواست دستی محاسبه می‌شود.','std'=>'10000','type'=>'text','section'=>'artisthub'),
 
 /* ---------------------------------------------------------------------------
    v3.11.0 — «اعلان‌ها و بروزرسانی‌ها»

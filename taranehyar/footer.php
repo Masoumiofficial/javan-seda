@@ -60,7 +60,7 @@ if ( function_exists( 'tara_ui_footer_cols_count' ) ) {
 					$ab_about = ot_get_option('copyright');
 				}
 				if (!empty($ab_about)) {
-					echo '<p class="ab-footer__text">' . nl2br( esc_html( $ab_about ) ) . '</p>';
+					echo '<p class="ab-footer__text">' . nl2br( wp_kses_post( $ab_about ) ) . '</p>';
 				}
 				?>
 			</div>

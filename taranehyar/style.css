@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.12.1
+Version: 3.12.2
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -1318,11 +1318,11 @@ text-align: center;word-wrap: break-word;overflow-wrap: anywhere;}
 .music_lyrics_text p{margin: 0 0 14px 0;}
 .music_lyrics_text p:last-child{margin-bottom: 0;}
 .music_lyrics_text strong,.music_lyrics_text b{color: var(--ab-blue-accent);}
-/* v3.11.0 — ترانهٔ بلند: در حالتِ بسته فقط ۱–۲ خط، با محوِ نرم در پایین و
+/* v3.11.0 — ترانهٔ بلند: در حالتِ بسته چهار خط، با محوِ نرم در پایین و
    دکمهٔ «بیشتر بخوانید / کمتر بخوانید». متن در HTML کامل است (SEO). */
 .music_lyrics_fold{position: relative;}
 .music_lyrics_text{position: relative;}
-.music_lyrics_text.is-folded{max-height: calc(2em * 2.15 + 18px);overflow: hidden;}
+.music_lyrics_text.is-folded{max-height: calc(4em * 2.15 + 18px);overflow: hidden;}
 .music_lyrics_text.is-folded::after{content: "";position: absolute;inset-inline: 0;bottom: 0;height: 46px;
 pointer-events: none;background: linear-gradient(to bottom, rgba(255,255,255,0), var(--ab-surface));}
 .night .music_lyrics_text.is-folded::after{background: linear-gradient(to bottom, rgba(0,0,0,0), var(--ab-surface));}
@@ -1340,7 +1340,7 @@ border: 1px solid transparent;transition: background .2s ease,color .2s ease,bor
 .music_lyrics_head{padding: 13px 12px 12px 12px;}
 .music_lyrics_title{font-size: 15px;}
 .music_lyrics_text{padding: 14px 12px 18px 12px;font-size: 14px;line-height: 2;}
-.music_lyrics_text.is-folded{max-height: calc(2em * 2 + 14px);}
+.music_lyrics_text.is-folded{max-height: calc(4em * 2 + 14px);}
 .music_lyrics_more{font-size: 12px;padding: 8px 16px;margin-bottom: 14px;}
 }
 .single_content_box .music_box_player{height: auto;background: transparent;padding: 0;margin: 30px 0 0 0;}

@@ -17,7 +17,7 @@ class FakeOrder {
     function get_meta($key) { return isset($this->meta[$key]) ? $this->meta[$key] : ''; }
     function calculate_totals($tax) {} function save() { $GLOBALS['orders'][$this->id]=$this; }
     function get_id() { return $this->id; } function is_paid() { return $this->paid; }
-    function has_status($s) { return $s === $this->status; } function get_customer_id() { return $this->customer; } function get_total() { return $this->total; } function get_currency() { return $this->currency; }
+    function has_status($s) { return in_array($this->status, (array) $s, true); } function get_customer_id() { return $this->customer; } function get_total() { return $this->total; } function get_currency() { return $this->currency; }
 }
 function wc_create_order($args) { return new FakeOrder($args['customer_id']); }
 function wc_get_order($id) { return isset($GLOBALS['orders'][$id]) ? $GLOBALS['orders'][$id] : false; }
@@ -39,4 +39,14 @@ $GLOBALS['currency'] = 'IRR';
 t('rial conversion', 1000 === tara_hub_wc_amount(100));
 $GLOBALS['currency'] = 'USD';
 t('unknown currency is refused', !tara_hub_wc_ready() && null === tara_hub_wc_amount(100));
+$unrelated = new FakeOrder(11);
+t('unrelated order message unchanged', 'default' === tara_hub_order_received_message('default', $unrelated));
+$order->status = 'pending'; $order->paid = false;
+t('pending message avoids payment success', false !== strpos(tara_hub_order_received_message('default', $order), 'انتظار تأیید پرداخت'));
+$order->status = 'failed'; $order->paid = false;
+t('failed message avoids payment success', false !== strpos(tara_hub_order_received_message('default', $order), 'تأیید نشده'));
+$order->status = 'processing'; $order->paid = true;
+t('paid order gets thanks', false !== strpos(tara_hub_order_received_message('default', $order), 'سپاسگزاریم'));
+$order->status = 'refunded';
+t('refunded order does not get paid thanks', false === strpos(tara_hub_order_received_message('default', $order), 'سپاسگزاریم'));
 echo "\nRESULT pass=$PASS fail=$FAIL\n";

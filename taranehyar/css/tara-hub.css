@@ -65,3 +65,21 @@
 @media(max-width:800px){#mobiles_header .ty-acct-btn--mobile .ty-acct__svg{color:inherit}#mobiles_header .logo_mobiles img{max-width:min(150px,calc(100vw - 180px))}}
 @media(max-width:400px){#mobiles_header .navicon,#mobiles_header .search_mobile_box{width:42px;height:42px}#mobiles_header .search_mobile_box{left:60px}}
 @media(max-width:350px){#mobiles_header .navicon,#mobiles_header .search_mobile_box{width:40px;height:40px}#mobiles_header .search_mobile_box{left:57px}#mobiles_header .logo_mobiles img{max-width:calc(100vw - 166px)}}
+/* ارتباط هنرمند */
+.ty-artist__contact {display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:14px 0 2px}
+.ty-artist__identity .ty-artist__contact .ty-acct-follow--hero {margin:0}
+.ty-artist__contact .ty-dm-open,.ty-artist__contact > a {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:9px 16px;border:1px solid rgba(255,255,255,.48);border-radius:999px;color:#fff;background:rgba(255,255,255,.12);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.ty-artist__contact .ty-dm-open:hover,.ty-artist__contact > a:hover {background:#fff;color:#185adb}
+.ty-artist__contact .ty-dm-open:disabled {cursor:not-allowed}
+.ty-hub__head {padding:20px;border-radius:18px;background:linear-gradient(130deg,#17459c,#6339af);color:#fff}
+.ty-hub__head h2,.ty-hub__head p {color:inherit;margin:0}
+.ty-hub__form fieldset {border:1px solid var(--ab-line,#dbe4f0);border-radius:14px;padding:16px;display:grid;gap:12px;min-width:0}
+.ty-hub__form legend {padding:0 8px;font-weight:700}
+.ty-hub__form label {display:grid;gap:5px}
+.ty-hub__form input[type=file] {padding:8px;max-width:100%}
+.ty-hub__tracks li,.ty-hub__reqs li {display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:10px;border-bottom:1px solid var(--ab-line,#e6e8ee)}
+.ty-acct-slot:not(.ty-acct-slot--mobile) {margin-inline:10px}
+.ty-footer-toggle {all:unset;font:inherit;font-weight:inherit;color:inherit;display:block;width:100%}
+@media(max-width:767px){.ty-footer-toggle{box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;padding:10px 0;cursor:pointer}.ty-footer-toggle:after{content:'+';font-size:20px}.ty-footer-toggle[aria-expanded=true]:after{content:'−'}}
+
+@media(max-width:980px){.ty-acct-slot--mobile{margin-inline-start:4px}}

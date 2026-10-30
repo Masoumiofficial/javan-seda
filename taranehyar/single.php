@@ -74,8 +74,8 @@ if ( '' !== trim( wp_strip_all_tags( $tara_meta_html ) ) ) {
    جست‌وجوی تقریبی با نرمال‌سازی ي/ك/ة و نیم‌فاصله ← برچسب هم‌نام.
    در پایان، فیلتر taranehyar_artist_url می‌تواند نتیجه را بازنویسی کند.
 ------------------------------------------------------------------------------------------------- */
-$taranehyar_song   = function_exists( 'get_field' ) ? trim( (string) get_field( 'song' ) ) : '';
-$taranehyar_artist = function_exists( 'get_field' ) ? trim( (string) get_field( 'artist' ) ) : '';
+$taranehyar_song   = function_exists( 'tara_music_field' ) ? tara_music_field( 'song' ) : ( function_exists( 'get_field' ) ? trim( (string) get_field( 'song' ) ) : '' );
+$taranehyar_artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'artist' ) : ( function_exists( 'get_field' ) ? trim( (string) get_field( 'artist' ) ) : '' );
 if ( '' === $taranehyar_song ) {
 	$taranehyar_song = get_the_title();
 }
@@ -298,7 +298,7 @@ $taranehyar_lyrics_schema   = true;
 $taranehyar_artist_type     = 'Person';
 
 $taranehyar_lyrics_box = '';
-$taranehyar_lyrics_raw = function_exists( 'get_field' ) ? get_field( 'music_text' ) : '';
+$taranehyar_lyrics_raw = function_exists( 'tara_music_field' ) ? tara_music_field( 'music_text' ) : ( function_exists( 'get_field' ) ? get_field( 'music_text' ) : '' );
 if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw ) ) {
 
 	/* خروجی ایمن: اگر مقدار HTML باشد با wp_kses_post، وگرنه با nl2br + esc_html */

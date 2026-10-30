@@ -39,4 +39,27 @@ $GLOBALS['__is_ssl'] = true;
 t('download preserves external HTTP origin', 'http://files.example/song.mp3' === tara_media_url('http://files.example/song.mp3', true));
 t('player still upgrades HTTP scheme', 'https://files.example/song.mp3' === tara_media_url('http://files.example/song.mp3'));
 t('JSON file metadata is resolved', 'https://files.example/a.mp3' === tara_media_url('{"url":"https://files.example/a.mp3"}', true));
+if (!defined('MB_IN_BYTES')) { define('MB_IN_BYTES', 1048576); }
+function ajax_track_test($uid, $files) {
+    $GLOBALS['__current'] = $uid;
+    $_POST = array('do'=>'submit_track', 'title'=>'عنوان', 'artist_fa'=>'هنرمند');
+    $_FILES = $files;
+    try { tara_hub_ajax(); } catch (RuntimeException $e) {}
+    return $GLOBALS['__json'];
+}
+$before = count($GLOBALS['__posts']);
+$r = ajax_track_test(12, array());
+t('unlinked user cannot submit track', !$r['success']);
+tara_artist_verify(41, true);
+$r = ajax_track_test(11, array());
+t('audio required for track', !$r['success']);
+$r = ajax_track_test(11, array('audio128'=>array('name'=>'fake.mp3','tmp_name'=>'/tmp/not-upload','size'=>100,'error'=>0)));
+t('forged upload is rejected', !$r['success'] && count($GLOBALS['__posts']) === $before);
+file_put_contents('/tmp/fake-mp3', 'not an MP3');
+t('fake mp3 header is rejected', !tara_hub_mp3_header_valid('/tmp/fake-mp3'));
+file_put_contents('/tmp/fake-mp3', "ID3\x04\x00\x00\x00");
+t('id3 audio header is recognized', tara_hub_mp3_header_valid('/tmp/fake-mp3'));
+file_put_contents('/tmp/fake-mp3', "\xff\xfb\x90\x00");
+t('mpeg audio frame is recognized', tara_hub_mp3_header_valid('/tmp/fake-mp3'));
+unlink('/tmp/fake-mp3');
 echo "\nRESULT pass=$PASS fail=$FAIL\n";

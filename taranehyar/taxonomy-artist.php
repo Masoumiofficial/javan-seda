@@ -649,9 +649,12 @@ $taranehyar_social_icons = array(
 			<?php
 			/* v3.10.0 — «دنبال‌کردن» با شمارندهٔ واقعیِ دنبال‌کننده‌ها.
 			   اگر حسابِ کاربری خاموش باشد، تابع رشتهٔ خالی می‌دهد. */
+			echo '<div class="ty-artist__contact">';
 			if ( function_exists( 'tara_acc_follow_button' ) ) {
 				echo tara_acc_follow_button( (int) $taranehyar_term->term_id, array( 'class' => 'ty-acct-follow--hero' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
 			}
+			if ( function_exists( 'tara_dm_button' ) ) { echo tara_dm_button( (int) $taranehyar_term->term_id ); } // phpcs:ignore WordPress.Security.EscapeOutput
+			echo '</div>';
 			?>
 
 			<?php $taranehyar_latin = $taranehyar_term_field( 'artist_en' ); ?>
@@ -719,7 +722,6 @@ $taranehyar_social_icons = array(
 				<?php endif; ?>
 
 				<?php /* v3.12.0 — دایرکتِ مستقیم به هنرمندِ تأییدشده/وصل‌شده */ ?>
-				<?php if ( function_exists( 'tara_dm_button' ) ) { echo tara_dm_button( (int) $taranehyar_term->term_id ); } // phpcs:ignore WordPress.Security.EscapeOutput ?>
 
 				<span class="ty-artist__socials">
 					<?php foreach ( $taranehyar_social_icons as $taranehyar_field_key => $taranehyar_icon ) : ?>

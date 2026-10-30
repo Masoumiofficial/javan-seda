@@ -305,6 +305,21 @@ if ( ! function_exists( 'tara_hub_promo_quote' ) ) {
  * AJAX — ثبتِ درخواست/اثر تازه
  * ---------------------------------------------------------------------- */
 
+/** بررسی امضای ابتدایی MP3؛ کنترل پسوند به‌تنهایی کافی نیست. */
+function tara_hub_mp3_header_valid( $path ) {
+	$handle = @fopen( $path, 'rb' );
+	if ( ! $handle ) { return false; }
+	$header = fread( $handle, 4096 );
+	fclose( $handle );
+	if ( ! is_string( $header ) || strlen( $header ) < 4 ) { return false; }
+	if ( 0 === strpos( $header, 'ID3' ) ) { return true; }
+	for ( $i = 0, $n = strlen( $header ) - 1; $i < $n; $i++ ) {
+		$a = ord( $header[ $i ] ); $b = ord( $header[ $i + 1 ] );
+		if ( 255 === $a && ( $b & 224 ) === 224 && ( $b & 24 ) !== 8 && ( $b & 6 ) !== 0 ) { return true; }
+	}
+	return false;
+}
+
 if ( ! function_exists( 'tara_hub_ajax' ) ) {
 	/** نقطهٔ پایانیِ AJAXِ پنلِ هنرمند. */
 	function tara_hub_ajax() {
@@ -376,41 +391,67 @@ if ( ! function_exists( 'tara_hub_ajax' ) ) {
 				break;
 
 			case 'submit_track':
-				if ( $term <= 0 ) {
-					wp_send_json_error( array( 'message' => 'هنوز حسابِ هنرمندیِ شما تأیید نشده است.' ) );
+				if ( $term <= 0 || ! tara_artist_is_verified( $term ) ) {
+					wp_send_json_error( array( 'message' => 'ارسال اثر فقط برای هنرمند تأییدشده فعال است.' ) );
 				}
 				$title = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['title'] ) ) : '';
-				$audio = isset( $_POST['audio'] ) ? esc_url_raw( wp_unslash( (string) $_POST['audio'] ) ) : '';
-				$body  = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( (string) $_POST['body'] ) ) : '';
-				if ( '' === $title || '' === $audio ) {
-					wp_send_json_error( array( 'message' => 'نامِ اثر و آدرسِ فایلِ صوتی لازم است.' ) );
+				$artist = isset( $_POST['artist_fa'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['artist_fa'] ) ) : '';
+				if ( '' === $title || '' === $artist ) { wp_send_json_error( array( 'message' => 'نام اثر و نام فارسی هنرمند لازم است.' ) ); }
+				if ( empty( $_FILES['audio128']['name'] ) && empty( $_FILES['audio320']['name'] ) ) { wp_send_json_error( array( 'message' => 'حداقل یکی از فایل‌های صوتی MP3 را انتخاب کنید.' ) ); }
+				$rules = array( 'audio128' => array( 'mp3' => 'audio/mpeg' ), 'audio320' => array( 'mp3' => 'audio/mpeg' ), 'cover' => array( 'jpg|jpeg|jpe' => 'image/jpeg', 'png' => 'image/png' ) );
+				foreach ( $rules as $key => $mimes ) {
+					if ( empty( $_FILES[ $key ]['name'] ) ) { continue; }
+					$file = $_FILES[ $key ];
+					$limit = 'cover' === $key ? 5 * MB_IN_BYTES : 30 * MB_IN_BYTES;
+					if ( ! is_string( $file['name'] ) || ! isset( $file['error'], $file['tmp_name'], $file['size'] ) || ! is_string( $file['tmp_name'] ) || ! is_scalar( $file['error'] ) || ! is_scalar( $file['size'] ) || UPLOAD_ERR_OK !== (int) $file['error'] || (int) $file['size'] <= 0 || (int) $file['size'] > $limit || ! is_uploaded_file( $file['tmp_name'] ) ) {
+						wp_send_json_error( array( 'message' => 'فایل نامعتبر است یا از محدودیت حجم (کاور ۵ و صوت ۳۰ مگابایت) بیشتر است.' ) );
+					}
+					$checked = wp_check_filetype_and_ext( $file['tmp_name'], $file['name'], $mimes );
+					if ( empty( $checked['ext'] ) || empty( $checked['type'] ) || ( 'cover' === $key && ! @getimagesize( $file['tmp_name'] ) ) || ( 'cover' !== $key && ! tara_hub_mp3_header_valid( $file['tmp_name'] ) ) ) {
+						wp_send_json_error( array( 'message' => 'فرمت فایل مجاز نیست؛ صوت MP3 و تصویر JPG یا PNG انتخاب کنید.' ) );
+					}
 				}
-				$post_id = wp_insert_post(
-					array(
-						'post_type'    => 'post',
-						'post_status'  => 'draft',
-						'post_title'   => $title,
-						'post_content' => $body,
-						'post_author'  => $user_id,
-					),
-					true
-				);
-				if ( is_wp_error( $post_id ) || ! $post_id ) {
-					wp_send_json_error( array( 'message' => 'اثر ثبت نشد؛ دوباره تلاش کنید.' ) );
+				$lyrics = isset( $_POST['lyrics'] ) ? sanitize_textarea_field( wp_unslash( (string) $_POST['lyrics'] ) ) : '';
+				$notes = isset( $_POST['notes'] ) ? sanitize_textarea_field( wp_unslash( (string) $_POST['notes'] ) ) : '';
+				$post_id = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'draft', 'post_title' => $title, 'post_content' => $notes, 'post_author' => $user_id ), true );
+				if ( is_wp_error( $post_id ) || ! $post_id ) { wp_send_json_error( array( 'message' => 'اثر ثبت نشد؛ دوباره تلاش کنید.' ) ); }
+				require_once ABSPATH . 'wp-admin/includes/file.php';
+				require_once ABSPATH . 'wp-admin/includes/media.php';
+				require_once ABSPATH . 'wp-admin/includes/image.php';
+				$uploaded = array();
+				foreach ( $rules as $key => $mimes ) {
+					if ( empty( $_FILES[ $key ]['name'] ) ) { continue; }
+					$attachment = media_handle_upload( $key, (int) $post_id, array(), array( 'mimes' => $mimes ) );
+					if ( is_wp_error( $attachment ) ) {
+						foreach ( $uploaded as $id ) { wp_delete_attachment( $id, true ); }
+						wp_delete_post( (int) $post_id, true );
+						wp_send_json_error( array( 'message' => 'آپلود فایل انجام نشد: ' . $attachment->get_error_message() ) );
+					}
+					$uploaded[] = (int) $attachment;
+					if ( 'cover' === $key ) { set_post_thumbnail( (int) $post_id, (int) $attachment ); }
+					else { update_post_meta( (int) $post_id, 'audio128' === $key ? 'music128' : 'music320', (int) $attachment ); }
 				}
-				update_post_meta( (int) $post_id, 'music320', $audio );
+				update_post_meta( $post_id, 'song', $title );
+				update_post_meta( $post_id, 'musics_type', 'mp3' );
+				update_post_meta( $post_id, 'artist', $artist );
+				update_post_meta( $post_id, 'music_text', $lyrics );
+				foreach ( array( 'artist_en', 'song_en', 'composer', 'lyricist', 'arranger', 'mixer', 'producer' ) as $field ) {
+					if ( isset( $_POST[ $field ] ) ) { update_post_meta( $post_id, $field, sanitize_text_field( wp_unslash( (string) $_POST[ $field ] ) ) ); }
+				}
 				$tax = function_exists( 'tara_artist_tax' ) ? tara_artist_tax() : 'artist';
-				wp_set_object_terms( (int) $post_id, array( $term ), $tax );
-				tara_hub_request_add(
-					$user_id,
-					array(
-						'type'    => 'track',
-						'title'   => 'اثرِ تازه: ' . $title,
-						'body'    => 'به‌صورتِ پیش‌نویس ساخته شد و منتظرِ بررسی و انتشار است.',
-						'post_id' => (int) $post_id,
-					)
-				);
-				wp_send_json_success( array( 'post' => (int) $post_id, 'message' => 'اثر با موفقیت ارسال شد و بعد از بررسی منتشر می‌شود.' ) );
+				$assigned = wp_set_object_terms( (int) $post_id, array( $term ), $tax );
+				if ( is_wp_error( $assigned ) ) {
+					foreach ( $uploaded as $id ) { wp_delete_attachment( $id, true ); }
+					wp_delete_post( (int) $post_id, true );
+					wp_send_json_error( array( 'message' => 'اتصال اثر به هنرمند انجام نشد.' ) );
+				}
+				$request = tara_hub_request_add( $user_id, array( 'type' => 'track', 'title' => 'اثر تازه: ' . $title, 'body' => 'پیش‌نویس در انتظار بررسی', 'post_id' => (int) $post_id ) );
+				if ( ! $request || is_wp_error( $request ) ) {
+					foreach ( $uploaded as $id ) { wp_delete_attachment( $id, true ); }
+					wp_delete_post( (int) $post_id, true );
+					wp_send_json_error( array( 'message' => is_wp_error( $request ) ? $request->get_error_message() : 'ثبت درخواست ناموفق بود؛ دوباره تلاش کنید.' ) );
+				}
+				wp_send_json_success( array( 'post' => (int) $post_id, 'message' => 'اثر و فایل‌ها ارسال شد؛ پس از بررسی مدیر منتشر می‌شود.' ) );
 				break;
 
 			case 'request':
@@ -537,11 +578,26 @@ if ( ! function_exists( 'tara_hub_tab_artist' ) ) {
 
 				<section class="ty-hub__card">
 					<h3>ارسالِ اثرِ تازه</h3>
-					<form class="ty-hub__form" data-tara-hub="submit_track">
-						<label>نامِ اثر<input type="text" name="title" required maxlength="120"></label>
-						<label>آدرسِ فایلِ صوتی (MP3)<input type="url" name="audio" required dir="ltr" placeholder="https://…/song.mp3"></label>
-						<label>متنِ ترانه / توضیح<textarea name="body" rows="4" maxlength="4000"></textarea></label>
-						<button type="submit" class="ty-hub__btn">ارسال برای انتشار</button>
+					<form class="ty-hub__form" data-tara-hub="submit_track" enctype="multipart/form-data">
+						<fieldset><legend>مشخصات اثر</legend>
+							<label>نام اثر فارسی *<input type="text" name="title" required maxlength="120"></label>
+							<label>نام اثر انگلیسی<input type="text" name="song_en" dir="ltr" maxlength="120"></label>
+							<label>نام هنرمند فارسی *<input type="text" name="artist_fa" required maxlength="120" value="<?php echo esc_attr( $term ? $term->name : '' ); ?>"></label>
+							<label>نام هنرمند انگلیسی<input type="text" name="artist_en" dir="ltr" maxlength="120"></label>
+						</fieldset>
+						<fieldset><legend>فایل‌ها</legend>
+							<label>فایل MP3 کیفیت ۱۲۸<input type="file" name="audio128" accept=".mp3,audio/mpeg"></label>
+							<label>فایل MP3 کیفیت ۳۲۰<input type="file" name="audio320" accept=".mp3,audio/mpeg"></label>
+							<label>کاور JPG یا PNG<input type="file" name="cover" accept=".jpg,.jpeg,.png,image/jpeg,image/png"></label>
+							<small>حداقل یک فایل صوتی لازم است؛ سقف هر فایل صوتی ۳۰ و کاور ۵ مگابایت است. سقف سرور ممکن است کمتر باشد.</small>
+						</fieldset>
+						<fieldset><legend>ترانه و عوامل</legend>
+							<label>متن ترانه<textarea name="lyrics" rows="5" maxlength="20000"></textarea></label>
+							<label>ترانه‌سرا<input name="lyricist" maxlength="120"></label><label>آهنگساز<input name="composer" maxlength="120"></label>
+							<label>تنظیم‌کننده<input name="arranger" maxlength="120"></label><label>میکس و مستر<input name="mixer" maxlength="120"></label>
+							<label>تهیه‌کننده<input name="producer" maxlength="120"></label><label>توضیحات و مدارک<textarea name="notes" rows="3" maxlength="4000"></textarea></label>
+						</fieldset>
+						<button type="submit" class="ty-hub__btn">ارسال برای بررسی</button>
 						<p class="ty-hub__msg" role="status" data-tara-hub-msg></p>
 					</form>
 				</section>
@@ -842,3 +898,16 @@ if ( ! function_exists( 'tara_hub_assets' ) ) {
 if ( function_exists( 'add_action' ) ) {
 	add_action( 'wp_enqueue_scripts', 'tara_hub_assets', 32 );
 }
+
+/** پیام ویژه فقط برای سفارش پنل و مطابق وضعیت فعلی ووکامرس. */
+function tara_hub_order_received_message( $message, $order ) {
+	if ( ! is_object( $order ) || ! $order->get_meta( '_tara_hub_request', true ) ) { return $message; }
+	if ( $order->is_paid() && ! $order->has_status( array( 'cancelled', 'failed', 'refunded' ) ) ) {
+		return 'از پرداخت شما سپاسگزاریم. درخواست پنل هنرمند ثبت شد و وضعیت آن در حساب کاربری قابل پیگیری است.';
+	}
+	if ( $order->has_status( array( 'failed', 'cancelled', 'refunded' ) ) ) {
+		return 'پرداخت سفارش پنل هنرمند تأیید نشده یا برگشت خورده است؛ وضعیت سفارش را در حساب کاربری بررسی کنید.';
+	}
+	return 'سفارش پنل هنرمند ثبت شده و در انتظار تأیید پرداخت است؛ وضعیت آن را در حساب کاربری پیگیری کنید.';
+}
+add_filter( 'woocommerce_thankyou_order_received_text', 'tara_hub_order_received_message', 10, 2 );

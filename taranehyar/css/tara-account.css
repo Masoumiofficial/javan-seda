@@ -2392,3 +2392,8 @@ html[data-tara-night="1"] .ty-acct__navlink.is-active {
 /* ارقام و نمونه شماره از چپ آغاز می‌شوند؛ پیش‌شماره در سمت راست باقی می‌ماند. */
 .ty-acct-field__box--phone input[dir="ltr"] { text-align: left; direction: ltr; min-width: 0; }
 .ty-acct-field__box--phone input::placeholder { text-align: left; }
+/* پیش‌شمارهٔ تلفن در چپ، شماره نیز چپ‌چین. */
+.ty-acct-field__box--phone {direction:ltr}
+.ty-acct-field__box--phone .ty-acct-field__pre {order:0;direction:ltr;padding:0 10px 0 2px;margin:0 10px 0 0;border:0;border-right:1px solid var(--ty-line,#e5e8ee)}
+.ty-acct-field__box--phone input[dir="ltr"] {order:1;text-align:left}
+.ty-acct-field__box--phone .ty-acct-field__ico {order:2}

@@ -150,4 +150,20 @@
     if (window.MutationObserver) { new MutationObserver(update).observe(list, { childList: true }); }
     update();
   });
+  // Collapsible footer sections on narrow screens; without JS they stay visible.
+  document.querySelectorAll('.ab-footer__col--links, .ab-footer__col--cats').forEach(function (column, index) {
+    var heading = column.querySelector('.ab-footer__title');
+    if (!heading) { return; }
+    var button = document.createElement('button');
+    button.type = 'button'; button.className = 'ty-footer-toggle';
+    button.textContent = heading.textContent;
+    button.setAttribute('aria-expanded', 'false');
+    var panel = document.createElement('div'); panel.id = 'ty-footer-panel-' + index;
+    button.setAttribute('aria-controls', panel.id);
+    while (heading.nextSibling) { panel.appendChild(heading.nextSibling); }
+    heading.textContent = ''; heading.appendChild(button); column.appendChild(panel);
+    function sync() { panel.hidden = window.matchMedia('(max-width: 767px)').matches && button.getAttribute('aria-expanded') === 'false'; }
+    button.addEventListener('click', function () { button.setAttribute('aria-expanded', button.getAttribute('aria-expanded') === 'true' ? 'false' : 'true'); sync(); });
+    window.addEventListener('resize', sync); sync();
+  });
 })();

@@ -16,6 +16,7 @@ $tests=array(
  'relative links survive'=>strpos($html,'href="/music/"')!==false,
  'target and rel survive'=>strpos($html,'target="_blank"')!==false && strpos($html,'rel="nofollow"')!==false,
  'script tag is removed by stub sanitizer'=>strpos($html,'<script')===false,
+ 'category heading uses requested form'=>strpos($html, 'درباره موسیقی')!==false && strpos($html, 'دربارهٔ')===false,
  'all text remains in output'=>strpos($html,'پیوند خارجی')!==false && strpos($html,'داخلی')!==false,
  'toggle is progressive enhancement'=>strpos($html,'hidden>نمایش بیشتر')!==false && strpos($html,'aria-expanded="true"')!==false,
 );

@@ -99,13 +99,13 @@ if ( ! function_exists( 'tara_category_desc_full' ) ) {
 		$n++;
 		$id = 'ab-cat-desc-' . $n;
 
-		/* v3.7.8 — تیتر پویا: «دربارهٔ {نام دسته}» به‌جای «دربارهٔ این دسته».
+		/* v3.7.8 — تیتر پویا: «درباره {نام دسته}» به‌جای «درباره این دسته».
 		   عنوان دسته از خودِ ترم خوانده می‌شود؛ اگر ترم در دسترس نبود،
 		   همان عبارت عمومی می‌ماند تا هیچ صفحه‌ای تیتر خالی نگیرد. */
 		$term_obj = tara_category_term( $term );
 		$title    = ( $term_obj && '' !== trim( (string) $term_obj->name ) )
-			? 'دربارهٔ ' . $term_obj->name
-			: 'دربارهٔ این دسته';
+			? 'درباره ' . $term_obj->name
+			: 'درباره این دسته';
 
 		return '<section class="ab-cat-desc" aria-labelledby="' . esc_attr( $id . '-title' ) . '" data-ab-desc>'
 			. '<h2 class="ab-cat-desc__title" id="' . esc_attr( $id . '-title' ) . '">' . esc_html( $title ) . '</h2>'

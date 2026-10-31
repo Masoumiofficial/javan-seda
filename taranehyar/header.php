@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa-IR">
+<head>
+<?php
+/* v3.5.3 — عنوان دیگر دستی چاپ نمی‌شود: `add_theme_support('title-tag')` در myfunctions.php
+   فعال شد و وردپرس/افزونهٔ سئو عنوان را از فیلترهای استاندارد می‌سازد. ترکیبِ «عنوان دستی +
+   title-tag» دو <title> می‌ساخت؛ این گارد فقط برای وقتی است که پشتیبانی غیرفعال شده باشد. */
+if ( function_exists( 'wp_get_document_title' ) && ! ( function_exists( 'current_theme_supports' ) && current_theme_supports( 'title-tag' ) ) ) : ?>
+<title><?php echo esc_html( wp_get_document_title() ); ?></title>
+<?php endif; ?>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<?php /* v3.8.0 — متای بی‌معنای «dc:creator» با مقدار «Design Group - call by»
+   (بدون مقدار واقعی) حذف شد؛ چیزی جز یک برچسبِ خالی برای خزنده‌ها نبود. */ ?>
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f1420" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>">
+<link rel="alternate" href="<?php echo esc_url( home_url() ); ?>/feed" type="application/rss+xml" title="RSS 2.0">
+<?php /* v3.8.0 — اگر آیکون در تنظیمات خالی باشد، لینکِ خالی چاپ نمی‌شود
+   (مرورگر برای href="" همان صفحهٔ جاری را درخواست می‌کرد). */ ?>
+<?php if ( '' !== (string) ot_get_option( 'favicon' ) ) : ?>
+<link rel="shortcut icon" type="image/x-icon" href="<?php echo esc_url( ot_get_option('favicon') ); ?>">
+<?php endif; ?>
+<?php /* v3.8.2 — آیکون اپل همان لوگو است؛ دیگر هیچ‌جا src خالی ساخته نمی‌شود
+   (tara_logo_url همیشه آدرس معتبر می‌دهد: تنظیمات → لوگوی پیش‌فرض قالب). */ ?>
+<?php if ( function_exists( 'tara_logo_url' ) && '' !== (string) tara_logo_url() ) : ?>
+<link rel="apple-touch-icon" href="<?php echo esc_url( tara_logo_url() ); ?>">
+<?php endif; ?>
+<?php wp_enqueue_script("jquery"); wp_head('');
+if (is_singular() && get_option('thread_comments')) wp_enqueue_script('comment-reply'); ?>
+<?php
+/* v3.1.3 — CSS حیاتیِ هدر، inline و «وابسته به عرضِ صفحه» (نه کاربرگزار).
+   دو درسِ این نسخه:
+   ۱) در v3.1.2 یک جملهٔ فارسی بیرون از بلوک کامنت افتاده بود و داخل <head> چاپ می‌شد
+      (علتِ «سایت کلاً خراب شد»). این‌جا همه‌چیز داخل کامنت است و هیچ متنی print نمی‌شود.
+   ۲) نمایش/عدم‌نمایش هدر موبایل دیگر به wp_is_mobile() وابسته نیست؛ فقط با media query
+      انجام می‌شود، پس کشِ «نسخهٔ موبایل/دسکتاپ» و فیلترهای wp_is_mobile دیگر نمی‌توانند
+      هدر را در یک دستگاه خراب کنند. مارک‌آپ در همهٔ دستگاه‌ها یکسان است (cache-friendly).
+   ارتفاع هدر موبایل: ۷۰px | فاصلهٔ بالای صفحه در موبایل: ۹۰px (۷۰ + ۲۰). */
+?>
+<style id="ab-header-critical">
+body{padding-top:0;}
+/* هدر موبایل به‌صورت پیش‌فرض پنهان است و فقط در عرضِ موبایل/تبلت ظاهر می‌شود */
+#mobiles_header{display:none;}
+#header{margin-bottom:28px !important;}
+@media (max-width: 800px){
+body{padding-top:90px !important;}
+#mobiles_header{display:block !important;visibility:visible !important;height:70px !important;overflow:visible !important;}
+#header{display:none !important;}
+#header .menu_right{max-width:100% !important;}
+.tarlanweb_center{width:auto !important;max-width:100% !important;margin-right:12px;margin-left:12px;}
+.single_posts_right,.single_posts_left{width:100% !important;float:none !important;}
+.single_featured_image,.single_content_box img,.single_content_box iframe{max-width:100% !important;height:auto;}
+#centers_box,.single_content_box{overflow:visible;}
+.tarlanweb_center{max-width:100% !important;}
+}
+/* سازگاری با نسخه‌های قبلی که کلاس ab-has-mh را روی <body> می‌گذاشتند (بی‌اثر اگر نبود) */
+body.ab-has-mh{padding-top:90px;}
+@media (min-width: 801px){body.ab-has-mh #mobiles_header{display:none !important;}}
+</style>
+</head>
+<?php $darks_std = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'dark_modes', false ) : ( 'off' != ot_get_option( 'dark_modes' ) );
+if ( $darks_std ) { ?>
+<body <?php body_class('night'); ?>>
+<?php } else { ?>
+<body <?php body_class(''); ?>>
+<?php } ?>
+<?php /* v3.3.8 — هوک استاندارد بدنه (پلاگین‌ها/اسکیپ‌لینک از همین‌جا درج می‌شوند) */ ?>
+<?php if ( function_exists( 'wp_body_open' ) ) { wp_body_open(); } ?>
+<?php /* v3.4.2 — متنِ راهنما عمداً داخل بلوک PHP است (در 3.4.1 بعد از ?> رفته و چاپ می‌شد).
+   خاموشیِ این لینک: «تنظیمات قالب ← کنترل رابط ← لینک پرش به محتوا»
+   یا define( 'TARA_SKIP_LINK', false ); */ ?>
+<?php if ( ( ! defined( 'TARA_SKIP_LINK' ) || TARA_SKIP_LINK ) && ( ! function_exists( 'tara_ui_on' ) || tara_ui_on( 'ab_skip_link', true, 'TARA_SKIP_LINK' ) ) ) { ?>
+<a class="ab-skip-link" href="#centers_box">پرش به محتوای اصلی</a>
+<?php } /* TARA_SKIP_LINK */ ?>
+<header id="header">
+<div class="tarlanweb_center">
+<?php if(is_home()){ ?> <h1 class="h1_hidden_home"><?php echo esc_html( ot_get_option('head_h1') ); ?></h1> <?php } ?>
+<?php /* v3.8.3 — لوگوی روز و شب؛ CSS فقط یکی را نشان می‌دهد (بدون درخواستِ تازه). */ ?>
+<div class="logo_top"><figure><a href="<?php echo esc_url( home_url() ); ?>"><?php
+if ( function_exists( 'tara_logo_img' ) ) {
+	echo tara_logo_img( // phpcs:ignore WordPress.Security.EscapeOutput -- داخل تابع escape شده است
+		array(
+			'class' => 'ab-logo__img',
+			'alt'   => (string) ot_get_option( 'head_h1' ),
+			'title' => (string) ot_get_option( 'head_h1' ),
+		)
+	);
+} else {
+	?><img src="<?php echo esc_url( ot_get_option( 'logo' ) ); ?>" width="150" height="40" alt="<?php echo esc_attr( ot_get_option( 'head_h1' ) ); ?>"><?php
+}
+?></a></figure></div>
+<nav class="menu_right">
+<?php wp_nav_menu(array('theme_location'=>'top_menu','menu_id'=>'tara-menu','container'=>'')); ?>
+<div class="clear"></div>
+</nav>
+<?php /* v3.8.0 — فرم جست‌وجو برچسبِ خوانا گرفت: صفحه‌خوان قبلاً فقط
+   placeholder را می‌خواند و نقشِ «جست‌وجو» را هم نمی‌شناخت. */ ?>
+<form id="searches" method="get" role="search" action="<?php echo esc_url( home_url() ); ?>">
+<label class="screen-reader-text" for="lsds">جست‌وجو در سایت</label>
+<input id="lsds" class="meta searchfield" name="s" placeholder="جستجو  ..." type="search" data-swplive="true" autocomplete="off" enterkeyhint="search">
+<button type="submit" aria-label="جست‌وجو"><i class="icofont-search" aria-hidden="true"></i></button>
+</form>
+
+<?php
+/* v3.10.0 — دکمهٔ حسابِ کاربری در هدر (ورود / نام + تصویر + نشانِ پیام).
+   اگر قابلیت خاموش باشد، خروجی صفر است. */
+if ( function_exists( 'tara_acc_header_button' ) ) {
+	echo '<div class="ty-acct-slot">';
+	tara_acc_header_button( 'desktop' );
+	echo '</div>';
+}
+?>
+
+<?php $enablepop = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'sun_moon' ) : ( 'off' != ot_get_option( 'sun_moon' ) );
+if ( $enablepop ) { ?>
+<?php $darks_on = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'dark_modes', false ) : ( 'off' != ot_get_option( 'dark_modes' ) ); ?>
+<?php /* v3.8.0 — کلید شب/روز حالا با صفحه‌کلید هم کار می‌کند و وضعیتش را
+   به صفحه‌خوان می‌گوید (role=switch + aria-checked). پیش از این یک divِ
+   کلیک‌پذیر بود: نه Tab می‌گرفت، نه Enter/Space. اسکریپت درون‌خطی
+   (tara_runtime_inline_js) همین aria-checked را هم‌گام نگه می‌دارد. */ ?>
+<div class="dark_light_mode<?php echo $darks_on ? ' dark_active' : ''; ?>" role="switch" tabindex="0"
+	aria-checked="<?php echo $darks_on ? 'true' : 'false'; ?>" aria-label="حالت شب" title="روشن / شب">
+<i class="icofont-moon" aria-hidden="true"></i>
+<div class="toggle_modes" aria-hidden="true"></div>
+<i class="icofont-sun" aria-hidden="true"></i>
+</div>
+<?php } ?>
+
+
+<div class="clear"></div>
+</div>
+</header>
+<?php
+/* هدر موبایل همیشه رندر می‌شود؛ CSSِ بالا تصمیم می‌گیرد کِی دیده شود.
+   این خط هرگز نباید حذف شود — نبودش = نداشتن هدر در گوشی. */
+get_template_part('inc/mobiles_header');
+?>
+<main>

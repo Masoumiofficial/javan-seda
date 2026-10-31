@@ -1,0 +1,113 @@
+<?php
+/* v3.1.4 — «/page/2/» و بقیۀ صفحه‌های شماره‌دار نباید کپیِ این صفحه باشند:
+   لوپِ استانداردِ قالب (index.php) اجرا می‌شود تا فهرستِ واقعیِ نوشته‌ها + صفحه‌بندی بیاید.
+   این بلوک باید اولین سطرِ فایل بماند (خروجیِ قبل از get_header() صفر است). */
+if ( get_query_var( 'paged' ) ) {
+	locate_template( array( 'index.php' ), true, true );
+	return;
+}
+?>
+<?php get_header(''); ?>
+<!-- centers_box -->
+<div class="tarlanweb_center">
+<div id="centers_box">
+
+<!-- نوار زیر هدر — در نسخهٔ 3.1.2 به «اخبار روز» تبدیل شد (منبع: نوشته‌های دستهٔ news) -->
+<?php if ( ! function_exists( 'tara_ui_on' ) || tara_ui_on( 'ab_quickbar', true, 'TARA_QUICKBAR' ) ) { ?>
+<?php
+/* لایهٔ سازگاری: اگر myfunctions.php اعمال نشده باشد، همین‌جا فایل اخبار را بارگذاری می‌کند */
+if ( ! function_exists( 'tara_news_ticker' ) ) {
+	$_ab_news = trailingslashit( get_template_directory() ) . 'inc/ab-news-ticker.php';
+	if ( is_readable( $_ab_news ) ) {
+		require_once $_ab_news;
+	}
+	unset( $_ab_news );
+}
+if ( function_exists( 'tara_news_ticker' ) ) {
+	tara_news_ticker();   // خروجی: <nav class="ab-quickbar ab-news" id="ab-news">
+} else {
+?>
+<!-- fallback — همان نوار دسترسی سریعِ نسخهٔ 3.0.1 (اگر فایل اخبار روی هاست نبود) -->
+<nav class="ab-quickbar" aria-label="دسترسی سریع صفحه اصلی">
+	<ul class="ab-quickbar__list">
+		<li class="ab-quickbar__item">
+			<a href="#new-songs" class="ab-quickbar__link">
+				<i class="icofont-music-notes"></i>
+				<span>تازه‌ترین آهنگ‌ها</span>
+			</a>
+		</li>
+		<li class="ab-quickbar__item">
+			<a href="<?php echo esc_url( tara_artists_index_url() ); ?>" class="ab-quickbar__link">
+				<i class="icofont-microphone-alt"></i>
+				<span>همهٔ هنرمندان</span>
+			</a>
+		</li>
+		<li class="ab-quickbar__item">
+			<a href="#popular-songs" class="ab-quickbar__link">
+				<i class="icofont-fire-alt"></i>
+				<span>پربازدیدترین‌ها</span>
+			</a>
+		</li>
+	</ul>
+</nav>
+<?php } ?>
+<?php } /* TARA_QUICKBAR / ab_quickbar */ ?>
+
+<?php get_template_part('inc/vip_slider'); ?>
+<?php get_template_part('inc/tarlanweb_player'); ?>
+<?php
+/* v3.9.0 — «رادیو ترانه یار»: ایستگاهِ همیشه‌روشن با میکسِ خودکار.
+   اگر در تنظیمات روشن باشد و آهنگی برای صف پیدا شود، همین‌جا چاپ می‌شود. */
+if ( function_exists( 'tara_radio_home_section' ) ) {
+	echo tara_radio_home_section(); // phpcs:ignore WordPress.Security.EscapeOutput -- مارکاپِ همین قالب
+}
+?>
+<div id="new-songs" class="ab-section-anchor"></div>
+<?php get_template_part('inc/new_posts'); ?>
+<div id="popular-songs" class="ab-section-anchor"></div>
+<?php get_template_part('inc/mostviews_posts'); ?>
+<?php $artista = ot_get_option('hty',array()); foreach($artista as $artise){ ?>	
+<!-- song_boxs -->
+<div class="song_boxs">
+<div class="songs_title_box">
+<h3><?php echo esc_html( $artise['title'] ); ?></h3>
+<?php $category_id = $artise['hty-cat']; $category_link = get_category_link($category_id); ?>
+<a href="<?php echo esc_url($category_link); ?>">مشاهده بیشتر</a>
+<div class="clear"></div>
+<div class="liner"></div>
+</div>
+<div class="song_boxs_posts">
+<?php
+$cat_ft1=$artise['hty-cat']; $num_ft1=$artise['hty-t'];
+$my_custom_query= new WP_Query(array(
+'post_type' => 'post',
+'post_status' => 'publish',
+'cat'   =>  $cat_ft1,
+'orderby' => 'date',
+'posts_per_page' =>$num_ft1,
+'no_found_rows'=>true,'ignore_sticky_posts'=>true,'update_post_term_cache'=>false
+));
+/* صف پخش همین بخش (تابع در inc/tara-ui.php) — قبل از تگ <ul> ساخته می‌شود */
+$tara_hty_tracks = function_exists( 'tara_track_playlist' ) ? tara_track_playlist( $my_custom_query->posts ) : array();
+?>
+<ul<?php echo function_exists( 'tara_queue_attrs' ) ? tara_queue_attrs( $tara_hty_tracks, $artise['title'] ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
+<?php if($my_custom_query->have_posts()) : ?>
+<?php $GLOBALS['tara_card_play'] = true; ?>
+<?php while($my_custom_query->have_posts()) : $my_custom_query->the_post(); $post_id=get_the_ID(); ?>
+<li><?php get_template_part('inc/songs_post'); ?></li>
+<?php endwhile; endif; ?>
+<?php $GLOBALS['tara_card_play'] = false; ?>
+<?php wp_reset_postdata(); ?>
+</ul>
+<div class="clear"></div>
+</div>
+<div class="clear"></div>
+</div>
+<!-- song_boxs -->
+<?php } ?>
+<?php get_template_part('inc/artist_slider'); ?>
+<div class="clear"></div>
+</div>
+</div>
+<!-- centers_box -->
+<?php get_footer(''); ?>

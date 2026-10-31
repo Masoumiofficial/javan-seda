@@ -1,0 +1,100 @@
+/* Artist hub, messages and compact lists. */
+.ty-hub {display:grid;gap:16px;color:var(--ab-text,#222)}
+.ty-hub__card {padding:20px;border:1px solid var(--ab-line,#e6e8ee);border-radius:16px;background:var(--ab-surface,#fff)}
+.ty-hub__head h2,.ty-hub__card h3 {margin:0 0 10px}
+.ty-hub__form {display:grid;gap:10px}
+.ty-hub__form input,.ty-hub__form select,.ty-hub__form textarea {box-sizing:border-box;width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:10px;background:var(--ab-surface,#fff);color:inherit;font:inherit}
+.ty-hub__btn,.ty-list-more {border:0;border-radius:10px;background:#185adb;color:#fff;padding:10px 16px;cursor:pointer;font:inherit}
+.ty-hub__btn--ghost {background:transparent;color:#185adb;border:1px solid currentColor}
+.ty-hub__plans,.ty-hub__stats {display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.ty-hub__plan,.ty-hub__stats>div {padding:14px;border:1px solid var(--ab-line,#e6e8ee);border-radius:12px}
+.ty-hub__stats span,.ty-hub__stats b {display:block}
+.ty-hub__tracks,.ty-hub__reqs,.ty-hub__threads {list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ty-hub__thread {width:100%;text-align:start;padding:12px;border:1px solid #dbe4f0;border-radius:10px;background:transparent;color:inherit;cursor:pointer}
+.ty-verified {display:inline-flex;align-items:center;color:#198be6;vertical-align:middle}
+.ty-dm[hidden] {display:none!important}
+.ty-dm {position:fixed;inset:0;z-index:99999;display:grid;place-items:center;padding:16px}
+.ty-dm__veil {position:absolute;inset:0;background:rgba(0,0,0,.6)}
+.ty-dm__card {position:relative;width:min(100%,500px);height:min(650px,85vh);display:flex;flex-direction:column;background:var(--ab-surface,#fff);color:var(--ab-text,#222);border-radius:18px;overflow:hidden}
+.ty-dm__head,.ty-dm__form {display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid #ddd}
+.ty-dm__head h2,.ty-dm__head p {margin:0}.ty-dm__x {margin-inline-start:auto;border:0;background:transparent;font-size:24px;cursor:pointer}
+.ty-dm__body {flex:1;overflow:auto;padding:16px}.ty-dm__msg {width:fit-content;max-width:85%;padding:8px 12px;margin:8px 0;border-radius:14px;background:#e8eef7;color:#222;overflow-wrap:anywhere}.ty-dm__msg.is-mine {margin-inline-start:auto;background:#185adb;color:#fff}.ty-dm__msg p {margin:0;white-space:pre-wrap}.ty-dm__msg time {font-size:10px}
+.ty-dm__form {border:0;border-top:1px solid #ddd}.ty-dm__form textarea {flex:1;min-width:0;resize:vertical}.ty-dm__send {border:0;border-radius:10px;padding:10px;background:#185adb;color:#fff;cursor:pointer}
+.ty-list--collapsed>li:nth-child(n+5),.ty-list--collapsed>.play-list-row:nth-child(n+5) {display:none!important}
+.ty-list-more {margin:8px auto;display:block}
+.ty-acct-wrap {position:relative}.ty-acct-menu {display:none;position:absolute;top:100%;inset-inline-end:0;min-width:200px;z-index:1000;padding:8px;border:1px solid var(--ab-line,#ddd);border-radius:12px;background:var(--ab-surface,#fff);box-shadow:0 12px 30px #0002}.ty-acct-wrap:hover .ty-acct-menu,.ty-acct-wrap:focus-within .ty-acct-menu {display:grid}.ty-acct-menu a {display:block;padding:8px 12px;color:var(--ab-text,#222);border-radius:8px}.ty-acct-menu a:hover,.ty-acct-menu a:focus {background:#eaf1fe;color:#185adb}
+.dl_links_box a.ty-download-link,.dl_linksv_box a.ty-download-link {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 18px;border-radius:10px;background:#185adb;color:#fff;font-weight:700;text-decoration:none}
+.ty-acct-menu button {display:flex;align-items:center;gap:8px;width:100%;padding:8px 12px;border:0;background:transparent;color:var(--ab-text,#222);text-align:start;cursor:pointer;font:inherit}
+.ty-acct-menu a {display:flex;align-items:center;gap:8px}
+@media (min-width: 1024px) {
+ #header > .tarlanweb_center {width:100%;max-width:none;box-sizing:border-box;padding-inline:clamp(20px,3vw,48px)}
+ #header .menu_right li ul.sub-menu {margin-top:0;padding:8px;width:220px;box-sizing:border-box;border-radius:12px;box-shadow:0 14px 30px #0002}
+ #header .menu_right li ul.sub-menu > li {float:none;width:100%;height:auto;margin:0}
+ #header .menu_right li ul.sub-menu > li > a {display:block;box-sizing:border-box;width:100%;height:auto;padding:9px 12px;line-height:1.7}
+ #header .menu_right li:focus-within > ul.sub-menu {visibility:visible;opacity:1;display:block}
+}
+
+.ty-radio__queue.ty-list--collapsed {max-height:none;overflow:visible;grid-template-columns:1fr}
+.ty-radio__queue:not(.ty-list--collapsed) {max-height:340px;overflow-y:auto}
+.ty-list-more[hidden] {display:none!important}
+
+.ty-dm__status:not(:empty) {padding:8px 12px;margin:0;color:#b91c1c;background:#fef2f2}
+
+/* نمای تأیید هنرمند و اصلاح پنل */
+.ty-verified {flex:0 0 auto;justify-content:center;line-height:1;margin-inline-start:5px}
+.ty-verified svg {display:block;width:19px;height:19px;max-width:none;overflow:visible}
+.ty-artist__name .ty-verified {vertical-align:middle}
+.ty-artist__name .ty-verified svg {width:24px;height:24px}
+.ty-artist__portrait-verified {position:absolute;z-index:2;left:50%;bottom:10px;transform:translateX(-50%)}
+.ty-artist__portrait-verified .ty-verified {margin:0;padding:3px;border-radius:50%;background:#fff;box-shadow:0 3px 12px #0005}
+.ty-artist__portrait-verified .ty-verified svg {width:22px;height:22px}
+.ty-artist__portrait figcaption {bottom:auto;top:10px}
+.ty-dm-availability {display:inline-flex;flex-direction:column;align-items:flex-start;gap:3px;max-width:260px}
+.ty-dm-availability button:disabled {opacity:.65;cursor:not-allowed}
+.ty-dm-availability small {font-size:10px;line-height:1.7;color:#fff}
+.ty-acct__side {border-radius:20px;box-shadow:0 12px 32px rgba(24,55,102,.08)}
+.ty-acct__main,.ty-acct-head {border-radius:16px}
+.ty-acct__navlink {border-radius:12px;transition:background .18s ease,color .18s ease}
+.ty-acct__navlink.is-active {box-shadow:0 5px 16px rgba(24,90,219,.16)}
+.ty-hub__card {box-shadow:0 8px 26px rgba(24,55,102,.06)}
+.ty-hub__plan.is-vip {border-color:rgba(24,90,219,.42);background:rgba(24,90,219,.04)}
+.ty-hub__btn:focus-visible,.ty-dm-open:focus-visible {outline:2px solid #4c8bff;outline-offset:3px}
+@media(max-width:800px){#mobiles_header .ty-acct-btn--mobile .ty-acct__svg{color:inherit}#mobiles_header .logo_mobiles img{max-width:min(150px,calc(100vw - 180px))}}
+@media(max-width:400px){#mobiles_header .navicon,#mobiles_header .search_mobile_box{width:42px;height:42px}#mobiles_header .search_mobile_box{left:60px}}
+@media(max-width:350px){#mobiles_header .navicon,#mobiles_header .search_mobile_box{width:40px;height:40px}#mobiles_header .search_mobile_box{left:57px}#mobiles_header .logo_mobiles img{max-width:calc(100vw - 166px)}}
+/* ارتباط هنرمند */
+.ty-artist__contact {display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin:14px 0 2px}
+.ty-artist__identity .ty-artist__contact .ty-acct-follow--hero {margin:0}
+.ty-artist__contact .ty-dm-open,.ty-artist__contact > a {display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:9px 16px;border:1px solid rgba(255,255,255,.48);border-radius:999px;color:#fff;background:rgba(255,255,255,.12);font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.ty-artist__contact .ty-dm-open:hover,.ty-artist__contact > a:hover {background:#fff;color:#185adb}
+.ty-artist__contact .ty-dm-open:disabled {cursor:not-allowed}
+.ty-hub__head {padding:20px;border-radius:18px;background:linear-gradient(130deg,#17459c,#6339af);color:#fff}
+.ty-hub__head h2,.ty-hub__head p {color:inherit;margin:0}
+.ty-hub__form fieldset {border:1px solid var(--ab-line,#dbe4f0);border-radius:14px;padding:16px;display:grid;gap:12px;min-width:0}
+.ty-hub__form legend {padding:0 8px;font-weight:700}
+.ty-hub__form label {display:grid;gap:5px}
+.ty-hub__form input[type=file] {padding:8px;max-width:100%}
+.ty-hub__tracks li,.ty-hub__reqs li {display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;padding:10px;border-bottom:1px solid var(--ab-line,#e6e8ee)}
+.ty-acct-slot:not(.ty-acct-slot--mobile) {margin-inline:10px}
+.ty-footer-toggle {all:unset;font:inherit;font-weight:inherit;color:inherit;display:block;width:100%}
+@media(max-width:767px){.ty-footer-toggle{box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;padding:10px 0;cursor:pointer}.ty-footer-toggle:after{content:'+';font-size:20px}.ty-footer-toggle[aria-expanded=true]:after{content:'−'}}
+
+@media(max-width:980px){.ty-acct-slot--mobile{margin-inline-start:4px}}
+
+/* نشان استاندارد با اندازهٔ ثابت، هم در نام و هم روی تصویر. */
+.ty-verified {color:#1686e8;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;flex:none}
+.ty-verified svg {display:block;flex:none;width:19px;height:19px;max-width:none}
+.ty-verified--sm svg {width:15px;height:15px}
+.ty-verified--lg svg {width:23px;height:23px}
+.ty-artist__name .ty-verified {margin-inline-start:7px}
+.ty-artist__portrait-verified {position:absolute;left:50%;bottom:8px;transform:translateX(-50%);z-index:4;line-height:0;pointer-events:none}
+.ty-artist__portrait-verified .ty-verified {margin:0;padding:3px;background:#fff;border-radius:50%;box-shadow:0 2px 10px rgba(0,0,0,.35)}
+.ty-artist__portrait-verified .ty-verified svg {width:23px;height:23px}
+
+/* اگر بنر هم وجود دارد، عکس پروفایل و نشان روی خود عکس باقی می‌مانند. */
+.ty-artist__banner-avatar {position:relative;z-index:2;width:112px;max-width:38%;margin:-38px auto 0}
+.ty-artist__portrait--banner .ty-artist__banner-avatar img {display:block;width:100%;height:auto;aspect-ratio:1;object-fit:cover;border:3px solid #fff;border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.ty-artist__banner-avatar .ty-artist__portrait-verified {bottom:2px}
+@media(max-width:782px){.ty-artist__banner-avatar{width:94px;max-width:38%;margin-top:-32px}}
+.ty-artist__portrait--banner > img {aspect-ratio:16 / 5;object-fit:cover}
+.ty-artist__portrait.ty-artist__portrait--banner {width:100%;max-width:none}

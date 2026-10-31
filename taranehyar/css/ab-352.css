@@ -53,8 +53,9 @@
 
 .ab-cat-desc__body {
 	position: relative;
-	max-height: 2000px;
-	overflow: hidden;
+	/* متن بازشده نباید برای محتوای طولانی بریده شود. */
+	max-height: none;
+	overflow: visible;
 	line-height: 2.1;
 	color: var(--ab-text, #222);
 	transition: max-height 0.28s ease;
@@ -62,6 +63,7 @@
 
 .ab-cat-desc__body.is-clamped {
 	max-height: 190px;
+	overflow: hidden;
 }
 
 .ab-cat-desc__body.is-clamped::after {
@@ -86,6 +88,27 @@
 
 .night .ab-cat-desc__body.is-clamped::after {
 	background: linear-gradient(to bottom, rgba(21, 24, 31, 0), #15181F 78%);
+}
+
+/* لینک‌های داخل توضیح کامل، مستقل از ریست سراسری لینک‌ها، خوانا و قابل تشخیص باشند. */
+.ab-cat-desc__body a[href] {
+	color: var(--ab-blue, #185adb);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+	overflow-wrap: anywhere;
+}
+.ab-cat-desc__body a[href]:hover,
+.ab-cat-desc__body a[href]:focus-visible {
+	color: var(--ab-blue-dark, #1246ad);
+	text-decoration-thickness: 2px;
+}
+.ab-cat-desc__body a[href]:focus-visible {
+	outline: 2px solid currentColor;
+	outline-offset: 2px;
+}
+.night .ab-cat-desc__body a[href],
+html[data-tara-night="1"] .ab-cat-desc__body a[href] {
+	color: #a9c1ff;
 }
 
 .ab-cat-desc__actions {

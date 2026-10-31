@@ -11,8 +11,6 @@
 (function () {
 	'use strict';
 
-	var THRESHOLD = 190; // پیکسل ارتفاعِ دید در حالت جمع‌شده
-
 	function setup(root) {
 		var body = root.querySelector('[data-ab-desc-body]');
 		var btn = root.querySelector('[data-ab-desc-toggle]');
@@ -26,7 +24,7 @@
 		/* اجازه بده مرورگر ارتفاعِ کامل را حساب کند */
 		window.requestAnimationFrame(function () {
 			var full = body.scrollHeight;
-			if (full <= THRESHOLD + 24) {
+			if (full <= body.clientHeight + 1) {
 				body.classList.remove('is-clamped');
 				btn.hidden = true;
 				return;
@@ -50,6 +48,14 @@
 				btn.setAttribute('aria-expanded', 'true');
 			}
 		}
+
+		/* لینک‌های زیر محدودهٔ جمع‌شده با کیبورد قابل دسترس بمانند. */
+		body.addEventListener('focusin', function () {
+			if (collapsed && root.classList.contains('is-collapsed')) {
+				collapsed = false;
+				render();
+			}
+		});
 
 		btn.addEventListener('click', function () {
 			collapsed = !collapsed;

@@ -62,6 +62,7 @@ if ( function_exists( 'tara_radio_home_section' ) ) {
 	echo tara_radio_home_section(); // phpcs:ignore WordPress.Security.EscapeOutput -- مارکاپِ همین قالب
 }
 ?>
+<?php if ( function_exists( 'tara_playlists_home' ) ) { echo tara_playlists_home(); } // phpcs:ignore WordPress.Security.EscapeOutput ?>
 <div id="new-songs" class="ab-section-anchor"></div>
 <?php get_template_part('inc/new_posts'); ?>
 <div id="popular-songs" class="ab-section-anchor"></div>

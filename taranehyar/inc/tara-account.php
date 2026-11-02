@@ -1526,6 +1526,9 @@ if ( ! function_exists( 'tara_acc_playlist_toggle' ) ) {
 			$has    = in_array( $post_id, $tracks, true );
 			$want   = ( null === $on ) ? ! $has : (bool) $on;
 			if ( $want && ! $has ) {
+				if ( 'post' !== get_post_type( $post_id ) || 'publish' !== get_post_status( $post_id ) || ! function_exists( 'tara_track_src' ) || '' === tara_track_src( $post_id ) || ( function_exists( 'tara_playlist_audio_ids' ) && empty( tara_playlist_audio_ids( array( $post_id ) ) ) ) ) {
+					return new WP_Error( 'tara_no_audio', 'این آهنگ منتشر نشده یا فایل صوتی ندارد.' );
+				}
 				if ( count( $tracks ) >= tara_acc_limit( 'max_tracks' ) ) {
 					return new WP_Error( 'tara_tracks_full', 'این پلی‌لیست پر شده است.' );
 				}

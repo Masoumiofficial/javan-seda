@@ -107,6 +107,7 @@ class WP_Post {
 	public $post_type;
 	public $post_date;
 	public $post_content = '';
+	public $post_password = '';
 	public function __construct( $id, $title, $status = 'publish', $type = 'post', $date = '2026-01-01 10:00:00' ) {
 		$this->ID          = (int) $id;
 		$this->post_title  = $title;
@@ -199,9 +200,16 @@ function comments_open() {
 function post_type_supports( $type, $feature ) {
 	return true;
 }
-function get_post_type() {
-	return 'post';
+function get_post_type( $post = null ) {
+	if ( null === $post ) { return 'post'; }
+	$obj = is_object( $post ) ? $post : ( isset( $GLOBALS['__posts'][ (int) $post ] ) ? $GLOBALS['__posts'][ (int) $post ] : null );
+	return $obj ? $obj->post_type : false;
 }
+function get_post_status( $post = null ) {
+	$obj = is_object( $post ) ? $post : ( isset( $GLOBALS['__posts'][ (int) $post ] ) ? $GLOBALS['__posts'][ (int) $post ] : null );
+	return $obj ? $obj->post_status : false;
+}
+
 function is_page() {
 	return false;
 }
@@ -526,7 +534,7 @@ function current_user_can( $cap, $arg = null ) {
 	return ! empty( $GLOBALS['__caps'][ $cap ] );
 }
 function wp_verify_nonce( $nonce, $action ) {
-	if ( 'good' === $nonce && in_array( (string) $action, array( 'tara_save_term', 'tara_account', 'tara_rest', 'tara_radio_bpm_save' ), true ) ) {
+	if ( 'good' === $nonce && in_array( (string) $action, array( 'tara_save_term', 'tara_account', 'tara_rest', 'tara_radio_bpm_save', 'tara_playlist_save' ), true ) ) {
 		return true;
 	}
 	return 'good-post' === $nonce && 'tara_post_artist' === $action;

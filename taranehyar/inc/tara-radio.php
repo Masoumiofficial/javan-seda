@@ -60,6 +60,8 @@ if ( ! function_exists( 'tara_radio_defaults' ) ) {
 			'autostart'      => '',        // پخشِ خودکار در صفحهٔ رادیو (مرورگرها اغلب می‌بندند)
 			'home'           => 'on',      // کارتِ رادیو در صفحهٔ اصلی
 			'artist'         => 'on',      // دی‌جی اختصاصی هنرمند
+			'playlist_curated' => 'on',
+			'playlist_personal' => 'on',
 			'artist_player'  => 'on',      // پلیر مستقل فهرست آثار هنرمند
 			'home_featured'  => 'on',      // فقط آهنگ‌های «بخش ویژه» در صفحهٔ اصلی
 			'archives'       => 'on',      // دی‌جی‌باکس در آرشیو ژانر/حال‌وهوا
@@ -767,6 +769,8 @@ if ( ! function_exists( 'tara_radio_page_wanted' ) ) {
 		if ( tara_radio_is_tax_page() && 'on' === (string) tara_radio_option( 'archives', 'on' ) ) {
 			return true;
 		}
+
+		if ( function_exists( 'is_page_template' ) && ( is_page_template( 'page-playlists.php' ) || is_page_template( 'page-account.php' ) ) ) { return true; }
 
 		if ( function_exists( 'is_page_template' ) && is_page_template( 'page-radio.php' ) ) {
 			return true;

@@ -119,6 +119,18 @@ const flush=()=>new Promise(r=>setTimeout(r,0));
  const {dom,radio:r}=await setup(html); assert.equal(r.queue.length,0); assert.equal(r.addToQueue(songs[0]),false); dom.window.close();
 }
 {
+ const html=markup().replace('data-radio-mode="mixed"','data-radio-context="playlist" data-radio-mode="mixed"');
+ const foreign={id:88,title:'foreign',src:'https://example.org/88.mp3'};
+ const {w,dom,radio:r}=await setup(html,w=>w.localStorage.setItem('tara:radio:mine',JSON.stringify([foreign])));
+ let requests=0; w.fetch=()=>{requests++; throw new Error('fixed radio must not fetch');};
+ assert.deepEqual(Array.from(r.queue,t=>t.id),[1,2,3]);
+ assert.equal(r.addToQueue(foreign),false); r.play(foreign); assert.equal(r.nowId,null);
+ r.setMode('views'); assert.deepEqual(Array.from(r.queue,t=>t.id),[1,2,3]);
+ r.play(); await flush(); r.cursor=2; r.advance('ended',0); await flush();
+ assert.equal(requests,0); assert.deepEqual(Array.from(r.queue,t=>t.id),[1,2,3]); assert.equal(r.nowId,1);
+ dom.window.close();
+}
+{
  const {w,dom,radio:r}=await setup();
  const legacy=w.document.createElement('audio'); legacy._paused=false; legacy.pause=function(){this._paused=true;}; w.document.body.appendChild(legacy);
  r.play(); await flush(); assert.equal(legacy._paused,true,'DJ stops ordinary player');

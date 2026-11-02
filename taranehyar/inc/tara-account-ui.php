@@ -500,6 +500,8 @@ if ( ! function_exists( 'tara_acc_track_list' ) ) {
 		$rows  = '';
 
 		foreach ( $ids as $post_id ) {
+			$post = get_post( $post_id );
+			if ( ! $post || ! empty( $post->post_password ) || 'post' !== get_post_type( $post_id ) || 'publish' !== get_post_status( $post_id ) ) { continue; }
 			$src   = function_exists( 'tara_track_src' ) ? (string) tara_track_src( $post_id ) : '';
 			$index = -1;
 			if ( '' !== $src ) {
@@ -522,10 +524,12 @@ if ( ! function_exists( 'tara_acc_track_list' ) ) {
 			) . '</li>';
 		}
 
+		if ( '' === $rows ) { return '<p class="ty-acct-empty">' . esc_html( $args['empty'] ) . '</p>'; }
 		$attrs = '';
 		if ( ! empty( $queue ) ) {
 			$json = wp_json_encode( $queue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
 			if ( is_string( $json ) ) {
+				$GLOBALS['tara_has_queue'] = true;
 				$attrs .= ' data-tara-queue="' . esc_attr( $json ) . '"';
 			}
 			if ( '' !== (string) $args['title'] ) {
@@ -1068,6 +1072,7 @@ if ( ! function_exists( 'tara_acc_tab_playlists' ) ) {
 						</div>
 						<button type="button" class="ty-acct-mini" data-tara-pl-share="<?php echo esc_url( tara_acc_profile_url( 'playlists' ) . '&share=' . rawurlencode( $current['k'] ) ); ?>" aria-label="کپیِ لینکِ اشتراک"><?php echo tara_acc_icon( 'link' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 					</div>
+					<?php if ( function_exists( 'tara_playlist_radio' ) ) { echo tara_playlist_radio( $current['t'], $current['n'], 'personal' ); } ?>
 					<?php
 					echo tara_acc_track_list( // phpcs:ignore WordPress.Security.EscapeOutput
 						$current['t'],
@@ -1594,9 +1599,10 @@ if ( ! function_exists( 'tara_acc_public_playlist' ) ) {
 					<?php echo '' !== $owner_name ? ' · ساختهٔ ' . esc_html( $owner_name ) : ''; ?>
 				</p>
 			</header>
+			<?php if ( function_exists( 'tara_playlist_radio' ) ) { echo tara_playlist_radio( $found['t'], $found['n'], 'personal' ); } ?>
 			<?php
 			echo tara_acc_track_list( // phpcs:ignore WordPress.Security.EscapeOutput
-				$found['t'],
+				function_exists( 'tara_playlist_audio_ids' ) ? tara_playlist_audio_ids( $found['t'] ) : $found['t'],
 				array(
 					'mode'  => 'public',
 					'title' => $found['n'],

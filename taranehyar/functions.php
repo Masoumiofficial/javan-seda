@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.12.11' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.12.12' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -584,6 +584,9 @@ foreach ( array( 'tara-trust.php', 'tara-dm.php', 'tara-artisthub.php' ) as $tar
 unset( $taranehyar_hub_file, $taranehyar_hub_path );
 
 /* ۶-الف-۳-۲) رنگ‌ها و هویت (۳.۷.۷) — متغیرهای CSS از تنظیمات قالب */
+$taranehyar_playlists = TARANEHYAR_DIR . '/inc/tara-playlists.php';
+if ( is_readable( $taranehyar_playlists ) ) { require_once $taranehyar_playlists; }
+
 $taranehyar_brand = TARANEHYAR_DIR . '/inc/tara-brand.php';
 if ( is_readable( $taranehyar_brand ) ) {
 	require_once $taranehyar_brand;

@@ -296,7 +296,8 @@
 		this.limit = Math.round(clamp(CONF.limit || 20, 4, 40));
 		this.xfade = Math.round(clamp(CONF.xfade === undefined ? 6 : CONF.xfade, 0, 16));
 		this.power = 'warm';
-		this.artistScoped = root.getAttribute('data-radio-context') === 'artist';
+		this.fixedQueue = root.getAttribute('data-radio-context') === 'playlist';
+		this.artistScoped = root.getAttribute('data-radio-context') === 'artist' || this.fixedQueue;
 		this.mode = root.getAttribute('data-radio-mode') || CONF.mode || 'mixed';
 		this.featured = root.getAttribute('data-radio-featured') === '1';
 		this.tax = root.getAttribute('data-radio-tax') || '';
@@ -492,6 +493,7 @@
 
 	Radio.prototype.ensureQueue = function (force) {
 		var self = this;
+		if (this.fixedQueue) { return Promise.resolve(false); }
 
 		if (!force && this.queue.slice(this.cursor + 1).some(function (track) { return !this.isBad(track); }, this)) {
 			return Promise.resolve(true);
@@ -572,7 +574,7 @@
 		if (!rest.length) {
 			return false;
 		}
-		this.queue = shuffle(rest.slice());
+		this.queue = this.fixedQueue ? rest.slice() : shuffle(rest.slice());
 		this.cursor = -1;
 		this.paintQueue();
 		return true;
@@ -598,6 +600,10 @@
 			target = (this.cursor >= 0 ? this.queue[this.cursor] : null) || this.pickFirst();
 		}
 
+		if (target && this.fixedQueue) {
+			target = this.queue.find(function (item) { return String(item.id) === String(target.id); }) || null;
+			if (!target) { return; }
+		}
 		if (target && this.isBad(target)) { target = this.nextTrack(); }
 		if (!target) {
 			this.toast(L.empty || 'آهنگی برای پخش پیدا نشد.');
@@ -1947,6 +1953,7 @@
 	};
 
 	Radio.prototype.setMode = function (mode) {
+		if (this.fixedQueue) { return; }
 		var self = this;
 		if (this.queue.length) { this.sourceBackup = { queue: this.queue.slice(), cursor: this.cursor, mode: this.mode }; }
 		this.mode = mode;

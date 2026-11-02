@@ -159,6 +159,13 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 			)
 		);
 
+		if ( 'playlist' === $args['context'] ) {
+			$args['sources'] = false;
+			$args['taxonomy'] = '';
+			$args['term_id'] = 0;
+			$args['featured'] = false;
+		}
+
 		if ( 'artist' === $args['context'] ) {
 			$artist_tax = function_exists( 'tara_artist_tax' ) ? tara_artist_tax() : '';
 			$artist_term = ( $artist_tax && $args['taxonomy'] === $artist_tax && (int) $args['term_id'] > 0 ) ? get_term( (int) $args['term_id'], $artist_tax ) : null;
@@ -179,7 +186,7 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 		/* دکمهٔ «تنظیماتِ دی‌جی» فقط در صفحهٔ رادیو باز است. */
 		$adv_open = ( null === $args['adv_open'] ) ? ( 'page' === $args['context'] ) : (bool) $args['adv_open'];
 
-		if ( empty( $args['tracks'] ) ) {
+		if ( empty( $args['tracks'] ) && 'playlist' !== $args['context'] ) {
 			$args['tracks'] = tara_radio_tracks(
 				array(
 					'taxonomy' => (string) $args['taxonomy'],
@@ -362,7 +369,7 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 						<?php
 						/* v3.10.1 — «فهرست من» فقط وقتی معنی دارد که دکمهٔ
 						   «افزودن به رادیو» هم به کاربر نشان داده شود. */
-						if ( 'artist' !== $args['context'] && ( ! function_exists( 'tara_radio_user_add_on' ) || tara_radio_user_add_on() ) ) :
+						if ( ! in_array( $args['context'], array( 'artist', 'playlist' ), true ) && ( ! function_exists( 'tara_radio_user_add_on' ) || tara_radio_user_add_on() ) ) :
 							?>
 						<button type="button" class="ty-radio__tool" data-radio-mine aria-expanded="false" aria-controls="<?php echo esc_attr( $uid ); ?>-mine">
 							<i class="icofont-heart-alt" aria-hidden="true"></i>

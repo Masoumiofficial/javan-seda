@@ -328,6 +328,14 @@ array(
 ),
 
 array(
+'id'=>'playlist_home',
+'label'=>'پلی‌لیست‌های منتخب در صفحهٔ اصلی',
+'desc'=>'پس از ساخت برگه با قالب «پلی‌لیست‌های ترانه یار»، کارت‌های منتخب در صفحهٔ اصلی نمایش داده می‌شوند.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'homes',
+),
+array(
 'id'=>'indpl',
 'label'=>'پلیر ایندکس',
 'desc'=>'پلیر ایندکس نمایش داده شود؟',
@@ -1218,6 +1226,22 @@ array(
 'std'=>'on',
 'type'=>'on-off',
 'section'=>'radio'
+),
+array(
+'id'=>'radio_playlist_curated',
+'label'=>'دی‌جی پلی‌لیست‌های منتخب',
+'desc'=>'نمایش دی‌جی برای هر پلی‌لیست منتخب منتشرشده.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'radio',
+),
+array(
+'id'=>'radio_playlist_personal',
+'label'=>'دی‌جی پلی‌لیست‌های شخصی',
+'desc'=>'نمایش دی‌جی در پلی‌لیست شخصی و نسخهٔ عمومی آن.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'radio',
 ),
 array(
 'id'=>'radio_artist_player',

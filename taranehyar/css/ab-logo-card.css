@@ -1,0 +1,263 @@
+/*
+ * ab-logo-card.css — کارتِ «لوگوی سایت (روز و شب)» — نسخهٔ ۳.۸.۴
+ * =====================================================================
+ * چرا فایلِ جدا؟
+ *   کارت در دو جا دیده می‌شود: «ترانه یار ← پیشخوان» و «ترانه یار ← تنظیمات
+ *   قالب». صفحهٔ تنظیمات، CSS پنل را لود نمی‌کند؛ پس این استایل مستقل است و
+ *   هیچ متغیری از پنل قرض نمی‌گیرد (همهٔ رنگ‌ها با پیش‌فرضِ خودش می‌آید).
+ *
+ * اندازه‌ها:
+ *   پیش‌نمایش هر حالت یک نوارِ باارتفاعِ ثابت است (۷۶px، در گوشی ۶۴px) با
+ *   همان نسبتِ ۱۵۰:۴۰ لوگو؛ تصویر داخلش با `contain` می‌نشیند، پس هیچ لوگویی
+ *   کشیده، بریده یا بیرون‌زده نمی‌شود.
+ * ================================================================== */
+
+.ty-logo-card {
+	--logo-line: #e3e6ee;
+	--logo-ink: #1d2327;
+	--logo-muted: #5b6472;
+	--logo-accent: #185adb;
+	--logo-surface: #ffffff;
+	display: block;
+	max-width: 960px;
+	margin: 0 0 26px;
+	padding: 0;
+	direction: rtl;
+	text-align: right;
+	font-size: 13px;
+	line-height: 1.9;
+	color: var(--logo-ink);
+}
+
+.ty-logo-card__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(272px, 1fr));
+	gap: 16px;
+	align-items: start;
+}
+
+.ty-logo-card__col {
+	display: grid;
+	gap: 10px;
+	min-width: 0;
+	padding: 14px;
+	border: 1px solid var(--logo-line);
+	border-radius: 14px;
+	background: var(--logo-surface);
+}
+
+.ty-logo-card__col--night {
+	background: #17181f;
+	border-color: #2b2d38;
+}
+
+.ty-logo-card__col--night .ty-logo-card__caption,
+.ty-logo-card__col--night .ty-logo-card__hint,
+.ty-logo-card__col--night .ty-logo-card__row label { color: #e3e5ee; }
+
+/* ---- پیش‌نمایش: نوارِ ثابت با نسبتِ لوگو ---- */
+.ty-logo-card__preview {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 76px;
+	padding: 8px 12px;
+	overflow: hidden;
+	border: 1px solid var(--logo-line);
+	border-radius: 10px;
+	background-color: #fff;
+	background-image:
+		linear-gradient(45deg, #f1f1f4 25%, transparent 25%, transparent 75%, #f1f1f4 75%),
+		linear-gradient(45deg, #f1f1f4 25%, transparent 25%, transparent 75%, #f1f1f4 75%);
+	background-size: 16px 16px;
+	background-position: 0 0, 8px 8px;
+}
+
+.ty-logo-card__preview.is-night {
+	background-color: #101117;
+	background-image: none;
+	border-color: #2b2d38;
+}
+
+.ty-logo-card__preview img {
+	display: block;
+	width: auto;
+	height: auto;
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+}
+
+/* ---- سرنویسِ ستون و برچسب‌ها ---- */
+.ty-logo-card__caption {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin: 0;
+	font-size: 13px;
+}
+
+.ty-logo-card .ty-pill {
+	display: inline-block;
+	padding: 1px 9px;
+	border: 1px solid var(--logo-line);
+	border-radius: 999px;
+	background: #f6f7f9;
+	font-size: 11px;
+	line-height: 1.9;
+	color: #3c434a;
+	white-space: nowrap;
+}
+
+.ty-logo-card .ty-pill--ok { background: #eafaef; border-color: #b7e7c4; color: #116329; }
+
+/* ---- فرم ---- */
+.ty-logo-card__form { display: grid; gap: 10px; }
+
+.ty-logo-card__row { display: grid; gap: 5px; margin: 0; }
+
+.ty-logo-card__row label { font-size: 12px; font-weight: 700; color: var(--logo-ink); }
+
+.ty-logo-card__row input[type="file"],
+.ty-logo-card__row input[type="url"] {
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+	padding: 6px 10px;
+	border: 1px solid var(--logo-line);
+	border-radius: 9px;
+	background: #fff;
+	font-size: 12.5px;
+	line-height: 1.9;
+	color: #1d2327;
+}
+
+.ty-logo-card__row input[type="url"]:focus,
+.ty-logo-card__row input[type="file"]:focus {
+	outline: 2px solid var(--logo-accent);
+	outline-offset: 1px;
+}
+
+.ty-logo-card__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin: 2px 0 0;
+}
+
+.ty-logo-card__actions .ty-btn,
+.ty-logo-card__actions button {
+	flex: 1 1 auto;
+	min-width: 132px;
+}
+
+.ty-logo-card__hint {
+	margin: 0;
+	font-size: 11.5px;
+	line-height: 1.85;
+	color: var(--logo-muted);
+}
+
+.ty-logo-card__hint--foot {
+	margin-top: 14px;
+	padding-top: 12px;
+	border-top: 1px solid var(--logo-line);
+}
+
+/* ---- نسخهٔ صفحهٔ «تنظیمات قالب» (کارتِ مستقل با کادر) ---- */
+.ty-logo-card--settings {
+	max-width: 100%;
+	margin: 16px 0 24px;
+	padding: 16px 18px 14px;
+	border: 1px solid #dcdcde;
+	border-radius: 12px;
+	background: #fff;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+}
+
+.ty-logo-card--settings .ty-logo-card__title {
+	margin: 0 0 4px;
+	font-size: 15px;
+	font-weight: 700;
+	color: #1d2327;
+}
+
+.ty-logo-card--settings .ty-logo-card__lead {
+	margin: 0 0 12px;
+	font-size: 12px;
+	line-height: 1.9;
+	color: #50575e;
+}
+
+.ty-logo-card--settings .ty-logo-card__grid {
+	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+/* ---- واکنش‌گرایی ---- */
+@media (max-width: 960px) {
+	.ty-logo-card__grid,
+	.ty-logo-card--settings .ty-logo-card__grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 600px) {
+	.ty-logo-card { margin-bottom: 18px; }
+	.ty-logo-card__col { padding: 12px; border-radius: 12px; }
+	.ty-logo-card__preview { height: 64px; padding: 6px 10px; }
+	.ty-logo-card__actions .ty-btn,
+	.ty-logo-card__actions button { flex: 1 1 100%; min-width: 0; }
+	.ty-logo-card--settings { padding: 12px 12px 10px; margin: 12px 0 18px; }
+	.ty-logo-card--settings .ty-logo-card__lead { font-size: 11.5px; }
+}
+
+/* ---- ظرفِ صفحهٔ تنظیمات: هم‌تراز با کادرِ OptionTree ---- */
+.tara-logo-settings-wrap {
+	max-width: 1180px;
+	margin: 16px 20px 0 2px;
+}
+
+/* ---- دکمه‌های کارت در صفحهٔ تنظیمات ----
+   آن صفحه CSS پنل را لود نمی‌کند، پس دکمه‌ها استایلِ مستقل دارند؛ روی
+   پیشخوان پنل این قواعد اعمال نمی‌شوند (`.ty-logo-card--settings` فقط
+   همان‌جاست) تا دکمه‌های پنل شکلِ خودشان را نگه دارند. */
+.ty-logo-card--settings .ty-logo-card__actions button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	padding: 6px 14px;
+	border: 1px solid #c3c4c7;
+	border-radius: 8px;
+	background: #f6f7f7;
+	color: #1d2327;
+	font-size: 12.5px;
+	font-weight: 600;
+	line-height: 1.9;
+	cursor: pointer;
+	transition: background .15s ease, border-color .15s ease;
+}
+
+.ty-logo-card--settings .ty-logo-card__actions button:hover { background: #f0f0f1; border-color: #8c8f94; }
+
+.ty-logo-card--settings .ty-logo-card__actions button.ty-btn--primary {
+	background: #185adb;
+	border-color: #185adb;
+	color: #fff;
+}
+
+.ty-logo-card--settings .ty-logo-card__actions button.ty-btn--primary:hover {
+	background: #1246ad;
+	border-color: #1246ad;
+}
+
+.ty-logo-card--settings .ty-logo-card__actions .dashicons {
+	width: 16px;
+	height: 16px;
+	font-size: 16px;
+	line-height: 1;
+}
+
+@media (max-width: 782px) {
+	.tara-logo-settings-wrap { margin: 12px 10px 0 0; }
+}

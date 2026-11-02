@@ -1,0 +1,7 @@
+# فایل‌های رمزگذاری‌شدۀ ionCube (لایسنسِ قالب):
+# هیچ‌وقت نباید پایانِ خطوطشان نرمال‌سازی شود یا در diff/merge درگیر شوند.
+# یک بایت اختلاف = «The file …/functions.php is corrupted.» و مرگِ کل سایت.
+javanseda/functions.php            binary
+javanseda/RTL_License_*.php        binary
+# بسته‌های انتشار
+artifacts/*.zip                    binary

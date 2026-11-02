@@ -98,4 +98,4 @@ if($field && !empty($field['value'])){
 
 <!-- vip_img_box -->
 
-<?php endif; wp_reset_query(); } ?>
+<?php endif; wp_reset_postdata(); } ?>

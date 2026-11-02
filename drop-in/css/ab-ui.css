@@ -1,0 +1,1056 @@
+/*
+ ab-ui.css — کپیِ «لایۀ اختصاصی آهنگ‌بان» از انتهای style.css (نسخۀ 3.3.8).
+
+ چرا این فایل هست؟  اگر روزی «آپدیت قالب مادر» style.css را بازنویسی کند، همهٔ
+ بلوک‌های این لایه پاک می‌شوند و قالب برهنه می‌ماند. inc/ab-ui-guard.php همان‌وقت
+ همین فایل را enqueue می‌کند (وگرنه اصلاً بارگذاری نمی‌شود ⇒ در حالت عادی صفر بایت
+ اضافه). پس این فایل را با style.css قاطی نکنید و برای آپدیت‌ها حفظش کنید.
+
+ چطور دوباره بسازیم؟  از خط «ab-ui-layer» در style.css تا انتهای فایل را کپی کنید:
+   python3 tools/ab-ui-sync.py     (اگر اسکریپت را دارید)  یا دستی:
+   · ابتدا از style.css بلوک‌های جدید را به انتهایش اضافه کنید، سپس این فایل را
+     از همان مارکر تا EOF بازنویسی کنید.
+
+ خاموشی کل گارد:  define( 'JAVANSEDA_UI_GUARD', false );
+*/
+
+/* ── ab-ui-layer ──────────────────────────────────────────────────────────────────
+   از این خط تا انتهای فایل، لایۀ اختصاصی آهنگ‌بان است (v3.2.0 → v3.3.8).
+   css/ab-ui.css کپیِ همین ناحیه است و inc/ab-ui-guard.php آن را فقط وقتی enqueue
+   می‌کند که این مارکر از style.css رفته باشد (مثلاً بعد از آپدیت قالب مادر).
+   ─────────────────────────────────────────────────────────────────────────────── */
+/* ==========================================================================
+   بلوک ۲۴ (3.2.0 · نوار پخش در 3.2.4: تیره‌پسند، کوتاه‌تر، قبلی/بعدی) — باکس «ما را دنبال کنید» + نوارِ چسبانِ پخش
+   فایل: inc/ab-post-extras.php  ·  فراخوانی: single.php (بالای باکس پلیر)
+   پالت سازمانی: #FFFFFF · #185ADB · #111111 — بدون گرادینت، بدون رنگ جدید
+   خاموشی: JAVANSEDA_POST_EXTRAS / JAVANSEDA_STICKY_PLAYER یا گزینهٔ fixbtn
+   اگر فایل لایه حذف شود، این قواعد بی‌مصرف می‌مانند ولی چیزی را نمی‌شکنند.
+   ========================================================================== */
+.ab-social-box{display:block;margin:14px 0 8px;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:12px;box-shadow:0 1px 2px rgba(17,17,17,.04);overflow:hidden}
+.ab-social-box__head{display:flex;align-items:center;flex-wrap:wrap;padding:11px 14px;border-bottom:1px solid var(--ab-line)}
+.ab-social-box__head>i{font-size:16px;color:var(--ab-blue);margin-left:8px}
+.ab-social-box__title{font-size:14px;font-weight:700;color:var(--ab-text)}
+.ab-social-box__hint{margin-right:auto;font-size:11.5px;color:var(--ab-muted)}
+.ab-social-box__row{display:block;padding:11px 11px 13px}
+.ab-social{display:inline-flex;align-items:center;margin:0 8px 8px 0;padding:7px 11px 7px 9px;background:var(--ab-page);border:1px solid var(--ab-line);border-radius:10px;color:var(--ab-text);text-decoration:none;transition:border-color .16s ease,background-color .16s ease}
+.ab-social__icon{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:30px;height:30px;margin-left:9px;border-radius:8px;background:var(--ab-blue-soft);color:var(--ab-blue);font-size:16px;transition:background-color .16s ease,color .16s ease}
+.ab-social__txt{display:block;min-width:0;line-height:1.35}
+.ab-social__txt b{display:block;font-size:12.5px;font-weight:700;color:var(--ab-text);white-space:nowrap}
+.ab-social__txt em{display:block;max-width:150px;overflow:hidden;font-size:10.5px;font-style:normal;font-weight:400;color:var(--ab-muted);white-space:nowrap;text-overflow:ellipsis;direction:ltr;unicode-bidi:embed}
+.ab-social__arrow{font-size:13px;color:var(--ab-muted);transition:color .16s ease}
+.ab-social:hover,.ab-social:focus{border-color:var(--ab-blue);background:var(--ab-blue-soft);color:var(--ab-blue-accent);text-decoration:none}
+.ab-social:hover .ab-social__icon,.ab-social:focus .ab-social__icon{background:var(--ab-blue);color:var(--ab-white)}
+.ab-social:hover .ab-social__arrow,.ab-social:focus .ab-social__arrow{color:var(--ab-blue-accent)}
+/* --- نوار چسبانِ پخش (کنترل همان <audio id="audio"> قالب) — 3.2.4 --- */
+/* رنگ‌ها از متغیرهای قالب می‌آیند؛ `.night` همان متغیرها را بازنویسی می‌کند
+   ⇒ نوار در حالت شب خودکار تیره می‌شود (مشکل «سفید ماندن» از همین‌جا رفع شد).
+   ارتفاع: ≈60px به‌جای ≈84px · دکمۀ قبلی/بعدی · شمارۀ قطعه · اکولایزر روی تصویر. */
+.ab-sticky{position:fixed;right:0;left:0;bottom:0;z-index:9999;background:var(--ab-surface);border-top:1px solid var(--ab-line);box-shadow:0 -2px 10px rgba(17,17,17,.07);padding-bottom:env(safe-area-inset-bottom)}
+.ab-sticky::before{content:"";position:absolute;top:0;right:0;left:0;height:2px;background:var(--ab-blue);opacity:0;transition:opacity .18s ease}
+.ab-sticky.ab-sp--playing::before{opacity:1}
+#ab-sticky-player[hidden]{display:none}
+.ab-sticky[hidden]{display:none}
+.ab-sp-audio{display:none}
+body.ab-sticky-on{padding-bottom:60px}
+.ab-sp__in{display:flex;align-items:center;max-width:1100px;margin:0 auto;padding:4px 12px}
+.ab-sp-thumb{position:relative;display:block;flex:0 0 auto;width:34px;height:34px;border-radius:8px;overflow:hidden;background:var(--ab-blue-soft)}
+.ab-sp-thumb img{display:block;width:34px;height:34px;object-fit:cover}
+.ab-sp-thumb--none{display:flex;align-items:center;justify-content:center;color:var(--ab-blue-accent);font-size:15px}
+.ab-sp-eq{position:absolute;right:3px;bottom:3px;display:none;align-items:flex-end;height:10px}
+.ab-sp-eq i{display:block;width:2px;height:100%;margin-right:1px;background:var(--ab-blue);border-radius:1px;transform-origin:bottom;animation:ab-sp-eq .85s ease-in-out infinite alternate}
+.ab-sp-eq i:nth-child(2){animation-duration:.62s}
+.ab-sp-eq i:nth-child(3){animation-duration:1.05s}
+.ab-sp--playing .ab-sp-eq{display:flex}
+@keyframes ab-sp-eq{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.ab-sp-eq i{animation:none}}
+.ab-sp-play{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:32px;height:32px;margin:0 8px;padding:0;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:50%;color:var(--ab-blue-accent);font-size:14px;line-height:1;cursor:pointer;transition:background .16s ease,color .16s ease,border-color .16s ease,transform .12s ease}
+.ab-sp-play:hover,.ab-sp-play:focus{background:var(--ab-blue);border-color:var(--ab-blue);color:var(--ab-white)}
+.ab-sp-play:active{transform:scale(.94)}
+.ab-sp-nav{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:26px;height:26px;padding:0;border:1px solid transparent;border-radius:50%;background:none;color:var(--ab-muted);font-size:13px;line-height:1;cursor:pointer;text-decoration:none;transition:color .16s ease,border-color .16s ease}
+.ab-sp-nav:hover,.ab-sp-nav:focus{color:var(--ab-blue-accent);border-color:var(--ab-blue);text-decoration:none}
+.ab-sp__no{flex:0 0 auto;margin:0 8px 0 0;padding:1px 7px;border:1px solid var(--ab-line);border-radius:999px;background:var(--ab-page);font-size:10.5px;line-height:1.6;color:var(--ab-muted);white-space:nowrap}
+.ab-sp__no b{font-weight:700;color:var(--ab-blue-accent)}
+.ab-sp__meta{flex:1 1 auto;min-width:0}
+.ab-sp__title{display:block;font-size:12.5px;font-weight:700;line-height:1.45;color:var(--ab-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+a.ab-sp__title:hover,a.ab-sp__title:focus{color:var(--ab-blue-accent);text-decoration:none}
+.ab-sp__artist{display:block;font-size:10.5px;color:var(--ab-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ab-sp__bar{display:flex;align-items:center;margin-top:3px;min-width:0}
+.ab-sp-slide{position:relative;display:flex;align-items:center;flex:1 1 auto;min-width:0}
+.ab-sp-track{position:absolute;top:50%;right:8px;left:8px;height:4px;margin-top:-2px;border-radius:2px;background:rgba(24,90,219,.16);overflow:hidden}
+.ab-sp-fill{position:absolute;top:0;left:0;display:block;width:0;height:100%;border-radius:2px;background:var(--ab-blue)}
+.ab-sp-range{position:relative;z-index:1;flex:1 1 auto;width:100%;height:4px;margin:0 8px;-webkit-appearance:none;appearance:none;background:transparent;border:0;outline:none;cursor:pointer;direction:ltr}
+.ab-sp-range::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border:2px solid var(--ab-surface);border-radius:50%;background:var(--ab-blue);box-shadow:0 0 0 1px var(--ab-line)}
+.ab-sp-range::-moz-range-thumb{width:12px;height:12px;border:2px solid var(--ab-surface);border-radius:50%;background:var(--ab-blue)}
+.ab-sp-range::-moz-range-track{height:4px;background:transparent;border:0}
+.ab-sp-range:focus-visible{outline:2px solid var(--ab-blue);outline-offset:3px}
+.ab-sp-range:disabled{opacity:.55;cursor:default}
+.ab-sp-time{flex:0 0 auto;font-size:10px;color:var(--ab-muted);white-space:nowrap;direction:ltr;unicode-bidi:embed}
+.ab-sp-time b{font-weight:500}
+.ab-sp__dl{display:inline-flex;align-items:center;flex:0 0 auto;margin:0 6px;padding:5px 9px;border:1px solid var(--ab-line);border-radius:8px;background:var(--ab-page);color:var(--ab-text);font-size:11.5px;line-height:1.4;transition:border-color .16s ease,color .16s ease}
+.ab-sp__dl i{margin-left:5px;color:var(--ab-blue-accent);font-size:14px}
+.ab-sp__dl:hover,.ab-sp__dl:focus{border-color:var(--ab-blue);color:var(--ab-blue-accent);text-decoration:none}
+.ab-sp-close{flex:0 0 auto;width:26px;height:26px;padding:0;border:0;background:none;color:var(--ab-muted);font-size:14px;line-height:1;cursor:pointer}
+.ab-sp-close:hover,.ab-sp-close:focus{color:var(--ab-text)}
+/* سه مورد که رنگِ صریحِ روشن داشتند و در شب باید عوض شوند */
+.night .ab-sticky{box-shadow:0 -2px 14px rgba(0,0,0,.5)}
+.night .ab-sp-track{background:rgba(255,255,255,.14)}
+.night .ab-sp-thumb{background:#2c2c2c}
+@media (max-width:767px){
+	.ab-social-box__row{padding:9px 9px 10px}
+	.ab-social{display:flex;width:100%;margin:0 0 7px}
+	.ab-social:last-child{margin-bottom:0}
+	.ab-social__txt em{max-width:none}
+	.ab-social__arrow{margin-right:auto}
+	.ab-sp__in{padding:3px 8px}
+	.ab-sp-thumb,.ab-sp-thumb img{width:30px;height:30px}
+	.ab-sp-play{width:28px;height:28px;margin:0 5px;font-size:12px}
+	.ab-sp-nav{width:24px;height:24px;font-size:11px}
+	.ab-sp__no{margin:0 5px 0 0;padding:1px 6px}
+	.ab-sp__dl span{display:none}
+	.ab-sp__dl{padding:5px 7px;margin:0 4px}
+	.ab-sp__artist{display:none}
+	body.ab-sticky-on{padding-bottom:50px}
+}
+@media print{.ab-sticky,.ab-social-box{display:none}}
+/* --- انتهای بلوک ۲۴ (v3.2.4 — نوار پخش: شب‌تیره، کوتاه، با قبلی/بعدی) --- */
+
+/* ==========================================================================
+   بلوک ۲۵ (3.2.1 / بازطراحی در 3.2.3) — «شناسنامۀ آهنگ» (خواننده · آهنگساز · ترانه‌سرا · تنظیم · میکس و مستر · تولید)
+   فایل: inc/ab-credits.php  ·  جایگاه: single.php (بعد از لینک‌های دانلود یا بالای پلیر)
+   پالت سازمانی: #FFFFFF · #185ADB · #111111 — بدون گرادینت
+   حذف فایل لایه ⇒ این قواعد بی‌مصرف می‌مانند و چیزی را نمی‌شکنند.
+   ========================================================================== */
+/* چیدمان افقی: خودِ باکس یک ردیفِ flex است؛ تیتر جلوی چیپ‌ها می‌نشیند و
+   هر آیکن/برچسب/مقدار یک «کادر کوچک» جداست. ارتفاع کل ≈ یک خط متن (۳۴px) و
+   در موبایل چیپ‌ها بدون اسکرول‌بار در خود خط می‌شکنند. */
+.ab-credits{display:flex;align-items:center;flex-wrap:wrap;margin:12px 0;padding:8px 11px;background:var(--ab-page);border:1px solid var(--ab-line);border-radius:14px}
+.ab-credits__title{display:inline-flex;align-items:center;margin:0 2px 0 4px;padding:0;font-size:12.5px;font-weight:700;color:var(--ab-muted);line-height:1.5}
+.ab-credits__title i{font-size:14px;color:var(--ab-blue);margin-left:5px}
+.ab-credits__row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;flex:1 1 300px;min-width:0}
+.ab-credit{display:inline-flex;align-items:center;max-width:100%;margin:0;padding:4px 10px;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:999px;box-shadow:0 1px 1px rgba(17,17,17,.03);font-size:12.5px;line-height:1.5;transition:border-color .16s ease,box-shadow .16s ease}
+.ab-credit:hover{border-color:var(--ab-blue);box-shadow:0 1px 3px rgba(24,90,219,.15)}
+.ab-credit>i{flex:0 0 auto;font-size:13px;color:var(--ab-blue);margin-left:6px}
+.ab-credit__k{flex:0 0 auto;margin-left:6px;font-size:11px;font-weight:500;color:var(--ab-muted);white-space:nowrap}
+.ab-credit__v{min-width:0;font-size:12.5px;font-weight:700;color:var(--ab-text)}
+.ab-credit__v a{color:var(--ab-text);text-decoration:none;border-bottom:1px solid transparent;transition:color .16s ease,border-color .16s ease}
+.ab-credit__v a:hover,.ab-credit__v a:focus{color:var(--ab-blue-accent);border-bottom-color:var(--ab-blue-accent);text-decoration:none}
+.ab-credit__sep{margin:0 4px;color:var(--ab-muted);font-weight:400}
+@media (max-width:767px){
+	.ab-credits{padding:7px 9px;border-radius:12px}
+	.ab-credits__title{width:100%;margin:0 0 2px}
+	.ab-credits__row{gap:5px;flex:1 1 100%}
+	.ab-credit{padding:3px 9px}
+	.ab-credit__v{font-size:12px}
+}
+@media print{.ab-credits{display:none}}
+/* آیکنِ جاافتادۀ قالب: در home.php و 404.php از icofont-microphone-alt استفاده شده، ولی این گلیف
+   در css/icofont.min.css این نسخۀ قالب وجود ندارد (بخشی از آیکن دیده نمی‌شد). با همان گلیف
+   میکروفنِ موجود (icofont-radio-mic) جایگزین شد؛ اگر آیکون‌فونت را کامل عوض کردید، خط بعد را بردارید. */
+.icofont-microphone-alt:before{content:"\ea4e"}
+/* --- انتهای بلوک ۲۵ (v3.2.3 — چیپی/افقی) --- */
+
+/*
+==================================================================================
+   بلوک ۲۶ (نسخۀ 3.3.0) — تراز سراسری، ریتم فاصله، کارت‌ها و خوانایی متن فارسی
+   --------------------------------------------------------------------------------
+   • این بلوک «ساختار» است و دائمی: عرض ظرف‌ها، شبکهٔ کارت‌ها، فاصله‌ها، تایپوگرافی.
+     زیباییِ شیشه‌ای در فایل جداگانه است (css/ab-glass.css) تا با یک define() خاموش
+     شود و این اصلاحات ساختاری دست‌نخورده بمانند.
+   • علت ریشۀ «وسط‌چین نبودن»: .tarlanweb_center عرضِ ثابتِ پله‌ای داشت
+     (1300 → 1200 → 1100 → … → 250) بدون هیچ padding طرفین؛ بین پله‌ها حاشیه‌ها
+     ناگهان عوض می‌شد و حلقۀ منفیِ .song_boxs_posts ul{margin:0 -15px} ریل را ۳۰px
+     از ظرف بیرون می‌زد — با body{overflow-x:hidden} در RTL همان برشِ یک‌طرفه
+     «کج بودن» به‌نظر می‌رسید. راه‌حل: ظرف سیال با max-width + gutter پیوسته،
+     و شبکهٔ CSS Grid با gap (بدون مارجین منفی، بدون float).
+   • هیچ متن تازه‌ای چاپ نمی‌شود، هیچ هوک تازه‌ای روی the_content/template_include
+     نیست، پالت سازمانی بدون گرادینت است (#FFFFFF · #185ADB · #111111).
+   • در آخر فایل است ⇒ با همان ویژگی (0,1,0)/(0,2,0) بر پلّه‌های قبلی می‌برد و
+     نیازی به !important جدید نیست.
+================================================================================== */
+:root{
+--ab-container: 1280px;
+--ab-gutter: clamp(14px, 3.4vw, 32px);
+--ab-gap: 22px;
+--ab-gap-sm: 14px;
+--ab-radius-s: 10px;
+--ab-radius-m: 14px;
+--ab-radius-l: 20px;
+--ab-radius-xl: 26px;
+--ab-radius-pill: 999px;
+--ab-space-1: 4px;
+--ab-space-2: 8px;
+--ab-space-3: 12px;
+--ab-space-4: 16px;
+--ab-space-5: 24px;
+--ab-space-6: 32px;
+--ab-space-7: 44px;
+}
+html{-webkit-text-size-adjust: 100%;text-size-adjust: 100%}
+
+/* ۱) ظرف مرکزی: سیال، متوازن، با حاشیۀ پیوسته — و بدون وسط‌چین کردن متن */
+.tarlanweb_center{
+	width: auto;
+	max-width: var(--ab-container);
+	margin-right: auto;
+	margin-left: auto;
+	padding-right: var(--ab-gutter);
+	padding-left: var(--ab-gutter);
+	text-align: right;
+}
+#centers_box{width: auto;max-width: 100%;min-width: 0}
+.tarlanweb_center img,.tarlanweb_center video,.tarlanweb_center iframe,.tarlanweb_center object,.tarlanweb_center embed{max-width: 100%}
+.single_content_box img,.single_content_box iframe{max-width: 100%;height: auto}
+
+/* ۲) ریل‌های کارت: grid با gap به‌جای float + مارجین منفی ⇒ هیچ سرریزی بیرون ظرف.
+   عمداً از min() استفاده نشده (پشتیبانی سراسری) و اگر grid نباشد آیتم‌ها به‌صورت
+   بلوکِ تمام‌عرض روی هم می‌چینند — یعنی در مرورگر خیلی قدیمی هم نمی‌شکند. */
+.song_boxs_posts ul{display: grid;grid-template-columns: repeat(auto-fill, minmax(188px, 1fr));gap: var(--ab-gap);margin: 0;padding: 0;list-style: none}
+.song_boxs_posts ul li{width: auto;float: none;padding: 0;margin: 0;min-width: 0}
+.vip_img_box ul{display: grid;grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));gap: var(--ab-gap);margin: 0;padding: 0}
+.vip_img_box ul li{width: auto;float: none;padding: 0;margin: 0}
+
+/* ۳) ریتم بخش‌ها */
+.song_boxs{margin: var(--ab-space-7) 0}
+.ab-section-anchor{display: block;height: 0;margin: 0;padding: 0}
+.songs_title_box{display: flex;align-items: center;gap: var(--ab-space-3);width: 100%}
+.songs_title_box h1,.songs_title_box h2,.songs_title_box h3{float: none;margin: 0;font-size: 19px;line-height: 1.5;font-weight: 700;letter-spacing: 0;min-width: 0}
+/* تیتر بخش‌های خانه کوتاه است ⇒ یک‌خطی با «…». ولی تیتر صفحۀ دسته/برچسب (h1) می‌تواند
+   بلند باشد؛ در 3.3.0 تا 3.3.4 همان `nowrap` روی آن هم می‌افتاد و عنوان بریده می‌شد
+   («آهنگ ج…» که مالک دید) ⇒ برای h1/h2 دو خط مجاز با line-clamp. */
+.songs_title_box h3{white-space: nowrap;overflow: hidden;text-overflow: ellipsis;max-width: 60%}
+.songs_title_box h1,.songs_title_box h2{max-width: 72%;display: -webkit-box;-webkit-box-orient: vertical;-webkit-line-clamp: 2;overflow: hidden}
+.songs_title_box .liner{order: 2;flex: 1 1 auto;width: auto;height: 1px;margin: 0;background: var(--ab-line);border-radius: 1px}
+.songs_title_box a{order: 3;float: none;margin: 0;padding: 6px 13px;border-radius: var(--ab-radius-pill);border: 1px solid var(--ab-line);background: var(--ab-blue-soft);font-size: 12px;line-height: 1.6;white-space: nowrap}
+.songs_title_box .clear{display: none}
+
+/* ۴) کارت آهنگ: ارتفاع محتوا‌محور (به‌جای پله‌های ۲۰۰/۲۱۰/۲۳۰px) + هاور بدون پرش */
+.songs_post{width: 100%;height: 100%;min-height: 0;display: flex;flex-direction: column;padding: 0;border-radius: var(--ab-radius-m)}
+/* برش گوشه‌ها روی خودِ figure است، نه کل کارت: با overflow:hidden روی کارت،
+   حلقۀ :focus-visible لینکِ داخل کارت در لبه‌ها بریده می‌شد */
+.songs_post header figure{overflow: hidden;border-radius: var(--ab-radius-m) var(--ab-radius-m) 0 0}
+.songs_post header{flex: 1 1 auto}
+.songs_post footer{margin-top: auto;padding: 0 12px 12px}
+.songs_post header figure{margin: 0 0 var(--ab-space-3)}
+.songs_post header figure img{width: 100%;height: auto;aspect-ratio: 1 / 1;object-fit: cover;border-radius: 0}
+.songs_post header h2{margin: 0;padding: 0 12px 6px;font-size: 14px;line-height: 1.6}
+.songs_post header h2 a{display: block;padding: 0;font-size: 14px;font-weight: 600;line-height: 1.6}
+.songs_post header h2 a span{display: block;font-size: 12px;font-weight: 400;color: var(--ab-muted)}
+.songs_post:hover,.artist_boxs a:hover{-webkit-transform: none;transform: none}
+.songs_post:hover header figure img,.artist_boxs a:hover img{-webkit-transform: scale(1.03);transform: scale(1.03)}
+.songs_post header figure img{transition: transform .28s var(--ab-ease, ease)}
+
+/* ۵) خوانایی متن فارسی در صفحۀ نوشته */
+.single_content_box{font-size: 15px;line-height: 2.05;word-break: normal;overflow-wrap: anywhere}
+.single_content_box p{margin: 0 0 var(--ab-space-4);line-height: 2.05}
+.single_content_box h2,.single_content_box h3,.single_content_box h4{margin: var(--ab-space-6) 0 var(--ab-space-3);font-size: 17px;line-height: 1.7;font-weight: 700}
+.single_content_box h3{font-size: 16px}
+.single_content_box ul,.single_content_box ol{margin: 0 0 var(--ab-space-4);padding-inline-start: 22px}
+.single_content_box ul{list-style: disc}
+.single_content_box ol{list-style: decimal}
+.single_content_box li{list-style: inherit;margin-bottom: var(--ab-space-1);line-height: 1.95}
+.single_content_box blockquote{margin: var(--ab-space-5) 0;padding: var(--ab-space-3) var(--ab-space-4);border-right: 3px solid var(--ab-blue);background: var(--ab-blue-soft);font-style: normal;line-height: 1.95}
+.single_content_box a{text-decoration-thickness: 1px;text-underline-offset: 3px}
+.single_content_box table{width: 100%;border-collapse: collapse}
+.single_content_box td,.single_content_box th{padding: 8px 10px;border: 1px solid var(--ab-line)}
+
+/* ۶) دیدگاه‌ها و فرم‌ها */
+#commentform p{margin: 0 0 var(--ab-space-3)}
+#commentform input[type="text"],#commentform input[type="email"],#commentform input[type="url"],#commentform textarea{width: 100%;max-width: 520px;padding: 9px 12px;border: 1px solid var(--ab-line);border-radius: var(--ab-radius-s);font-size: 13.5px;line-height: 1.8}
+#commentform textarea{min-height: 120px}
+#commentform input[type="submit"]{padding: 9px 18px;border: 0;border-radius: var(--ab-radius-pill);background: var(--ab-blue);color: #fff;font-size: 13px;cursor:pointer}
+
+/* ۷) صفحۀ ۴۰۴ (ساختار؛ شیشه در ab-glass.css) */
+.ab-404-hero{display: grid;grid-template-columns: auto 1fr;gap: var(--ab-space-5);align-items: center;padding: var(--ab-space-6);margin: var(--ab-space-6) 0}
+.ab-404-badge{grid-column: 1;font-size: clamp(44px, 9vw, 76px);line-height: .95;font-weight: 800;color: var(--ab-blue);letter-spacing: -2px;text-align: center;direction: ltr}
+.ab-404-hero__body{grid-column: 2;min-width: 0}
+.ab-404-hero__body h1{margin: 0 0 var(--ab-space-2);font-size: 21px;line-height: 1.6}
+.ab-404-hero__body p{margin: 0;font-size: 13.5px;line-height: 2}
+.ab-404-actions{display: flex;flex-wrap: wrap;gap: var(--ab-space-3);align-items: center;margin: var(--ab-space-5) 0 0}
+/* جست‌وجو/لینک‌ها/تصویر ۴۰۴ از قبل در «بلوک ۲۱» همین فایل است؛ اینجا فقط شعاع‌ها و
+   فاصله‌ها با توکن هماهنگ می‌شوند (تکرار قواعدِ قبلی را اضافه نکردم). */
+.ab-404-search{margin: var(--ab-space-5) 0 0}
+.ab-404-links{margin: var(--ab-space-4) 0 0;padding: 0;list-style: none}
+.ab-404-links li{list-style: none}
+.ab-404-search input,.ab-404-search button,.ab-404-links a{border-radius: var(--ab-radius-pill)}
+.ab-404-links a{display: inline-flex;align-items: center}
+.ab-404-links a i{margin-left: 6px;color: var(--ab-blue);font-size: 15px}
+.ab-404-home{display: inline-flex;align-items:center;padding: 10px 20px;background: var(--ab-blue);color: #fff;font-size: 13px;line-height: 1.6;text-decoration:none}
+.ab-404-home i{margin-left: 7px}
+.ab-404-art{display: block;width: 100%;max-width: 560px;height: auto;margin: var(--ab-space-5) auto 0;border-radius: var(--ab-radius-l)}
+.ab-404 .songs_title_box h3,.ab-404 .songs_title_box h1{max-width: none}
+@media (max-width: 700px){
+	.ab-404-hero{grid-template-columns: 1fr;gap: var(--ab-space-3);text-align: center;justify-items: center}
+	.ab-404-hero__body{grid-column: 1;text-align: center}
+	.ab-404-actions,.ab-404-search,.ab-404-links{justify-content: center}
+	.songs_title_box h1,.songs_title_box h2,.songs_title_box h3{max-width: none;white-space: normal}
+	.song_boxs_posts ul{gap: var(--ab-gap-sm)}
+}
+
+.ab-404-back{display: inline-flex;align-items: center;padding: 10px 16px;border: 1px solid var(--ab-line);border-radius: var(--ab-radius-pill);background: var(--ab-blue-soft);font-size: 12.5px;line-height: 1.6;text-decoration: none}
+.ab-404-back i{margin-left: 7px;color: var(--ab-blue);font-size: 14px}
+
+/* ۸) لنگرهای کوچک: تراز آیکن/متن در چیپ‌ها و دکمه‌های مشترک */
+.ab-credits__title,.ab-sp__in,.songs_title_box a,.ab-404-links a,.dl_links_box a,.dl_linksv_box a{-webkit-font-smoothing: antialiased}
+@media (max-width: 767px){.song_boxs{margin: var(--ab-space-5) 0}}
+@media print{.ab-404-hero .ab-404-badge{display: none}}
+/* ۹) صفحۀ نوشته تکی: سلسله‌مراتب، ظرف و شبکۀ لینک‌های دانلود */
+.single_posts{padding: var(--ab-space-6) var(--ab-space-5);margin-bottom: var(--ab-space-6);border-radius: var(--ab-radius-l)}
+.single_posts > header{padding: 0}
+.tarlanweb_post_box header{margin: 0 0 var(--ab-space-4);clear: both}
+.tarlanweb_post_box header h1{font-size: clamp(19px, 2.3vw, 23px);line-height: 1.6;font-weight: 700;padding-bottom: 10px}
+.related_posts{padding: var(--ab-space-5);margin-bottom: var(--ab-space-6);border-radius: var(--ab-radius-l)}
+.dl_title{margin: 0 0 var(--ab-space-3);font-size: 15px;font-weight: 700;line-height: 1.7}
+.dl_linksv_box ul{display: grid;grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));gap: var(--ab-space-2);margin: 0;padding: 0;list-style: none}
+.dl_linksv_box ul li{width: auto;padding: 0;display: block;list-style: none}
+@media (max-width: 600px){
+	.single_posts{padding: var(--ab-space-4) var(--ab-space-3);border-radius: var(--ab-radius-m)}
+	.related_posts{padding: var(--ab-space-4) var(--ab-space-3)}
+}
+
+/* --- انتهای بلوک ۲۶ (v3.3.0 — تراز سراسری + کارت‌ها + خوانایی) --- */
+
+/* ============================================================================================
+   بلوک ۲۷ (نسخۀ 3.3.3) — چهار ایراد گزارش‌شده توسط مالک، همه با CSS و بدون جااسکریپت تازه
+   ------------------------------------------------------------------------------------------
+   ۱) ریل‌ها در موبایل (خواننده‌ها / آهنگ‌ها / مرتبط‌ها): «هر ردیف یک دونه و کلی فضا»
+      علت: در ۴۵۰pxِ قالب `.artist_boxs a{width:100%}` نوشته شده وowl carousel
+      هیچ‌گاه استایلش لود نمی‌شود (فقط js/owl.carousel.js هست، owl.carousel.css در قالب نیست)
+      ⇒ هیچ اسلایدری واقعاً اسلایدر نمی‌شود و آیتم‌ها بلوکی روی هم می‌چینند.
+      راه‌حل: ریل واقعی با scroll-snap بومی (لمسی، بدون کتابخانه) + گرید فشرح دو ستونه برای
+      فهرست‌های بلند (نتیجۀ جست‌وجو، بایگانی‌ها، صفحۀ خواننده). همه با :not(.owl-loaded) تا اگر
+      روزی owl کار کرد، owl کنترل را پس بگیرد.
+   ۲) کشی منوی موبایل: `.mobiles_menu` و `.bodydeactive` با position:fixed داخل
+      `#mobiles_header` هستند؛ لایۀ شیشۀ 3.3.0 روی همان المنت backdrop-filter گذاشت و
+      backdrop-filter (مثل filter/transform) «جرم مرجع» فرزندانه fixed را عوض می‌کند
+      ⇒ کشی به ارتفاع هدر (۶۵px) گیر می‌کرد و عملاً دیده نمی‌شد. در ab-glass.css اصلاح شد
+      (شیشه به ::before منتقل شد)؛ اینجا فقط ابعاد/کنتراست خود کشی درست می‌شود.
+   ۳) دیدگاه‌ها: قاعدۀ قالب `.commentlist li{background:rgba(255,255,255,.2);border:1px solid
+      rgba(0,0,0,.4)}` روی صفحۀ سفید یعنی «بی‌رنگ با حاشیۀ خاکستریِ خشن» و `.fn a` سبز است.
+   ۴) ۴۰۴ در حالت روشن: در ab-glass.css یک قاعدۀ گروهی، background سفیدِ شیشه را روی
+      input/button/لینک‌ها نشاند و رنگ متنِ سفیدِ قبلی باقی ماند ⇒ سفید روی سفید.
+   ========================================================================================== */
+
+/* ---- ۱) ریل‌ها ---- */
+.song_boxs .songs_title_box{margin-bottom:var(--ab-space-4)}
+@media (max-width: 767px){
+	/* ریل‌های صفحۀ اصلی: اسلایدر لمسی */
+	body.home .song_boxs .song_boxs_posts ul{
+		display:flex;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;
+		scroll-snap-type:x mandatory;scrollbar-width:none;gap:var(--ab-gap-sm);
+		padding:2px 1px 12px;margin:0;list-style:none
+	}
+	body.home .song_boxs .song_boxs_posts ul::-webkit-scrollbar{display:none;width:0;height:0}
+	body.home .song_boxs .song_boxs_posts ul>li{flex:0 0 clamp(140px,43vw,172px);width:auto;margin:0;scroll-snap-align:start}
+	/* فهرست‌های بلند: دو ستون فشرده (نه یک ستونِ کشیده) */
+	.song_boxs_posts ul{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ab-gap-sm)}
+	.songs_post .ft_box_head{padding:8px 10px}
+	.songs_post h2{font-size:12.5px}
+	.songs_post h2 span{font-size:11.5px}
+	.song_boxs+.song_boxs{margin-top:var(--ab-space-6)}
+}
+@media (max-width: 400px){
+	body.home .song_boxs .song_boxs_posts ul>li{flex-basis:clamp(132px,46vw,158px)}
+}
+
+/* ---- ۲) کشی منوی موبایل ---- */
+.mobiles_menu{width:min(82vw,256px);background:var(--ab-charcoal);padding-bottom:16px;-webkit-overflow-scrolling:touch}
+.mobiles_menu .top_logo_title{background:transparent;padding:14px 14px 10px;border-bottom:1px solid rgba(255,255,255,.10)}
+.mobiles_menu .top_logo_title img{padding:0;max-width:140px;height:auto}
+#cssmenu > ul > li > a{padding:11px 16px;font-size:13.5px;line-height:1.8}
+#cssmenu > ul > li > a:hover,#cssmenu > ul > li.active > a,#cssmenu > ul > li.open > a{background:rgba(255,255,255,.07)}
+#cssmenu ul ul{background:rgba(0,0,0,.20)}
+#cssmenu ul ul li a{padding:9px 30px 9px 22px;font-size:12.5px;line-height:1.8}
+#cssmenu ul ul li a:hover{background:rgba(255,255,255,.06)}
+.mobiles_menu .socials_box{background:transparent;padding:10px 0 0;margin:0;border-top:1px solid rgba(255,255,255,.10)}
+.mobiles_menu .socials_box a{margin:4px 5px;background:rgba(255,255,255,.08)}
+.ab-mobile-menu-fallback{list-style:none;margin:0;padding:0}
+.ab-mobile-menu-fallback li a{display:block;padding:11px 16px;font-size:13.5px;line-height:1.8;color:#fff}
+.ab-mobile-menu-fallback li+li{border-top:1px solid rgba(255,255,255,.07)}
+
+/* ---- ۳) دیدگاه‌ها ---- */
+#comments{margin-top:var(--ab-space-7)}
+.comments-title,.comment-title{font-size:16px;font-weight:700;line-height:1.7;margin:0 0 var(--ab-space-4)}
+ol.commentlist,ul.commentlist{list-style:none;margin:0 0 var(--ab-space-5);padding:0}
+.commentlist li{width:auto;background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:var(--ab-radius-m);padding:14px 16px;margin:0 0 12px;line-height:1.95}
+.commentlist .children{list-style:none;margin:12px 0 0;padding-inline-start:clamp(10px,3.2vw,22px)}
+.commentlist li .children li{background:var(--ab-blue-soft)}
+.commentlist li footer{border-bottom:1px solid var(--ab-line);padding-bottom:8px;margin-bottom:9px}
+#comments .commentlist li .avatar{width:42px !important;height:42px !important;border-radius:50% !important;object-fit:cover;box-shadow:0 0 0 2px var(--ab-line)}
+.commentlist .fn{float:none;display:inline-block;line-height:1.5;font-size:14px;font-weight:700;margin:0 10px 0 0}
+.commentlist .fn a{color:var(--ab-blue-accent) !important;text-decoration:none}
+.commentlist .fn a:hover{text-decoration:underline}
+.commentlist .says{display:none}
+.commentlist .comment-date,.commentlist .commentmeta,.commentlist .comment-awaiting-moderation{float:none;display:block;font-size:11.5px;line-height:1.8;color:var(--ab-muted)}
+.commentlist .comment-content{float:none;width:100%;text-align:inherit;font-size:13.5px;line-height:2.05;overflow-wrap:anywhere}
+.commentlist .comment-content p{margin:0 0 8px}
+.commentlist .reply,.commentlist .comment-replay{float:none;display:block;margin-top:8px}
+.commentlist .reply a,.commentlist .comment-replay a{display:inline-flex;align-items:center;float:none;padding:5px 13px;border:1px solid var(--ab-line);border-radius:var(--ab-radius-pill);background:var(--ab-surface);color:var(--ab-text);font-size:12px;line-height:1.6}
+.commentlist .reply a:hover,.commentlist .comment-replay a:hover{border-color:var(--ab-blue);color:var(--ab-blue-accent);background:var(--ab-blue-soft)}
+#respond{width:100%;margin:var(--ab-space-6) 0 0;padding:var(--ab-space-5) var(--ab-space-4);border:1px solid var(--ab-line);border-radius:var(--ab-radius-l);background:var(--ab-surface)}
+#reply-title{margin:0 0 var(--ab-space-4);font-size:15px;font-weight:700;padding:0}
+#respond .comment-form{display:grid;gap:var(--ab-space-3);grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr))}
+#respond .comment-form-comment,#respond .form-submit,#respond .comment-notes,#respond .logged-in-as,#respond p{grid-column:1/-1;margin:0}
+#respond label{display:block;font-size:12px;font-weight:600;margin-bottom:4px}
+#respond .comment-form-author,#respond .comment-form-email,#respond .comment-form-url{display:block}
+#respond input[type="text"],#respond input[type="email"],#respond input[type="url"],#respond textarea{width:100%;max-width:none;padding:10px 12px;font-size:13.5px;line-height:1.8;color:var(--ab-text);background:var(--ab-page);border:1px solid var(--ab-line);border-radius:var(--ab-radius-s)}
+#respond textarea{min-height:126px;resize:vertical}
+#respond input:focus,#respond textarea:focus{outline:none;border-color:var(--ab-blue);box-shadow:0 0 0 3px rgba(24,90,219,.16)}
+#respond .form-submit input[type="submit"],.form-submit #submit{padding:10px 22px;border:0;border-radius:var(--ab-radius-pill);background:var(--ab-blue);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
+#respond .cancel-comment-reply-link{display:inline-block;margin-inline-start:10px;font-size:12px;color:var(--ab-muted)}
+#respond .required{color:var(--ab-blue-accent)}
+.comment-navigation,.navigation.comment-navigation{display:flex;justify-content:space-between;gap:10px;margin:var(--ab-space-4) 0 0;font-size:12.5px}
+.nocomments{font-size:13px;color:var(--ab-muted);margin:var(--ab-space-4) 0 0}
+.night .commentlist li,.night #respond{background:var(--ab-charcoal)}
+.night .commentlist li .children li{background:rgba(255,255,255,.04)}
+
+/* ---- ۴) ۴۰۴ در حالت روشن (و شب) ---- */
+.ab-404-search{display:flex;flex-wrap:wrap;gap:8px;align-items:stretch}
+.ab-404-search input[type="search"],.ab-404-search input[type="text"]{
+	flex:1 1 220px;min-width:0;min-height:44px;padding:10px 14px;font-size:13.5px;line-height:1.6;
+	color:var(--ab-text);background:var(--ab-surface);border:1px solid var(--ab-line);border-radius:var(--ab-radius-pill);
+	box-shadow:none;-webkit-appearance:none;appearance:none
+}
+.ab-404-search input::placeholder{color:var(--ab-muted);opacity:1}
+.ab-404-search input:focus{outline:none;border-color:var(--ab-blue);box-shadow:0 0 0 3px rgba(24,90,219,.16)}
+.ab-404-search button{display:inline-flex;align-items:center;gap:7px;min-height:44px;padding:10px 20px;font-size:13px;font-weight:600;color:#fff;background:var(--ab-blue);border:1px solid transparent;border-radius:var(--ab-radius-pill);cursor:pointer;box-shadow:none}
+.ab-404-search button:hover{filter:brightness(1.06)}
+.ab-404-links a,.ab-404-back{color:var(--ab-text);background:var(--ab-surface);border:1px solid var(--ab-line)}
+.ab-404-links a:hover,.ab-404-back:hover{color:var(--ab-blue-accent);background:var(--ab-blue-soft);border-color:var(--ab-blue)}
+.ab-404-home{color:#fff;background:var(--ab-blue);border:1px solid transparent}
+.ab-404-home:hover{color:#fff;background:var(--ab-blue-accent)}
+.night .ab-404-search input[type="search"],.night .ab-404-search input[type="text"],.night .ab-404-links a,.night .ab-404-back{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);color:#ededed}
+/* انتهای بلوک ۲۷ (v3.3.3) */
+
+/* ============================================================================================
+   بلوک ۲۸ (نسخۀ 3.3.4) — فلاشِ «کل صفحه را گرفتنِ اسلایدر» هنگام رفرش
+   ------------------------------------------------------------------------------------------
+   علت: `inc/ab-perf.php` اسکریپت‌ها را defer می‌کند (JAVANSEDA_PERF_DEFER=true — کار درست برای
+   سرعت) و owl هنگام init کلاس `.owl-loaded` را اضافه می‌کند. تুকۀ owl که در style.css قالب
+   هست، قاعدۀ `.owl-carousel{display:none}` را ندارد؛ پس تا لحظۀ init، هر ۵ آیندِ
+   `.vip_top_slider` (و همهِ خواننده‌ها) پشت‌سرهم و تمام‌عرض چیده می‌شوند ⇒ «یک‌دفعه کل صفحه».
+   راه‌حل CSS-خالص: تا قبل از `.owl-loaded` فقط آیند اول چیده شود. همان چیزی که بعد از init
+   هم دیده می‌شود ⇒ بدون پرشِ ارتفاع (CLS)، بدون JS تازه، بدون درخواست تازه.
+   نکته: تصاویر ۲ تا ۵ از قبل loading="lazy" هستند، پس پنهان‌کردنشان بار شبکه را هم کم می‌کند.
+   اگر جااسکریپت کلاً خاموش باشد، کاربر همین آیند اول را می‌بیند (و لینک «مشاهده بیشتر» پایین
+   همان بخش، بقیه را دارد) — یعنی هیچ محتوایی از دسترس/Crawl خارج نمی‌شود.
+   ========================================================================================== */
+.vip_top_slider:not(.owl-loaded),
+.artists_slider:not(.owl-loaded){display:block;overflow:hidden}
+.vip_top_slider:not(.owl-loaded)>:nth-child(n+2),
+.artists_slider:not(.owl-loaded)>:nth-child(n+2){display:none}
+/* انتهای بلوک ۲۸ (v3.3.4) */
+
+/* ============================================================================================
+   بلوک ۲۹ (نسخۀ 3.3.5) — ایرادهای گزارش‌شدۀ صفحۀ دسته‌ها، ریل هنرمندان و نایت‌مود
+   ------------------------------------------------------------------------------------------
+   ۱) عنوان دسته با «…» بریده می‌شد: `white-space:nowrap` + `text-overflow:ellipsis` که برای
+      تیتر کوتاهِ بخش‌ها (h3) نوشته شده بود، روی `h1` صفحۀ دسته هم می‌افتاد.
+   ۲) تیتر صفحۀ دسته زیرش «کادر سفید خالی» داشت → در category.php گارد شد + در ab-glass.css
+      قاعدۀ .archive_txt_box هم با :has() مشروط شد تا در بقیۀ قالب‌ها هم کادرِ بی‌محتوا نسازد.
+   ۳) ریل هنرمندان «بهم چسبیده»: دو علت — (الف) `.artist_boxs a` روی `width:180px` قفل بود، درحالی‌که
+      owl عرض هر آیتم را خودش از پهنای استیج و تعداد آیتم حساب می‌کند ⇒ در عرض‌های تنگ دایرۀ 150px
+      از جایش بیرون می‌زد و روی همسایه می‌افتاد (همان «چسبیده»); (ب) فاصلۀ افقی بین آیتم‌ها صفر بود،
+      چون تکهٔ owlِ قالب `margin` آیتم‌ها را ندارد. رفع: `max-width:100%` (بدون تغییر طراحی) + فاصله
+      روی `padding-inline` خودِ `.owl-item`. حلقۀ 20px عمودیِ قالب (خط 905) هم دست‌نخورده مانده.
+   ========================================================================================== */
+.artist_boxs a{width: 180px;max-width: 100%;height: auto;padding: 0;direction: rtl;text-align: center}
+.artist_boxs a img{width: 150px;height: auto;max-width: 100%;box-shadow: 0 0 0 1px var(--ab-line)}
+.artist_boxs a span{max-width: 100%;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;padding: 0 2px;font-size: 12.5px;line-height: 1.8}
+.artists_slider .owl-item{padding: 20px 9px 0}
+.night .artist_boxs a img{box-shadow: 0 0 0 1px rgba(255,255,255,.14)}
+@media (max-width: 767px){
+	.artist_boxs a span{font-size: 11.5px}
+	.artists_slider .owl-item{padding: 12px 7px 0}
+}
+/* سازگاری نایت‌مود (v3.3.5): .ab-social* و .ab-credit* که در 3.2.x با رنگ صلبِ روشن نوشته شده بودند
+   به توکن‌های --ab-* تبدیل شدند تا در حالت شب «کارت سفید با متن مشکی» نشوند؛ در حالت روشن
+   تنها تفاوت‌ها ملایم‌تر شدن مرزها و کمی پررنگ‌تر شدن رنگ‌های کمکی است. */
+/* انتهای بلوک ۲۹ (v3.3.5) */
+
+/* ============================================================================================
+   بلوک ۳۰ (نسخۀ 3.3.6) — پلیرِ صفحۀ آهنگ و دو اصلاحِ سرعت
+   ------------------------------------------------------------------------------------------
+   ۱) «پلیر چسبیده/ناهماهنگ»: داخل .player دو float بود با عرض‌های ناسازگار
+      (`.player_controls{width:170px}` + `.info-box{width:83%}` ⇒ جمعشان از عرض ظرف بیشتر
+      می‌شد و ردیف می‌شکست) و قالب برای ترمیم، در موبایل `.track-info-box` را با
+      `position:absolute;top:-40px` به بالای کارت پرت می‌کرد ⇒ تیتر روی خط بالا می‌چسبید.
+      ردیف با flex جمع شد؛ نیازی به عرض درصدی و absolute نبود.
+   ۲) `.play-list` (لیست آهنگ‌های آلبوم) پنل 300px با `position:absolute;top:75px` بود ⇒ روی
+      محتوای زیرِ پلیر می‌افتاد و در موبایل از کارت بیرون می‌زد؛ بلوک هم‌عرضِ پایینِ کارت شد.
+   ۳) سرعت: `.nowPlayingIcon` (چهار جا در single.php) چهار <span> با `animation:…infinite` داشت
+      که «عرض» را انیمیت می‌کرد ⇒ هر ۰.۳ ثانیه یک layout کامل روی صفحۀ پخش. به
+      `transform:scaleX` تبدیل شد (فقط compositor) و ریتم از 0.3s به 1.3s رسید.
+   ۴) سرعت: `will-change:transform` روی مارکیِ تیکر خبر حذف شد (لایۀ دائمی می‌سازد؛ خودِ
+      `animation` لایه می‌گیرد) و `backdrop-filter` در css/ab-glass.css برای ≤۸۰۰px خاموش شد.
+   ========================================================================================== */
+.music_box_player{height: auto;min-height: 80px;padding: 12px 14px;margin: 18px 0}
+.music_box_player .player{display: flex;flex-direction: row-reverse;align-items: center;gap: 14px;height: auto}
+.player_controls{float: none;width: auto;height: auto;flex: 0 0 auto;display: flex;align-items: center;gap: 12px}
+.music_box_player .info-box{float: none;width: auto;min-width: 0;flex: 1 1 auto;height: auto;display: flex;align-items: center;gap: 12px}
+.music_box_player .info-box .track-info-box{float: none;width: auto;min-width: 0;height: auto;margin-top: 0;position: static;display: flex;align-items: baseline;gap: 8px;flex: 0 1 auto}
+.music_box_player .progress-box{float: none;width: auto;min-width: 0;flex: 1 1 auto;margin-top: 0}
+.music_box_player .info-box .track-info-box .audio-time{width: auto;padding: 0}
+.music_box_player .progress-box .progress-cell .progress{height: 6px;border-radius: 999px;background: var(--ab-line)}
+/* لیست آلبوم: از پنل مطلق به بخش هم‌عرضِ پایینِ همان کارت (حاشیه‌ها با padding کارت یکی است) */
+.music_box_player .play-list{position: static;width: auto;max-width: none;margin: 12px -14px -12px;padding: 2px 14px 12px;background: transparent;box-shadow: none;border: 0;border-top: 1px solid var(--ab-line);border-radius: 0;z-index: auto}
+.music_box_player .play-list .play-list-row{margin: 7px 0}
+.music_box_player .play-list .play-list-row .track-title .playlist-track{color: var(--ab-text)}
+.single_content_box .music_box_player .play-list{margin-top: 12px}
+#index_music_player{background: transparent;border: 0;border-radius: 0;box-shadow: none;padding: 0;margin: 0 0 26px}
+/* v3.4.0 — پوسته دیگر جعبه نیست (قبلاً همین‌جا + خط 927 قالب مادر هر دو بکس می‌ساختند);
+   تنها جعبه، کارتِ .music_box_player در بلوک ۳۳ است. */
+/* انیمیشن «در حال پخش»: فقط compositor، بدون تغییر عرض */
+.nowPlayingIcon span{width: 22px;transform-origin: right center;-webkit-backface-visibility: hidden;backface-visibility: hidden}
+.nowPlayingIcon span:nth-child(1){-webkit-animation: ab-bar 1.3s ease-in-out infinite;animation: ab-bar 1.3s ease-in-out infinite}
+.nowPlayingIcon span:nth-child(2){-webkit-animation: ab-bar 1.3s ease-in-out -.32s infinite;animation: ab-bar 1.3s ease-in-out -.32s infinite}
+.nowPlayingIcon span:nth-child(3){-webkit-animation: ab-bar 1.3s ease-in-out -.64s infinite;animation: ab-bar 1.3s ease-in-out -.64s infinite}
+.nowPlayingIcon span:nth-child(4){-webkit-animation: ab-bar 1.3s ease-in-out -.96s infinite;animation: ab-bar 1.3s ease-in-out -.96s infinite}
+@-webkit-keyframes ab-bar{0%,100%{transform: scaleX(.2)}50%{transform: scaleX(.78)}}
+@keyframes ab-bar{0%,100%{transform: scaleX(.2)}50%{transform: scaleX(.78)}}
+@media (max-width: 600px){
+	.music_box_player{padding: 12px}
+	.music_box_player .player{flex-wrap: wrap-reverse;gap: 10px}
+	.player_controls{flex: 1 1 auto;justify-content: center}
+	.music_box_player .info-box{flex: 1 1 100%}
+	.music_box_player .play-list{margin: 10px -12px -12px;padding: 2px 12px 12px}
+}
+@media (prefers-reduced-motion: reduce){
+	.nowPlayingIcon span{-webkit-animation: none;animation: none;transform: scaleX(.6)}
+	.ab-news .ab-news-track{animation: none}
+}
+/* انتهای بلوک ۳۰ (v3.3.6) */
+
+/* ============================================================================================
+   بلوک ۳۱ (نسخۀ 3.3.7) — آمارِ اثر روی کاور + بیرون‌آمدن دایرۀ هنرمند از کادر مربع
+   ------------------------------------------------------------------------------------------
+   ۱) `.ab-card-stats` را `inc/songs_post.php` چاپ می‌کند (بازدید از متای `views`، میانگین
+      رأی از `kksr_avg` یا `kksr_ratings ÷ kksr_casts`). لایه روی خودِ figure نشسته،
+      `pointer-events:none` دارد ⇒ لینک کارت دست‌نخورده می‌ماند و چون absolute است، هیچ
+      تغییر چیدمان/CLS ندارد.
+   ۲) مات‌وشیشه‌ای شدن کاور *فقط در حالت hover/focus* اعمال می‌شود، نه همیشه: blur روی
+      دوازده کارتِ هم‌زمان گران است، ولی روی یک کارتِ در حال اشاره تقریباً رایگان.
+   ۳) روی دستگاه لمسی (hover:none) هیچ فیلتری نیست و آمار به‌صورت دو چیپِ تیره روی
+      پایینِ کاور همیشه دیده می‌شود ⇒ هم خوانا، هم بی‌هزینه.
+   ۴) ستاره‌ها بدون گرادینت: یک ردیف ☆ و یک ردیف ★ که با `width` درصدی بریده می‌شود.
+   ۵) دایرۀ هنرمند: کادر گوشه‌گردِ شیشه‌ای از `css/ab-glass.css` برداشته شد (همان
+      «مربع/مستطیل دور دایره»)؛ حالا فقط حلقۀ باریک خودش می‌ماند و در hover آبی می‌شود.
+   ========================================================================================== */
+.songs_post header figure{position: relative}
+.ab-card-stats{position: absolute;inset: 0;display: flex;align-items: flex-end;padding: 7px;opacity: 0;pointer-events: none;background: rgba(255,255,255,.26);transition: opacity .16s ease}
+.night .ab-card-stats{background: rgba(17,17,17,.30)}
+.songs_post:hover .ab-card-stats,
+.songs_post:focus-within .ab-card-stats{opacity: 1}
+@supports (backdrop-filter: blur(2px)){
+	.songs_post:hover .ab-card-stats,
+	.songs_post:focus-within .ab-card-stats{-webkit-backdrop-filter: blur(6px) saturate(1.12);backdrop-filter: blur(6px) saturate(1.12)}
+}
+.ab-card-stats__in{display: flex;align-items: center;flex-wrap: wrap;gap: 5px;width: 100%}
+.ab-cs-num{display: inline-flex;align-items: center;gap: 4px;max-width: 100%;padding: 3px 8px;border-radius: var(--ab-radius-pill, 999px);background: var(--ab-glass-bg-strong, rgba(255,255,255,.88));border: 1px solid var(--ab-glass-border, rgba(17,17,17,.08));color: var(--ab-text, #222);font-size: 11px;font-weight: 700;line-height: 1.7;letter-spacing: .1px;white-space: nowrap}
+.ab-cs-num i{font-style: normal;font-size: 12.5px}
+.ab-cs-num>i:first-child{font-size: 12px;color: var(--ab-blue-accent, #185ADB)}
+.ab-cs-num em{font-style: normal;font-weight: 500;color: var(--ab-muted, #555);font-size: 10px}
+.ab-cs-stars{position: relative;display: inline-block;direction: ltr;font-size: 11px;line-height: 1.4;letter-spacing: 1px;color: var(--ab-muted, #555)}
+.ab-cs-stars>b{position: absolute;top: 0;left: 0;display: block;overflow: hidden;white-space: nowrap;color: var(--ab-cs-star, var(--ab-blue, #185ADB));font-weight: 400}
+.artist_boxs a:hover img,
+.artist_boxs a:focus img{box-shadow: 0 0 0 2px var(--ab-blue-accent, #185ADB), 0 8px 20px rgba(24,90,219,.20)}
+.night .ab-cs-num{border-color: rgba(255,255,255,.10)}
+@media (hover: none){
+	.ab-card-stats{background: transparent;padding: 6px}
+	.ab-cs-num{background: rgba(17,17,17,.56);border-color: transparent;color: #FFFFFF;text-shadow: 0 1px 2px rgba(0,0,0,.35)}
+	.ab-cs-num>i:first-child,.ab-cs-num em{color: rgba(255,255,255,.82)}
+	.ab-cs-stars{color: rgba(255,255,255,.5)}
+	.ab-cs-stars>b{color: var(--ab-cs-star, #FFFFFF)}
+}
+@media (prefers-reduced-motion: reduce){
+	.ab-card-stats{transition: none}
+}
+/* ابزارک خوانا: اگر قالب .screen-reader-text را ندارد، خودمان تعریفش می‌کنیم
+   (متن‌های «بازدید این اثر» / «از ۵» فقط برای صفحه‌خوان است، نه چشم) */
+.screen-reader-text{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);border:0;white-space:nowrap}
+/* انتهای بلوک ۳۱ (v3.3.7) */
+
+/* ==========================================================================
+   بلوک ۳۲ (3.3.8 · اصلاح 3.3.9) — دسترس‌پذیریِ هدر + id یکتای پلیرها
+   فایل‌ها: header.php (wp_body_open + .ab-skip-link) · single.php و
+            inc/tarlanweb_player.php (data-ab-player + id یکتا، بدون هیچ
+            display:none — در 3.3.8 پنهان‌سازی چیدمان پلیر را به‌هم ریخت)
+   پالت سازمانی بدون گرادینت · خاموشی: JAVANSEDA_SKIP_LINK / JAVANSEDA_UI_GUARD
+   ========================================================================== */
+
+/* ۱) لینک «پرش به محتوا»: پیش از اولین Tab دیده نمی‌شود، با فوکوس ظاهر می‌شود
+      (mkp در style.css برای آیتم‌های منو z-index:99999 دارد؛ ما زیر آن می‌مانیم). */
+.ab-skip-link{position:absolute;top:8px;right:8px;left:auto;z-index:99998;display:inline-block;padding:9px 15px;background:var(--ab-blue);color:var(--ab-white);font-size:13px;font-weight:700;line-height:1.4;border-radius:10px;text-decoration:none;box-shadow:0 6px 18px rgba(17,17,17,.18);transform:translateY(-220%);transition:transform .16s ease}
+.ab-skip-link:focus,.ab-skip-link:focus-visible{transform:none;outline:2px solid var(--ab-blue-accent);outline-offset:2px;color:var(--ab-white)}
+.night .ab-skip-link{background:var(--ab-blue-accent);color:#0b0f16;box-shadow:0 6px 18px rgba(0,0,0,.5)}
+
+/* ۲) پلیر دوم: js/scripts.js فقط یک پلیر را bind می‌کند (getElementById + querySelector
+      سراسری) ⇒ در صفحۀ آهنگِ آلبوم‌دار، ردیف کنترلِ پلیر دوم به صدای پلیر اول وصل
+      نبود. کاری که کردیم فقط «یکتاکردن idها» است: پلیر اول همان audio/volume-bar را
+      نگه می‌دارد (پس JS قالب دقیقاً مثل قبل کار می‌کند) و بعدی‌ها audio-2,… می‌شوند تا
+      DOM معتبر شود. عمداً هیچ قاعدۀ display:none برای پلیرها افزوده نشد: ترتیب رندر
+      پلیرها بین home/single/sidebarها یکسان نیست و هر پنهان‌سازی بر اساس شمارهٔ
+      «اول/دوم» روی برخی صفحه‌ها پلیرِ درست را بی‌کار می‌کند (تجربۀ 3.3.8). اگر روزی
+      JS چندنمونگی شد، همان لحظه می‌توان روی data-ab-player استایل بست. */
+
+/* ۳) حالت خاموشی JAVANSEDA_SKIP_LINK: لینک پرش چاپ نمی‌شود، پس قاعده هم لازم نیست */
+
+/* انتهای بلوک ۳۲ (v3.3.8 · اصلاحیۀ 3.3.9) */
+
+/* ============================================================================================
+   بلوک ۳۳ (نسخۀ 3.4.0) — پلیر: یک باکس، ردیفِ منظم، کنترل لمسیِ بزرگ، لیست آلبوم تمیز
+   ------------------------------------------------------------------------------------------
+   گزارش: «پلیرِ صفحۀ اصلی بد است، چسبیده به هم، و خودش باکس دارد و داخل یک باکس دیگر».
+   علتِ باکسِ دوبل: #index_music_player دو بار جعبه می‌گرفت (خط 927ِ قالب مادر + بلوک ۳۰)
+   و .music_box_player هم کارتِ لایۀ شیشه‌ای (css/ab-glass.css:200) را داشت ⇒ سه تعریف روی
+   دو عنصر با سه شعاع مختلف (7px / 14px / 20px). الآن: پوسته بی‌جعبه شد (بلوک ۳۰ اصلاح شد)
+   و .music_box_player از گروه کارتِ ab-glass.css بیرون رفت ⇒ تنها جعبه، همین بلوک است.
+   چرا فقط CSS و نه بازنویسی تمپلیت؟ چون js/scripts.js به ساختار DOM وابسته است:
+     · .progress-box.children[0].children[0].children[1] ⇒ اندیکاتورِ پخش (خط 148)
+     · .play-list-row با ترتیب [دکمه، شمارۀ ترک، لینک] (خط 217)
+     · .album_show_hide ⇒ slideToggle روی #index_music_player .play-list (خط 97)
+   پس هیچ تگِ تازه‌ای لازم نشد و «لیست تا کلیک پنهان بماند» (خط 1385) هم دست‌نخورده است.
+   پالت سازمانی (#FFFFFF · #185ADB · #111111) · بدون گرادینت · بدون !importantِ تازه.
+   بازگشت: همین بلوک را از انتهای style.css حذف کنید (CSSِ خالص ⇒ کلید PHP ندارد).
+   ========================================================================================== */
+
+/* ۱) کارت — تک‌منبع، در هوم و در صفحۀ نوشته یکسان.
+      v3.4.1 — همه‌چیز از توکن‌های --ab-player-* خوانده می‌شود و همان توکن‌ها را
+      «تنظیمات قالب ← کنترل رابط» (inc/ab-controls.php) ست می‌کند. سه اصلاح مهم:
+      · height:auto — قالب مادر (خط 928) هنوز 80px ارتفاع می‌دهد؛ اینجا صریح
+        خنثی می‌شود تا با کم‌شدن هر بلوک، کارت له نشود.
+      · overflow:visible — با hidden ردیف آخر لیست آلبوم درست روی لبۀ پایین و
+        گوشۀ گرد بریده می‌شد (همان «چسبیدن به پایین» که گزارش شده بود).
+      · margin-bottom از توکن ⇒ فاصلۀ پایین پلیر تا محتوای زیرش یک‌دست و قابل‌تنظیم. */
+.music_box_player{
+	background: var(--ab-player-bg, var(--ab-surface));
+	border: var(--ab-player-border, 1px solid var(--ab-line));
+	border-radius: var(--ab-player-radius, var(--ab-radius-l, 20px));
+	box-shadow: var(--ab-player-shadow, var(--ab-depth-1, 0 1px 2px rgba(17,17,17,.05), 0 8px 22px rgba(17,17,17,.06)));
+	padding: var(--ab-player-pad, 14px 16px);
+	margin: 0 0 var(--ab-player-gap, 30px);
+	height: auto;min-height: 0;overflow: visible;
+}
+/* در صفحۀ اصلی پلیر داخل #index_music_player است؛ فاصلۀ همان پوسته هم توکنی شد
+   تا «زیرِ پلیر» فقط یک جا تعریف شود (بلوک ۳۰ مقدار 26px می‌داد). */
+#index_music_player{margin: 0 0 var(--ab-player-gap, 30px)}
+.single_content_box .music_box_player{margin: 26px 0 var(--ab-player-gap, 30px);padding: var(--ab-player-pad, 14px 16px);background: var(--ab-player-bg, var(--ab-surface));border: var(--ab-player-border, 1px solid var(--ab-line));border-radius: var(--ab-player-radius, var(--ab-radius-l, 20px));box-shadow: var(--ab-player-shadow, var(--ab-depth-1, 0 1px 2px rgba(17,17,17,.05), 0 8px 22px rgba(17,17,17,.06)));overflow: visible}
+
+/* ۲) ردیف کنترل‌ها: سه ستونِ انعطاف‌پذیر با فاصلۀ یکسان (دیگر float و عرض درصدی نیست) */
+.music_box_player .player{gap: var(--ab-player-row-gap, 16px);align-items: center}
+.player_controls{gap: 8px;align-items: center}
+.music_box_player .info-box{gap: 14px;align-items: center}
+.music_box_player .info-box .track-info-box{gap: 10px;align-items: baseline}
+
+/* ۳) تیتر و زمان: تیتر با برشِ نرم به‌جای له‌کردنِ نوار پیشرفت */
+.music_box_player .info-box .track-info-box .track-title-text{
+	display: block;max-width: 100%;font-size: 14px;font-weight: 700;line-height: 1.5;
+	color: var(--ab-text);white-space: nowrap;overflow: hidden;text-overflow: ellipsis;
+}
+.music_box_player .info-box .track-info-box .audio-time{
+	direction: ltr;unicode-bidi: isolate;font-variant-numeric: tabular-nums;letter-spacing: .02em;
+	font-size: 11.5px;color: var(--ab-muted);white-space: nowrap;
+}
+
+/* ۴) دکمه‌ها: هدف ۴۰px (۴۴px روی لمسی)، دایره‌ای، با حالت hover/active/focus
+      سایز آیکن بدون !important عوض می‌شود: قاعدۀ قالب `font: 2em IcoFont !important` است،
+      پس `2em` را با کوچک‌کردن font-size خودِ ظرف کنترل می‌کنیم (9px ⇒ 18px). */
+.music_box_player .previous-track-btn,
+.music_box_player .next-track-btn,
+.music_box_player .album_show_hide{
+	width: var(--ab-player-btn, 40px);height: var(--ab-player-btn, 40px);float: none;font-size: 9px;line-height: 1;
+	display: inline-flex;align-items: center;justify-content:center;
+	border-radius: 999px;background: var(--ab-blue-soft);color: var(--ab-blue);cursor: pointer;
+	transition: background .16s ease, color .16s ease, transform .12s ease;
+}
+.music_box_player .previous-track-btn:hover,
+.music_box_player .next-track-btn:hover,
+.music_box_player .album_show_hide:hover{background: var(--ab-blue);color: var(--ab-white)}
+.music_box_player .previous-track-btn:active,
+.music_box_player .next-track-btn:active,
+.music_box_player .album_show_hide:active{transform: scale(.93)}
+.music_box_player .album_show_hide i{font-size: 18px;line-height: 1}
+.music_box_player .previous-track-btn.disabled,
+.music_box_player .next-track-btn.disabled{opacity: .42;pointer-events: none}
+.music_box_player .large-toggle-btn{
+	width: var(--ab-player-play, 52px);height: var(--ab-player-play, 52px);float: none;flex: 0 0 auto;
+	display: inline-flex;align-items: center;justify-content: center;
+	border-radius: 999px;background: var(--ab-blue);color: var(--ab-white);cursor: pointer;
+	box-shadow: var(--ab-depth-1, 0 6px 16px rgba(24,90,219,.28));
+	transition: background .16s ease, transform .12s ease;
+}
+.music_box_player .large-toggle-btn:hover{background: var(--ab-blue-accent)}
+.music_box_player .large-toggle-btn:active{transform: scale(.95)}
+.music_box_player .large-toggle-btn .icofont-play-alt-1,
+.music_box_player .large-toggle-btn .icofont-pause{
+	font-size: 22px;line-height: 1;display: block;position: static;
+}
+
+/* ۵) نوار پیشرفت: خطِ ۶px با سرِ پخش (بدون !important: اندیکاتور همان عنصری است که JS
+      عرضش را ست می‌کند؛ ::after فقط ظاهر است و ساختار DOM دست‌نخورده می‌ماند) */
+.music_box_player .progress-box{display: flex;flex-wrap: wrap;gap: 12px;align-items: center}
+/* صفحۀ پاک‌سازیِ clearfixهای قالب: .player / .info-box / .progress-box / ردیف‌ها
+   با :before/:afterِ `content:" ";display:table` شناور بودند؛ در flex همان‌ها
+   «آیتمِ فضای خالی» می‌سازند و gap را شلوغ می‌کنند ⇒ خاموش می‌شوند. */
+.music_box_player .player:before,.music_box_player .player:after,
+.music_box_player .info-box .track-info-box:before,.music_box_player .info-box .track-info-box:after,
+.music_box_player .play-list .play-list-row:before,.music_box_player .play-list .play-list-row:after{content: none;display: none}
+.music_box_player .progress-box .progress-cell{height: 18px;float: none;min-width: 0;flex: 1 1 auto;display: flex;align-items: center}
+.music_box_player .progress-box .progress-cell .progress{height: 6px;flex: 1 1 auto;width: auto;background: var(--ab-line)}
+.music_box_player .progress-box .progress-cell .progress .progress-buffer{background: var(--ab-blue-soft);border-radius: 999px}
+.music_box_player .progress-box .progress-cell .progress .progress-indicator{
+	background: var(--ab-blue);height: 100%;top: 0;border-radius: 999px;overflow: visible;
+}
+.music_box_player .progress-box .progress-cell .progress .progress-indicator::after{
+	content: "";position: absolute;right: -6px;top: 50%;transform: translateY(-50%);
+	width: 12px;height: 12px;border-radius: 999px;background: var(--ab-white);
+	box-shadow: 0 0 0 2px var(--ab-blue);
+}
+
+/* ۶) صدا: اسلایدر اصلیِ مرورگر با accent-color (سبک‌تر و قابل‌اعتمادتر از بازسازیش) */
+.music_box_player .volume_box{display: flex;align-items: center;gap: 8px;flex: 0 0 auto;min-width: 0}
+.music_box_player .volume_box > i{font-size: 16px;line-height: 1;color: var(--ab-muted)}
+.music_box_player .volume_box input[type=range]{
+	width: 92px;max-width: 28vw;height: 18px;margin: 0;accent-color: var(--ab-blue);cursor: pointer;
+}
+
+/* ۷) لیست آلبوم: بخشِ پایینِ کارت، ولی *داخل* padding خودش.
+      v3.4.1 — مارجین منفی (‎-14px) و چسبیدن به لبۀ کارت حذف شد: قبلاً ردیف آخر دقیقاً به
+      لبۀ پایین کارت می‌چسبید و با گوشۀ گرد بریده می‌شد ⇒ «پایین پلیر کم و بقیه مشخصه».
+      حالا فهرست با فاصلۀ خودش تمام می‌شود و کارت تا محتوای زیرش فاصلۀ استاندارد دارد. */
+.music_box_player .play-list{
+	position: static;width: auto;max-width: none;left: auto;top: auto;z-index: auto;
+	margin: var(--ab-player-list-gap, 14px) 0 0;padding: 10px 0 2px;
+	background: var(--ab-player-list-bg, transparent);
+	border-top: var(--ab-player-list-sep, 1px solid var(--ab-line));border-radius: 0;box-shadow: none;
+}
+#index_music_player .play-list{max-height: 296px;overflow: auto;overscroll-behavior: contain;-webkit-overflow-scrolling: touch}
+.music_box_player .play-list .play-list-row{
+	display: flex;align-items: center;gap: 10px;margin: 0 0 2px;padding: 7px 10px;
+	border-radius: var(--ab-radius-s, 10px);transition: background .14s ease;
+}
+.music_box_player .play-list .play-list-row:hover{background: var(--ab-blue-soft)}
+.music_box_player .play-list .play-list-row .track-number{
+	flex: 0 0 20px;width: 20px;display: block;font-size: 12px;color: var(--ab-muted);text-align: center;
+}
+.music_box_player .play-list .play-list-row .track-title{flex: 1 1 auto;min-width: 0;display: block}
+.music_box_player .play-list .play-list-row .track-title .playlist-track{
+	display: block;font-size: 13px;line-height: 1.6;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;
+}
+.music_box_player .play-list .play-list-row .small-toggle-btn{
+	width: 26px;height: 26px;flex: 0 0 auto;margin: 0;display: inline-flex;align-items: center;justify-content: center;
+	border-radius: 999px;background: var(--ab-blue-soft);color: var(--ab-blue);overflow: hidden;
+}
+.music_box_player .play-list-row:has(.active-track){background: var(--ab-blue-soft)}
+
+/* ۸) شب‌رنگ */
+.night .music_box_player,
+.night .single_content_box .music_box_player{
+	background: var(--ab-charcoal);border-color: rgba(255,255,255,.10);box-shadow: none;
+}
+.night .music_box_player .previous-track-btn,
+.night .music_box_player .next-track-btn,
+.night .music_box_player .album_show_hide{background: rgba(255,255,255,.07);color: #fff}
+.night .music_box_player .previous-track-btn:hover,
+.night .music_box_player .next-track-btn:hover,
+.night .music_box_player .album_show_hide:hover{background: var(--ab-blue);color: #fff}
+.night .music_box_player .info-box .track-info-box .track-title-text{color: #fff}
+.night .music_box_player .progress-box .progress-cell .progress{background: rgba(255,255,255,.14)}
+.night .music_box_player .progress-box .progress-cell .progress .progress-buffer{background: rgba(24,90,219,.4)}
+.night .music_box_player .progress-box .progress-cell .progress .progress-indicator::after{background: #0b0f16}
+.night .music_box_player .play-list{border-top-color: rgba(255,255,255,.10)}
+.night .music_box_player .play-list .play-list-row .small-toggle-btn{background: rgba(255,255,255,.08);color: #fff}
+.night .music_box_player .play-list .play-list-row:hover{background: rgba(255,255,255,.05)}
+
+/* ۹) ریسپانسیو
+      ≤1000px : اسلایدر صدا زیرِ نوار می‌رود تا پیشرفت نفس بکشد
+      ≤600px  : تیتر+پیشرفت در خط بالا (تمام‌عرض)، دکمه‌ها در خط پایین و وسط‌چین
+      ≤420px  : لیست آلبوم کوتاه‌تر و صدای تمام‌عرض */
+@media (max-width: 1000px){
+	.music_box_player .volume_box{flex: 0 0 auto}
+}
+@media (max-width: 760px){
+	.music_box_player{padding: 12px 13px}
+	.music_box_player .player{gap: 12px}
+	.music_box_player .progress-box .progress-cell{flex: 1 1 100%}
+	.music_box_player .volume_box{flex: 1 1 100%;order: 5;justify-content: flex-start}
+	.music_box_player .volume_box input[type=range]{width: 100%;max-width: 220px;flex: 1 1 auto}
+	.music_box_player .play-list{margin: 11px 0 0;padding: 8px 0 2px}
+}
+@media (max-width: 600px){
+	#index_music_player{margin: 0 0 var(--ab-player-gap, 26px)}
+	.music_box_player .info-box{flex-direction: column;align-items: stretch;gap: 6px}
+	.music_box_player .info-box .track-info-box{flex-direction: row;align-items: center;gap: 8px}
+	.music_box_player .progress-box{flex: 1 1 100%;min-width: 0}
+	.music_box_player .large-toggle-btn{width: 48px;height: 48px}
+	.music_box_player .large-toggle-btn .icofont-play-alt-1,.music_box_player .large-toggle-btn .icofont-pause{font-size: 20px}
+	.music_box_player .previous-track-btn,.music_box_player .next-track-btn,.music_box_player .album_show_hide{width: 44px;height: 44px}
+	#index_music_player .play-list{max-height: 240px}
+}
+@media (max-width: 420px){
+	.music_box_player{padding: 11px}
+	.music_box_player .info-box .track-info-box .track-title-text{font-size: 13px}
+	.music_box_player .play-list{margin: 10px 0 0;padding: 8px 0 2px}
+	.music_box_player .play-list .play-list-row{padding: 9px 8px}
+}
+@media (hover: none){
+	.music_box_player .previous-track-btn,.music_box_player .next-track-btn,.music_box_player .album_show_hide{width: 44px;height: 44px}
+	.music_box_player .large-toggle-btn{width: 54px;height: 54px}
+	.music_box_player .play-list .play-list-row{padding: 10px}
+}
+@media (prefers-reduced-motion: reduce){
+	.music_box_player .large-toggle-btn,
+	.music_box_player .previous-track-btn,
+	.music_box_player .next-track-btn,
+	.music_box_player .album_show_hide,
+	.music_box_player .play-list .play-list-row{transition: none}
+	.music_box_player .large-toggle-btn:active,
+	.music_box_player .previous-track-btn:active,
+	.music_box_player .next-track-btn:active,
+	.music_box_player .album_show_hide:active{transform: none}
+}
+/* انتهای بلوک ۳۳ (v3.4.0 · اصلاحیۀ 3.4.1) */
+
+/* ============================================================================================
+   بلوک ۳۴ (نسخۀ 3.4.1) — حالت‌های پلیر که از «تنظیمات قالب ← کنترل رابط» انتخاب می‌شوند
+   ------------------------------------------------------------------------------------------
+   inc/ab-controls.php بر اساس گزینه‌ها فقط دو چیز تولید می‌کند:
+     · کلاس روی <body>  →  ab-player-compact / ab-player-legacy / ab-player-list-open /
+                           ab-player-list-hide / ab-player-novol
+     · توکن‌های --ab-player-* در :root (داخل <style id="ab-ui-controls">، بعد از استایل‌ها
+       enqueue می‌شود ⇒ با همان ویژگی برنده است، بدون !important)
+   این بلوک همان کلاس‌ها را به رفتار CSS وصل می‌کند. DOM پلیر دست‌نخورده است، چون
+   js/scripts.js به ترتیب فرزندهایِ .progress-box و .play-list-row وابسته است.
+   اگر این بلوک حذف شود فقط «حالت‌ها» از کار می‌افتند و پلیر به شکل 3.4.0 برمی‌گردد.
+   پالت #FFFFFF · #185ADB · #111111 — بدون گرادینت — بدون !important.
+   ========================================================================================== */
+
+/* «ساده (قالب مادر)»: کارت بی‌جعبه است، پس جعبۀ سفیدِ خودِ قالب برای پلیرِ صفحۀ اصلی زنده می‌شود */
+body.ab-player-legacy #index_music_player{background: #fff;border-radius: 7px;box-shadow: 0 6px 20px rgba(17,17,17,.08);padding: 6px 10px}
+body.ab-player-legacy .music_box_player .play-list{max-height: 220px}
+
+/* «فهرست آلبوم: باز» — قاعدۀ خط 1385 (‎#index_music_player .play-list{display:none}) را با
+   ویژگیِ بیشتر بازنویسی می‌کند، نه با !important؛ کلیک روی «نمایش آلبوم» هم مثل قبل کار می‌کند */
+body.ab-player-list-open #index_music_player .play-list{display: block}
+
+/* «فهرست آلبوم: مخفی» — خودِ فهرست و دکمۀ «نمایش آلبوم» (جعبه‌های آلبوم که از قبل
+   display:none !important دارند بی‌تأثیر می‌مانند) */
+body.ab-player-list-hide .music_box_player .play-list,
+body.ab-player-list-hide .music_box_player .album_show_hide{display: none}
+
+/* «دکمۀ صدا: خاموش» — flex gap فقط بین آیتم‌های موجود حساب می‌شود، پس ردیف نمی‌شکند */
+body.ab-player-novol .music_box_player .volume_box{display: none}
+
+/* فوتر: اگر ستونی در «تنظیمات قالب ← پانوشت ← ستون‌های فوتر» خاموش شود، footer.php
+   شمارۀ ستون‌های روشن را در data-ab-cols می‌نویسد ⇒ شبکه به‌جای جای خالی، عرض را بین
+   ستون‌های باقی‌مانده تقسیم می‌کند. (قواعد زیر عمداً !important ندارند: قاعدۀ خط 1854
+   هم دیگر !important ندارد؛ قاعدۀ media در 991px/767px مثل قبل برنده است ⇒ در موبایل
+   همان دو/یک ستون همیشگی.) */
+.ab-footer__grid[data-ab-cols="3"]{grid-template-columns:repeat(3, minmax(0, 1fr))}
+.ab-footer__grid[data-ab-cols="2"]{grid-template-columns:repeat(2, minmax(0, 1fr))}
+.ab-footer__grid[data-ab-cols="1"]{grid-template-columns:minmax(0, 1fr)}
+
+/* بازگشت: گزینه‌ها را در «تنظیمات قالب ← کنترل رابط» روی حالت پیش‌فرض بگذارید
+   (کارت / دکمه / روشن) یا همین بلوک ۳۴ را از انتهای style.css حذف کنید. برای تنظیم
+   دستیِ دقیق‌تر هم می‌شود توکن‌ها را در «ظاهره ← سفارشی‌سازی ← CSS اضافی» بازنویسی کرد:
+     :root{--ab-player-gap:36px;--ab-player-radius:14px}                          */
+/* انتهای بلوک ۳۴ (v3.4.1) */
+/* ============================================================================================
+   بلوک ۳۵ (نسخۀ 3.4.2) — «پلیر داخل کادر بماند»
+   ------------------------------------------------------------------------------------------
+   گزارش: «پلیر ریخته به هم و از کادر زده بیرون». در 3.4.1 برای رفع بریدگیِ ردیف آخر،
+   overflow:hiddenِ کارت برداشته شد؛ آن کار لازم بود ولی کارت را بی‌حصار گذاشت:
+   قالب مادر روی فرزندهای پلیر float و position:absolute می‌گذارد
+     · خط 953/977 : .info-box{float:right;width:83%} و .progress-box{float:left;min-width:75%}
+     · خط 1040    : .play-list{position:absolute;top:75px;width:300px;z-index:888}
+     · خط 1642    : در موبایل .track-info-box{position:absolute;top:-40px}
+   بلوک‌های ۳۰ و ۳۳ بیشترشان را خنثی می‌کردند، ولی با حذف overflow:hidden هر قاعدۀ
+   جا‌افتاده (یا قواعد !important‌دارِ لایه‌های دیگر) دیگر بریده نمی‌شد ⇒ بیرون‌زدگی.
+   راه‌حل این بلوک: هم «حصار» برگردد، هم چیدمان ردیف‌ها اینجا *مجددا و کامل* نوشته شود
+   تا اگر هر یک از بلوک‌های ۳۰/۳۳ جابه‌جا یا حذف شدند، پلیر باز هم داخل کادر بماند:
+     · display:flow-root  ⇒ جریان مستقل: ارتفاع کارت همیشه جمعِ فرزندهاست و هیچ float بیرون نمی‌زند
+     · overflow:hidden    ⇒ گوشۀ گرد، فرزندِ گرد را می‌بُرد؛ چون لیست *داخل* padding است، چیزی بریده نمی‌شود
+     · min-width:0 روی همه‌چیز ⇒ تیترِ بلند نوار پیشرفت را به بیرون هل نمی‌دهد
+     · سقف ارتفاع لیست در همه‌جا ⇒ کارتِ صفحۀ نوشته هم با آلبوم ۴۰‌ترکی کشیده نمی‌شود
+   هیچ DOM‌ی تغییر نمی‌کند (js/scripts.js سالم)، هیچ !important تازه‌ای نیست، پالت
+   #FFFFFF · #185ADB · #111111 و بدون گرادیند. بازگشت: همین بلوک را از انتها حذف کنید.
+   ========================================================================================== */
+.music_box_player{
+	display: flow-root;
+	overflow: hidden;
+	min-height: 0;
+}
+/* ردیف کنترل‌ها — سه بخشِ مستقل، هر سه با min-width:0 */
+.music_box_player .player{display: flex;flex-wrap: nowrap;align-items: center;gap: var(--ab-player-row-gap, 16px);height: auto;min-width: 0}
+.music_box_player .player > *{min-width: 0}
+.music_box_player .player_controls{display: flex;align-items: center;gap: 8px;flex: 0 0 auto;float: none;width: auto;height: auto}
+.music_box_player .info-box{display: flex;align-items: center;gap: 14px;flex: 1 1 auto;float: none;width: auto;height: auto;min-width: 0}
+.music_box_player .info-box .track-info-box{
+	display: flex;align-items: baseline;gap: 10px;min-width: 0;
+	position: static;top: auto;left: auto;right: auto;margin-top: 0;float: none;width: auto;height: auto;
+}
+.music_box_player .progress-box{display: flex;flex-wrap: wrap;align-items: center;gap: 12px;flex: 1 1 auto;float: none;width: auto;min-width: 0;margin-top: 0}
+.music_box_player .progress-box .progress-cell{display: flex;align-items: center;flex: 1 1 auto;width: auto;min-width: 0;height: 18px;float: none}
+.music_box_player .progress-box .progress-cell .progress{width: auto;min-width: 0}
+/* لیست آلبوم: همیشه داخل کارت، با سقف ارتفاع (صفحۀ نوشته هم) */
+.music_box_player .play-list{
+	position: static;top: auto;left: auto;right: auto;width: auto;max-width: none;z-index: auto;
+	max-height: min(296px, 45vh);overflow: auto;overscroll-behavior: contain;
+}
+/* دکمه‌ها: float موروثی حذف (در flex بی‌معنی است و در حالت fallback علتِ بیرون‌زدگی بود) */
+.music_box_player .previous-track-btn,.music_box_player .next-track-btn,
+.music_box_player .album_show_hide,.music_box_player .large-toggle-btn{float: none}
+@media (max-width: 600px){
+	.music_box_player .player{flex-wrap: wrap-reverse;gap: 10px}
+	.music_box_player .player_controls{flex: 1 1 auto;justify-content: center}
+	.music_box_player .info-box{flex: 1 1 100%}
+}
+/* انتهای بلوک ۳۵ (v3.4.2) */
+/* ============================================================================================
+   بلوک ۳۶ (نسخۀ 3.4.4) — اسلایدر صدا: از حالت «پاپ‌آپ عمودی» بیرون بیاید و گوشه بنشیند
+   ------------------------------------------------------------------------------------------
+   گزارش: «کم‌وزیاد کردن صدا آمده رو خط پخش موزیک، همان اول؛ باید گوشۀ چپ یا راست، با
+   فاصله از المان‌های دیگر». علت ریشۀ کار در خودِ قالب مادر است، نه در 3.4.2:
+     · خط 1117 : .volume_box{width:30px;float:right;margin:-7px -40px 0 0;position:relative}
+     · خط 1119 تا 1127 : اسلایدر صدا position:absolute;top:-50px;left:-30px است، همراه با
+       transform:rotate(-90deg) و visibility:hidden;opacity:0 و فقط با :hover نمایان می‌شود
+       ⇒ یک نوارِ عمودیِ مخفی که با ۵۰px منفیِ بالا و ۴۰px منفیِ راست، روی خطِ دکمۀ پخش
+       می‌نشیند و با بقیهٔ المان‌ها قاطی می‌شود. بلوک ۳۴ عرض/ارتفاع را درست کرد ولی همین
+       پنج اعلامیه دست‌نخورده ماند.
+   راه‌حل — CSS فقط، DOM و js/scripts.js دست‌نخورده:
+     · موقعیت مطلق + چرخش + مخفی‌شدن لغو می‌شود ⇒ اسلایدر افقی و همیشه دیدنی
+     · .volume_box از float، عرض 30px و مارجین منفی آزاد می‌شود
+     · margin-inline-start:auto ⇒ چسبیده به گوشۀ انتهایی ردیف (در RTL: چپ) و
+       padding-inline-start:16px ⇒ فاصله از نوار پیشرفت (در ≤760px هر دو صفر می‌شوند)
+     · appearance:auto + accent-color ⇒ کنترل بومیِ مرورگر، با پرشدۀ آبی در
+       Chrome/Safari/Firefox (به‌جای بازسازی pseudo-element که در هر مرورگر فرق می‌کند)
+   بازگشت: «تنظیمات قالب ← کنترل رابط ← دکمۀ صدا در پلیر» = خاموش (کل اسلایدر حذف
+   می‌شود) یا حذف همین بلوک از انتهای فایل. در ≤450px قالب مادر خودش
+   .volume_box{display:none !important} را دارد (خط 1649) — عمداً دست نمی‌زنیم.
+   هیچ !important تازه‌ای نیست، پالت #FFFFFF · #185ADB · #111111، بدون گرادینت.
+   ========================================================================================== */
+.music_box_player .volume_box{
+	display: flex;align-items: center;gap: 10px;
+	flex: 0 0 auto;min-width: 0;
+	float: none;width: auto;
+	margin: 0;margin-inline-start: auto;
+	padding-inline-start: 16px;
+	position: relative;top: auto;left: auto;right: auto;bottom: auto;
+}
+.music_box_player .volume_box > i{
+	float: none;margin: 0;font-size: 17px;line-height: 1;color: var(--ab-muted);
+}
+.music_box_player .volume_box input[type=range]{
+	position: static;top: auto;bottom: auto;left: auto;right: auto;
+	visibility: visible;opacity: 1;
+	-webkit-transform: none;-moz-transform: none;transform: none;
+	-webkit-appearance: auto;-moz-appearance: auto;appearance: auto;
+	direction: ltr;
+	width: 108px;max-width: 26vw;height: 20px;
+	margin: 0;padding: 0;border: 0;background: transparent;
+	accent-color: var(--ab-blue);cursor: pointer;
+}
+.music_box_player .volume_box:hover input[type=range]{visibility: visible;opacity: 1}
+.music_box_player .volume_box input[type=range]:focus{outline: none}
+.music_box_player .volume_box input[type=range]:focus-visible{
+	outline: 2px solid var(--ab-blue);outline-offset: 3px;border-radius: 6px;
+}
+/* فاصلهٔ مطمئن میان دو آیتمِ ردیف، حتی اگر flex جایگزینش نشود */
+.music_box_player .progress-box{column-gap: 14px}
+@media (max-width: 760px){
+	.music_box_player .volume_box{
+		flex: 1 1 100%;order: 5;justify-content: flex-start;
+		margin-inline-start: 0;padding-inline-start: 0;
+	}
+	.music_box_player .volume_box input[type=range]{width: 100%;max-width: 220px;flex: 1 1 auto}
+}
+/* انتهای بلوک ۳۶ (v3.4.4) */
+/* ============================================================================================
+   بلوک ۳۷ (نسخۀ 3.4.5) — کاورِ صفحۀ پست: ۵۰۰×۵۰۰، از تنظیمات قابل تنظیم
+   ------------------------------------------------------------------------------------------
+   درخواست: «سایز تصویر تو پست ۵۰۰×۵۰۰ باشه». کاور پست در single.php داخل
+   <figure class="single_featured_image"> است و قالب مادر روی img هیچ عرضی نمی‌گذاشت
+   (خط 1260: width:auto;height:auto;max-width:100%) ⇒ اندازه فقط از فایلِ source می‌آمد.
+     · عرض = --ab-post-img-size (توکنی که inc/ab-controls.php از «تنظیمات قالب» در :root
+       می‌گذارد؛ پیش‌فرض ۵۰۰px، بازۀ اسلایدر ۲۴۰ تا ۹۰۰)
+     · body.ab-post-img-square ⇒ مربع: aspect-ratio روی figure و object-fit:cover روی img
+       (کات از وسط؛ اگر «کات مربعی» را خاموش کنید نسبت اصلیِ عکس حفظ می‌شود)
+     · max-width:100% همه‌جا می‌ماند ⇒ در ستون باریک و موبایل هیچ‌وقت بیرون نمی‌زند؛
+       قاعدۀ 2507 (max-width/height:auto !important زیر 800px) با همین فرض نوشته شده و
+       دست‌نخورده است. ارتفاعِ figure از aspect-ratio می‌آید، پس !importantِ آن هم مشمول
+       img ما نمی‌شود.
+     · @supports: برای مرورگرهای بدون aspect-ratio (سافاری ۱۴ و قدیمی‌تر) ارتفاع صریح
+   PHP هیچ ارتفاع/عرضی به img نمی‌نویسد؛ فقط sizes و سایزِ source درست می‌شود
+   (javan_seda_post_cover_size/args) ⇒ srcset نزدیک‌ترین فایل را برمی‌دارد، پس ۵۰۰px
+   روی دسکتاپ ۱۰۲۴ پیکسل دانلود نمی‌کند.
+   بازگشت: «تنظیمات قالب ← کنترل رابط ← کات مربعی کاور» = خاموش (مربع نبود) یا حذف همین
+   بلوک از انتهای style.css. بدون !important · بدون گرادینت · پالت #FFFFFF #185ADB #111111
+   ========================================================================================== */
+.single_featured_cover .single_featured_image{
+	width: var(--ab-post-img-size, 500px);
+	max-width: 100%;
+}
+.single_featured_cover .single_featured_image img{
+	display: block;width: 100%;height: auto;max-width: 100%;
+}
+body.ab-post-img-square .single_featured_cover .single_featured_image{
+	aspect-ratio: 1 / 1;
+}
+body.ab-post-img-square .single_featured_cover .single_featured_image img{
+	height: 100%;object-fit: cover;object-position: center;
+}
+@supports not (aspect-ratio: 1 / 1){
+	body.ab-post-img-square .single_featured_cover .single_featured_image{
+		height: var(--ab-post-img-size, 500px);max-height: 100vw;
+	}
+}
+/* در فهرست‌ها/جست‌وجو هم همان کادر استفاده می‌شود؛ اگر cover در محتوا تزریق شده باشد (*JAVANSEDA_COVER_IN_CONTENT*)
+   چون کلاس‌ها یکی‌اند، همین قواعد یک‌دست می‌گیرد. */
+/* انتهای بلوک ۳۷ (v3.4.5) */
+
+/* ==========================================================================================
+   بلوک ۳۸ (نسخۀ 3.4.9) — بیوگرافیِ هنرمند (کوتاه + دکمۀ «کامل») · مجموعِ بازدید ·
+   «توضیح کوتاه/کامل»ِ دسته‌ها و برچسب‌ها با دکمۀ نمایشِ بیشتر/کمتر
+   ------------------------------------------------------------------------------------------
+   markup از جاوا_seda_term_more_html() / بلوکِ بیوِ taxonomy-artist.php می‌آید؛ این‌جا فقط
+   قواعد است. max-height به‌جای height تا متنِ بلند جا بیفتد، و با کلاسِ is-open باز می‌شود
+   (JSِ ریزِ همان فایل، یک شنوندهٔ رویداد روی document — بدون کتابخانه).
+   بازگشت: «تنظیمات پوسته ← کنترل رابط» و خالی‌کردنِ فیلدها؛ حذف همین بلوک هم ظاهری را
+   به قبل برمی‌گرداند. بدون !important · بدون گرادینت · پالتِ خودِ قالب.
+   ========================================================================================== */
+.ab-artist-bio__short{font-size:14px;line-height:2.1;color:var(--ab-text)}
+.ab-artist-bio__short p{margin:0 0 8px}
+.ab-artist-bio__short p:last-child{margin-bottom:0}
+.ab-artist-bio__more{margin:10px 0 0}
+.ab-artist-bio__btn{display:inline-block;padding:6px 16px;border:1px solid var(--ab-blue);border-radius:var(--ab-radius-pill,20px);font-size:13px;color:var(--ab-blue);transition:background-color .15s ease,color .15s ease}
+.ab-artist-bio__btn:hover{background:var(--ab-blue);color:var(--ab-white)}
+.ab-artist-bio__btn i{margin-right:6px;font-size:12px}
+.ab-artist-page__views{margin:8px 0 0;font-size:12.5px;color:var(--ab-muted)}
+.ab-artist-page__views i{margin-left:4px}
+.ab-artist__views{display:block;font-size:11.5px;line-height:1.9;color:var(--ab-muted)}
+.ab-artist__views i{margin-left:3px;font-size:11px}
+a:hover .ab-artist__views{color:var(--ab-blue)}
+.ab-artists__sep{margin:0 6px;opacity:.45}
+/* توضیح کامل — بسته در بالا، با سه خطِ قابل‌مشاهده */
+.ab-term-more{position:relative;max-height:10.5em;overflow:hidden;transition:max-height .22s ease}
+.ab-term-more.is-open{max-height:none}
+.ab-term-more__title{margin:0 0 6px;font-size:14px;font-weight:700;color:var(--ab-text)}
+.ab-term-more__inner{font-size:13.5px;line-height:2.1;color:var(--ab-text)}
+.ab-term-more__inner p{margin:0 0 8px}
+.ab-term-more__inner p:last-child{margin-bottom:0}
+.ab-term-more__bar{margin:8px 0 0}
+.ab-term-more__btn{padding:5px 14px;background:none;border:1px solid var(--ab-line);border-radius:var(--ab-radius-pill,20px);font-family:inherit;font-size:12.5px;color:var(--ab-blue);cursor:pointer}
+.ab-term-more__btn:hover{border-color:var(--ab-blue)}
+.ab-term-more__wrap{margin-top:14px}
+/* شبِ تار */
+.night .ab-artist-bio__short,.night .ab-term-more__inner,.night .ab-term-more__title{color:var(--ab-text)}
+.night .ab-artist-bio__btn{border-color:var(--ab-blue)}
+.night .ab-term-more__btn{border-color:var(--ab-line)}
+.night a:hover .ab-artist__views{color:var(--ab-blue)}
+@media (max-width:767px){
+	.ab-term-more{max-height:9em}
+	.ab-artist-bio__short{font-size:13.5px;line-height:2}
+}
+@media (prefers-reduced-motion: reduce){
+	.ab-term-more,.ab-artist-bio__btn{transition:none}
+}
+/* انتهای بلوک ۳۸ (v3.4.9) */

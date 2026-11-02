@@ -1,0 +1,1462 @@
+<?php
+/**
+ * عناصر مشترکِ رابط کاربری — آهنگ، هنرمند، چیپ‌ها و پلیر «رادیو»
+ * ==========================================================================
+ * چرا این فایل؟ قبلاً مارکاپِ آهنگ چهار جای مختلف (صفحهٔ اصلی، صفحهٔ هنرمند،
+ * جست‌وجو، ابزارک‌ها) جداگانه نوشته می‌شد و هر جای دیگری شکل دیگری داشت. حالا
+ * یک منبع دارد و همه جا یکسان است.
+ *
+ * اصولی که رعایت می‌شود:
+ *   • هیچ چیز در دیتابیس نوشته نمی‌شود؛ فقط خواندن.
+ *   • هر تابع با function_exists محافظت شده تا قالب فرزند بتواند جایگزینش کند.
+ *   • همهٔ خروجی‌ها escape می‌شوند؛ کلاس‌ها با پیشوند `ty-` تا با CSS قدیمی
+ *     قالب (ab-*) تداخل نداشته باشند.
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/* -------------------------------------------------------------------------
+ * ۰) لوگو — یک منبعِ واحد برای سربرگ، کشوی موبایل و کارتِ پنل (v3.8.2)
+ * ----------------------------------------------------------------------
+ * پیش از این `ot_get_option('logo')` مستقیم در دو قالب چاپ می‌شد؛ اگر مقدار
+ * خالی بود `src=""` تولید می‌شد (مرورگر همان صفحه را به‌جای تصویر می‌خواست).
+ * حالا همیشه یک آدرسِ معتبر برمی‌گردد: تنظیمات → وگرنه لوگوی پیش‌فرضِ قالب.
+ * ---------------------------------------------------------------------- */
+
+if ( ! function_exists( 'tara_logo_default' ) ) {
+	/**
+	 * لوگوی پیش‌فرضِ قالب.
+	 *
+	 * @return string
+	 */
+	function tara_logo_default() {
+		return trailingslashit( get_template_directory_uri() ) . 'images/logo.png';
+	}
+}
+
+if ( ! function_exists( 'tara_logo_raw' ) ) {
+	/**
+	 * مقدارِ خامِ یک گزینهٔ لوگو (بدونِ پیش‌فرض) — برای تشخیص «سفارشی یا نه».
+	 *
+	 * @param string $key logo|logo_night.
+	 * @return string
+	 */
+	function tara_logo_raw( $key ) {
+		$value = function_exists( 'ot_get_option' ) ? ot_get_option( $key, '' ) : '';
+		if ( function_exists( 'tara_media_url' ) ) {
+			$value = tara_media_url( $value );
+		} elseif ( is_array( $value ) ) {
+			$value = isset( $value['url'] ) && is_string( $value['url'] ) ? $value['url'] : '';
+		}
+
+		return is_string( $value ) ? trim( $value ) : '';
+	}
+}
+
+if ( ! function_exists( 'tara_logo_url' ) ) {
+	/**
+	 * آدرس لوگوی روز (هرگز خالی).
+	 *
+	 * @return string
+	 */
+	function tara_logo_url() {
+		$value = tara_logo_raw( 'logo' );
+
+		return '' !== $value ? $value : tara_logo_default();
+	}
+}
+
+if ( ! function_exists( 'tara_logo_night_url' ) ) {
+	/**
+	 * آدرس لوگوی حالت شب. اگر تنظیم نشده باشد، همان لوگوی روز برمی‌گردد
+	 * (هیچ سایتی با به‌روزرسانی این نسخه خالی/سفید نمی‌شود).
+	 *
+	 * @return string
+	 */
+	function tara_logo_night_url() {
+		$value = tara_logo_raw( 'logo_night' );
+
+		return '' !== $value ? $value : tara_logo_url();
+	}
+}
+
+if ( ! function_exists( 'tara_logo_img' ) ) {
+	/**
+	 * مارک‌آپِ لوگو: دو تصویر (روز و شب) که CSS یکی را نشان می‌دهد.
+	 *
+	 * چرا دو <img> و نه یک تصویر با تعویضِ src؟ چون تعویضِ src در جاوااسکریپت
+	 * یک درخواستِ تازه در لحظهٔ تغییرِ حالت می‌سازد و تا رسیدنش لوگو خالی
+	 * می‌شود؛ این‌جا هر دو تصویر با هم می‌آیند و تعویض فقط یک قاعدهٔ CSS است.
+	 * اگر لوگوی شب تنظیم نشده باشد، تصویر دوم چاپ نمی‌شود.
+	 *
+	 * @param array $args {
+	 *     @type string $class   کلاسِ هر <img>.
+	 *     @type string $alt     متنِ جانشین.
+	 *     @type string $title   tooltip.
+	 *     @type bool   $attr    چاپِ width/height (برای کشوی گوشی لازم است).
+	 * }
+	 * @return string
+	 */
+	function tara_logo_img( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'class' => 'ab-logo__img',
+				'alt'   => '',
+				'title' => '',
+				'attr'  => true,
+			)
+		);
+
+		$day   = tara_logo_url();
+		$night = tara_logo_night_url();
+		$dim   = $args['attr'] ? ' width="150" height="40"' : '';
+		$alt   = ' alt="' . esc_attr( $args['alt'] ) . '"';
+		$title = '' !== (string) $args['title'] ? ' title="' . esc_attr( $args['title'] ) . '"' : '';
+		$base  = esc_attr( $args['class'] );
+
+		$html = '<img class="' . $base . ' ab-logo__img--day" src="' . esc_url( $day ) . '"' . $dim . $alt . $title . ' decoding="async" fetchpriority="high">';
+
+		if ( '' !== tara_logo_raw( 'logo_night' ) ) {
+			/* v3.8.4 — عمداً lazy نیست: تصویر در حالت روز display:none است و
+			   مرورگرها تصویرِ lazyِ پنهان را تا لحظهٔ نمایش دانلود نمی‌کنند؛
+			   نتیجه یک لحظه جای خالی هنگامِ روشن‌کردنِ حالت شب بود. لوگو
+			   چند کیلوبایت است، پس eager درست‌تر است. */
+			$html .= '<img class="' . $base . ' ab-logo__img--night" src="' . esc_url( $night ) . '"' . $dim . $alt . $title . ' decoding="async">';
+		}
+
+		return $html;
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * ۱) خواندن داده‌های آهنگ — همیشه با fallback به متای ساده
+ * ---------------------------------------------------------------------- */
+
+if ( ! function_exists( 'tara_music_field' ) ) {
+	/**
+	 * یک فیلد موسیقی را می‌خواند: ACF → متای نوشته → رشتهٔ خالی.
+	 * (ACF ممکن است نصب نباشد؛ این تابع هیچ‌وقت خطای کشنده نمی‌دهد.)
+	 *
+	 * @param string   $key     نام فیلد.
+	 * @param int|null $post_id شناسهٔ نوشته.
+	 * @return string
+	 */
+	function tara_music_field( $key, $post_id = null ) {
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+
+		if ( function_exists( 'get_field' ) ) {
+			$value = get_field( $key, $post_id );
+			if ( is_scalar( $value ) && '' !== trim( (string) $value ) ) {
+				return trim( (string) $value );
+			}
+		}
+
+		$value = get_post_meta( $post_id, $key, true );
+
+		return is_scalar( $value ) ? trim( (string) $value ) : '';
+	}
+}
+
+if ( ! function_exists( 'tara_media_fix_scheme' ) ) {
+	/**
+	 * اصلاح پروتکل آدرس فایل (v3.7.6)
+	 *
+	 * اگر سایت روی HTTPS باشد و آدرس فایل صوتی با `http://` ذخیره شده باشد،
+	 * مرورگر آن را «محتوای ناامن» می‌داند و **پخش نمی‌کند**؛ همان چیزی که
+	 * کاربر «کار نکردن پلیر» می‌دید. آدرس‌های `//host/...` هم به پروتکل فعلی
+	 * تبدیل می‌شوند.
+	 *
+	 * @param string $url آدرس.
+	 * @return string
+	 */
+	function tara_media_fix_scheme( $url ) {
+		$url = trim( (string) $url );
+		if ( '' === $url ) {
+			return '';
+		}
+		if ( 0 === strpos( $url, '//' ) ) {
+			return ( is_ssl() ? 'https:' : 'http:' ) . $url;
+		}
+		if ( is_ssl() && 0 === stripos( $url, 'http://' ) ) {
+			return 'https://' . substr( $url, 7 );
+		}
+		return $url;
+	}
+}
+
+if ( ! function_exists( 'tara_media_url' ) ) {
+	/**
+	 * هر چیزی که ACF/متا برای یک فایل برمی‌گرداند → آدرس واقعی فایل.
+	 *
+	 * چرا لازم است؟ فیلد «فایل» در ACF می‌تواند سه شکل برگرداند:
+	 *   ۱) رشتهٔ آدرس            → همان
+	 *   ۲) آرایه (url / ID)       → باید استخراج شود
+	 *   ۳) شناسهٔ پیوست (عدد)     → باید با wp_get_attachment_url تبدیل شود
+	 * اگر شکل ۲ یا ۳ همین‌طور به `audio.src` برود، مرورگر «1234» را یک مسیر
+	 * نسبی می‌فهمد، درخواست ۴۰۴ می‌شود و پلیر «کار نمی‌کند». این تابع همان
+	 * باگ را می‌بندد و هیچ داده‌ای را عوض نمی‌کند.
+	 *
+	 * @param mixed $value مقدار خام.
+	 * @return string
+	 */
+	function tara_media_url( $value, $preserve_scheme = false ) {
+		if ( is_string( $value ) ) {
+			$value = trim( $value );
+
+			/* متای قدیمی گاهی آرایهٔ سریال‌شده است */
+			if ( '' !== $value ) {
+				$maybe = ( '{' === $value[0] || '[' === $value[0] ) ? json_decode( $value, true ) : ( 0 === strpos( $value, 'a:' ) && function_exists( 'maybe_unserialize' ) ? maybe_unserialize( $value ) : null );
+				if ( is_array( $maybe ) ) {
+					return tara_media_url( $maybe, $preserve_scheme );
+				}
+			}
+
+			if ( '' === $value ) {
+				return '';
+			}
+
+			/* عدد خالص = شناسهٔ پیوست */
+			if ( ctype_digit( $value ) && function_exists( 'wp_get_attachment_url' ) ) {
+				$url = wp_get_attachment_url( (int) $value );
+				return $url ? ( $preserve_scheme ? $url : tara_media_fix_scheme( $url ) ) : '';
+			}
+
+			return $preserve_scheme && 0 !== strpos( $value, '//' ) ? $value : tara_media_fix_scheme( $value );
+		}
+
+		if ( is_numeric( $value ) && function_exists( 'wp_get_attachment_url' ) ) {
+			$url = wp_get_attachment_url( (int) $value );
+			return $url ? ( $preserve_scheme ? $url : tara_media_fix_scheme( $url ) ) : '';
+		}
+
+		if ( is_array( $value ) ) {
+			foreach ( array( 'url', 'src', 'link' ) as $key ) {
+				if ( isset( $value[ $key ] ) && is_string( $value[ $key ] ) && '' !== trim( $value[ $key ] ) ) {
+					return $preserve_scheme && 0 !== strpos( $value[ $key ], '//' ) ? $value[ $key ] : tara_media_fix_scheme( $value[ $key ] );
+				}
+			}
+			foreach ( array( 'ID', 'id', 'attachment_id' ) as $key ) {
+				if ( isset( $value[ $key ] ) && function_exists( 'wp_get_attachment_url' ) ) {
+					$url = wp_get_attachment_url( (int) $value[ $key ] );
+					if ( $url ) {
+						return $preserve_scheme ? $url : tara_media_fix_scheme( $url );
+					}
+				}
+			}
+			if ( isset( $value[0] ) ) {
+				return tara_media_url( $value[0], $preserve_scheme );
+			}
+		}
+
+		return '';
+	}
+}
+
+if ( ! function_exists( 'tara_track_src' ) ) {
+	/**
+	 * آدرس فایلِ صوتی یک آهنگ: ۳۲۰ ترجیح دارد، بعد ۱۲۸.
+	 *
+	 * @param int $post_id شناسهٔ نوشته.
+	 * @return string
+	 */
+	function tara_track_src( $post_id = 0 ) {
+		$post_id = (int) $post_id;
+
+		foreach ( array( 'music320', 'music128', 'music' ) as $key ) {
+			$src = tara_music_value( $key, $post_id );
+			if ( '' !== $src ) {
+				return $src;
+			}
+		}
+
+		return '';
+	}
+}
+
+if ( ! function_exists( 'tara_post_has_video' ) ) {
+	/**
+	 * آیا این اثر «موزیک ویدیو» دارد؟ (v3.7.9)
+	 * ------------------------------------------------------------------
+	 * تا امروز تنها راهِ فهمیدنش این بود که کاربر روی کارت کلیک کند و در
+	 * صفحهٔ آهنگ پلیر ویدیو را ببیند. حالا کارت‌ها یک نشانهٔ کوچک ویدیو
+	 * می‌گیرند تا از فهرست هم معلوم باشد.
+	 *
+	 * فقط `get_post_meta` خوانده می‌شود (بدون `get_field`) تا روی فهرست‌های
+	 * ۲۰تایی صفحهٔ هنرمند هم هزینهٔ اضافه نداشته باشد؛ متای نوشته‌های داخل
+	 * حلقه از قبل در کشِ وردپرس هست. نتیجه هم در همان درخواست memo می‌شود.
+	 *
+	 * @param int $post_id شناسهٔ نوشته (۰ = نوشتهٔ جاری).
+	 * @return bool
+	 */
+	function tara_post_has_video( $post_id = 0 ) {
+		static $cache = array();
+
+		$id = $post_id ? (int) $post_id : (int) get_the_ID();
+		if ( ! $id ) {
+			return false;
+		}
+		if ( isset( $cache[ $id ] ) ) {
+			return $cache[ $id ];
+		}
+
+		$has = false;
+		foreach ( array( 'video1080', 'video720', 'video480' ) as $key ) {
+			$value = get_post_meta( $id, $key, true );
+			if ( is_scalar( $value ) && '' !== trim( (string) $value ) ) {
+				$has = true;
+				break;
+			}
+		}
+
+		/* فیلدها ممکن است فقط در ACF ذخیره شده باشند (نام فیلد متفاوت) */
+		if ( ! $has && function_exists( 'get_field' ) ) {
+			$value = get_field( 'video720', $id );
+			$has   = is_scalar( $value ) && '' !== trim( (string) $value );
+		}
+
+		$cache[ $id ] = (bool) apply_filters( 'tara_post_has_video', $has, $id );
+
+		return $cache[ $id ];
+	}
+}
+
+if ( ! function_exists( 'tara_post_has_audio' ) ) {
+	/**
+	 * آیا این اثر فایل صوتی دارد؟ (v3.8.0)
+	 * ------------------------------------------------------------------
+	 * قرینهٔ `tara_post_has_video` برای نشانهٔ «آهنگ». فقط متا خوانده
+	 * می‌شود (بدون `get_field`) تا در فهرست‌های بلند هزینه‌ای نداشته باشد.
+	 *
+	 * @param int $post_id شناسهٔ نوشته (۰ = نوشتهٔ جاری).
+	 * @return bool
+	 */
+	function tara_post_has_audio( $post_id = 0 ) {
+		static $cache = array();
+
+		$id = $post_id ? (int) $post_id : (int) get_the_ID();
+		if ( ! $id ) {
+			return false;
+		}
+		if ( isset( $cache[ $id ] ) ) {
+			return $cache[ $id ];
+		}
+
+		$has = false;
+		foreach ( array( 'music320', 'music128', 'music' ) as $key ) {
+			$value = get_post_meta( $id, $key, true );
+			if ( is_scalar( $value ) && '' !== trim( (string) $value ) ) {
+				$has = true;
+				break;
+			}
+		}
+
+		/* آلبوم‌ها فایل صوتی را در ردیف‌های تکرارشونده (ACF Repeater) نگه
+		   می‌دارند؛ متای والد شمارنده است، پس عددِ بزرگ‌تر از صفر کافی است. */
+		if ( ! $has ) {
+			$album = get_post_meta( $id, 'album', true );
+			if ( is_array( $album ) ) {
+				$has = ! empty( $album );
+			} elseif ( is_scalar( $album ) && (int) $album > 0 ) {
+				$has = true;
+			}
+		}
+
+		$cache[ $id ] = (bool) apply_filters( 'tara_post_has_audio', $has, $id );
+
+		return $cache[ $id ];
+	}
+}
+
+if ( ! function_exists( 'tara_video_badge' ) ) {
+	/**
+	 * نشانهٔ «موزیک ویدیو» روی کارت/ردیف. خروجی رشتهٔ خالی برای آثار صوتی.
+	 *
+	 * @param int    $post_id شناسهٔ نوشته.
+	 * @param string $variant 'card' (روی کاور) یا 'row' (کنار تیتر).
+	 * @return string
+	 */
+	function tara_video_badge( $post_id = 0, $variant = 'card' ) {
+		if ( ! tara_post_has_video( $post_id ) ) {
+			return '';
+		}
+
+		if ( 'row' === $variant ) {
+			return '<span class="ty-track__vid" aria-label="موزیک ویدیو" title="موزیک ویدیو"><i class="icofont-play-alt-2" aria-hidden="true"></i></span>';
+		}
+
+		return '<span class="ab-card-video" aria-label="موزیک ویدیو" title="موزیک ویدیو">'
+			. '<i class="icofont-play-alt-2" aria-hidden="true"></i><em>ویدیو</em></span>';
+	}
+}
+
+if ( ! function_exists( 'tara_media_badge' ) ) {
+	/**
+	 * نشانهٔ نوعِ اثر روی کاور کارت (v3.8.0)
+	 * ------------------------------------------------------------------
+	 * در دور ۶۷ فقط «ویدیو» نشان داده می‌شد و بدتر از آن، در گوشهٔ **چپ**
+	 * می‌نشست (`inset-inline-end` در RTL = چپ). کاربر خواست همان نشانه به
+	 * سمت راست بیاید و برای آثار صوتی هم قرینه‌اش ساخته شود.
+	 *
+	 *   • ویدیو → پیل تیره + مثلث پخش + «ویدیو»
+	 *   • آهنگ  → پیل روشن‌تر + نت موسیقی + «آهنگ»
+	 *   • هیچ‌کدام → رشتهٔ خالی (بدون کلاس و فاصلهٔ اضافه)
+	 *
+	 * در ردیف‌های فهرست فقط «ویدیو» برچسب می‌گیرد؛ ردیف‌های صوتی خودشان
+	 * فهرست یک سایت موسیقی‌اند و آیکون «آهنگ» روی هر ۱۱۷ ردیف فقط شلوغی
+	 * می‌سازد.
+	 *
+	 * @param int    $post_id شناسهٔ نوشته.
+	 * @param string $variant 'card' یا 'row'.
+	 * @return string
+	 */
+	function tara_media_badge( $post_id = 0, $variant = 'card' ) {
+		$id = $post_id ? (int) $post_id : (int) get_the_ID();
+
+		if ( tara_post_has_video( $id ) ) {
+			return tara_video_badge( $id, $variant );
+		}
+
+		if ( 'row' === $variant || ! tara_post_has_audio( $id ) ) {
+			return '';
+		}
+
+		return '<span class="ab-card-audio" aria-label="نسخهٔ صوتی" title="نسخهٔ صوتی">'
+			. '<i class="icofont-music-note" aria-hidden="true"></i><em>آهنگ</em></span>';
+	}
+}
+
+if ( ! function_exists( 'tara_music_value' ) ) {
+	/**
+	 * مقدارِ خامِ یک فیلد موسیقی (ACF → متا) و بعد نرمال‌سازی به آدرس/رشته.
+	 * برای فیلدهای متنی، همان `tara_music_field` کافی است.
+	 *
+	 * @param string $key     نام فیلد.
+	 * @param int    $post_id شناسهٔ نوشته.
+	 * @return string
+	 */
+	function tara_music_value( $key, $post_id = 0, $preserve_scheme = false ) {
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+		if ( ! $post_id ) {
+			return '';
+		}
+
+		$raw = null;
+		if ( function_exists( 'get_field' ) ) {
+			$raw = get_field( $key, $post_id );
+		}
+		/* get_field وقتی فیلد وجود ندارد، false هم برمی‌گرداند (نه فقط null). */
+		if ( null === $raw || false === $raw || '' === $raw || array() === $raw ) {
+			$raw = get_post_meta( $post_id, $key, true );
+		}
+
+		if ( is_string( $raw ) && '' !== trim( $raw ) && ! in_array( $key, array( 'music320', 'music128', 'music', 'album128', 'album320', 'video480', 'video720', 'video1080' ), true ) ) {
+			return trim( $raw );
+		}
+
+		return tara_media_url( $raw, $preserve_scheme );
+	}
+}
+
+if ( ! function_exists( 'tara_track_title' ) ) {
+	/**
+	 * نام آهنگ — «song» و اگر نبود، عنوان نوشته.
+	 *
+	 * @param int $post_id شناسهٔ نوشته.
+	 * @return string
+	 */
+	function tara_track_title( $post_id = 0 ) {
+		$post_id = (int) $post_id;
+		$song    = tara_music_field( 'song', $post_id );
+
+		return '' !== $song ? $song : (string) get_the_title( $post_id );
+	}
+}
+
+if ( ! function_exists( 'tara_track_artist' ) ) {
+	/**
+	 * نام هنرمند — فیلد «artist» و اگر نبود، اولین ترمِ تاکسونومی هنرمند.
+	 *
+	 * @param int $post_id شناسهٔ نوشته.
+	 * @return string
+	 */
+	function tara_track_artist( $post_id = 0 ) {
+		$post_id = (int) $post_id;
+		$artist  = tara_music_field( 'artist', $post_id );
+
+		if ( '' === $artist && function_exists( 'get_the_terms' ) && function_exists( 'tara_artist_tax' ) ) {
+			$terms = get_the_terms( $post_id, tara_artist_tax() );
+			if ( is_array( $terms ) && isset( $terms[0] ) ) {
+				$artist = $terms[0]->name;
+			}
+		}
+
+		return $artist;
+	}
+}
+
+if ( ! function_exists( 'tara_track_cover' ) ) {
+	/**
+	 * تصویر کاور (اندازهٔ ۱۹۰×۱۹۰). اگر نبود، تصویر پیش‌فرضِ قالب.
+	 *
+	 * @param int    $post_id شناسهٔ نوشته.
+	 * @param string $size    اندازهٔ تصویر.
+	 * @return string
+	 */
+	function tara_track_cover( $post_id = 0, $size = 'thumb2' ) {
+		$post_id = (int) $post_id;
+
+		if ( $post_id && has_post_thumbnail( $post_id ) ) {
+			$src = get_the_post_thumbnail_url( $post_id, $size );
+			if ( $src ) {
+				return $src;
+			}
+		}
+
+		/* فیلدهای کاور اختیاریِ محتوا (اگر قالب یا افزونه‌ای داشته باشد) */
+		if ( $post_id ) {
+			foreach ( array( 'cover', 'poster', 'artwork' ) as $cover_key ) {
+				$cover = tara_media_url( get_post_meta( $post_id, $cover_key, true ) );
+				if ( '' !== $cover ) {
+					return $cover;
+				}
+			}
+		}
+
+		return get_template_directory_uri() . '/images/nomusics.jpg';
+	}
+}
+
+if ( ! function_exists( 'tara_track_playlist' ) ) {
+	/**
+	 * ساخت فهرستِ قابل‌پخش برای یک مجموعه نوشته. فقط آهنگ‌های دارای فایل صوتی.
+	 *
+	 * @param WP_Post[]|int[] $posts فهرست نوشته‌ها یا شناسه‌ها.
+	 * @return array
+	 */
+	function tara_track_playlist( $posts ) {
+		$tracks = array();
+
+		foreach ( (array) $posts as $item ) {
+			$post_id = is_object( $item ) ? (int) $item->ID : (int) $item;
+			if ( ! $post_id ) {
+				continue;
+			}
+
+			$src = tara_track_src( $post_id );
+			if ( '' === $src ) {
+				continue;
+			}
+
+			$tracks[] = array(
+				'id'     => $post_id,
+				'title'  => tara_track_title( $post_id ),
+				'artist' => tara_track_artist( $post_id ),
+				'src'    => $src,
+				'cover'  => tara_track_cover( $post_id, 'thumb2' ),
+				'link'   => get_permalink( $post_id ),
+			);
+		}
+
+		return $tracks;
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * ۲) ردیفِ آهنگ (فهرست‌ها)
+ * ---------------------------------------------------------------------- */
+
+if ( ! function_exists( 'tara_track_row' ) ) {
+	/**
+	 * یک ردیف آهنگ با دکمهٔ پخش. همان دکمه، پلیرِ صفحه را با ایندکس صدا می‌زند.
+	 *
+	 * @param int   $post_id شناسهٔ نوشته.
+	 * @param array $args    گزینه‌ها: index، show_cover، show_date، badge، current.
+	 * @return string
+	 */
+	function tara_track_row( $post_id = 0, $args = array() ) {
+		$post_id = (int) $post_id;
+		$args    = wp_parse_args(
+			$args,
+			array(
+				'index'      => -1,
+				'show_cover' => true,
+				'show_date'  => false,
+				'badge'      => '',
+				'current'    => false,
+				'actions'    => '',
+			)
+		);
+
+		$src    = tara_track_src( $post_id );
+		$title  = tara_track_title( $post_id );
+		$artist = tara_track_artist( $post_id );
+		$cover  = tara_track_cover( $post_id, 'thumb3' );
+		$link   = get_permalink( $post_id );
+
+		$classes = 'ty-track';
+		if ( $args['current'] ) {
+			$classes .= ' is-current';
+		}
+		/* v3.9.1 — اگر دکمهٔ «افزودن به رادیو» چاپ می‌شود، ستونِ ششم لازم
+		   است؛ وگرنه دکمه به سطرِ دوم می‌افتد و ردیف دوخطی می‌شود. */
+		if ( '' !== (string) $src && function_exists( 'tara_radio_add_button' ) && function_exists( 'tara_radio_on' ) && tara_radio_on() ) {
+			$classes .= ' ty-track--radio';
+		}
+		/* v3.10.0 — دکمه‌های حسابِ کاربری (علاقه‌مندی/پلی‌لیست/برداشتن) */
+		if ( '' !== (string) $args['actions'] ) {
+			$classes .= ' ty-track--act';
+		}
+
+		ob_start();
+		?>
+		<div class="<?php echo esc_attr( $classes ); ?>"
+			data-tara-row="<?php echo esc_attr( (int) $args['index'] ); ?>"
+			data-tara-date="<?php echo esc_attr( (string) get_post_time( 'U', true, $post_id ) ); ?>"
+			data-tara-name="<?php echo esc_attr( $title ); ?>"
+			data-tara-artist="<?php echo esc_attr( $artist ); ?>">
+			<?php if ( '' !== $src ) : ?>
+				<button type="button" class="ty-track__play"
+					data-tara-play="<?php echo esc_attr( (int) $args['index'] ); ?>"
+					data-tara-track="<?php echo esc_attr( $post_id ); ?>"
+					data-tara-src="<?php echo esc_url( $src ); ?>"
+					data-tara-title="<?php echo esc_attr( $title ); ?>"
+					data-tara-artist="<?php echo esc_attr( $artist ); ?>"
+					data-tara-cover="<?php echo esc_url( $cover ); ?>"
+					data-tara-link="<?php echo esc_url( $link ); ?>"
+					aria-label="پخش <?php echo esc_attr( $title ); ?>">
+					<span class="ty-icon-play" aria-hidden="true"></span>
+					<span class="ty-icon-pause" aria-hidden="true"></span>
+				</button>
+			<?php else : ?>
+				<span class="ty-track__play ty-track__play--none" aria-hidden="true"><span class="ty-icon-note"></span></span>
+			<?php endif; ?>
+
+			<?php if ( $args['show_cover'] ) : ?>
+				<a class="ty-track__cover" href="<?php echo esc_url( $link ); ?>" tabindex="-1" aria-hidden="true">
+					<img src="<?php echo esc_url( $cover ); ?>" width="48" height="48" alt="" loading="lazy">
+				</a>
+			<?php endif; ?>
+
+			<div class="ty-track__body">
+				<a class="ty-track__title" href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( $title ); ?><?php echo tara_video_badge( $post_id, 'row' ); // خروجی escape شده در تابع ?></a>
+				<span class="ty-track__artist"><?php echo esc_html( $artist ); ?></span>
+			</div>
+
+			<?php if ( '' !== (string) $args['badge'] ) : ?>
+				<span class="ty-track__badge"><?php echo esc_html( $args['badge'] ); ?></span>
+			<?php endif; ?>
+
+			<?php if ( $args['show_date'] ) : ?>
+				<span class="ty-track__date"><?php echo esc_html( get_the_date( '', $post_id ) ); ?></span>
+			<?php endif; ?>
+
+			<?php
+			/* v3.9.0 — «افزودن به رادیو» روی هر ردیفِ فهرست. اگر رادیو خاموش
+			   باشد یا فایل صوتی نباشد، تابع خودش رشتهٔ خالی برمی‌گرداند. */
+			if ( function_exists( 'tara_radio_add_button' ) && '' !== (string) $src ) {
+				echo tara_radio_add_button( $post_id, array( 'class' => 'ty-radio-add ty-radio-add--row' ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی escape شده
+			}
+
+			/* v3.10.0 — دکمه‌های حساب؛ مارکاپشان در inc/tara-account-ui.php
+			   ساخته می‌شود و همین‌جا فقط چاپ می‌شود. */
+			if ( '' !== (string) $args['actions'] ) {
+				echo '<span class="ty-track__act">' . $args['actions'] . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput -- در همان تابع escape شده
+			}
+			?>
+		</div>
+		<?php
+
+		return trim( (string) ob_get_clean() );
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * ۳) چیپ‌های تاکسونومی (ژانر، حال‌وهوا، ترانه‌سرا…)
+ * ---------------------------------------------------------------------- */
+
+if ( ! function_exists( 'tara_queue_attrs' ) ) {
+	/**
+	 * صف پخشِ یک بخش را روی ظرف فهرست می‌نویسد.
+	 *
+	 * @param array  $tracks خروجی tara_track_playlist().
+	 * @param string $title  عنوان بخش (برای سربرگ پاپ‌آپ).
+	 * @return string attribute های آمادهٔ چاپ.
+	 */
+	function tara_queue_attrs( $tracks, $title = '' ) {
+		$tracks = array_values( array_filter( (array) $tracks ) );
+		if ( empty( $tracks ) ) {
+			return '';
+		}
+		$json = wp_json_encode( $tracks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		if ( ! is_string( $json ) ) {
+			return '';
+		}
+		$GLOBALS['tara_has_queue'] = true;
+		$out = ' data-tara-queue="' . esc_attr( $json ) . '"';
+		if ( '' !== $title ) {
+			$out .= ' data-tara-title="' . esc_attr( wp_strip_all_tags( $title ) ) . '"';
+		}
+		return $out;
+	}
+}
+
+if ( ! function_exists( 'tara_card_play' ) ) {
+	/**
+	 * دکمهٔ پخشِ کوچک روی کارت آهنگ. صف از نزدیک‌ترین `[data-tara-queue]`
+	 * خوانده می‌شود؛ بدون صف، ردیف در کارت اصلی پیدا می‌شود.
+	 *
+	 * @param int $post_id شناسهٔ نوشته.
+	 * @return string
+	 */
+	function tara_card_play( $post_id = 0 ) {
+		/* خاموشی: define( 'TARA_CARD_PLAY', false ) یا تنظیمات قالب «ab_card_play» */
+		if ( ( defined( 'TARA_CARD_PLAY' ) && ! TARA_CARD_PLAY )
+			|| ( function_exists( 'tara_ui_on' ) && ! tara_ui_on( 'ab_card_play', true, 'TARA_CARD_PLAY' ) ) ) {
+			return '';
+		}
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+		if ( ! $post_id ) {
+			return '';
+		}
+		$src = function_exists( 'tara_track_src' ) ? tara_track_src( $post_id ) : '';
+		if ( '' === $src ) {
+			return '';
+		}
+		/* v3.7.8 — دکمهٔ پخش خودش دادهٔ کافی را با خود می‌برد؛ اگر صف پیدا نشد
+		   (مثل فهرست صفحهٔ هنرمند)، JS یک صف تک‌قطعه‌ای می‌سازد و پخش می‌کند. */
+		return '<button type="button" class="ty-cardplay" data-tara-track="' . esc_attr( $post_id ) . '"'
+			. ' data-tara-src="' . esc_url( $src ) . '"'
+			. ' data-tara-title="' . esc_attr( tara_track_title( $post_id ) ) . '"'
+			. ' data-tara-artist="' . esc_attr( tara_track_artist( $post_id ) ) . '"'
+			. ' data-tara-cover="' . esc_url( tara_track_cover( $post_id, 'thumb2' ) ) . '"'
+			. ' data-tara-link="' . esc_url( get_permalink( $post_id ) ) . '"'
+			. ' aria-label="پخش ' . esc_attr( tara_track_title( $post_id ) ) . '">'
+			. '<span class="ty-icon-play" aria-hidden="true"></span>'
+			. '<span class="ty-icon-pause" aria-hidden="true"></span>'
+			. '</button>';
+	}
+}
+
+if ( ! function_exists( 'tara_track_list' ) ) {
+	/**
+	 * فهرست آهنگ‌ها با «صف پخش» مخصوص خودش.
+	 *
+	 * چرا صف روی خودِ <ul>؟ چون در یک صفحه چند فهرست داریم (آهنگ‌ها، آلبوم‌ها،
+	 * آرشیو) و شمارهٔ ردیف در هر کدام از صفر شروع می‌شود. با
+	 * `data-tara-queue` هر فهرست صف خودش را دارد و پلیرِ چسبان همان را پخش
+	 * می‌کند — بدون هیچ کوئری یا AJAX اضافه.
+	 *
+	 * @param array $posts فهرست نوشته‌ها یا شناسه‌ها.
+	 * @param array $args  title/badge/show_date/class/context.
+	 * @return string
+	 */
+	function tara_track_list( $posts, $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'title'     => '',
+				'badge'     => '',
+				'show_date' => false,
+				'class'     => 'ty-tracklist',
+				'context'   => '',
+			)
+		);
+
+		$posts = (array) $posts;
+		if ( empty( $posts ) ) {
+			return '';
+		}
+
+		$queue = array();
+		$rows  = array();
+
+		foreach ( $posts as $item ) {
+			$post_id = is_object( $item ) ? (int) $item->ID : (int) $item;
+			if ( ! $post_id ) {
+				continue;
+			}
+
+			$src   = function_exists( 'tara_track_src' ) ? tara_track_src( $post_id ) : '';
+			$index = -1;
+
+			if ( '' !== $src ) {
+				$index   = count( $queue );
+				$queue[] = array(
+					'id'     => $post_id,
+					'title'  => tara_track_title( $post_id ),
+					'artist' => tara_track_artist( $post_id ),
+					'src'    => $src,
+					'cover'  => tara_track_cover( $post_id, 'thumb2' ),
+					'link'   => get_permalink( $post_id ),
+				);
+			}
+
+			$rows[] = tara_track_row(
+				$post_id,
+				array(
+					'index'     => $index,
+					'badge'     => $args['badge'],
+					'show_date' => (bool) $args['show_date'],
+				)
+			);
+		}
+
+		if ( empty( $rows ) ) {
+			return '';
+		}
+
+		$attrs = '';
+		if ( ! empty( $queue ) ) {
+			$json = wp_json_encode( $queue, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+			if ( is_string( $json ) ) {
+				$attrs .= ' data-tara-queue="' . esc_attr( $json ) . '"';
+			}
+			if ( '' !== $args['title'] ) {
+				$attrs .= ' data-tara-title="' . esc_attr( $args['title'] ) . '"';
+			}
+			$attrs .= ' data-tara-context="' . esc_attr( $args['context'] ) . '"';
+		}
+
+		$html = '<ul class="' . esc_attr( $args['class'] ) . '"' . $attrs . '>';
+		foreach ( $rows as $row ) {
+			$html .= '<li>' . $row . '</li>';
+		}
+		$html .= '</ul>';
+
+		return $html;
+	}
+}
+
+if ( ! function_exists( 'tara_term_chips' ) ) {
+	/**
+	 * فهرست ترم‌های یک نوشته به‌شکل چیپ لینک‌دار.
+	 *
+	 * @param string $taxonomy نامک تاکسونومی.
+	 * @param int    $post_id  شناسهٔ نوشته (۰ = نوشتهٔ جاری).
+	 * @param string $label    برچسبِ اختیاری قبل از چیپ‌ها.
+	 * @return string
+	 */
+	function tara_term_chips( $taxonomy, $post_id = 0, $label = '' ) {
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+		if ( ! $post_id || ! taxonomy_exists( $taxonomy ) ) {
+			return '';
+		}
+
+		$terms = get_the_terms( $post_id, $taxonomy );
+		if ( ! is_array( $terms ) || empty( $terms ) ) {
+			return '';
+		}
+
+		$out = '<span class="ty-chips ty-chips--' . esc_attr( $taxonomy ) . '">';
+		if ( '' !== $label ) {
+			$out .= '<span class="ty-chips__label">' . esc_html( $label ) . '</span>';
+		}
+		foreach ( $terms as $term ) {
+			$link = get_term_link( $term );
+			if ( is_wp_error( $link ) ) {
+				continue;
+			}
+			$out .= '<a class="ty-chip" href="' . esc_url( $link ) . '">' . esc_html( $term->name ) . '</a>';
+		}
+		$out .= '</span>';
+
+		return $out;
+	}
+}
+
+/* -------------------------------------------------------------------------
+ * ۴) پلیر — مارکاپِ مشترک
+ * ---------------------------------------------------------------------- */
+
+if ( ! function_exists( 'tara_dock_markup' ) ) {
+	/**
+	 * نوار چسبانِ پایین صفحه. یک‌بار در هر صفحه رندر می‌شود و همان صدای
+	 * پلیر اصلی را کنترل می‌کند (همگام‌سازی در js/tara-player.js).
+	 *
+	 * @param array $first قطعهٔ اول (برای مقدار شروع).
+	 * @return string
+	 */
+	function tara_dock_markup( $first ) {
+		$first = wp_parse_args(
+			(array) $first,
+			array(
+				'title'  => 'در حال پخش',
+				'artist' => '',
+				'cover'  => '',
+				'link'   => '',
+			)
+		);
+
+		/* آدرس خالی = درخواست به خودِ صفحه؛ پس یک تصویر جانشین می‌گذاریم */
+		if ( '' === (string) $first['cover'] ) {
+			$first['cover'] = get_template_directory_uri() . '/images/nomusics.jpg';
+		}
+		if ( '' === (string) $first['link'] ) {
+			$first['link'] = home_url( '/' );
+		}
+
+		/* v3.7.5 — اگر همین حالا روی صفحهٔ همان آهنگ هستیم، لینک «صفحهٔ آهنگ»
+		   بی‌معناست (به همان صفحه برمی‌گردد). پس نشان داده نمی‌شود. */
+		$tara_same_page = is_singular() && ! empty( $first['id'] ) && (int) get_the_ID() === (int) $first['id'];
+
+		ob_start();
+		?>
+		<div class="ty-dock" data-tara-dock hidden dir="rtl">
+			<span class="ty-dock__bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+			<a class="ty-dock__art" href="<?php echo esc_url( $first['link'] ); ?>" tabindex="-1" aria-hidden="true">
+				<img class="ty-dock__img" src="<?php echo esc_url( $first['cover'] ); ?>" width="44" height="44" alt="" data-tara-dock-art>
+			</a>
+			<div class="ty-dock__meta">
+				<a class="ty-dock__title" href="<?php echo esc_url( $first['link'] ); ?>" data-tara-dock-link data-tara-dock-title><?php echo esc_html( $first['title'] ); ?></a>
+				<span class="ty-dock__artist" data-tara-dock-artist><?php echo esc_html( $first['artist'] ); ?></span>
+				<div class="ty-dock__rail"><span class="ty-dock__fill" data-tara-dock-fill></span></div>
+			</div>
+			<button type="button" class="ty-dock__btn" data-tara-dock-prev aria-label="قطعهٔ قبل"><span class="ty-icon-prev" aria-hidden="true"></span></button>
+			<button type="button" class="ty-dock__btn ty-dock__btn--main" data-tara-dock-toggle aria-label="پخش / توقف">
+				<span class="ty-icon-play" aria-hidden="true"></span><span class="ty-icon-pause" aria-hidden="true"></span>
+			</button>
+			<button type="button" class="ty-dock__btn" data-tara-dock-next aria-label="قطعهٔ بعد"><span class="ty-icon-next" aria-hidden="true"></span></button>
+			<div class="ty-dock__vol" data-tara-dock-volbox>
+				<button type="button" class="ty-dock__btn ty-dock__btn--vol" data-tara-dock-mute aria-label="بی‌صدا / با صدا">
+					<span class="ty-icon-vol" aria-hidden="true"></span>
+					<span class="ty-icon-muted" aria-hidden="true"></span>
+				</button>
+				<input type="range" class="ty-dock__volrange" data-tara-dock-vol min="0" max="100" value="100" step="1" aria-label="بلندی صدا" dir="ltr">
+			</div>
+			<button type="button" class="ty-dock__btn ty-dock__btn--list" data-tara-dock-list aria-label="فهرست پخش" aria-haspopup="dialog"<?php echo ( (int) ( isset( $first['total'] ) ? $first['total'] : 0 ) < 2 ) ? ' hidden' : ''; ?>>
+				<span class="ty-icon-list" aria-hidden="true"></span>
+			</button>
+
+			<button type="button" class="ty-dock__btn ty-dock__btn--close" data-tara-dock-close aria-label="بستن پلیر">
+				<span class="ty-icon-close" aria-hidden="true"></span>
+			</button>
+		</div>
+		<?php
+		return trim( (string) ob_get_clean() );
+	}
+}
+
+if ( ! function_exists( 'tara_playlist_modal' ) ) {
+	/**
+	 * کادر (پاپ‌آپ) فهرست پخش — یک‌بار در هر صفحه.
+	 * محتوای ردیف‌ها را جاوااسکریپت از صفِ همان پلیر می‌سازد، پس یک کادر
+	 * برای همهٔ پلیرهای صفحه کافی است و صفحه با لیست‌های تکراری سنگین نمی‌شود.
+	 *
+	 * @return string
+	 */
+	function tara_playlist_modal() {
+		ob_start();
+		?>
+		<div class="ty-modal" id="tara-playlist-modal" data-tara-modal hidden>
+			<div class="ty-modal__backdrop" data-tara-modal-close></div>
+			<div class="ty-modal__panel" role="dialog" aria-modal="true" aria-labelledby="tara-modal-title">
+				<header class="ty-modal__head">
+					<div class="ty-modal__heading">
+						<span class="ty-modal__eyebrow">در حال پخش از</span>
+						<h2 class="ty-modal__title" id="tara-modal-title" data-tara-modal-title>فهرست پخش</h2>
+					</div>
+					<span class="ty-modal__count" data-tara-modal-count></span>
+					<button type="button" class="ty-modal__close" data-tara-modal-close aria-label="بستن فهرست">
+						<span class="ty-icon-close" aria-hidden="true"></span>
+					</button>
+				</header>
+
+				<div class="ty-modal__search">
+					<span class="ty-icon-search" aria-hidden="true"></span>
+					<input type="search" data-tara-modal-search placeholder="جست‌وجو در نام آهنگ یا خواننده…" aria-label="جست‌وجو در فهرست پخش" autocomplete="off">
+				</div>
+
+				<ol class="ty-modal__list" data-tara-modal-list></ol>
+				<p class="ty-modal__empty" data-tara-modal-empty hidden>چیزی با این نام در فهرست نیست.</p>
+
+				<footer class="ty-modal__foot">
+					<span data-tara-modal-meta></span>
+					<span class="ty-modal__hint">کلید <kbd>Esc</kbd> کادر را می‌بندد</span>
+				</footer>
+			</div>
+		</div>
+		<?php
+		return trim( (string) ob_get_clean() );
+	}
+}
+
+if ( ! function_exists( 'tara_video' ) ) {
+	/**
+	 * پلیر ویدیو با کنترل کیفیت، سرعت پخش و تصویر شاخص.
+	 *
+	 * @param array $args {
+	 *     @type array  $sources کیفیت => آدرس (مثلاً array( '1080' => '...', '720' => '...' )).
+	 *     @type string $poster  تصویر شاخص.
+	 *     @type string $title   عنوان.
+	 * }
+	 * @return string
+	 */
+	function tara_video( $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'sources' => array(),
+				'poster'  => '',
+				'title'   => '',
+			)
+		);
+
+		$sources = array();
+		foreach ( (array) $args['sources'] as $quality => $src ) {
+			$url = tara_media_url( $src );
+			if ( '' !== $url ) {
+				$sources[ (string) $quality ] = $url;
+			}
+		}
+
+		if ( empty( $sources ) ) {
+			return '';
+		}
+
+		/* بالاترین کیفیت، منبع پیش‌فرض */
+		$qualities = array_keys( $sources );
+		usort(
+			$qualities,
+			static function ( $a, $b ) {
+				return (int) $b - (int) $a;
+			}
+		);
+		$default = $qualities[0];
+
+		ob_start();
+		?>
+		<section class="ty-video" data-tara-video dir="rtl">
+			<div class="ty-video__stage">
+				<video class="ty-video__el" data-tara-video-el playsinline preload="metadata"
+					<?php if ( '' !== $args['poster'] ) : ?>poster="<?php echo esc_url( $args['poster'] ); ?>"<?php endif; ?>>
+					<source src="<?php echo esc_url( $sources[ $default ] ); ?>" type="video/mp4">
+				</video>
+
+				<button type="button" class="ty-video__cover" data-tara-video-toggle aria-label="پخش ویدیو">
+					<?php if ( '' !== $args['poster'] ) : ?>
+						<img class="ty-video__poster" src="<?php echo esc_url( $args['poster'] ); ?>" alt="" loading="lazy">
+					<?php endif; ?>
+					<span class="ty-video__bigplay" aria-hidden="true"><span class="ty-icon-play"></span></span>
+					<?php if ( '' !== $args['title'] ) : ?>
+						<span class="ty-video__caption"><?php echo esc_html( $args['title'] ); ?></span>
+					<?php endif; ?>
+				</button>
+			</div>
+
+			<div class="ty-video__bar">
+				<button type="button" class="ty-video__btn" data-tara-video-play aria-label="پخش / توقف">
+					<span class="ty-icon-play" aria-hidden="true"></span><span class="ty-icon-pause" aria-hidden="true"></span>
+				</button>
+
+				<div class="ty-video__rail">
+					<span class="ty-video__loaded" data-tara-video-loaded></span>
+					<span class="ty-video__played" data-tara-video-played></span>
+					<input type="range" class="ty-video__seek" data-tara-video-seek min="0" max="100" value="0" step="0.1" aria-label="جای پخش ویدیو">
+				</div>
+
+				<span class="ty-video__time" data-tara-video-time>۰۰:۰۰ / ۰۰:۰۰</span>
+
+				<div class="ty-video__menu">
+					<button type="button" class="ty-video__btn ty-video__btn--text" data-tara-video-settings aria-haspopup="true" aria-expanded="false">
+						<span data-tara-video-quality><?php echo esc_html( $default ); ?>p</span>
+						<span class="ty-icon-caret" aria-hidden="true"></span>
+					</button>
+					<div class="ty-video__pop" data-tara-video-pop hidden>
+						<span class="ty-video__pop-title">کیفیت</span>
+						<div class="ty-video__qualities">
+							<?php foreach ( $qualities as $quality ) : ?>
+								<button type="button" class="ty-video__quality<?php echo $quality === $default ? ' is-active' : ''; ?>" data-tara-video-src="<?php echo esc_url( $sources[ $quality ] ); ?>" data-tara-video-q="<?php echo esc_attr( $quality ); ?>"><?php echo esc_html( $quality ); ?>p</button>
+							<?php endforeach; ?>
+						</div>
+						<span class="ty-video__pop-title">سرعت پخش</span>
+						<div class="ty-video__rates">
+							<?php foreach ( array( '0.75', '1', '1.25', '1.5', '2' ) as $rate ) : ?>
+								<button type="button" class="ty-video__rate<?php echo '1' === $rate ? ' is-active' : ''; ?>" data-tara-video-rate="<?php echo esc_attr( $rate ); ?>"><?php echo esc_html( '1' === $rate ? 'عادی' : $rate . '×' ); ?></button>
+							<?php endforeach; ?>
+						</div>
+						<button type="button" class="ty-video__pip" data-tara-video-pip><span class="ty-icon-pip" aria-hidden="true"></span> تصویر در تصویر</button>
+					</div>
+				</div>
+
+				<button type="button" class="ty-video__btn" data-tara-video-mute aria-label="بی‌صدا / با صدا" aria-pressed="false">
+					<span class="ty-icon-vol" aria-hidden="true"></span>
+					<span class="ty-icon-muted" aria-hidden="true"></span>
+				</button>
+				<?php
+				/* v3.8.3 — آیکونِ استانداردِ تمام‌صفحه (چهار گوشهٔ رو‌به‌بیرون) و
+				   آیکونِ «خروج» (چهار گوشهٔ رو‌به‌داخل) که وقتی پلیر تمام‌صفحه است
+				   جای آن را می‌گیرد. SVGِ درون‌خطی است تا رنگش از `currentColor`
+				   بیاید و به فونتِ آیکون وابسته نباشد. */
+				?>
+				<button type="button" class="ty-video__btn ty-video__btn--fs" data-tara-video-fs aria-label="تمام‌صفحه" aria-pressed="false">
+					<svg class="ty-video__ico ty-video__ico--expand" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+					<svg class="ty-video__ico ty-video__ico--collapse" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>
+				</button>
+			</div>
+		</section>
+		<?php
+		return trim( (string) ob_get_clean() );
+	}
+}
+
+if ( ! function_exists( 'tara_player' ) ) {
+	/**
+	 * پلیرِ «رادیو»: یک کارت بزرگ با کنترل‌های کامل + فهرستِ پخش + نوار چسبان.
+	 *
+	 * @param array $args {
+	 *     @type array  $tracks      فهرست آهنگ‌ها (خروجی tara_track_playlist).
+	 *     @type string $title       عنوان کارت.
+	 *     @type string $subtitle    زیرعنوان.
+	 *     @type string $cover       تصویر بزرگ کارت.
+	 *     @type string $zoom        نسخهٔ اصلی تصویر (دکمهٔ دوربین + پاپ‌آپ).
+	 *     @type int    $start       ایندکس شروع.
+	 *     @type string $context     شناسهٔ زمینه (artist/home/single) برای داده‌ساختاریافته.
+	 * }
+	 * @return string
+	 */
+	function tara_player( $args = array() ) {
+		/* نوار چسبان و کادر فهرست فقط یک‌بار در هر صفحه رندر می‌شوند. */
+		static $tara_dock_done = false;
+		static $tara_audio_done = false;
+
+		$args = wp_parse_args(
+			$args,
+			array(
+				'tracks'   => array(),
+				'title'    => '',
+				'subtitle' => '',
+				'cover'    => '',
+				'zoom'     => '', /* v3.7.8 — آدرس نسخهٔ اصلی تصویر برای پاپ‌آپ دوربین */
+				'start'    => 0,
+				'context'  => 'page',
+			)
+		);
+
+		$tracks = array_values( array_filter( (array) $args['tracks'] ) );
+		if ( empty( $tracks ) ) {
+			return '';
+		}
+
+		$uid   = 'tara-player-' . wp_unique_id();
+		$first = isset( $tracks[ $args['start'] ] ) ? $tracks[ $args['start'] ] : $tracks[0];
+		$json  = wp_json_encode( $tracks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+
+		/* v3.7.5 — سه حالت «بی‌مصرف» پنهان می‌شود:
+		   • یک قطعه ⇒ «فهرست پخش» معنا ندارد
+		   • روی صفحهٔ همان آهنگ ⇒ «صفحهٔ آهنگ» به همین صفحه برمی‌گردد
+		   همچنین تعداد قطعه‌ها به dock داده می‌شود تا دکمهٔ فهرستش هم پنهان شود. */
+		$tara_total     = count( $tracks );
+		$tara_same_page = is_singular() && ! empty( $first['id'] ) && (int) get_the_ID() === (int) $first['id'];
+
+		ob_start();
+		?>
+		<section class="ty-player" id="<?php echo esc_attr( $uid ); ?>" data-tara-player="<?php echo esc_attr( $args['context'] ); ?>" dir="rtl">
+			<script type="application/json" class="ty-player__data"><?php echo $json; // phpcs:ignore WordPress.Security.EscapeOutput -- JSON ساختهٔ خودمان است ?></script>
+
+			<div class="ty-player__art">
+				<?php $tara_zoom_src = isset( $args['zoom'] ) && is_scalar( $args['zoom'] ) ? (string) $args['zoom'] : ''; ?>
+				<?php if ( '' !== $tara_zoom_src ) : ?>
+					<button type="button" class="ty-player__zoom" data-tara-zoom="<?php echo esc_url( $tara_zoom_src ); ?>" aria-label="نمایش کاور در اندازهٔ بزرگ" title="نمایش کاور در اندازهٔ بزرگ">
+						<i class="icofont-camera" aria-hidden="true"></i>
+					</button>
+				<?php endif; ?>
+				<img class="ty-player__img" src="<?php echo esc_url( $args['cover'] ? $args['cover'] : $first['cover'] ); ?>" width="180" height="180" alt="" data-tara-art>
+				<span class="ty-player__pulse" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+			</div>
+
+			<div class="ty-player__main">
+				<div class="ty-player__head">
+					<div class="ty-player__labels">
+						<span class="ty-player__eyebrow"><?php echo esc_html( '' !== $args['title'] ? $args['title'] : 'پخش آنلاین' ); ?></span>
+						<a class="ty-player__song" href="<?php echo esc_url( $first['link'] ); ?>" data-tara-title-link>
+							<span data-tara-title><?php echo esc_html( $first['title'] ); ?></span>
+						</a>
+						<span class="ty-player__artist" data-tara-artist><?php echo esc_html( $first['artist'] ); ?></span>
+					</div>
+
+					<div class="ty-player__tools">
+						<span class="ty-player__count" data-tara-count><?php echo esc_html( tara_fa_number( count( $tracks ) ) ); ?> قطعه</span>
+						<?php if ( $tara_total > 1 ) : ?>
+						<button type="button" class="ty-player__tool" data-tara-list aria-haspopup="dialog" aria-expanded="false" aria-controls="tara-playlist-modal" aria-label="فهرست پخش">
+							<span class="ty-icon-list" aria-hidden="true"></span>
+							<span class="ty-player__tool-label">فهرست پخش</span>
+						</button>
+						<?php endif; ?>
+						<?php if ( ! $tara_same_page ) : ?>
+						<a class="ty-player__tool" href="<?php echo esc_url( $first['link'] ); ?>" data-tara-title-link aria-label="رفتن به صفحهٔ این آهنگ">
+							<span class="ty-icon-note" aria-hidden="true"></span>
+							<span class="ty-player__tool-label">صفحهٔ آهنگ</span>
+						</a>
+						<?php endif; ?>
+					</div>
+				</div>
+
+				<div class="ty-player__transport">
+					<button type="button" class="ty-player__btn ty-player__btn--skip" data-tara-prev aria-label="قطعهٔ قبل">
+						<span class="ty-icon-prev" aria-hidden="true"></span>
+					</button>
+					<button type="button" class="ty-player__btn ty-player__btn--main" data-tara-toggle aria-label="پخش / توقف">
+						<span class="ty-icon-play" aria-hidden="true"></span>
+						<span class="ty-icon-pause" aria-hidden="true"></span>
+						<span class="ty-player__spinner" aria-hidden="true"></span>
+					</button>
+					<button type="button" class="ty-player__btn ty-player__btn--skip" data-tara-next aria-label="قطعهٔ بعد">
+						<span class="ty-icon-next" aria-hidden="true"></span>
+					</button>
+
+					<div class="ty-player__timeline">
+						<div class="ty-player__buffer" data-tara-buffer></div>
+						<div class="ty-player__fill" data-tara-fill></div>
+						<input type="range" class="ty-player__seek" data-tara-seek min="0" max="100" value="0" step="0.1" aria-label="جای پخش">
+					</div>
+
+					<span class="ty-player__time" data-tara-time>۰۰:۰۰ / ۰۰:۰۰</span>
+
+					<div class="ty-player__vol">
+						<button type="button" class="ty-player__vol-btn" data-tara-mute aria-label="بی‌صدا / با صدا" aria-pressed="false">
+							<span class="ty-icon-vol" aria-hidden="true"></span>
+							<span class="ty-icon-muted" aria-hidden="true"></span>
+						</button>
+						<input type="range" data-tara-volume min="0" max="1" step="0.01" value="1" aria-label="صدا">
+					</div>
+				</div>
+
+				<p class="ty-player__error" data-tara-error hidden>فایل صوتی این قطعه در دسترس نیست. قطعهٔ بعدی را امتحان کنید.</p>
+			</div>
+
+			<?php if ( ! $tara_audio_done ) : ?>
+				<?php $tara_audio_done = true; ?>
+				<audio class="ty-player__audio" preload="none" data-tara-audio playsinline></audio>
+			<?php endif; ?>
+		</section>
+
+		<?php if ( ! $tara_dock_done ) : ?>
+		<?php $tara_dock_done = true; ?>
+		<?php $GLOBALS['tara_dock_printed'] = true; ?>
+		<?php $GLOBALS['tara_modal_printed'] = true; ?>
+		<?php
+		$first['total'] = $tara_total;
+		echo tara_dock_markup( $first ); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع
+		?>
+		<?php echo tara_playlist_modal(); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع ?>
+		<?php endif; ?>
+		<?php
+
+		return trim( (string) ob_get_clean() );
+	}
+}
+
+if ( ! function_exists( 'tara_fa_number' ) ) {
+	/**
+	 * عدد فارسی. اگر هستهٔ قالب تابع خودش را دارد، همان استفاده می‌شود.
+	 *
+	 * @param int|float $number عدد.
+	 * @return string
+	 */
+	function tara_fa_number( $number ) {
+		if ( function_exists( 'tara_number_fa' ) ) {
+			return tara_number_fa( $number );
+		}
+
+		return strtr( (string) $number, array( '0' => '۰', '1' => '۱', '2' => '۲', '3' => '۳', '4' => '۴', '5' => '۵', '6' => '۶', '7' => '۷', '8' => '۸', '9' => '۹' ) );
+	}
+}
+
+if ( ! function_exists( 'tara_runtime_footer' ) ) {
+	/**
+	 * تضمینِ وجود نوار چسبان و پاپ‌آپ فهرست در صفحه.
+	 *
+	 * چرا لازم است؟ در صفحهٔ اصلی، صف‌ها از فهرست بخش‌ها می‌آیند
+	 * (`data-tara-queue`). اگر کارتِ پلیر خاموش باشد یا آهنگی برای آن پیدا
+	 * نشود، هیچ‌جا `tara_player()` صدا زده نمی‌شود؛ در نتیجه پاپ‌آپ و نوار
+	 * چسبان هم ساخته نمی‌شدند و دکمهٔ «فهرست پخش» روی کارت‌ها بی‌اثر بود.
+	 *
+	 * این تابع در `wp_footer` و فقط وقتی صفی در صفحه هست، آن دو را (مخفی)
+	 * چاپ می‌کند. هیچ خروجی اضافه‌ای روی صفحه‌های بی‌صف ندارد.
+	 */
+	function tara_runtime_footer() {
+		if ( empty( $GLOBALS['tara_has_queue'] ) ) {
+			return;
+		}
+
+		$dock  = empty( $GLOBALS['tara_dock_printed'] );
+		$modal = empty( $GLOBALS['tara_modal_printed'] );
+
+		if ( ! $dock && ! $modal ) {
+			return;
+		}
+
+		$placeholder = array(
+			'id'     => 0,
+			'title'  => '',
+			'artist' => '',
+			'src'    => '',
+			'cover'  => '',
+			'link'   => '',
+		);
+
+		if ( $dock && function_exists( 'tara_dock_markup' ) ) {
+			echo tara_dock_markup( $placeholder ); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع
+			$GLOBALS['tara_dock_printed'] = true;
+		}
+		if ( $modal && function_exists( 'tara_playlist_modal' ) ) {
+			echo tara_playlist_modal(); // phpcs:ignore WordPress.Security.EscapeOutput -- escape شده در تابع
+			$GLOBALS['tara_modal_printed'] = true;
+		}
+	}
+	add_action( 'wp_footer', 'tara_runtime_footer', 30 );
+}
+
+if ( ! function_exists( 'tara_runtime_inline_js' ) ) {
+	/**
+	 * اسکریپتِ کوچکِ درون‌خطی (v3.7.5)
+	 * =====================================================================
+	 * چرا درون‌خطی؟ چون در سایتِ کاربر، دکمهٔ «بالا» و کلید شب/روز اصلاً کار
+	 * نمی‌کردند؛ این دو تا فقط به JS وابسته بودند. فایلِ بیرونی می‌تواند
+	 * ۴۰۴ شود، توسط افزونهٔ کش ترکیب یا حذف شود، یا پیش از jQuery شکسته
+	 * باشد. اسکریپتِ درون‌خطی هیچ‌کدام از این ریسک‌ها را ندارد.
+	 *
+	 * همچنین اگر `js/tara-player.js` به هر دلیلی اجرا نشده باشد (نشانه:
+	 * نبودن data-tara-ready روی <html>)، همین اسکریپت دوباره آن را با
+	 * نسخهٔ تازه بارگذاری می‌کند تا پخش و پاپ‌آپ فهرست کار کند.
+	 */
+	function tara_runtime_inline_js() {
+		$player = esc_url( TARANEHYAR_URI . '/js/tara-player.js' );
+		$ver    = defined( 'TARANEHYAR_VERSION' ) ? TARANEHYAR_VERSION : '0';
+		?>
+		<script id="tara-runtime-inline">
+		(function () {
+			var doc = document, root = doc.documentElement;
+			root.setAttribute('data-tara-chrome', '1');
+			var KEY = 'tara-night';
+
+			function store(v) { try { window.localStorage.setItem(KEY, v ? '1' : '0'); } catch (e) {} }
+			function paint(on) {
+				doc.body.classList.toggle('night', on);
+				var keys = doc.querySelectorAll('.dark_light_mode');
+				for (var i = 0; i < keys.length; i++) {
+					keys[i].classList.toggle('dark_active', on);
+					/* v3.8.0 — وضعیت کلید برای صفحه‌خوان */
+					keys[i].setAttribute('aria-checked', on ? 'true' : 'false');
+				}
+				var knobs = doc.querySelectorAll('.toggle_modes');
+				for (var j = 0; j < knobs.length; j++) { knobs[j].classList.toggle('active', on); }
+				root.setAttribute('data-tara-night', on ? '1' : '0');
+			}
+
+			try {
+				var saved = window.localStorage.getItem(KEY);
+				if (saved === '1' || saved === '0') { paint(saved === '1'); }
+			} catch (e) {}
+
+			/* کلید شب/روز: کل محدودهٔ کلید کلیک‌پذیر است، نه فقط نقطهٔ وسط */
+			doc.addEventListener('click', function (ev) {
+				var el = ev.target;
+				while (el && el !== doc.body) {
+					if (el.classList && (el.classList.contains('dark_light_mode') || el.classList.contains('toggle_modes'))) {
+						ev.preventDefault();
+						ev.stopPropagation();
+						var next = !doc.body.classList.contains('night');
+						paint(next);
+						store(next);
+						return;
+					}
+					el = el.parentNode;
+				}
+			}, true);
+
+			/* v3.8.0 — دکمهٔ «بالا» با صفحه‌کلید */
+			doc.addEventListener('keydown', function (ev) {
+				var el = ev.target;
+				if (!el || !el.classList || !el.classList.contains('top_page')) { return; }
+				if (ev.key !== 'Enter' && ev.key !== ' ' && ev.key !== 'Spacebar') { return; }
+				ev.preventDefault();
+				try { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+				catch (e) { window.scrollTo(0, 0); }
+			});
+
+			/* v3.8.0 — کلید شب/روز با صفحه‌کلید: Enter و Space */
+			doc.addEventListener('keydown', function (ev) {
+				var el = ev.target;
+				if (!el || !el.classList || !el.classList.contains('dark_light_mode')) { return; }
+				if (ev.key !== 'Enter' && ev.key !== ' ' && ev.key !== 'Spacebar') { return; }
+				ev.preventDefault();
+				var next = !doc.body.classList.contains('night');
+				paint(next);
+				store(next);
+			});
+
+			/* v3.8.0 — کشوی منوی موبایل: aria-expanded روی دکمه، aria-hidden روی
+			   کشو، بستن با Escape و برگشت فوکوس به دکمه. باز/بستنِ بصری همان
+			   انیمیشن jQuery قبلی است؛ این‌جا فقط وضعیتِ معنایی هم‌گام می‌شود. */
+			(function () {
+				var nav = doc.querySelector('#mobiles_header .navicon');
+				var drawer = doc.querySelector('#ab-mobile-drawer');
+				if (!nav || !drawer) { return; }
+
+				function setOpen(open) {
+					nav.setAttribute('aria-expanded', open ? 'true' : 'false');
+					nav.setAttribute('aria-label', open ? 'بستن منو' : 'منوی سایت');
+					var panel = drawer.querySelector('.mobiles_menu');
+					if (panel) { panel.setAttribute('aria-hidden', open ? 'false' : 'true'); }
+				}
+
+				nav.addEventListener('click', function () {
+					setOpen(nav.getAttribute('aria-expanded') !== 'true');
+				});
+
+				/* بستنِ کشو با Escape: همان مسیر بستنِ لمس (پرده) را صدا می‌زنیم
+				   تا انیمیشن و رفتارِ قبلی دست‌نخورده بماند. */
+				doc.addEventListener('keydown', function (ev) {
+					if (ev.key !== 'Escape' && ev.key !== 'Esc') { return; }
+					if (nav.getAttribute('aria-expanded') !== 'true') { return; }
+					var veil = drawer.querySelector('.bodydeactive');
+					if (veil) { veil.click(); }
+					setOpen(false);
+					try { nav.focus(); } catch (e) {}
+				});
+			})();
+
+			/* دکمهٔ «بالا» */
+			var topBtn = doc.querySelector('.top_page');
+			function onScroll() {
+				if (!topBtn) { return; }
+				var y = window.pageYOffset || doc.documentElement.scrollTop || 0;
+				topBtn.classList.toggle('is-shown', y > 420);
+			}
+			window.addEventListener('scroll', onScroll, { passive: true });
+			doc.addEventListener('DOMContentLoaded', onScroll);
+			onScroll();
+
+			doc.addEventListener('click', function (ev) {
+				var el = ev.target;
+				while (el && el !== doc.body) {
+					if (el.classList && el.classList.contains('top_page')) {
+						ev.preventDefault();
+						ev.stopPropagation();
+						try { window.scrollTo({ top: 0, behavior: 'smooth' }); }
+						catch (e) { window.scrollTo(0, 0); }
+						return;
+					}
+					el = el.parentNode;
+				}
+			}, true);
+
+			/* خودترمیمی پلیر: اگر فایلش اجرا نشده باشد، دوباره بارگذاری می‌شود */
+			window.addEventListener('load', function () {
+				if (root.getAttribute('data-tara-ready')) { return; }
+				if (!doc.querySelector('[data-tara-player], [data-tara-queue], [data-tara-track]')) { return; }
+				var s = doc.createElement('script');
+				s.src = '<?php echo $player; ?>?v=<?php echo esc_js( $ver ); ?>-' + Date.now();
+				s.async = false;
+				doc.body.appendChild(s);
+			});
+		})();
+		</script>
+		<?php
+	}
+	add_action( 'wp_footer', 'tara_runtime_inline_js', 99 );
+}

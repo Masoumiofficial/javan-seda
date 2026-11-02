@@ -1,0 +1,4 @@
+Verified icon adapted from Material Design Icons by Google.
+Source: https://github.com/google/material-design-icons/tree/master/src/action/verified/materialiconsround
+Licensed under the Apache License, Version 2.0; see material-design-icons-LICENSE.txt.
+The original SVG path was adapted to use a solid blue silhouette and a white check stroke.

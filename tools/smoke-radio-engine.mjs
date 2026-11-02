@@ -125,4 +125,38 @@ const flush=()=>new Promise(r=>setTimeout(r,0));
  legacy.dispatchEvent(new w.Event('play',{bubbles:true})); assert.equal(r.state,'paused','ordinary player stops DJ');
  dom.window.close();
 }
+{
+ const data=[{...songs[0],bpm:120},{...songs[1],bpm:125}];
+ const {dom,radio:r}=await setup(markup(data),w=>{w.TaraRadio.config.tempo=true;});
+ r.play(); await flush(); r.advance('user',4); await flush();
+ assert.equal(r.fade.tempoRate,120/125,'tempo based on real provided BPM');
+ assert.equal(r.decks[1-r.active].playbackRate,120/125); r.cancelFade();
+ assert.equal(r.decks[1-r.active].playbackRate,1,'cancel resets speed'); dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(markup([{...songs[0],bpm:80},{...songs[1],bpm:150}]),w=>{w.TaraRadio.config.tempo=true;});
+ r.play(); await flush(); r.advance('user',4); await flush(); assert.equal(r.fade.tempoRate,1,'large BPM difference leaves tempo unchanged'); dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(markup(),w=>{w.TaraRadio.config.tempo=true;});
+ r.play(); await flush(); r.advance('user',4); await flush(); assert.equal(r.fade.tempoRate,1,'missing BPM does not invent tempo'); dom.window.close();
+}
+{
+ const files=[1,2,3,4,5].map(i=>'https://example.org/v'+i+'.mp3');
+ const {dom,radio:r}=await setup(markup(),w=>{w.TaraRadio.config.station={on:true,files};});
+ r.state='playing'; let picked=[]; r.playVoiceFile=src=>picked.push(src); r.paintSay=()=>{}; r.chime=()=>{};
+ for(let i=0;i<6;i++) r.speak('station',songs[0],null);
+ assert.deepEqual(picked,[...files,files[0]],'five voice files rotate and wrap');
+ r.voiceFailed[files[1]]=true; r.speak('station',songs[0],null); assert.equal(picked.at(-1),files[2], 'failed file skipped');
+ dom.window.close();
+}
+{
+ const files=['https://example.org/v1.mp3','https://example.org/v2.mp3'];
+ const {dom,radio:r}=await setup(markup(),w=>{w.TaraRadio.config.station={on:true,files};w.TaraRadio.config.duck=0;});
+ r.state='playing'; r.paintSay=()=>{}; r.chime=()=>{};
+ r.speak('station',songs[0],null); assert.equal(r.duckTarget,0,'zero duck value is honored');
+ r.voice.onerror(); assert.equal(r.voiceFailed[files[0]],true,'broken file isolated');
+ r.speak('station',songs[0],null); assert.equal(r.voice.src,files[1],'later announcement uses remaining file');
+ r.pause(); assert.equal(r.duckTarget,1,'pause releases duck'); dom.window.close();
+}
 console.log('radio engine queue, crossfade, pause, source race and CDN fallback: passed');

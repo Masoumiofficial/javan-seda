@@ -17,8 +17,7 @@
  *   دارد؛ پس موتورِ مستقل (js/tara-radio.js) دارد و کنارِ پلیرِ اصلی
  *   می‌نشیند، نه روی آن. هیچ کلاس یا شناسهٔ پلیرِ قبلی عوض نشده است.
  *
- * هیچ داده‌ای نوشته نمی‌شود، هیچ جدولی ساخته نمی‌شود و همهٔ ورودی‌های
- * AJAX اعتبارسنجی می‌شوند.
+ * BPM اختیاری در متای نوشته ذخیره می‌شود؛ جدول جدیدی ساخته نمی‌شود و ورودی‌های AJAX اعتبارسنجی می‌شوند.
  *
  * @package Taranehyar
  */
@@ -167,6 +166,12 @@ if ( ! function_exists( 'tara_radio_settings' ) ) {
 		$xfade = max( 0, min( 20, (int) tara_radio_option( 'xfade', 6 ) ) );
 		$limit = max( 4, min( 40, (int) tara_radio_option( 'limit', 20 ) ) );
 
+		$station_files = array();
+		foreach ( array( 'station_file', 'station_file_2', 'station_file_3', 'station_file_4', 'station_file_5' ) as $file_key ) {
+			$file = esc_url_raw( (string) tara_radio_option( $file_key, '' ) );
+			if ( '' !== $file && ! in_array( $file, $station_files, true ) ) { $station_files[] = $file; }
+		}
+
 		$settings = array(
 			'mode'      => $mode,
 			'xfade'     => $xfade,
@@ -185,6 +190,7 @@ if ( ! function_exists( 'tara_radio_settings' ) ) {
 				'next'  => (string) tara_radio_option( 'station_next' ),
 				'names' => ( 'on' === (string) tara_radio_option( 'station_names', 'on' ) ),
 				'file'  => esc_url_raw( (string) tara_radio_option( 'station_file', '' ) ),
+				'files' => $station_files,
 			),
 			'labels'    => array(
 				'play'   => 'پخش رادیو',
@@ -238,6 +244,31 @@ if ( ! function_exists( 'tara_radio_duration' ) ) {
 	}
 }
 
+/* BPM دستی و اختیاری: بدون داده، هیچ ادعای تشخیص خودکار ضرب نمی‌کنیم. */
+if ( ! function_exists( 'tara_radio_bpm' ) ) {
+	function tara_radio_bpm( $value ) {
+		if ( ! is_scalar( $value ) || ! is_numeric( $value ) ) { return 0; }
+		$value = (float) $value;
+		return $value >= 60 && $value <= 200 ? round( $value, 1 ) : 0;
+	}
+}
+if ( ! function_exists( 'tara_radio_bpm_box' ) ) {
+	function tara_radio_bpm_box( $post ) {
+		wp_nonce_field( 'tara_radio_bpm_save', 'tara_radio_bpm_nonce' );
+		$value = tara_radio_bpm( get_post_meta( $post->ID, '_tara_radio_bpm', true ) );
+		echo '<label for="tara-radio-bpm">سرعت آهنگ (BPM، اختیاری)</label> <input id="tara-radio-bpm" name="tara_radio_bpm" type="number" min="60" max="200" step="0.1" value="' . esc_attr( $value ? $value : '' ) . '">';
+		echo '<p>اگر BPM معتبر هر دو آهنگ ثبت شده باشد، سرعت ورودی هنگام گذر به صورت محدود تنظیم می‌شود؛ در غیر این صورت سرعت اصلی حفظ می‌شود. این تنظیم ضرب‌ها یا وکال را خودکار تشخیص نمی‌دهد.</p>';
+	}
+	function tara_radio_bpm_register() { add_meta_box( 'tara-radio-bpm-box', 'میکس رادیو', 'tara_radio_bpm_box', 'post', 'side', 'default' ); }
+	function tara_radio_bpm_save( $id ) {
+		if ( ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) || ( function_exists( 'wp_is_post_revision' ) && wp_is_post_revision( $id ) ) || ! isset( $_POST['tara_radio_bpm_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['tara_radio_bpm_nonce'] ) ), 'tara_radio_bpm_save' ) || ! current_user_can( 'edit_post', $id ) || ! isset( $_POST['tara_radio_bpm'] ) ) { return; }
+		$value = tara_radio_bpm( wp_unslash( $_POST['tara_radio_bpm'] ) );
+		if ( $value ) { update_post_meta( $id, '_tara_radio_bpm', $value ); } else { delete_post_meta( $id, '_tara_radio_bpm' ); }
+	}
+	add_action( 'add_meta_boxes', 'tara_radio_bpm_register' );
+	add_action( 'save_post_post', 'tara_radio_bpm_save' );
+}
+
 if ( ! function_exists( 'tara_radio_track' ) ) {
 	/**
 	 * یک آهنگ به شکلِ آمادهٔ JSON.
@@ -271,6 +302,7 @@ if ( ! function_exists( 'tara_radio_track' ) ) {
 			'cover'    => $cover,
 			'link'     => (string) get_permalink( $post_id ),
 			'duration' => (int) tara_radio_duration( $post_id ),
+			'bpm'      => tara_radio_bpm( get_post_meta( $post_id, '_tara_radio_bpm', true ) ),
 		);
 	}
 }

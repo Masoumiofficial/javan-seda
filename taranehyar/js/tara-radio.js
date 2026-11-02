@@ -149,7 +149,8 @@
 			src: String(track.src || ''),
 			cover: String(track.cover || ''),
 			link: String(track.link || ''),
-			duration: Number(track.duration) || 0
+			duration: Number(track.duration) || 0,
+			bpm: Number(track.bpm) >= 60 && Number(track.bpm) <= 200 ? Number(track.bpm) : 0
 		};
 	}
 
@@ -161,9 +162,7 @@
 		}
 	}
 
-	/* «هم‌ترازیِ سرعت» در فرهنگِ دی‌جی یعنی پیچِ صفحه هم کمی عوض شود؛
-	   با preservesPitch=false همان حسِ وینیل می‌آید. اگر مرورگر پشتیبانی
-	   نکند، بی‌صدا رد می‌شود و فقط سرعت عوض می‌شود. */
+	/* در صورت پشتیبانی مرورگر، زیر و بمی صدا هنگام تغییر سرعت حفظ شود. */
 	function setVinylPitch(el, on) {
 		if (!el) {
 			return;
@@ -289,7 +288,9 @@
 		this.lastSecond = -1;
 		this.voice = null;
 		this.speechUtterance = null;
-		this.voiceBroken = false;
+		this.voiceSerial = 0;
+		this.voiceFailed = {};
+		this.voiceIndex = 0;
 		this.graph = null;
 		this.forcedPlain = false;
 		this.limit = Math.round(clamp(CONF.limit || 20, 4, 40));
@@ -787,17 +788,18 @@
 			incoming.preload = 'auto';
 		}
 		incoming.volume = 0;
-		incoming.playbackRate = 1;
-		if (CONF.tempo) {
-			setVinylPitch(incoming, true);
-		}
+		var currentTrack = this.queue.find(function (item) { return String(item.id) === String(self.nowId); });
+		var ratio = currentTrack && currentTrack.bpm && track.bpm ? currentTrack.bpm / track.bpm : 1;
+		var tempoRate = CONF.tempo && dur > 2500 && ratio >= 0.92 && ratio <= 1.08 ? ratio : 1;
+		incoming.playbackRate = tempoRate;
+		setVinylPitch(incoming, false);
 		if (this.graph) {
 			resetGraphDeck(this.graph.nodes[1 - this.active]);
 		}
 
 		this.pending = normalize(track);
 		this.state = 'fading';
-		this.fade = { start: now(), dur: dur, waiting: true };
+		this.fade = { start: now(), dur: dur, waiting: true, tempoRate: tempoRate };
 		var fade = this.fade;
 		this.root.classList.add('is-fading');
 		this.paintState();
@@ -960,6 +962,7 @@
 		this.cancelFade();
 		each(this.decks, function (deck) { deck.pause(); deck.playbackRate = 1; });
 		window.clearTimeout(this.announceTimer);
+		++this.voiceSerial;
 		if (this.voice) { this.voice.pause(); }
 		if (this.speechUtterance && window.speechSynthesis) {
 			this.speechUtterance = null;
@@ -1307,7 +1310,7 @@
 			gainIn = Math.sin(e * Math.PI / 2);
 
 			if (CONF.tempo && this.fade.dur > 2500) {
-				b.playbackRate = clamp(0.962 + 0.038 * e, 0.9, 1);
+				b.playbackRate = this.fade.tempoRate + (1 - this.fade.tempoRate) * e;
 			}
 
 			if (t >= 1) {
@@ -1473,11 +1476,18 @@
 		this.paintSay(line);
 		this.chime();
 
-		/* اگر فایلِ وکال یک‌بار خطا داد، دیگر تلاش نمی‌کنیم؛ وگرنه
-		   حلقهٔ بی‌پایانِ «فایل → خطا → فایل» می‌شد. */
-		if (st.file && !skipFile && !this.voiceBroken) {
-			this.playVoiceFile(st.file, line);
-			return;
+		/* فایل‌های معرفی به نوبت پخش می‌شوند؛ فایل خراب تا بارگذاری مجدد کنار گذاشته می‌شود. */
+		var files = Array.isArray(st.files) ? st.files : (st.file ? [st.file] : []);
+		if (!skipFile && files.length) {
+			for (var i = 0; i < files.length; i++) {
+				var index = (this.voiceIndex + i) % files.length;
+				var source = files[index];
+				if (source && !this.voiceFailed[source]) {
+					this.voiceIndex = (index + 1) % files.length;
+					this.playVoiceFile(source, line);
+					return;
+				}
+			}
 		}
 
 		if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
@@ -1527,7 +1537,7 @@
 			spoken = true;
 			pickVoice();
 			utter.onstart = function () {
-				self.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
+				self.duckTo(typeof CONF.duck === 'number' ? CONF.duck : 0.35);
 			};
 			utter.onend = function () {
 				if (self.speechUtterance === utter) { self.speechUtterance = null; }
@@ -1541,7 +1551,7 @@
 				window.speechSynthesis.cancel();
 				self.speechUtterance = utter;
 				window.speechSynthesis.speak(utter);
-				self.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
+				self.duckTo(typeof CONF.duck === 'number' ? CONF.duck : 0.35);
 				self.duckGuard(Math.max(6000, Math.min(24000, line.length * 110)));
 			} catch (e) {
 				self.unduck();
@@ -1576,35 +1586,34 @@
 		}
 
 		var voice = this.voice;
-		voice.onended = function () {
+		var serial = ++this.voiceSerial;
+		var failed = false;
+		var fail = function () {
+			if (serial !== self.voiceSerial || failed) { return; }
+			failed = true;
+			self.voiceFailed[src] = true;
 			self.unduck();
-		};
-		voice.onerror = function () {
-			self.unduck();
-			self.voiceBroken = true;
 			if (self.state === 'playing' || self.state === 'fading') { self.speak(fallbackText, null, null, true); }
 		};
+		voice.onended = function () {
+			if (serial === self.voiceSerial) { self.unduck(); }
+		};
+		voice.onerror = fail;
 
 		try {
 			voice.src = src;
 			voice.volume = 1;
 			voice.currentTime = 0;
 			var p = voice.play();
-			if (p && typeof p.catch === 'function') {
-				p.catch(function () {
-					self.unduck();
-					self.voiceBroken = true;
-				});
-			}
-			this.duckTo(CONF.duck > 0 ? CONF.duck : 0.35);
+			if (p && typeof p.catch === 'function') { p.catch(fail); }
+			this.duckTo(typeof CONF.duck === 'number' ? CONF.duck : 0.35);
 			this.duckGuard(20000);
-		} catch (e) {
-			this.unduck();
-		}
+		} catch (e) { fail(); }
+
 	};
 
 	Radio.prototype.duckTo = function (value) {
-		this.duckTarget = clamp(value, 0.02, 1);
+		this.duckTarget = clamp(value, 0, 1);
 		this.root.classList.add('is-talking');
 	};
 

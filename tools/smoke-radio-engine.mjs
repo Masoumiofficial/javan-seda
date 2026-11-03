@@ -138,6 +138,65 @@ const flush=()=>new Promise(r=>setTimeout(r,0));
  dom.window.close();
 }
 {
+ const {dom,radio:r}=await setup(); r.play(); await flush();
+ assert.equal(r.current().volume,1,'initial playback is audible even if animation frames are suspended');
+ dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(markup(),w=>{w.TaraRadio.config.fx=true; w.AudioContext=function(){this.close=()=>{};this.createGain=()=>{throw Error('unsupported graph');};};});
+ r.play(); await flush(); assert.equal(r.nowId,1); assert.equal(r.forcedPlain,true,'graph setup failures fall back to plain audio'); assert.equal(r.state,'playing'); dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(); r.play(); await flush();
+ r.graph={ctx:{close(){}},nodes:[]}; const old=r.current();
+ old.dispatchEvent(new dom.window.Event('error')); await flush();
+ assert.equal(r.forcedPlain,true); assert.notEqual(r.current(),old); assert.equal(r.nowId,1); assert.equal(r.bad['1'],undefined,'CORS error retries the same track without graph');
+ dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup();
+ r.current().play=function(){const e=new Error('bad format');e.name='NotSupportedError';return Promise.reject(e);};
+ r.play(); await new Promise(resolve=>setTimeout(resolve,400)); await flush();
+ assert.equal(r.bad['1'],true); assert.equal(r.nowId,2,'unsupported first track advances instead of pausing'); dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(); r.play(); await flush(); const incoming=r.decks[1-r.active];
+ incoming.play=function(){const e=new Error('mobile restriction');e.name='NotAllowedError';return Promise.reject(e);};
+ r.advance('user',4); await flush(); assert.equal(r.nowId,2); assert.equal(r.current(),r.decks[0]); assert.equal(r.state,'playing','second deck restriction falls back to active deck'); dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(); r.play(); await flush();
+ r.graph={ctx:{close(){}},nodes:[]}; r.destroyGraph(); r.pause();
+ await new Promise(resolve=>setTimeout(resolve,100));
+ assert.equal(r.state,'paused','late graph fallback does not restart after pause'); dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(); r.play(); await flush();
+ r.graph={ctx:{close(){}},nodes:[]}; let accept;
+ const incoming=r.decks[1-r.active]; incoming.play=()=>new Promise(resolve=>{accept=resolve;});
+ r.advance('user',4); incoming.dispatchEvent(new dom.window.Event('error')); await flush();
+ assert.equal(r.forcedPlain,true); assert.equal(r.nowId,2); assert.equal(r.bad['2'],undefined,'incoming graph error retries without CORS');
+ accept(); await flush(); assert.equal(r.nowId,2,'stale incoming promise is ignored'); dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(); r.play(); await flush();
+ const incoming=r.decks[1-r.active]; incoming.dispatchEvent(new dom.window.Event('error'));
+ assert.equal(r.bad['2'],undefined,'preload failure alone does not permanently blacklist a track');
+ dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(); r.play(); await flush(); const current=r.current();
+ Object.defineProperty(current,'ended',{value:true,configurable:true});
+ const incoming=r.decks[1-r.active]; incoming.play=()=>new Promise(()=>{});
+ r.advance('user',4); incoming.dispatchEvent(new dom.window.Event('error')); await flush();
+ assert.equal(r.nowId,3,'when outgoing song has ended, failed incoming deck skips to the next track'); dom.window.close();
+}
+{
+ const {dom,radio:r}=await setup(); r.play(); await flush();
+ Object.defineProperty(dom.window.document,'hidden',{value:true,configurable:true});
+ r.duckTo(0); assert.equal(r.current().volume,0); r.unduck(); assert.equal(r.current().volume,1,'voice duck is released without animation frames in background'); dom.window.close();
+}
+{
  const data=[{...songs[0],bpm:120},{...songs[1],bpm:125}];
  const {dom,radio:r}=await setup(markup(data),w=>{w.TaraRadio.config.tempo=true;});
  r.play(); await flush(); r.advance('user',4); await flush();

@@ -667,7 +667,8 @@
 			resetGraphDeck(this.graph.nodes[this.active]);
 		}
 		el.src = track.src;
-		el.volume = 0;
+		// A background tab may not receive animation frames; never start silently.
+		el.volume = clamp(this.duckTarget, 0, 1);
 		el.playbackRate = 1;
 
 		var cue = Math.round(clamp(CONF.cue || 0, 0, 30));
@@ -688,7 +689,7 @@
 		var token = ++this.playToken;
 		var promise;
 		try { promise = el.play(); } catch (err) { promise = Promise.reject(err); }
-		this.softStart = now();
+		this.softStart = now() - 420;
 		this.duck = 1;
 		this.trackCount++;
 		this.mixed++;
@@ -699,8 +700,9 @@
 		}
 
 		if (promise && typeof promise.catch === 'function') {
-			promise.catch(function () {
+			promise.catch(function (err) {
 				if (token !== self.playToken || self.current() !== el) { return; }
+				if (err && err.name === 'NotSupportedError') { self.onDeckError(self.active); return; }
 				self.pause();
 				self.toast('پخش شروع نشد؛ دوباره روی دکمهٔ پخش بزنید.');
 			});
@@ -809,9 +811,15 @@
 		var fade = this.fade;
 		this.root.classList.add('is-fading');
 		this.paintState();
-		var failed = function () {
+		var failed = function (err) {
 			if (self.fade !== fade) { return; }
 			self.cancelFade();
+			// Some mobile browsers refuse a second audio element. Reuse the active deck.
+			if (err && err.name === 'NotAllowedError') { self.startDeck(track, 0); return; }
+			if (err && err.name === 'NotSupportedError') {
+				if (self.graph) { self.destroyGraph(false); self.startDeck(track, 0); return; }
+				self.bad[String(track.id)] = true;
+			}
 			self.crossfadeRetryAt = now() + 5000;
 			self.toast('آهنگ بعدی آماده نشد؛ پخش فعلی ادامه دارد.');
 			if (cur.ended) { self.advance('ended', 0); }
@@ -1051,31 +1059,31 @@
 			return;
 		}
 
-		var master = ctx.createGain();
-		master.gain.value = 1;
-
-		var analyser = ctx.createAnalyser();
-		analyser.fftSize = 128;
-		analyser.smoothingTimeConstant = 0.72;
-
-		master.connect(analyser);
-		analyser.connect(ctx.destination);
-
-		/* «اکوی گذر»: تأخیرِ کوتاه با فیدبکِ ملایم برای انتهای هر میکس */
-		var delay = ctx.createDelay(1);
-		delay.delayTime.value = 0.26;
-		var feedback = ctx.createGain();
-		feedback.gain.value = 0.32;
-		delay.connect(feedback);
-		feedback.connect(delay);
-		var wet = ctx.createGain();
-		wet.gain.value = 0.55;
-		delay.connect(wet);
-		wet.connect(master);
-
-		var nodes = [];
-
 		try {
+			var master = ctx.createGain();
+			master.gain.value = 1;
+
+			var analyser = ctx.createAnalyser();
+			analyser.fftSize = 128;
+			analyser.smoothingTimeConstant = 0.72;
+
+			master.connect(analyser);
+			analyser.connect(ctx.destination);
+
+			/* «اکوی گذر»: تأخیرِ کوتاه با فیدبکِ ملایم برای انتهای هر میکس */
+			var delay = ctx.createDelay(1);
+			delay.delayTime.value = 0.26;
+			var feedback = ctx.createGain();
+			feedback.gain.value = 0.32;
+			delay.connect(feedback);
+			feedback.connect(delay);
+			var wet = ctx.createGain();
+			wet.gain.value = 0.55;
+			delay.connect(wet);
+			wet.connect(master);
+
+			var nodes = [];
+
 			this.decks.forEach(function (el) {
 				el.crossOrigin = 'anonymous';
 				var src = ctx.createMediaElementSource(el);
@@ -1122,9 +1130,16 @@
 
 		if (ctx.state === 'suspended' && ctx.resume) {
 			var self = this;
-			ctx.resume().catch(function () {
-				if (self.graph && self.graph.ctx === ctx) { self.destroyGraph(); }
-			});
+			try {
+				var resumed = ctx.resume();
+				if (resumed && typeof resumed.then === 'function') {
+					resumed.then(function () {
+						if (self.graph && self.graph.ctx === ctx && ctx.state !== 'running') { self.destroyGraph(); }
+					}, function () {
+						if (self.graph && self.graph.ctx === ctx) { self.destroyGraph(); }
+					});
+				}
+			} catch (e) { if (self.graph && self.graph.ctx === ctx) { self.destroyGraph(false); } }
 		}
 	};
 
@@ -1152,7 +1167,9 @@
 		this.resetDecks();
 
 		if (restart !== false && track && wasPlaying) {
+			var token = this.playToken;
 			window.setTimeout(function () {
+				if (token !== self.playToken || (self.state !== 'playing' && self.state !== 'fading')) { return; }
 				self.startDeck(track, at);
 			}, 80);
 		}
@@ -1346,16 +1363,30 @@
 			if (!failed && incoming && incoming.__preloaded) {
 				failed = this.queue.find(function (item) { return item.src === incoming.__preloaded; });
 			}
-			if (failed) { this.bad[String(failed.id)] = true; }
+			if (failed && this.graph && this.fade) {
+				this.destroyGraph(false);
+				this.startDeck(failed, 0);
+				return;
+			}
+			if (failed && this.fade && !this.graph) { this.bad[String(failed.id)] = true; }
 			if (incoming) { incoming.__preloaded = null; }
 			if (this.fade) {
 				this.cancelFade();
 				this.toast('فایل بعدی آماده نشد؛ پخش فعلی ادامه دارد.');
-				this.preloadNext();
+				if (this.current() && this.current().ended) { this.advance('ended', 0); }
+				else { this.preloadNext(); }
 			}
 			return;
 		}
 		var id = this.nowId;
+		// A same-origin URL can redirect to a CDN without CORS. Retry once without Web Audio.
+		if (this.graph && (this.state === 'playing' || this.state === 'fading')) {
+			var track = this.queue.find(function (item) { return String(item.id) === String(id); });
+			var position = this.current() ? this.current().currentTime || 0 : 0;
+			if (track) { this.destroyGraph(false); this.startDeck(track, position); return; }
+		}
+		if (this.errorToken === this.playToken) { return; }
+		this.errorToken = this.playToken;
 		if (id !== null) { this.bad[String(id)] = true; }
 		if (this.state !== 'playing' && this.state !== 'fading') { return; }
 		this.cancelFade();
@@ -1620,11 +1651,13 @@
 
 	Radio.prototype.duckTo = function (value) {
 		this.duckTarget = clamp(value, 0, 1);
+		if (document.hidden) { this.duck = this.duckTarget; if (!this.fade && this.current()) { this.current().volume = this.duck; } }
 		this.root.classList.add('is-talking');
 	};
 
 	Radio.prototype.unduck = function () {
 		this.duckTarget = 1;
+		if (document.hidden) { this.duck = 1; if (!this.fade && this.current()) { this.current().volume = 1; } }
 		this.root.classList.remove('is-talking');
 		window.clearTimeout(this.duckTimer);
 	};

@@ -248,7 +248,7 @@ if ( ! function_exists( 'tara_expected_hashes' ) ) {
 		'single.php'                => 'da24c5148021c0e228ab23311bc308840260aa0f1d8b666bd9d03b2deb5414ff',
 		'page.php'                  => 'eed2370a3205d53f58bf0d5721275ae8896daf6c32e862403d9fe3a2982aac50',
 		'myfunctions.php'           => '04b63b53dab707ab426215216bcf8978fab0b15ce1d0536f98d23bf2995a4080',
-		'style.css'                 => '64ca26217e52169af3588097da3050e5dcff3f313522c5c544692ce09054d7b1',
+		'style.css'                 => '3f93defbf29d88a75fafd32dd417c12cb36763f24acaee1524bb9b59ef4f4d52',
 		'footer.php'                => '8d0779d9ac7f59fc6009e2f959d0939018f9fb1abd06b79662e6d7aa2d1dfce0',
 		'header.php'                => 'ceb4e5701bb38570828be9867f5c5b55141d16f145c5b29c9148d79edd51caed',
 		'home.php'                  => '7618169dc3d921700f58d5741b974b4ae170bdec836713ec5849ac64c62adde3',

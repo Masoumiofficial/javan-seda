@@ -22,5 +22,5 @@ assert(box.querySelector('[data-tara-children="1"] #comment-2'));assert.equal(bo
 mode='fail';root.click();await flush();await flush();assert.equal(root.disabled,false);assert.match(root.parentElement.textContent,/دوباره تلاش/);assert.equal(box.querySelectorAll('#comment-3').length,1);
 mode='final'; box.setAttribute('data-prepend','1');
 w.fetch=async()=>({json:async()=>({success:true,data:{html:'<li id="comment-4">old</li>',cursor:'end',more:false}})});
-root.click();await flush();await flush();assert.equal(box.querySelector('[data-parent="0"]'),null);assert.equal(box.querySelector('.commentlist').firstElementChild.id,'comment-4');assert.equal(w.location.href,'https://ex/song/');
+root.click();await flush();await flush();assert.equal(box.querySelector('[data-parent="0"]'),null);assert.equal(box.querySelector('.commentlist').lastElementChild.id,'comment-4');assert.deepEqual(Array.from(box.querySelector('.commentlist').children, el=>el.id),['comment-1','comment-3','comment-4']);assert.equal(w.location.href,'https://ex/song/');
 dom.window.close();console.log('comments: nonce refresh, nesting, pagination, retry and unchanged URL: passed');

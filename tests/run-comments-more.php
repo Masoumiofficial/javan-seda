@@ -44,7 +44,17 @@ $GLOBALS['__options']['thread_comments']=0; $flat=tara_cm_get_batch(10,0,'',20);
 ck('threading off includes replies in flat list', count($flat)>15);
 
 $GLOBALS['__options']['thread_comments']=1; $GLOBALS['__options']['comment_order']='asc'; $budget=7; ob_start(); $newest=tara_cm_render_batch(10,0,'',$budget,1,5); $revhtml=ob_get_clean();
-ck('newest-first batch displays ascending and reserves siblings', tara_cm_prepend() && strpos($revhtml,'comment-12"') < strpos($revhtml,'comment-15"') && substr_count($revhtml,'data-depth="1"')===5 && strpos($newest['cursor'],'|12')!==false);
+ck('newest-first batch remains descending and reserves siblings', strpos($revhtml,'comment-15"') < strpos($revhtml,'comment-12"') && substr_count($revhtml,'data-depth="1"')===5 && strpos($newest['cursor'],'|12')!==false);
+foreach (array('newest'=>'DESC','oldest'=>'ASC') as $first=>$direction) {
+ $GLOBALS['__options']['default_comments_page']=$first; $cursor=''; $allids=array(); $steps=0;
+ do {
+  $budget=30;ob_start();$batch=tara_cm_render_batch(10,0,$cursor,$budget,1,5);$out=ob_get_clean();
+  preg_match_all('/id="comment-([0-9]+)" data-depth="1"/',$out,$found);
+  $allids=array_merge($allids,array_map('intval',$found[1]));$cursor=$batch['cursor'];$steps++;
+ } while($batch['more'] && $steps<10);
+ $expected=array_merge(range(1,15),array(102)); if($direction==='DESC') $expected=array_reverse($expected);
+ ck('all root batches appended in '.$direction.' order without duplicates', $allids===$expected && !$batch['more'] && $steps>1);
+}
 ck('password posts excluded',!tara_cm_is_post((object)array('post_type'=>'post','post_status'=>'publish','post_password'=>'secret')));
 $GLOBALS['__posts'][10]=new WP_Post(10,'Song');
 $_POST=array('post_id'=>'10','nonce'=>'bad','parent'=>'0','cursor'=>''); try { tara_cm_ajax(); } catch (RuntimeException $e) {}

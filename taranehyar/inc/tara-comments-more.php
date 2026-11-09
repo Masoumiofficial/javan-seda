@@ -22,10 +22,6 @@ add_filter( 'comments_template_query_args', function ( $args ) {
 }, 99 );
 
 function tara_cm_order( $parent = 0 ) { return $parent ? 'ASC' : ( 'newest' === get_option( 'default_comments_page', 'newest' ) ? 'DESC' : 'ASC' ); }
-function tara_cm_prepend() {
-	$display = 'desc' === strtolower( (string) get_option( 'comment_order', 'asc' ) ) ? 'DESC' : 'ASC';
-	return tara_cm_order() !== $display;
-}
 function tara_cm_cursor( $comment ) { return $comment->comment_date_gmt . '|' . (int) $comment->comment_ID; }
 function tara_cm_valid_cursor( $value ) {
 	return is_string( $value ) && ( '' === $value || preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\|[1-9][0-9]{0,18}$/D', $value ) );
@@ -61,7 +57,6 @@ function tara_cm_render_batch( $post_id, $parent, $cursor, &$budget, $depth, $li
 	$selected = array_slice( $comments, 0, min( $limit, max( 0, $budget ) ) );
 	$last = $selected ? tara_cm_cursor( $selected[ count( $selected ) - 1 ] ) : $cursor;
 	$more = count( $comments ) > count( $selected );
-	if ( ! $parent && tara_cm_prepend() ) { $selected = array_reverse( $selected ); }
 	$count = count( $selected ); $shown = 0;
 	foreach ( $selected as $comment ) {
 		--$budget; ++$shown;
@@ -91,7 +86,7 @@ function tara_comments_load_more() {
 	if ( (int) get_comments_number( $post_id ) > 0 ) {
 		if ( function_exists( 'tara_comments_heading' ) ) { echo tara_comments_heading( $post_id ); }
 		$budget = 30;
-		echo '<div class="tara-cmore" data-post="' . esc_attr( $post_id ) . '" data-nonce="' . esc_attr( wp_create_nonce( 'tara_comments_' . $post_id ) ) . '" data-prepend="' . ( tara_cm_prepend() ? '1' : '0' ) . '" data-ajax="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '"><ol class="commentlist" data-tara-children="0">';
+		echo '<div class="tara-cmore" data-post="' . esc_attr( $post_id ) . '" data-nonce="' . esc_attr( wp_create_nonce( 'tara_comments_' . $post_id ) ) . '" data-ajax="' . esc_url( admin_url( 'admin-ajax.php' ) ) . '"><ol class="commentlist" data-tara-children="0">';
 		$was_in_loop = ! empty( $GLOBALS['in_comment_loop'] );
 		$GLOBALS['in_comment_loop'] = true;
 		add_filter( 'comment_text', 'wp_kses_post', 999 );

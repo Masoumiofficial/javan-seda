@@ -20,7 +20,7 @@
     if (!result.success || !result.data || typeof result.data.html!=='string') throw new Error('load');
     var list=control.parentElement.querySelector(':scope > ol[data-tara-children]');
     if(!list) throw new Error('list');
-    list.insertAdjacentHTML(data.parent==='0' && box.getAttribute('data-prepend')==='1' ? 'afterbegin' : 'beforeend',result.data.html);
+    list.insertAdjacentHTML('beforeend',result.data.html);
     control.setAttribute('data-cursor',result.data.cursor || '');
     status.textContent=''; button.disabled=false;
     if(!result.data.more) { control.remove(); }

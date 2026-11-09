@@ -534,6 +534,7 @@ function current_user_can( $cap, $arg = null ) {
 	return ! empty( $GLOBALS['__caps'][ $cap ] );
 }
 function wp_verify_nonce( $nonce, $action ) {
+	if ( 'good' === $nonce && preg_match( '/^tara_comments_[1-9][0-9]*$/', (string) $action ) ) { return true; }
 	if ( 'good' === $nonce && in_array( (string) $action, array( 'tara_save_term', 'tara_account', 'tara_rest', 'tara_radio_bpm_save', 'tara_playlist_save' ), true ) ) {
 		return true;
 	}

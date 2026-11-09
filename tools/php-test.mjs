@@ -48,7 +48,7 @@ for (const js of ['admin-panel.js']) {
   files.push({ parent: '/tmp/theme/js', name: js, url: 'file://' + path.join(theme, 'js', js) });
 }
 /* فایل‌های تازهٔ ۳.۷.۰ — آزمون run-370 */
-for (const name of ['tara-taxonomies.php', 'tara-ui.php', 'tara-critical.php', 'tara-brand.php', 'admin-settings-shell.php', 'tax-listing.php', 'ab-credits.php', 'vip_slider.php', 'ab-seo.php', 'ab-logo-setting.php', 'ab-post-extras.php', 'ab-vip-image.php', 'tara-assets.php', 'ab-glass.php', 'ab-ui-guard.php', 'tara-radio.php', 'tara-radio-ui.php', 'tara-tax-hero.php', 'tara-playlists.php']) {
+for (const name of ['tara-taxonomies.php', 'tara-ui.php', 'tara-critical.php', 'tara-brand.php', 'admin-settings-shell.php', 'tax-listing.php', 'ab-credits.php', 'vip_slider.php', 'ab-seo.php', 'ab-logo-setting.php', 'ab-post-extras.php', 'ab-vip-image.php', 'tara-assets.php', 'ab-glass.php', 'ab-ui-guard.php', 'tara-radio.php', 'tara-radio-ui.php', 'tara-tax-hero.php', 'tara-playlists.php', 'tara-comments-more.php']) {
   files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
 }
 for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-settings.css', 'ab-glass.css', 'ab-ui.css', 'ab-vip-image.css', 'tara-ui.min.css', 'style.min.css', 'ab-glass.min.css', 'ab-logo-card.css', 'tara-radio.css', 'tara-tax.css']) {

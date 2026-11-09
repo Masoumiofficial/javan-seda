@@ -93,6 +93,9 @@ if ( is_readable( $_tara_comments ) ) {
 	require_once $_tara_comments;
 }
 unset( $_tara_comments );
+$_tara_more_comments = trailingslashit( get_template_directory() ) . 'inc/tara-comments-more.php';
+if ( is_readable( $_tara_more_comments ) ) { require_once $_tara_more_comments; }
+unset( $_tara_more_comments );
 
 /* اگر لایۀ بالا روی سرور نبود، همه‌چیز دقیقاً مثل قبل کار می‌کند: نامک singer
    و آدرسِ همان صفحۀ «همهٔ خواننده‌ها». (هیچ فایلی به تنهایی نمی‌تواند بشکند.) */

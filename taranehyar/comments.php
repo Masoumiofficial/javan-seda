@@ -8,6 +8,8 @@
 
 <?php return; endif; ?>
 
+<?php if ( is_singular( 'post' ) && function_exists( 'tara_comments_load_more' ) && tara_cm_is_post( get_queried_object() ) ) { tara_comments_load_more(); echo '<div class="clear"></div></div>'; return; } ?>
+
 <?php
 /* v3.4.6 — دو دروازۀ اضافی که فهرست دیدگاه‌ها را می‌بستند باز شد:
    1) اگر «کاربر باید ثبت‌نام/وارد شود» روشن باشد، این فایل وسط کار return می‌کرد و

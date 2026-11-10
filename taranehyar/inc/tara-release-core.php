@@ -3,7 +3,7 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /** Prices are in toman; international prices are indicative, not a payment quote. */
-function tara_release_catalog() {
+function tara_release_catalog( $include_disabled = false ) {
 	$services = array(
 		'song' => array( 'label' => 'آهنگ', 'amount' => 1500000 ),
 		'video' => array( 'label' => 'موزیک‌ویدیو', 'amount' => 2500000 ),
@@ -18,6 +18,9 @@ function tara_release_catalog() {
 		if ( is_scalar( $price ) && preg_match( '/^[0-9]{1,10}$/D', (string) $price ) && (float) $price <= 2000000000 ) { $service['amount'] = (int) $price; }
 	}
 	unset( $service );
+	foreach ( array_keys( $services ) as $key ) {
+		if ( ! $include_disabled && function_exists( 'ot_get_option' ) && 'off' === (string) ot_get_option( 'release_service_' . $key, 'on' ) ) { unset( $services[ $key ] ); }
+	}
 	return $services;
 }
 
@@ -95,7 +98,7 @@ function tara_release_quote_ready( $row ) {
 	if ( ! is_array( $row ) || ! isset( $row['type'], $row['status'], $row['final_toman'], $row['refund_terms'], $row['extra_costs'] ) || 'release' !== $row['type'] || 'awaiting_payment' !== $row['status'] ) { return false; }
 	if ( ! is_scalar( $row['final_toman'] ) || ! preg_match( '/^[1-9][0-9]{0,9}$/D', (string) $row['final_toman'] ) || (float) $row['final_toman'] > 2000000000 ) { return false; }
 	if ( ! is_string( $row['refund_terms'] ) || '' === trim( $row['refund_terms'] ) || ! is_string( $row['extra_costs'] ) || '' === trim( $row['extra_costs'] ) ) { return false; }
-	$catalog = tara_release_catalog();
+	$catalog = tara_release_catalog( true );
 	if ( ! isset( $row['service'] ) || ! is_string( $row['service'] ) || ! isset( $catalog[ $row['service'] ] ) || empty( $row['id'] ) || empty( $row['quote_revision'] ) ) { return false; }
 	if ( 'international' === $row['service'] ) {
 		foreach ( array( 'rights_checked', 'geographic_checked', 'distribution_legal_confirmed', 'identity_checked', 'settlement_confirmed' ) as $check ) {

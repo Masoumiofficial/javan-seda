@@ -4,16 +4,23 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 function tara_release_render_wizard() {
 	$catalog = tara_release_catalog();
+	$opt = function ( $key, $default ) { $value = function_exists( 'ot_get_option' ) ? ot_get_option( $key, $default ) : $default; return is_string( $value ) ? $value : $default; };
+	$international_single = $opt( 'release_int_single_price', '8900000' );
+	$international_album = $opt( 'release_int_album_price', '19900000' );
+	if ( ! preg_match( '/^[0-9]{1,10}$/D', $international_single ) || (float) $international_single > 2000000000 ) { $international_single = '8900000'; }
+	if ( ! preg_match( '/^[0-9]{1,10}$/D', $international_album ) || (float) $international_album > 2000000000 ) { $international_album = '19900000'; }
+	$rules_url = esc_url( $opt( 'release_rules_url', 'https://ahangban.ir/works/' ), array( 'http', 'https' ) );
 	ob_start(); ?>
 	<section class="tara-release" dir="rtl">
-		<header><h2>آثارت را به مخاطبان بیشتری معرفی کن</h2><p>درخواست همکاری و انتشار آثار خود را برای بررسی ثبت کنید.</p></header>
+		<header><h2><?php echo esc_html( $opt( 'release_title', 'آثارت را به مخاطبان بیشتری معرفی کن' ) ); ?></h2><p><?php echo esc_html( $opt( 'release_subtitle', 'درخواست همکاری و انتشار آثار خود را برای بررسی ثبت کنید.' ) ); ?></p></header>
 		<p>مبلغ نهایی و هزینه‌های احتمالی پس از بررسی اعلام می‌شود. ثبت درخواست به معنی تضمین انتشار یا درآمد نیست.</p>
 		<div class="tara-release__prices" aria-label="تعرفه‌های پایه">
 			<?php foreach ( $catalog as $key => $service ) : if ( 'international' === $key ) { continue; } ?>
 				<div><strong><?php echo esc_html( $service['label'] ); ?></strong><span><?php echo esc_html( number_format_i18n( $service['amount'] ) ); ?> تومان</span></div>
 			<?php endforeach; ?>
 		</div>
-		<aside><h3>انتشار بین‌المللی: فقط بررسی</h3><p>ارزیابی رایگان؛ تک‌آهنگ از ۸٬۹۰۰٬۰۰۰ تومان، آلبوم از ۱۹٬۹۰۰٬۰۰۰ تومان، ویدیو استعلامی و چندهنرمند یا لیبل توافقی. این ارقام قطعی نیستند.</p><p>Spotify، Apple Music، YouTube Music، Deezer، Amazon Music، Tidal و سایر فروشگاه‌ها صرفاً نامزد بررسی هستند. تأیید حقوق، محدودیت‌های قانونی و جغرافیایی، هویت و تسویه الزامی است. اطلاعات جعلی و دور زدن تحریم مجاز نیست.</p></aside>
+		<?php if ( isset( $catalog['international'] ) ) : ?><aside><h3>انتشار بین‌المللی: فقط بررسی</h3><p>ارزیابی رایگان؛ تک‌آهنگ از <?php echo esc_html( number_format_i18n( (int) $international_single ) ); ?> تومان، آلبوم از <?php echo esc_html( number_format_i18n( (int) $international_album ) ); ?> تومان، ویدیو استعلامی و چندهنرمند یا لیبل توافقی. این ارقام قطعی نیستند.</p><p><?php echo esc_html( $opt( 'release_international_platforms', 'Spotify، Apple Music، YouTube Music، Deezer، Amazon Music، Tidal و سایر فروشگاه‌ها' ) ); ?> صرفاً نامزد بررسی هستند. تأیید حقوق، محدودیت‌های قانونی و جغرافیایی، هویت و تسویه الزامی است. اطلاعات جعلی و دور زدن تحریم مجاز نیست.</p><p><?php echo esc_html( $opt( 'release_international_text', '' ) ); ?></p></aside><?php endif; ?>
+		<?php for ( $i = 1; $i <= 8; $i++ ) : $condition = $opt( 'release_condition_' . $i . '_text', '' ); if ( 'off' === $opt( 'release_condition_' . $i . '_on', 'on' ) || '' === trim( $condition ) ) { continue; } ?><details><summary>شرط <?php echo esc_html( (string) $i ); ?></summary><p><?php echo esc_html( $condition ); ?></p></details><?php endfor; ?>
 		<form class="tara-release__form" data-release-wizard method="post">
 			<p data-release-progress aria-live="polite"></p>
 			<fieldset data-release-step><legend>۱. اطلاعات هویتی و تماس</legend>
@@ -43,7 +50,7 @@ function tara_release_render_wizard() {
 			<fieldset data-release-step><legend>۴. حقوق اثر و قوانین</legend>
 				<label>توضیحات مالکیت و مدارک<textarea name="legal" maxlength="4000"></textarea></label>
 				<label><input type="checkbox" name="rights" value="1" required> صاحب حقوق اثر هستم یا مجوز لازم را دارم. *</label>
-				<label><input type="checkbox" name="terms" value="1" required> <a href="https://ahangban.ir/works/" target="_blank" rel="noopener noreferrer">شرایط خدمات</a> را خوانده و می‌پذیرم. *</label>
+				<label><input type="checkbox" name="terms" value="1" required> <a href="<?php echo $rules_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>" target="_blank" rel="noopener noreferrer">شرایط خدمات</a> را خوانده و می‌پذیرم. *</label>
 			</fieldset>
 			<fieldset data-release-step><legend>۵. خلاصه و بررسی</legend>
 				<p data-release-summary></p><p>هزینهٔ توزیع، مالیات، ارز و کارمزد در صورت وجود جداگانه بررسی و پیش از پرداخت مشخص می‌شوند. مبلغ نهایی و شرایط لغو و بازپرداخت پس از بررسی اعلام و برای تأیید ارائه خواهند شد.</p>

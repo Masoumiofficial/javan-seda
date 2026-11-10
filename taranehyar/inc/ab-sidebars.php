@@ -261,7 +261,7 @@ if ( ! function_exists( 'tara_expected_hashes' ) ) {
 		'inc/ab-perf.php'           => 'dc305da6590c6b4002214f7db71412c0d11965f9a024c3e77ea35517f85234f4',
 		'inc/ab-seo.php'            => '83cd9e3cf2a81e93599a0f93598c15120ba7efbc49cd1c33bee5415528b305c0',
 		'inc/ab-controls.php'       => 'eed236181fe745999f0c150e4cec8c2e8c6b6daf3b52bf4e98a2347f60851176',
-		'inc/theme-options.php'     => '640ed8efb7fdb266f5d9ccbc645491f70e7e45fdd0d13a8dfbb3955feaea581e',
+		'inc/theme-options.php'     => 'ab1cb2f92f2d009a9e119bcfb096c60fd8b923a44013d2d19e289d7c4ae687c6',
 		'taxonomy-artist.php'       => '0e2a19b4eac410a4ca932d12d7a51bccc59207b2926c9e7e182c80aaae083483',
 		'taxonomy-singer.php'       => '38ed6b25f0146a900e1c580a85d64698497caf73c561abbadc0e9e4d245f9fce',
 		'inc/ab-tax-artist.php'     => '8aaa995ae6658ecbb7a2dd1ea32afc5c881edfaf1abc1594e89ee3a4c1bba9b0',

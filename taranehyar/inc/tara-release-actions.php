@@ -1,5 +1,5 @@
 <?php
-/** In-progress HTTP adapter; deliberately not hooked into the theme yet. */
+/** HTTP and WooCommerce operations for artist release requests. */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /** The logged-in owner may submit, but cannot select a user id or price. */
@@ -13,14 +13,14 @@ function tara_release_ajax_submit() {
 	if ( ! is_string( $token ) || ! preg_match( '/^[a-f0-9]{32,64}$/D', $token ) || ! tara_hub_request_lock( $user_id ) ) { wp_send_json_error( array( 'message' => 'شناسه نامعتبر است یا درخواست دیگری در حال پردازش است.' ), 400 ); }
 	$existing = tara_release_find_submission( tara_hub_requests( $user_id ), $token );
 	if ( $existing ) { wp_send_json_success( array( 'id' => $existing['id'], 'message' => 'درخواست پیش‌تر ثبت شده است.' ) ); }
-	$has_work = isset( $_FILES['work_file']['error'] ) && UPLOAD_ERR_NO_FILE !== $_FILES['work_file']['error'];
-	$valid = tara_release_validate( $input, $has_work );
+	$uploads = tara_release_file_inputs( $_FILES );
+	if ( is_wp_error( $uploads ) ) { wp_send_json_error( array( 'message' => $uploads->get_error_message() ), 400 ); }
+	$valid = tara_release_validate( $input, isset( $uploads['work'] ) );
 	if ( is_wp_error( $valid ) ) { wp_send_json_error( array( 'message' => $valid->get_error_message() ), 400 ); }
 	$stored = array();
-	foreach ( array( 'work_file' => 'work', 'cover_file' => 'cover', 'document_file' => 'document' ) as $field => $key ) {
-		if ( ! isset( $_FILES[ $field ]['error'] ) || UPLOAD_ERR_NO_FILE === $_FILES[ $field ]['error'] ) { continue; }
-		if ( 'on' !== ot_get_option( 'release_uploads_on', 'off' ) ) { $file = new WP_Error( 'release_upload', 'آپلود خصوصی فعال نیست.' ); }
-		else { $extension = isset( $_FILES[ $field ]['name'] ) && is_string( $_FILES[ $field ]['name'] ) ? strtolower( pathinfo( $_FILES[ $field ]['name'], PATHINFO_EXTENSION ) ) : ''; $kind = 'work' === $key ? ( 'mp4' === $extension ? 'video' : 'audio' ) : $key; $file = tara_release_store_upload( $_FILES[ $field ], $kind ); }
+	foreach ( $uploads as $key => $upload ) {
+		if ( 'on' !== ot_get_option( 'release_uploads_on', 'on' ) ) { $file = new WP_Error( 'release_upload', 'آپلود خصوصی فعال نیست.' ); }
+		else { $extension = isset( $upload['name'] ) && is_string( $upload['name'] ) ? strtolower( pathinfo( $upload['name'], PATHINFO_EXTENSION ) ) : ''; $is_work = 'work' === $key || 0 === strpos( $key, 'work_' ); $kind = $is_work ? ( 'mp4' === $extension ? 'video' : 'audio' ) : $key; $file = tara_release_store_upload( $upload, $kind ); }
 		if ( is_wp_error( $file ) ) {
 			$dir = tara_release_private_dir(); if ( ! is_wp_error( $dir ) ) { foreach ( $stored as $old ) { @unlink( $dir . DIRECTORY_SEPARATOR . $old['token'] . '.bin' ); } }
 			wp_send_json_error( array( 'message' => $file->get_error_message() ), 400 );
@@ -71,6 +71,7 @@ function tara_release_admin_update( $user_id, $request_id, $input, $now ) {
 		if ( isset( $input['status'] ) && is_string( $input['status'] ) && '' !== $input['status'] && $input['status'] !== $changed['status'] ) {
 			$changed = tara_release_transition( $changed, $input['status'], 'admin', $now );
 			if ( is_wp_error( $changed ) ) { return $changed; }
+			if ( 'published' === $changed['status'] && function_exists( 'tara_release_sms_queue' ) ) { $changed = tara_release_sms_queue( $changed, 'published' ); }
 		}
 		return $changed;
 	} );
@@ -78,7 +79,7 @@ function tara_release_admin_update( $user_id, $request_id, $input, $now ) {
 
 /** Prepare at most one WooCommerce order after the owner accepts the exact quote. */
 function tara_release_prepare_checkout( $user_id, $id, $hash ) {
-	if ( ! function_exists( 'ot_get_option' ) || 'on' !== ot_get_option( 'release_payment_on', 'off' ) || ! tara_hub_wc_ready() ) { return new WP_Error( 'release_disabled', 'پرداخت در حال حاضر فعال نیست.' ); }
+	if ( ! function_exists( 'ot_get_option' ) || 'on' !== ot_get_option( 'release_payment_on', 'on' ) || ! tara_hub_wc_ready() ) { return new WP_Error( 'release_disabled', 'پرداخت در حال حاضر فعال نیست.' ); }
 	if ( (int) $user_id <= 0 || ! is_string( $id ) || ! is_string( $hash ) || ! tara_hub_request_lock( $user_id ) ) { return new WP_Error( 'release_lock', 'درخواست دیگری در حال پردازش است؛ دوباره تلاش کنید.' ); }
 	$rows = tara_hub_requests( $user_id ); $row = null;
 	foreach ( $rows as $candidate ) { if ( isset( $candidate['id'], $candidate['type'] ) && 'release' === $candidate['type'] && $id === $candidate['id'] ) { $row = $candidate; break; } }
@@ -142,9 +143,11 @@ function tara_release_wc_paid( $order_id ) {
 		if ( 'paid' === $row['status'] ) { return $row; }
 		if ( ! tara_release_order_matches_paid( $row, $order, $user_id ) ) { return new WP_Error( 'release_payment', 'پرداخت قابل تأیید نیست.' ); }
 		$updated = true;
-		return tara_release_transition( $row, 'paid', 'verified_gateway', time() );
+		$paid = tara_release_transition( $row, 'paid', 'verified_gateway', time() );
+		return ! is_wp_error( $paid ) && function_exists( 'tara_release_sms_queue' ) ? tara_release_sms_queue( $paid, 'paid' ) : $paid;
 	} );
 	if ( is_wp_error( $result ) && 'release_lock' === $result->get_error_code() && function_exists( 'wp_schedule_single_event' ) ) { wp_schedule_single_event( time() + 60, 'tara_release_retry_paid', array( (int) $order_id ) ); }
+	if ( ! is_wp_error( $result ) && isset( $result['sms_events']['paid']['status'] ) && 'pending' === $result['sms_events']['paid']['status'] && function_exists( 'tara_release_sms_schedule' ) ) { tara_release_sms_schedule( $user_id, $id, 'paid' ); }
 	if ( $updated && ! is_wp_error( $result ) && function_exists( 'tara_acc_notify' ) ) { tara_acc_notify( $user_id, array( 'title' => 'پرداخت درخواست انتشار تأیید شد.' ) ); }
 }
 
@@ -153,7 +156,7 @@ function tara_release_download() {
 	$user_id = isset( $_GET['user_id'] ) ? (int) $_GET['user_id'] : 0;
 	$id = isset( $_GET['request_id'] ) && is_string( $_GET['request_id'] ) ? sanitize_text_field( wp_unslash( $_GET['request_id'] ) ) : '';
 	$key = isset( $_GET['file'] ) && is_string( $_GET['file'] ) ? sanitize_key( wp_unslash( $_GET['file'] ) ) : '';
-	if ( ! is_user_logged_in() || $user_id <= 0 || ( get_current_user_id() !== $user_id && ! current_user_can( 'manage_options' ) ) || ! in_array( $key, array( 'work', 'cover', 'document' ), true ) ) { wp_die( 'دسترسی مجاز نیست.', '', array( 'response' => 403 ) ); }
+	if ( ! is_user_logged_in() || $user_id <= 0 || ( get_current_user_id() !== $user_id && ! current_user_can( 'manage_options' ) ) || ! tara_release_file_key_valid( $key ) ) { wp_die( 'دسترسی مجاز نیست.', '', array( 'response' => 403 ) ); }
 	check_admin_referer( 'tara_release_file_' . $user_id . '_' . $id . '_' . $key );
 	$file = null;
 	foreach ( tara_hub_requests( $user_id ) as $row ) {
@@ -195,7 +198,7 @@ function tara_release_order_needs_payment( $needs_payment, $order ) {
 	if ( ! $needs_payment || ! is_object( $order ) || ! is_callable( array( $order, 'get_meta' ) ) ) { return $needs_payment; }
 	$id = (string) $order->get_meta( '_tara_release_request', true );
 	if ( '' === $id ) { return $needs_payment; }
-	if ( ! function_exists( 'ot_get_option' ) || 'on' !== ot_get_option( 'release_payment_on', 'off' ) ) { return false; }
+	if ( ! function_exists( 'ot_get_option' ) || 'on' !== ot_get_option( 'release_payment_on', 'on' ) ) { return false; }
 	$user_id = (int) $order->get_meta( '_tara_release_user', true );
 	if ( $user_id <= 0 || $user_id !== (int) $order->get_customer_id() ) { return false; }
 	foreach ( tara_hub_requests( $user_id ) as $row ) {

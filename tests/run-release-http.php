@@ -6,6 +6,7 @@ function wp_parse_url($url){return parse_url($url);}
 require '/tmp/theme/inc/tara-artisthub.php';
 require '/tmp/theme/inc/tara-release-core.php';
 require '/tmp/theme/inc/tara-release-storage.php';
+require '/tmp/theme/inc/tara-release-files.php';
 require '/tmp/theme/inc/tara-release-actions.php';
 $pass=0;$fail=0;
 function http_release_test($name,$ok){global $pass,$fail;echo ($ok?'PASS ':'FAIL ').$name."\n";if($ok)++$pass;else ++$fail;}

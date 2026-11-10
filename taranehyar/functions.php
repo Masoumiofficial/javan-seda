@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.12.16-beta.1' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.12.16-beta.2' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -584,7 +584,7 @@ foreach ( array( 'tara-trust.php', 'tara-dm.php', 'tara-artisthub.php' ) as $tar
 unset( $taranehyar_hub_file, $taranehyar_hub_path );
 
 /* انتشار آثار: اگر همهٔ اجزا موجود باشند به پنل هنرمند وصل می‌شوند. */
-$tara_release_files = array( 'tara-release-core.php', 'tara-release-files.php', 'tara-release-storage.php', 'tara-release-actions.php', 'tara-release-ui.php', 'tara-release-live.php' );
+$tara_release_files = array( 'tara-release-core.php', 'tara-release-files.php', 'tara-release-storage.php', 'tara-release-sms.php', 'tara-release-actions.php', 'tara-release-ui.php', 'tara-release-live.php' );
 $tara_release_ready = true;
 foreach ( $tara_release_files as $tara_release_file ) { if ( ! is_readable( TARANEHYAR_DIR . '/inc/' . $tara_release_file ) ) { $tara_release_ready = false; break; } }
 if ( $tara_release_ready ) {

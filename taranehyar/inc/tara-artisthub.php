@@ -681,7 +681,7 @@ if ( ! function_exists( 'tara_hub_tab_artist' ) ) {
 				<section class="ty-hub__card">
 					<h3>درخواست‌های من</h3>
 					<ul class="ty-hub__reqs">
-						<?php foreach ( $reqs as $row ) : ?>
+						<?php foreach ( $reqs as $row ) : if ( isset( $row['type'] ) && 'release' === $row['type'] ) { continue; } ?>
 							<li>
 								<b><?php echo esc_html( isset( $row['title'] ) ? $row['title'] : 'درخواست' ); ?></b>
 								<span class="ty-hub__status is-<?php echo esc_attr( isset( $row['status'] ) ? $row['status'] : 'pending' ); ?>"><?php echo esc_html( tara_hub_status_label( isset( $row['status'] ) ? $row['status'] : 'pending' ) ); ?></span>

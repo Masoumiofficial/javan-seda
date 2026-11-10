@@ -6,6 +6,7 @@ function wp_parse_url($url){return parse_url($url);}
 require '/tmp/theme/inc/tara-artisthub.php';
 require '/tmp/theme/inc/tara-release-core.php';
 require '/tmp/theme/inc/tara-release-storage.php';
+require '/tmp/theme/inc/tara-release-sms.php';
 require '/tmp/theme/inc/tara-release-actions.php';
 class WC_Order_Item_Fee { public $amount=0; function set_name($x){} function set_tax_status($x){} function set_amount($x){$this->amount=$x;} function set_total($x){$this->amount=$x;} }
 class TestReleaseOrder {
@@ -56,6 +57,11 @@ $o->amount=1;test_release_storage('order-pay rejects changed amount',!tara_relea
 $GLOBALS['__ot']['release_payment_on']='off';test_release_storage('order-pay disabled by manager',!tara_release_order_needs_payment(true,$o));$GLOBALS['__ot']['release_payment_on']='on';
 tara_release_wc_paid(1);test_release_storage('unpaid callback cannot mark paid',tara_hub_requests(42)[0]['status']==='awaiting_payment');
 $o->paid=true;$o->status='processing';tara_release_wc_paid(1);test_release_storage('verified callback marks paid',tara_hub_requests(42)[0]['status']==='paid');
+test_release_storage('paid SMS queued only after verified callback',tara_hub_requests(42)[0]['sms_events']['paid']['status']==='pending');
+tara_release_wc_paid(1);test_release_storage('duplicate callback leaves single paid event',count(tara_hub_requests(42)[0]['sms_events'])===1);
+$r=tara_release_admin_update(42,$id,array('status'=>'preparing'),1005);
+$r=tara_release_admin_update(42,$id,array('status'=>'published','publication_url'=>'https://example.com/song'),1006);
+test_release_storage('published SMS queued with saved public URL',!is_wp_error($r) && $r['sms_events']['published']['url']==='https://example.com/song');
 $o->status='refunded';tara_release_wc_refunded(1);test_release_storage('full verified refund recorded',tara_hub_requests(42)[0]['status']==='refunded');
 $GLOBALS['__db_sum']=0;
 test_release_storage('lock timeout fails closed',is_wp_error(tara_release_save_request(44,$data,str_repeat('f',32),1000)) && empty(tara_hub_requests(44)));

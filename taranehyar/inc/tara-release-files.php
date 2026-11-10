@@ -1,5 +1,5 @@
 <?php
-/** Private file primitives for release requests. Not connected to a route yet. */
+/** Private file handling for release requests. */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /** A resolved directory nested within a publicly served directory is never acceptable. */
@@ -26,6 +26,35 @@ function tara_release_private_dir() {
 		if ( false === $resolved || tara_release_path_within( $dir, $resolved ) ) { return new WP_Error( 'release_storage', 'فضای فایل باید خارج از مسیرهای عمومی سایت باشد.' ); }
 	}
 	return $dir;
+}
+
+/** Fixed slot identifiers are safe for lookup and never become file paths. */
+function tara_release_file_key_valid( $key ) {
+	return is_string( $key ) && ( in_array( $key, array( 'work', 'cover', 'document' ), true ) || 1 === preg_match( '/^work_([2-9]|10)$/D', $key ) );
+}
+
+/** Flatten a PHP multi-file field without trusting its array shape or declared size. */
+function tara_release_file_inputs( $files ) {
+	if ( ! is_array( $files ) ) { return new WP_Error( 'release_file_input', 'فایل‌های ارسالی نامعتبرند.' ); }
+	$result = array();
+	$max = function_exists( 'ot_get_option' ) ? ot_get_option( 'release_max_tracks', '10' ) : '10';
+	$max = is_scalar( $max ) && preg_match( '/^(?:[1-9]|10)$/D', (string) $max ) ? (int) $max : 10;
+	if ( isset( $files['work_file']['error'] ) && UPLOAD_ERR_NO_FILE !== $files['work_file']['error'] ) { $result['work'] = $files['work_file']; }
+	if ( isset( $files['work_files'] ) ) {
+		$group = $files['work_files'];
+		if ( ! is_array( $group ) || ! isset( $group['name'], $group['tmp_name'], $group['error'], $group['size'] ) || ! is_array( $group['name'] ) || ! is_array( $group['tmp_name'] ) || ! is_array( $group['error'] ) || ! is_array( $group['size'] ) || count( $group['name'] ) > $max || count( $group['name'] ) !== count( $group['tmp_name'] ) || count( $group['name'] ) !== count( $group['error'] ) || count( $group['name'] ) !== count( $group['size'] ) ) { return new WP_Error( 'release_file_input', 'تعداد یا ساختار فایل‌های اثر مجاز نیست.' ); }
+		foreach ( $group['name'] as $i => $name ) {
+			if ( ! isset( $group['tmp_name'][ $i ], $group['error'][ $i ], $group['size'][ $i ] ) || ! is_string( $name ) || ! is_string( $group['tmp_name'][ $i ] ) || ! is_int( $group['error'][ $i ] ) || ! is_numeric( $group['size'][ $i ] ) ) { return new WP_Error( 'release_file_input', 'اطلاعات فایل نامعتبر است.' ); }
+			if ( UPLOAD_ERR_NO_FILE === $group['error'][ $i ] ) { continue; }
+			$n = count( $result ) + 1;
+			if ( $n > $max ) { return new WP_Error( 'release_file_input', 'تعداد فایل‌های اثر بیش از حد مجاز است.' ); }
+			$result[ 1 === $n ? 'work' : 'work_' . $n ] = array( 'name' => $name, 'tmp_name' => $group['tmp_name'][ $i ], 'error' => $group['error'][ $i ], 'size' => $group['size'][ $i ] );
+		}
+	}
+	foreach ( array( 'cover_file' => 'cover', 'document_file' => 'document' ) as $field => $slot ) {
+		if ( isset( $files[ $field ]['error'] ) && UPLOAD_ERR_NO_FILE !== $files[ $field ]['error'] ) { $result[ $slot ] = $files[ $field ]; }
+	}
+	return $result;
 }
 
 /** Metadata checks must also be followed by a server-side MIME check. */

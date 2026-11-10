@@ -1,5 +1,5 @@
 <?php
-/** In-progress adapter to the existing artist request store; not registered as an endpoint. */
+/** Adapter to the existing artist request store. */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /**

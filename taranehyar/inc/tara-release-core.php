@@ -1,5 +1,5 @@
 <?php
-/** Foundations for release requests. Deliberately not loaded until the workflow is integrated. */
+/** Domain logic for artist release requests. */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 /** Prices are in toman; international prices are indicative, not a payment quote. */

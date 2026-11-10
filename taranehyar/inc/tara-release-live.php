@@ -10,6 +10,7 @@ add_action( 'woocommerce_payment_complete', 'tara_release_wc_paid' );
 add_action( 'woocommerce_order_status_processing', 'tara_release_wc_paid' );
 add_action( 'woocommerce_order_status_completed', 'tara_release_wc_paid' );
 add_action( 'tara_release_retry_paid', 'tara_release_wc_paid' );
+add_action( 'tara_release_sms_event', 'tara_release_sms_process', 10, 3 );
 add_action( 'woocommerce_order_status_refunded', 'tara_release_wc_refunded' );
 add_action( 'tara_release_retry_refunded', 'tara_release_wc_refunded' );
 
@@ -36,6 +37,7 @@ function tara_release_admin_post() {
 	if ( isset( $input['save_quote'] ) ) { $input['quote_revision'] = str_replace( '-', '', wp_generate_uuid4() ); }
 	$result = tara_release_admin_update( $user_id, $id, $input, time() );
 	if ( is_wp_error( $result ) ) { wp_die( esc_html( $result->get_error_message() ), 'خطا', array( 'response' => 400, 'back_link' => true ) ); }
+	if ( isset( $result['sms_events']['published']['status'] ) && 'pending' === $result['sms_events']['published']['status'] ) { tara_release_sms_schedule( $user_id, $id, 'published' ); }
 	if ( function_exists( 'tara_acc_notify' ) ) { tara_acc_notify( $user_id, array( 'title' => 'درخواست انتشار شما به‌روزرسانی شد.', 'url' => add_query_arg( 'tab', 'artist', tara_acc_page_url( 'page-account.php' ) ) ) ); }
 	wp_safe_redirect( admin_url( 'admin.php?page=tara-release&updated=1' ) ); exit;
 }
@@ -44,7 +46,10 @@ add_action( 'admin_post_tara_release_manage', 'tara_release_admin_post' );
 function tara_release_admin_page() {
 	if ( ! current_user_can( 'manage_options' ) ) { return; }
 	$page = isset( $_GET['paged'] ) ? max( 1, (int) $_GET['paged'] ) : 1;
-	$users = get_users( array( 'meta_key' => 'tara_artist_requests', 'number' => 50, 'offset' => ( $page - 1 ) * 50, 'orderby' => 'ID', 'order' => 'ASC' ) );
+	$target_user = isset( $_GET['user_id'] ) ? absint( $_GET['user_id'] ) : 0;
+	$args = array( 'meta_key' => 'tara_artist_requests', 'number' => 50, 'offset' => ( $page - 1 ) * 50, 'orderby' => 'ID', 'order' => 'ASC' );
+	if ( $target_user > 0 ) { $args['include'] = array( $target_user ); }
+	$users = get_users( $args );
 	$statuses = tara_release_statuses();
 	?> <div class="wrap"><h1>درخواست‌های انتشار</h1><p>فهرست بر اساس کاربران صفحه‌بندی شده است. پرداخت بین‌المللی فعال نیست.</p>
 	<?php if ( isset( $_GET['updated'] ) ) : ?><div class="notice notice-success"><p>تغییرات ذخیره شد.</p></div><?php endif; ?>
@@ -52,7 +57,8 @@ function tara_release_admin_page() {
 	<div class="postbox" style="padding:16px;margin:16px 0"><h2><?php echo esc_html( $row['title'] ); ?> — <?php echo esc_html( $user->display_name ); ?> (#<?php echo esc_html( (string) $user->ID ); ?>)</h2>
 	<p>شناسه: <?php echo esc_html( $row['id'] ); ?> | وضعیت: <?php echo esc_html( isset( $statuses[ $row['status'] ] ) ? $statuses[ $row['status'] ] : $row['status'] ); ?> | تعرفه اولیه: <?php echo esc_html( number_format_i18n( (int) $row['price'] ) ); ?> تومان</p>
 	<details><summary>جزئیات درخواست</summary><?php foreach ( (array) $row['details'] as $key => $value ) : if ( ! is_scalar( $value ) ) { continue; } ?><p><strong><?php echo esc_html( $key ); ?>:</strong> <?php echo esc_html( is_bool( $value ) ? ( $value ? 'بله' : 'خیر' ) : $value ); ?></p><?php endforeach; ?></details>
-	<?php foreach ( isset( $row['files'] ) ? (array) $row['files'] : array() as $key => $file ) : if ( ! in_array( $key, array( 'work', 'cover', 'document' ), true ) ) { continue; } $url = add_query_arg( array( 'action' => 'tara_release_download', 'user_id' => (int) $user->ID, 'request_id' => $row['id'], 'file' => $key ), admin_url( 'admin-post.php' ) ); $url = wp_nonce_url( $url, 'tara_release_file_' . $user->ID . '_' . $row['id'] . '_' . $key ); ?><p><a href="<?php echo esc_url( $url ); ?>">دریافت فایل <?php echo esc_html( $key ); ?></a></p><?php endforeach; ?>
+	<?php foreach ( isset( $row['files'] ) ? (array) $row['files'] : array() as $key => $file ) : if ( ! tara_release_file_key_valid( $key ) ) { continue; } $url = add_query_arg( array( 'action' => 'tara_release_download', 'user_id' => (int) $user->ID, 'request_id' => $row['id'], 'file' => $key ), admin_url( 'admin-post.php' ) ); $url = wp_nonce_url( $url, 'tara_release_file_' . $user->ID . '_' . $row['id'] . '_' . $key ); ?><p><a href="<?php echo esc_url( $url ); ?>">دریافت فایل <?php echo esc_html( $key ); ?></a></p><?php endforeach; ?>
+	<?php if ( ! empty( $row['sms_events'] ) ) : $sms_labels = array( 'pending' => 'در صف', 'sending' => 'در حال ارسال یا نتیجه نامشخص', 'accepted' => 'پذیرفته‌شده توسط سرویس', 'failed' => 'ناموفق یا نتیجه نامشخص' ); ?><p>وضعیت ارسال پیامک (accepted یعنی پذیرش توسط سرویس، نه تحویل قطعی):</p><?php foreach ( $row['sms_events'] as $event => $sms ) : if ( ! in_array( $event, array( 'paid', 'published' ), true ) ) { continue; } ?><p><?php echo esc_html( ( 'paid' === $event ? 'پرداخت' : 'انتشار' ) . ': ' . ( isset( $sms['status'], $sms_labels[ $sms['status'] ] ) ? $sms_labels[ $sms['status'] ] : 'نامشخص' ) ); ?></p><?php if ( isset( $sms['status'] ) && in_array( $sms['status'], array( 'failed', 'sending', 'pending' ), true ) ) : ?><form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" onsubmit="return confirm('ابتدا در پنل پیامک بررسی کنید که پیام قبلاً ارسال نشده باشد. تلاش مجدد ممکن است پیام تکراری و هزینه ایجاد کند. ادامه؟')"><input type="hidden" name="action" value="tara_release_sms_retry"><input type="hidden" name="user_id" value="<?php echo esc_attr( (string) $user->ID ); ?>"><input type="hidden" name="request_id" value="<?php echo esc_attr( $row['id'] ); ?>"><input type="hidden" name="event" value="<?php echo esc_attr( $event ); ?>"><?php wp_nonce_field( 'tara_release_sms_retry' ); ?><button type="submit" class="button">تلاش مجدد پیامک</button></form><?php endif; ?><?php endforeach; ?><?php endif; ?>
 	<details><summary>تاریخچه</summary><?php foreach ( isset( $row['history'] ) ? (array) $row['history'] : array() as $history ) : ?><p><?php echo esc_html( isset( $statuses[ $history['status'] ] ) ? $statuses[ $history['status'] ] : $history['status'] ); ?> — <?php echo esc_html( date_i18n( 'Y/m/d H:i', (int) $history['time'] ) ); ?><?php if ( isset( $history['event'] ) ) : ?> — <?php echo esc_html( $history['event'] ); ?><?php endif; ?><?php if ( isset( $history['final_toman'] ) ) : ?> — <?php echo esc_html( number_format_i18n( (int) $history['final_toman'] ) ); ?> تومان؛ هزینه‌ها: <?php echo esc_html( $history['extra_costs'] ); ?>؛ شرایط: <?php echo esc_html( $history['refund_terms'] ); ?><?php endif; ?><?php if ( ! empty( $history['note'] ) ) : ?> — <?php echo esc_html( $history['note'] ); ?><?php endif; ?></p><?php endforeach; ?></details>
 	<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="tara_release_manage"><input type="hidden" name="user_id" value="<?php echo esc_attr( (string) $user->ID ); ?>"><input type="hidden" name="request_id" value="<?php echo esc_attr( $row['id'] ); ?>"><?php wp_nonce_field( 'tara_release_admin' ); ?>
 	<p><label>وضعیت <select name="status"><option value="">بدون تغییر</option><?php foreach ( $statuses as $key => $label ) : if ( ! tara_release_transition_allowed( $row['status'], $key, 'admin' ) ) { continue; } ?><option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $label ); ?></option><?php endforeach; ?></select></label></p>
@@ -92,3 +98,49 @@ function tara_release_public_schema() {
 	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . '</script>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- JSON encoded with hex flags
 }
 add_action( 'wp_head', 'tara_release_public_schema', 5 );
+
+/** Display the associated release in both HPOS and classic Woo order screens. */
+function tara_release_order_details( $order ) {
+	if ( ! is_object( $order ) || ! is_callable( array( $order, 'get_meta' ) ) ) { return; }
+	$id = (string) $order->get_meta( '_tara_release_request', true );
+	$user_id = (int) $order->get_meta( '_tara_release_user', true );
+	if ( '' === $id || $user_id <= 0 || $user_id !== (int) $order->get_customer_id() || ( ! current_user_can( 'manage_options' ) && (int) get_current_user_id() !== $user_id ) ) { return; }
+	foreach ( tara_hub_requests( $user_id ) as $row ) {
+		if ( ! isset( $row['id'], $row['type'], $row['order_id'] ) || 'release' !== $row['type'] || $row['id'] !== $id || (int) $row['order_id'] !== (int) $order->get_id() ) { continue; }
+		$statuses = tara_release_statuses();
+		echo '<p><strong>درخواست انتشار:</strong> ' . esc_html( $row['title'] ) . ' — ' . esc_html( isset( $statuses[ $row['status'] ] ) ? $statuses[ $row['status'] ] : $row['status'] ) . '</p>';
+		if ( current_user_can( 'manage_options' ) ) { echo '<p><a href="' . esc_url( add_query_arg( array( 'page' => 'tara-release', 'user_id' => $user_id ), admin_url( 'admin.php' ) ) ) . '">مشاهدهٔ درخواست و فایل‌ها</a></p>'; }
+		break;
+	}
+}
+add_action( 'woocommerce_admin_order_data_after_order_details', 'tara_release_order_details' );
+add_action( 'woocommerce_order_details_after_order_table', 'tara_release_order_details' );
+
+/** Manual retry is deliberate because a timeout can mean a provider accepted the first send. */
+function tara_release_sms_retry_admin() {
+	if ( ! current_user_can( 'manage_options' ) ) { wp_die( 'دسترسی مجاز نیست.', '', array( 'response' => 403 ) ); }
+	check_admin_referer( 'tara_release_sms_retry' );
+	$input = wp_unslash( $_POST );
+	$user_id = isset( $input['user_id'] ) ? (int) $input['user_id'] : 0;
+	$id = isset( $input['request_id'] ) && is_string( $input['request_id'] ) ? $input['request_id'] : '';
+	$event = isset( $input['event'] ) && is_string( $input['event'] ) ? $input['event'] : '';
+	if ( ! in_array( $event, array( 'paid', 'published' ), true ) ) { wp_die( 'پیام نامعتبر است.' ); }
+	$result = tara_release_change_request( $user_id, $id, function ( $row ) use ( $event ) {
+		if ( ! isset( $row['sms_events'][ $event ]['status'] ) || ! in_array( $row['sms_events'][ $event ]['status'], array( 'pending', 'failed', 'sending' ), true ) ) { return new WP_Error( 'release_sms', 'این پیام قابل ارسال مجدد نیست.' ); }
+		$row['sms_events'][ $event ]['status'] = 'pending';
+		return $row;
+	} );
+	if ( is_wp_error( $result ) ) { wp_die( esc_html( $result->get_error_message() ), 'خطا', array( 'response' => 400, 'back_link' => true ) ); }
+	tara_release_sms_schedule( $user_id, $id, $event );
+	wp_safe_redirect( admin_url( 'admin.php?page=tara-release&user_id=' . $user_id . '&updated=1' ) ); exit;
+}
+add_action( 'admin_post_tara_release_sms_retry', 'tara_release_sms_retry_admin' );
+
+function tara_release_storage_notice() {
+	if ( ! current_user_can( 'manage_options' ) || ! function_exists( 'ot_get_option' ) || 'on' !== ot_get_option( 'release_enabled', 'off' ) ) { return; }
+	$dir = tara_release_private_dir();
+	if ( is_wp_error( $dir ) || 'on' !== ot_get_option( 'release_uploads_on', 'on' ) ) {
+		echo '<div class="notice notice-warning"><p>آپلود خصوصی انتشار آثار هنوز آماده نیست. در تنظیمات قالب آپلود را روشن کنید و مسیر خصوصی خارج از وب را مطابق راهنما تنظیم و در سرور آزمایش کنید.</p></div>';
+	}
+}
+add_action( 'admin_notices', 'tara_release_storage_notice' );

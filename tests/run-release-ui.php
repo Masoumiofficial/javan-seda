@@ -1,6 +1,7 @@
 <?php
 require __DIR__ . '/stubs-wp.php';
 require '/tmp/theme/inc/tara-release-core.php';
+require '/tmp/theme/inc/tara-release-files.php';
 require '/tmp/theme/inc/tara-release-ui.php';
 $pass=0; $fail=0;
 function ui_release_test($name,$ok){global $pass,$fail;echo ($ok?'PASS ':'FAIL ').$name."\n";if($ok)++$pass;else ++$fail;}

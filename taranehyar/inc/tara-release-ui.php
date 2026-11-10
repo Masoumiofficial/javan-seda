@@ -1,5 +1,5 @@
 <?php
-/** UI for the in-progress release workflow. Not hooked into the account yet. */
+/** Account UI for the release workflow. */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
 function tara_release_render_wizard( $user_id = 0 ) {
@@ -36,7 +36,7 @@ function tara_release_render_wizard( $user_id = 0 ) {
 				<label>نام و نام خانوادگی *<input name="full_name" maxlength="120" required></label>
 				<label>نام هنری *<input name="artist_name" maxlength="120" required></label>
 				<label>شماره تماس *<input name="mobile" type="tel" dir="ltr" maxlength="30" required></label>
-				<label>ایمیل *<input name="email" type="email" dir="ltr" maxlength="254" required></label>
+				<p>پیامک وضعیت به شمارهٔ تأییدشدهٔ حساب شما ارسال می‌شود، نه لزوماً شمارهٔ تماس این فرم.</p><label>ایمیل *<input name="email" type="email" dir="ltr" maxlength="254" required></label>
 				<label>کشور محل سکونت *<input name="country" maxlength="100" required></label>
 				<label>اینستاگرام<input name="instagram" type="url" dir="ltr" maxlength="500"></label>
 				<label>وب‌سایت<input name="website" type="url" dir="ltr" maxlength="500"></label>
@@ -54,8 +54,8 @@ function tara_release_render_wizard( $user_id = 0 ) {
 				<label>لینک فایل اثر<input name="file_url" type="url" dir="ltr" maxlength="1000"></label>
 				<label>لینک کاور<input name="cover_url" type="url" dir="ltr" maxlength="1000"></label>
 				<label>توضیحات<textarea name="description" maxlength="4000"></textarea></label>
-				<?php if ( 'on' === $opt( 'release_uploads_on', 'off' ) && ! is_wp_error( tara_release_private_dir() ) ) : ?>
-				<label>فایل اثر (MP3، WAV یا MP4)<input type="file" name="work_file" accept=".mp3,.wav,.mp4"></label>
+				<?php if ( 'on' === $opt( 'release_uploads_on', 'on' ) && ! is_wp_error( tara_release_private_dir() ) ) : ?>
+				<label>فایل‌های اثر یا قطعات آلبوم (حداکثر ۱۰ فایل MP3، WAV یا MP4؛ سقف نهایی طبق تنظیمات سایت)<input type="file" name="work_files[]" accept=".mp3,.wav,.mp4" multiple></label>
 				<label>فایل کاور (JPG یا PNG)<input type="file" name="cover_file" accept=".jpg,.jpeg,.png"></label>
 				<label>مدرک مالکیت (PDF، JPG یا PNG)<input type="file" name="document_file" accept=".pdf,.jpg,.jpeg,.png"></label>
 				<?php else : ?><p>آپلود خصوصی فعال نیست؛ لینک اثر را وارد کنید.</p><?php endif; ?>
@@ -66,20 +66,20 @@ function tara_release_render_wizard( $user_id = 0 ) {
 				<label><input type="checkbox" name="terms" value="1" required> <a href="<?php echo $rules_url; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- esc_url above ?>" target="_blank" rel="noopener noreferrer">شرایط خدمات</a> را خوانده و می‌پذیرم. *</label>
 			</fieldset>
 			<fieldset data-release-step><legend>۵. خلاصه و بررسی</legend>
-				<p data-release-summary></p><p><?php echo esc_html( $opt( 'release_extra_text', 'هزینهٔ توزیع، مالیات، ارز و کارمزد در صورت وجود جداگانه بررسی و پیش از پرداخت مشخص می‌شوند. مبلغ نهایی و شرایط لغو و بازپرداخت پس از بررسی اعلام و برای تأیید ارائه خواهند شد.' ) ); ?></p>
+				<p data-release-summary></p><p>پس از ثبت و بررسی مدیر، مبلغ و شرایط اختصاصی را در همین صفحه مشاهده و تأیید می‌کنید؛ سپس امکان پرداخت فعال می‌شود.</p><p><?php echo esc_html( $opt( 'release_extra_text', 'هزینهٔ توزیع، مالیات، ارز و کارمزد در صورت وجود جداگانه بررسی و پیش از پرداخت مشخص می‌شوند. مبلغ نهایی و شرایط لغو و بازپرداخت پس از بررسی اعلام و برای تأیید ارائه خواهند شد.' ) ); ?></p>
 			</fieldset>
 			<div class="tara-release__actions"><button type="button" data-release-prev>قبلی</button><button type="button" data-release-next>بعدی</button><button type="submit" data-release-submit>ثبت درخواست</button></div>
 			<p data-release-message role="status" aria-live="polite"></p>
 		</form>
 		<?php endif; ?>
 		<?php if ( $user_id > 0 ) : $statuses = tara_release_statuses(); foreach ( tara_hub_requests( $user_id ) as $row ) : if ( ! isset( $row['type'], $row['id'], $row['status'] ) || 'release' !== $row['type'] ) { continue; } ?>
-		<article class="tara-release__request"><h3><?php echo esc_html( $row['title'] ); ?></h3><p>وضعیت: <?php echo esc_html( isset( $statuses[ $row['status'] ] ) ? $statuses[ $row['status'] ] : $row['status'] ); ?></p>
+		<article class="tara-release__request"><h3><?php echo esc_html( $row['title'] ); ?></h3><p>کد رهگیری: <span dir="ltr"><?php echo esc_html( $row['id'] ); ?></span></p><p>وضعیت: <?php echo esc_html( isset( $statuses[ $row['status'] ] ) ? $statuses[ $row['status'] ] : $row['status'] ); ?><?php if ( ! empty( $row['order_id'] ) ) : ?> · شماره سفارش: <?php echo esc_html( (string) $row['order_id'] ); ?><?php endif; ?></p>
 		<?php if ( ! empty( $row['note'] ) ) : ?><p>یادداشت مدیر: <?php echo esc_html( $row['note'] ); ?></p><?php endif; ?>
 		<?php if ( ! empty( $row['publication_url'] ) ) : ?><p><a href="<?php echo esc_url( $row['publication_url'] ); ?>" target="_blank" rel="noopener noreferrer">لینک انتشار</a></p><?php endif; ?>
 		<?php if ( ! empty( $row['history'] ) && is_array( $row['history'] ) ) : ?><details><summary>تاریخچه وضعیت</summary><?php foreach ( $row['history'] as $history ) : if ( ! isset( $history['status'], $history['time'] ) ) { continue; } ?><p><?php echo esc_html( isset( $statuses[ $history['status'] ] ) ? $statuses[ $history['status'] ] : $history['status'] ); ?> — <?php echo esc_html( date_i18n( 'Y/m/d H:i', (int) $history['time'] ) ); ?></p><?php endforeach; ?></details><?php endif; ?>
 		<?php if ( 'awaiting_payment' === $row['status'] && isset( $row['final_toman'], $row['extra_costs'], $row['refund_terms'], $row['quote_revision'] ) ) : ?>
 			<p>مبلغ نهایی: <?php echo esc_html( number_format_i18n( (int) $row['final_toman'] ) ); ?> تومان</p><p>هزینه‌های جانبی: <?php echo esc_html( $row['extra_costs'] ); ?></p><p>شرایط لغو و بازپرداخت: <?php echo esc_html( $row['refund_terms'] ); ?></p>
-			<?php if ( 'international' !== $row['service'] && 'on' === $opt( 'release_payment_on', 'off' ) ) : ?><form data-release-checkout><input type="hidden" name="request_id" value="<?php echo esc_attr( $row['id'] ); ?>"><input type="hidden" name="quote_hash" value="<?php echo esc_attr( tara_release_quote_hash( $row ) ); ?>"><label><input type="checkbox" name="accept_quote" value="1" required> مبلغ، هزینه‌ها و شرایط لغو و بازپرداخت این سفارش را می‌پذیرم.</label><button type="submit">ادامه پرداخت</button><p role="status" data-release-message></p></form><?php endif; ?>
+			<?php if ( 'international' !== $row['service'] && 'on' === $opt( 'release_payment_on', 'on' ) ) : ?><form data-release-checkout><input type="hidden" name="request_id" value="<?php echo esc_attr( $row['id'] ); ?>"><input type="hidden" name="quote_hash" value="<?php echo esc_attr( tara_release_quote_hash( $row ) ); ?>"><label><input type="checkbox" name="accept_quote" value="1" required> مبلغ، هزینه‌ها و شرایط لغو و بازپرداخت این سفارش را می‌پذیرم.</label><button type="submit">ادامه پرداخت</button><p role="status" data-release-message></p></form><?php endif; ?>
 		<?php endif; ?></article>
 		<?php endforeach; endif; ?>
 	</section>

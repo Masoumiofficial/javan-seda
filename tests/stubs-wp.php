@@ -727,6 +727,8 @@ function wp_doing_cron() {
 
 /* ---------- $wpdb ---------- */
 class JV_Fake_WPDB {
+	public $prefix       = 'wp_';
+	public $usermeta     = 'wp_usermeta';
 	public $postmeta     = 'wp_postmeta';
 	public $posts        = 'wp_posts';
 	public $term_relationships = 'wp_term_relationships';

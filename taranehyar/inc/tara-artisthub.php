@@ -19,6 +19,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** Shared lock for every theme writer of tara_artist_requests.
+ * Until the release workflow is integrated, preserve legacy behavior.
+ */
+function tara_hub_request_lock( $user_id ) {
+	global $wpdb;
+	static $held = array();
+	if ( ! defined( 'TARA_RELEASE_INTEGRATED' ) || ! TARA_RELEASE_INTEGRATED ) { return true; }
+	$user_id = (int) $user_id;
+	if ( $user_id <= 0 || ! is_object( $wpdb ) ) { return false; }
+	if ( isset( $held[ $user_id ] ) ) { return true; }
+	$name = 'tara_hub_' . md5( $wpdb->usermeta . ':' . $user_id );
+	if ( '1' !== (string) $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, %d)', $name, 5 ) ) ) { return false; }
+	$held[ $user_id ] = true;
+	register_shutdown_function( function () use ( $wpdb, $name ) { $wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $name ) ); } );
+	return true;
+}
+
 if ( ! function_exists( 'tara_hub_opt' ) ) {
 	/** خواندنِ تنظیماتِ پنلِ هنرمند. */
 	function tara_hub_opt( $key, $default = '' ) {
@@ -135,6 +152,7 @@ function tara_hub_wc_paid( $order_id ) {
 	$expected = (string) $order->get_meta( '_tara_hub_expected' );
 	$currency = (string) $order->get_meta( '_tara_hub_currency' );
 	if ( $user_id <= 0 || $user_id !== (int) $order->get_customer_id() || '' === $request_id || '' === $expected || $currency !== $order->get_currency() || abs( (float) $order->get_total() - (float) $expected ) > 0.001 ) { return; }
+	if ( ! tara_hub_request_lock( $user_id ) ) { if ( function_exists( 'wp_schedule_single_event' ) ) { wp_schedule_single_event( time() + 60, 'tara_hub_retry_paid', array( (int) $order_id ) ); } return; }
 	$rows = tara_hub_requests( $user_id );
 	foreach ( $rows as &$row ) {
 		if ( isset( $row['id'], $row['order_id'], $row['type'] ) && 'plan' === $row['type'] && $row['id'] === $request_id && (int) $row['order_id'] === (int) $order_id && 'pending' === $row['status'] ) {
@@ -152,6 +170,7 @@ function tara_hub_wc_refunded( $order_id ) {
 	$user_id = (int) $order->get_meta( '_tara_hub_user' );
 	$request_id = (string) $order->get_meta( '_tara_hub_request' );
 	if ( $user_id <= 0 || $user_id !== (int) $order->get_customer_id() || '' === $request_id ) { return; }
+	if ( ! tara_hub_request_lock( $user_id ) ) { if ( function_exists( 'wp_schedule_single_event' ) ) { wp_schedule_single_event( time() + 60, 'tara_hub_retry_refunded', array( (int) $order_id ) ); } return; }
 	$rows = tara_hub_requests( $user_id );
 	foreach ( $rows as &$row ) {
 		if ( isset( $row['id'], $row['order_id'], $row['type'] ) && 'plan' === $row['type'] && $row['id'] === $request_id && (int) $row['order_id'] === (int) $order_id ) {
@@ -162,6 +181,8 @@ function tara_hub_wc_refunded( $order_id ) {
 	update_user_meta( $user_id, 'tara_artist_requests', $rows );
 }
 if ( function_exists( 'add_action' ) ) {
+	add_action( 'tara_hub_retry_paid', 'tara_hub_wc_paid' );
+	add_action( 'tara_hub_retry_refunded', 'tara_hub_wc_refunded' );
 	add_action( 'woocommerce_order_status_refunded', 'tara_hub_wc_refunded' );
 	add_action( 'woocommerce_payment_complete', 'tara_hub_wc_paid' );
 	add_action( 'woocommerce_order_status_processing', 'tara_hub_wc_paid' );
@@ -208,6 +229,7 @@ if ( ! function_exists( 'tara_hub_request_add' ) ) {
 		if ( $user_id <= 0 ) {
 			return '';
 		}
+		if ( ! tara_hub_request_lock( $user_id ) ) { return ''; }
 		$id   = 'r' . time() . wp_rand( 100, 999 );
 		$rows = tara_hub_requests( $user_id );
 		array_unshift(
@@ -332,6 +354,7 @@ if ( ! function_exists( 'tara_hub_ajax' ) ) {
 			wp_send_json_error( array( 'message' => 'پنلِ هنرمند در این سایت خاموش است.' ) );
 		}
 
+		if ( ! tara_hub_request_lock( $user_id ) ) { wp_send_json_error( array( 'message' => 'درخواست دیگری در حال پردازش است؛ دوباره تلاش کنید.' ) ); }
 		$do   = isset( $_POST['do'] ) ? sanitize_key( wp_unslash( (string) $_POST['do'] ) ) : '';
 		$term = tara_hub_user_term( $user_id );
 
@@ -790,11 +813,13 @@ if ( ! function_exists( 'tara_hub_admin_handle' ) ) {
 		if ( $user_id <= 0 || '' === $req_id ) {
 			return;
 		}
+		if ( ! tara_hub_request_lock( $user_id ) ) { return; }
 		$rows = tara_hub_requests( $user_id );
 		foreach ( $rows as &$row ) {
 			if ( ! isset( $row['id'] ) || $row['id'] !== $req_id ) {
 				continue;
 			}
+			if ( isset( $row['type'] ) && 'release' === $row['type'] ) { continue; }
 			if ( 'approve' === $action ) {
 				if ( 'upgrade' === $row['type'] && ( $term_id <= 0 || ! term_exists( $term_id, function_exists( 'tara_artist_tax' ) ? tara_artist_tax() : 'artist' ) || (int) get_term_meta( $term_id, 'tara_artist_user', true ) ) ) {
 					continue;

@@ -104,3 +104,80 @@ function tara_release_quote_ready( $row ) {
 	}
 	return isset( $row['accepted_quote_hash'] ) && is_string( $row['accepted_quote_hash'] ) && hash_equals( tara_release_quote_hash( $row ), $row['accepted_quote_hash'] );
 }
+
+/** Construct a request for insertion into the existing artist request array.
+ * Caller provides an unpredictable per-submission token and handles locking and persistence.
+ */
+function tara_release_build_request( $input, $token, $now, $has_file = false ) {
+	if ( ! is_string( $token ) || ! preg_match( '/^[a-f0-9]{32,64}$/D', $token ) || ! is_int( $now ) || $now <= 0 ) { return new WP_Error( 'release_token', 'شناسهٔ درخواست نامعتبر است.' ); }
+	$data = tara_release_validate( $input, $has_file );
+	if ( is_wp_error( $data ) ) { return $data; }
+	$catalog = tara_release_catalog();
+	return array(
+		'id' => 'release_' . $token, 'type' => 'release', 'service' => $data['service'],
+		'title' => $data['title'], 'body' => $data['description'], 'details' => $data,
+		'price' => $catalog[ $data['service'] ]['amount'], 'status' => 'new', 'created' => $now,
+		'note' => '', 'history' => array( array( 'status' => 'new', 'time' => $now, 'actor' => 'customer' ) ),
+	);
+}
+
+/** Find an existing submission without confusing it with a legacy artist request. */
+function tara_release_find_submission( $rows, $token ) {
+	if ( ! is_array( $rows ) || ! is_string( $token ) || ! preg_match( '/^[a-f0-9]{32,64}$/D', $token ) ) { return null; }
+	$id = 'release_' . $token;
+	foreach ( $rows as $row ) {
+		if ( is_array( $row ) && isset( $row['type'], $row['id'] ) && 'release' === $row['type'] && $id === $row['id'] ) { return $row; }
+	}
+	return null;
+}
+
+/** Set a new quote; changes invalidate any prior acceptance. No order may exist. */
+function tara_release_set_quote( $row, $amount, $extras, $refund_terms, $revision ) {
+	if ( ! is_array( $row ) || ! isset( $row['type'], $row['status'] ) || 'release' !== $row['type'] || ! in_array( $row['status'], array( 'approved', 'awaiting_payment' ), true ) || ! empty( $row['order_id'] ) ) { return new WP_Error( 'release_quote_state', 'تغییر پیش‌فاکتور در این وضعیت مجاز نیست.' ); }
+	if ( ! is_scalar( $amount ) || ! preg_match( '/^[1-9][0-9]{0,9}$/D', (string) $amount ) || (float) $amount > 2000000000 || ! is_string( $extras ) || ! is_string( $refund_terms ) || ! is_string( $revision ) || ! preg_match( '/^[a-f0-9]{32,64}$/D', $revision ) ) { return new WP_Error( 'release_quote', 'اطلاعات پیش‌فاکتور نامعتبر است.' ); }
+	$extras = sanitize_textarea_field( $extras );
+	$refund_terms = sanitize_textarea_field( $refund_terms );
+	if ( '' === trim( $extras ) || '' === trim( $refund_terms ) || strlen( $extras ) > 16000 || strlen( $refund_terms ) > 16000 ) { return new WP_Error( 'release_quote_terms', 'هزینه‌ها و شرایط لغو و بازپرداخت باید مشخص شوند.' ); }
+	$row['final_toman'] = (int) $amount;
+	$row['extra_costs'] = $extras;
+	$row['refund_terms'] = $refund_terms;
+	$row['quote_revision'] = $revision;
+	unset( $row['accepted_quote_hash'], $row['accepted_at'] );
+	return $row;
+}
+
+/** Called only after the authenticated owner sees and explicitly accepts this exact quote. */
+function tara_release_accept_quote( $row, $submitted_hash, $now ) {
+	if ( ! is_array( $row ) || ! isset( $row['type'], $row['status'], $row['quote_revision'], $row['final_toman'], $row['extra_costs'], $row['refund_terms'] ) || 'release' !== $row['type'] || 'awaiting_payment' !== $row['status'] || ! is_string( $submitted_hash ) || ! preg_match( '/^[a-f0-9]{64}$/D', $submitted_hash ) || ! hash_equals( tara_release_quote_hash( $row ), $submitted_hash ) || ! is_int( $now ) || $now <= 0 || ! empty( $row['order_id'] ) ) { return new WP_Error( 'release_accept', 'پیش‌فاکتور تغییر کرده یا قابل پذیرش نیست.' ); }
+	$row['accepted_quote_hash'] = $submitted_hash;
+	$row['accepted_at'] = $now;
+	return $row;
+}
+
+/** State change is pure; persistence and authorization remain the caller's responsibility. */
+function tara_release_transition( $row, $to, $actor, $now ) {
+	if ( ! is_array( $row ) || ! isset( $row['type'], $row['status'] ) || 'release' !== $row['type'] || ! is_string( $to ) || ! is_string( $actor ) || ! is_int( $now ) || $now <= 0 || ! tara_release_transition_allowed( $row['status'], $to, $actor ) ) { return new WP_Error( 'release_transition', 'تغییر وضعیت مجاز نیست.' ); }
+	if ( 'awaiting_payment' === $to && ( empty( $row['final_toman'] ) || empty( $row['quote_revision'] ) || empty( $row['extra_costs'] ) || empty( $row['refund_terms'] ) ) ) { return new WP_Error( 'release_quote', 'ابتدا مبلغ و شرایط اختصاصی سفارش را مشخص کنید.' ); }
+	if ( 'published' === $to && empty( $row['publication_url'] ) ) { return new WP_Error( 'release_publication', 'لینک انتشار لازم است.' ); }
+	if ( ! isset( $row['history'] ) || ! is_array( $row['history'] ) ) { $row['history'] = array(); }
+	$row['status'] = $to;
+	$row['history'][] = array( 'status' => $to, 'time' => $now, 'actor' => $actor );
+	return $row;
+}
+
+/** Verify the server-side Woo order against the exact accepted request and amount.
+ * No browser return, arbitrary order status, or order meta alone is proof of payment.
+ */
+function tara_release_order_matches_paid( $row, $order, $user_id ) {
+	if ( ! is_array( $row ) || ! is_object( $order ) || ! tara_release_quote_ready( $row ) || ! isset( $row['order_id'] ) || (int) $row['order_id'] <= 0 || (int) $user_id <= 0 ) { return false; }
+	foreach ( array( 'get_id', 'get_customer_id', 'get_meta', 'get_currency', 'get_total', 'is_paid', 'has_status' ) as $method ) {
+		if ( ! is_callable( array( $order, $method ) ) ) { return false; }
+	}
+	if ( ! $order->is_paid() || $order->has_status( array( 'cancelled', 'failed', 'refunded' ) ) || (int) $order->get_id() !== (int) $row['order_id'] || (int) $order->get_customer_id() !== (int) $user_id ) { return false; }
+	if ( (string) $order->get_meta( '_tara_release_request', true ) !== (string) $row['id'] || (int) $order->get_meta( '_tara_release_user', true ) !== (int) $user_id || (string) $order->get_meta( '_tara_release_quote', true ) !== $row['accepted_quote_hash'] ) { return false; }
+	$currency = $order->get_currency();
+	if ( ! in_array( $currency, array( 'IRT', 'IRR' ), true ) ) { return false; }
+	$expected = (int) $row['final_toman'] * ( 'IRR' === $currency ? 10 : 1 );
+	$total = $order->get_total();
+	return is_numeric( $total ) && abs( (float) $total - (float) $expected ) < 0.001;
+}

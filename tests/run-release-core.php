@@ -24,4 +24,32 @@ t_release('admin cannot assert payment',!tara_release_transition_allowed('awaiti
 t_release('verified gateway payment transition',tara_release_transition_allowed('awaiting_payment','paid','verified_gateway'));
 t_release('cannot bypass payment',!tara_release_transition_allowed('approved','published'));
 t_release('cancelled terminal',!tara_release_transition_allowed('cancelled','approved'));
+$token=str_repeat('a',32); $req=tara_release_build_request($data,$token,1000);
+t_release('build request',!is_wp_error($req) && $req['status']==='new' && $req['price']===1500000);
+t_release('idempotent lookup',tara_release_find_submission(array(array('id'=>'old','type'=>'plan'),$req),$token)===$req);
+t_release('malformed idempotency token rejected',is_wp_error(tara_release_build_request($data,'bad',1000)));
+$req=tara_release_transition($req,'review','admin',1001); $req=tara_release_transition($req,'approved','admin',1002);
+t_release('quote cannot omit refund terms',is_wp_error(tara_release_set_quote($req,'1000','none','',str_repeat('b',32))));
+$req=tara_release_set_quote($req,'1000','بدون هزینه','شرایط بازپرداخت',str_repeat('b',32));
+$req=tara_release_transition($req,'awaiting_payment','admin',1003);
+t_release('history tracks transitions',count($req['history'])===4);
+t_release('stale quote cannot be accepted',is_wp_error(tara_release_accept_quote($req,str_repeat('0',64),1004)));
+$req=tara_release_accept_quote($req,tara_release_quote_hash($req),1004);
+t_release('fresh quote acceptance ready',tara_release_quote_ready($req));
+$req=tara_release_set_quote($req,'1200','بدون هزینه','شرایط بازپرداخت',str_repeat('c',32));
+t_release('quote edit removes consent',!tara_release_quote_ready($req) && !isset($req['accepted_at']));
+$req['order_id']=123;
+t_release('quote cannot be edited with order',is_wp_error(tara_release_set_quote($req,'1300','بدون هزینه','شرایط بازپرداخت',str_repeat('d',32))));
+class ReleaseTestOrder {
+ public $paid=true; public $total=12000; public $currency='IRR'; public $id=123; public $customer=42; public $meta=array(); public $bad=false;
+ function get_id(){return $this->id;} function get_customer_id(){return $this->customer;} function get_meta($key,$single=true){return $this->meta[$key]??'';} function get_currency(){return $this->currency;} function get_total(){return $this->total;} function is_paid(){return $this->paid;} function has_status($s){return $this->bad;}
+}
+$req['accepted_quote_hash']=tara_release_quote_hash($req); $order=new ReleaseTestOrder();
+$order->meta=array('_tara_release_request'=>$req['id'],'_tara_release_user'=>42,'_tara_release_quote'=>$req['accepted_quote_hash']);
+t_release('server verified IRR order',tara_release_order_matches_paid($req,$order,42));
+$order->paid=false;t_release('unpaid order cannot transition',!tara_release_order_matches_paid($req,$order,42));$order->paid=true;
+$order->total=11999;t_release('wrong total rejected',!tara_release_order_matches_paid($req,$order,42));$order->total=12000;
+t_release('wrong owner rejected',!tara_release_order_matches_paid($req,$order,43));
+$order->currency='USD';t_release('unsupported currency rejected',!tara_release_order_matches_paid($req,$order,42));$order->currency='IRR';
+$order->meta['_tara_release_quote']=str_repeat('0',64);t_release('different quote rejected',!tara_release_order_matches_paid($req,$order,42));
 echo "RESULT pass=$pass fail=$fail\n";

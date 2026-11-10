@@ -1,0 +1,17 @@
+.ty-playlists{padding-block:28px 48px;color:var(--ab-text,#222)}
+.ty-playlists__hero{padding:clamp(22px,4vw,44px);border-radius:24px;background:linear-gradient(130deg,#174abc,#4a7bf0);color:#fff;margin-bottom:22px}
+.ty-playlists__hero h1{font-size:clamp(24px,4vw,36px);line-height:1.5;margin:6px 0 8px;color:inherit}
+.ty-playlists__hero p{line-height:1.9;margin:0 0 12px}.ty-playlists__eyebrow{font-size:13px;opacity:.9}
+.ty-playlists__button{display:inline-flex;padding:10px 18px;border-radius:12px;background:#fff;color:#174abc;font-weight:700}
+.ty-playlists__filters{display:flex;gap:8px;overflow-x:auto;padding:4px 0 18px}
+.ty-playlists__filters a,.ty-playlists__pagination a{white-space:nowrap;padding:9px 15px;border:1px solid var(--ab-line,#ddd);border-radius:99px;color:var(--ab-text,#222);background:var(--ab-surface,#fff)}
+.ty-playlists__filters a[aria-current=page]{background:#185adb;color:white;border-color:#185adb}
+.ty-playlists__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
+.ty-playlists__card{display:flex;flex-direction:column;gap:8px;padding:12px;border:1px solid var(--ab-line,#ddd);border-radius:18px;background:var(--ab-surface,#fff);color:var(--ab-text,#222);overflow:hidden}
+.ty-playlists__card img,.ty-playlists__placeholder{width:100%;height:auto;aspect-ratio:1;object-fit:cover;border-radius:12px}.ty-playlists__placeholder{display:grid;place-items:center;background:#e9efff;color:#185adb;font-size:52px}
+.ty-playlists__card strong{font-size:16px}.ty-playlists__card span:not(.ty-playlists__placeholder){font-size:13px;line-height:1.8;opacity:.75}
+.ty-playlists__back{display:inline-block;margin:0 0 16px;color:#185adb}.ty-playlists__intro{display:flex;align-items:center;gap:18px;line-height:2}.ty-playlists__cover{width:150px;height:150px;object-fit:cover;border-radius:16px}.ty-playlists__tracks{margin-top:24px}.ty-playlists__tracks h2{margin-bottom:14px}.ty-playlists__empty{padding:24px;text-align:center}.ty-playlists__pagination{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:22px}
+.night .ty-playlists__card,.night .ty-playlists__filters a:not([aria-current]),.night .ty-playlists__pagination a,html[data-tara-night="1"] .ty-playlists__card{background:#20232b;color:#f1f4ff;border-color:#424958}
+@media(max-width:600px){.ty-playlists__grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.ty-playlists__hero{border-radius:18px}.ty-playlists__intro{align-items:flex-start}.ty-playlists__cover{width:90px;height:90px}}
+
+.ty-playlists--home{padding-block:20px}.ty-playlists__homehead{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px}.ty-playlists__homehead h2{margin:0;font-size:20px}.ty-playlists__homehead a{color:var(--ab-blue,#185adb)}

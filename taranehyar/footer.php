@@ -1,0 +1,232 @@
+<div class="clear"></div>
+</main>
+<?php $upbs = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'upb' ) : ( 'off' != ot_get_option( 'upb' ) ); if ( $upbs ) { ?>
+<?php /* v3.8.0 — دکمهٔ «بالا» از divِ فقط-لمسی به role=button با tabindex و
+   برچسب تبدیل شد؛ با Tab و Enter/Space هم کار می‌کند (کلیدها در اسکریپت
+   درون‌خطی tara_runtime_inline_js). */ ?>
+<div class="top_page boxes_shadows" role="button" tabindex="0" aria-label="بازگشت به بالای صفحه"><i class="icofont-thin-up" aria-hidden="true"></i></div>
+<?php } ?>
+<?php /* v3.2.0 — «باکس شناور پایین-راست» (تلگرام/اینستاگرام) از پایین صفحه حذف شد.
+   لینک‌های اجتماعی حالا در باکس «ما را دنبال کنید» بالای لینک‌های دانلودِ همان صفحهٔ پست
+   نمایش داده می‌شوند (inc/ab-post-extras.php). گزینهٔ fixbtn در تنظیمات قالب هم به همان باکس
+   وصل شده است؛ برای همین این بلوک دیگر لازم نیست. اگر خواستید برگردد، همین ۷ خط را
+   از نسخهٔ 3.1.4 جای‌گذاری کنید. */ ?>
+
+<?php
+/* v3.4.1 — کنترل فوتر از «تنظیمات قالب ← کنترل رابط». اگر فایل inc/ab-controls.php
+   نصب نباشد، مقدارهای زیر دقیقاً رفتار نسخهٔ قبل را بازتولید می‌کنند. */
+$ab_footer_cats_num = 8;
+if ( function_exists( 'tara_ui_footer_cats' ) ) {
+	$ab_footer_cats_num = tara_ui_footer_cats();
+}
+$ab_footer_links = array(
+	array( 'label' => 'همهٔ هنرمندان', 'url' => tara_artists_index_url(), 'icon' => 'icofont-microphone-alt' ),
+	array( 'label' => 'تازه‌ترین آهنگ‌ها', 'url' => home_url('/#new-songs'), 'icon' => 'icofont-music-notes' ),
+);
+if ( function_exists( 'tara_ui_footer_links' ) ) {
+	$ab_footer_links = tara_ui_footer_links();
+}
+$ab_footer_cols_on = 4;
+if ( function_exists( 'tara_ui_footer_cols_count' ) ) {
+	$ab_footer_cols_on = tara_ui_footer_cols_count();
+}
+?>
+<footer id="footer" class="ab-footer" role="contentinfo">
+<div class="tarlanweb_center">
+	<div class="ab-footer__grid" data-ab-cols="<?php echo esc_attr( $ab_footer_cols_on ); ?>">
+		<!-- ستون ۱: درباره ما -->
+		<?php if ( ! function_exists( 'tara_ui_footer_col' ) || tara_ui_footer_col( 'about' ) ) { ?>
+		<div class="ab-footer__col ab-footer__col--about">
+			<h4 class="ab-footer__title">درباره ما</h4>
+			<div class="ab-footer__content">
+				<?php
+				/* ۳.۷.۰ — ترتیب تازه: «دربارهٔ سایت» (تب تازه) → settings → توضیح سایت.
+				   اگر گزینهٔ نمایش در پانوشت خاموش باشد، همان رفتار قبلی برمی‌گردد. */
+				$ab_about = '';
+				$ab_about_show = ot_get_option('about_show_footer');
+				if ('off' !== $ab_about_show) {
+					$ab_about = trim((string) ot_get_option('about_site_text'));
+				}
+				if (empty($ab_about)) {
+					$ab_about = ot_get_option('footer_about');
+				}
+				if (empty($ab_about)) {
+					$ab_about = ot_get_option('navar_txt');
+				}
+				if (empty($ab_about)) {
+					$ab_about = get_bloginfo('description');
+				}
+				if (empty($ab_about)) {
+					$ab_about = ot_get_option('copyright');
+				}
+				if (!empty($ab_about)) {
+					echo '<p class="ab-footer__text">' . nl2br( wp_kses_post( $ab_about ) ) . '</p>';
+				}
+				?>
+			</div>
+		</div>
+		<?php } ?>
+
+		<!-- ستون ۲: لینک‌های مفید -->
+		<?php if ( ! function_exists( 'tara_ui_footer_col' ) || tara_ui_footer_col( 'links' ) ) { ?>
+		<div class="ab-footer__col ab-footer__col--links">
+			<h4 class="ab-footer__title">لینک‌های مفید</h4>
+			<nav class="ab-footer__nav" aria-label="لینک‌های مفید فوتر">
+				<?php /* v3.4.0 — دو پیوند اصلی (همهٔ هنرمندان / تازه‌ترین آهنگ‌ها) به‌جای ستون «دسته‌های پرطرفدار» اینجا می‌آیند: فوتر کوتاه‌تر و لینک‌ها در یک ستون.
+				   v3.4.1 — همان دو پیوند + لینک‌های دستیِ شما، از تنظیمات قالب (ab_footer_pinned / ab_footer_links). */ ?>
+				<?php if (!empty($ab_footer_links)) { ?>
+				<ul class="ab-footer__menu ab-footer__menu--pinned">
+					<?php foreach ($ab_footer_links as $ab_fl) { ?>
+					<li><a href="<?php echo esc_url($ab_fl['url']); ?>" class="ab-footer__cat-featured"><i class="<?php echo esc_attr($ab_fl['icon']); ?>" aria-hidden="true"></i> <?php echo esc_html($ab_fl['label']); ?></a></li>
+					<?php } ?>
+				</ul>
+				<?php } ?>
+				<?php
+				if (has_nav_menu('ft_menu')) {
+					wp_nav_menu(array(
+						'theme_location' => 'ft_menu',
+						'menu_id'        => 'tarlanweb_ir',
+						'container'      => false,
+						'menu_class'     => 'ab-footer__menu',
+						'depth'          => 1,
+						'fallback_cb'    => false,
+					));
+				} else {
+					echo '<ul id="tarlanweb_ir" class="ab-footer__menu">';
+					wp_list_pages(array('title_li' => '', 'depth' => 1, 'number' => 6));
+					echo '</ul>';
+				}
+				?>
+			</nav>
+		</div>
+		<?php } ?>
+
+		<!-- ستون ۳: دسته‌های پرطرفدار -->
+		<?php if ( ! function_exists( 'tara_ui_footer_col' ) || tara_ui_footer_col( 'cats' ) ) { ?>
+		<div class="ab-footer__col ab-footer__col--cats">
+			<h4 class="ab-footer__title">دسته‌های پرطرفدار</h4>
+			<ul class="ab-footer__cats">
+				<?php
+				$ab_categories = get_categories(array(
+					'orderby'    => 'count',
+					'order'      => 'DESC',
+					'hide_empty' => true,
+					'number'     => $ab_footer_cats_num,
+				));
+				if (!empty($ab_categories) && !is_wp_error($ab_categories)) {
+					foreach ($ab_categories as $ab_cat) {
+						echo '<li><a href="' . esc_url(get_category_link($ab_cat->term_id)) . '">' . esc_html($ab_cat->name) . ' <span class="ab-footer__count">(' . esc_html(number_format_i18n($ab_cat->count)) . ')</span></a></li>';
+					}
+				}
+				?>
+			</ul>
+		</div>
+		<?php } ?>
+
+		<!-- ستون ۴: ما را دنبال کنید -->
+		<?php if ( ! function_exists( 'tara_ui_footer_col' ) || tara_ui_footer_col( 'social' ) ) { ?>
+		<div class="ab-footer__col ab-footer__col--social">
+			<h4 class="ab-footer__title">ما را دنبال کنید</h4>
+			<div class="socials_box ab-footer__socials">
+				<?php /* v3.8.0 — برچسب‌های صفحه‌خوان فارسی شدند (قبلاً «facebook» و
+				   «telegram» بود؛ بدتر از آن، لینک تلگرام aria-label="twitter" داشت). */ ?>
+				<?php if(ot_get_option('facebook') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('facebook')); ?>" aria-label="فیسبوک" class="icofont-facebook"></a><?php } if(ot_get_option('instagram') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('instagram')); ?>" aria-label="اینستاگرام" class="icofont-instagram"></a><?php } if(ot_get_option('telegram') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('telegram')); ?>" aria-label="تلگرام" class="icofont-paper-plane"></a><?php } if(ot_get_option('twitter') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('twitter')); ?>" aria-label="توییتر" class="icofont-twitter"></a><?php } if(ot_get_option('youtube') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('youtube')); ?>" aria-label="یوتیوب" class="icofont-youtube-play"></a><?php } if(ot_get_option('aparat') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('aparat')); ?>" aria-label="آپارات" class="icofont-movie"></a><?php } ?>
+				<?php /* v3.2.0 — دو پیام‌رسان تازه (کلیدهایشان در تنظیمات قالب → «شبکه‌های اجتماعی» اضافه شده) */ if(ot_get_option('bale') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('bale')); ?>" aria-label="bale" class="icofont-chat"></a><?php } if(ot_get_option('rubika') !=""){ ?>
+				<a target="_blank" rel="noreferrer noopener nofollow" href="<?php echo esc_url(ot_get_option('rubika')); ?>" aria-label="rubika" class="icofont-comment"></a><?php } ?>
+				<div class="clear"></div>
+			</div>
+
+			<?php if ( ! function_exists( 'tara_ui_footer_search' ) || tara_ui_footer_search() ) { ?>
+			<form class="ab-footer__search" method="get" action="<?php echo esc_url(home_url('/')); ?>" role="search">
+				<label for="ab-footer-search-input" class="screen-reader-text">جستجو در سایت</label>
+				<input id="ab-footer-search-input" class="ab-footer__search-input" name="s" placeholder="جستجوی ترانه، هنرمند..." type="text" required>
+				<button type="submit" class="ab-footer__search-btn" aria-label="جستجو"><i class="icofont-search"></i></button>
+			</form>
+			<?php } ?>
+		</div>
+		<?php } ?>
+	</div>
+
+	<!-- ردیف پایین: کپی‌رایت + لینک‌های اختیاری سیاست‌ها + داده ساختاریافته Organization -->
+	<div class="ab-footer__bottom">
+		<div class="ab-footer__copyright">
+			<p><?php echo esc_html(ot_get_option('copyright')); ?></p>
+		</div>
+		<?php
+		$ab_rules_url   = ot_get_option('rules_url');
+		$ab_ads_url     = ot_get_option('ads_url');
+		$ab_contact_url = ot_get_option('contact_url');
+		if (!empty($ab_rules_url) || !empty($ab_ads_url) || !empty($ab_contact_url)) {
+			echo '<div class="ab-footer__policy-links">';
+			if (!empty($ab_rules_url)) {
+				echo '<a href="' . esc_url($ab_rules_url) . '">قوانین و مقررات</a>';
+			}
+			if (!empty($ab_ads_url)) {
+				echo '<a href="' . esc_url($ab_ads_url) . '">تبلیغات</a>';
+			}
+			if (!empty($ab_contact_url)) {
+				echo '<a href="' . esc_url($ab_contact_url) . '">تماس با ما</a>';
+			}
+			echo '</div>';
+		}
+		?>
+		<div class="clear"></div>
+	</div>
+
+	<?php
+	$ab_org_name = get_bloginfo('name');
+	$ab_org_url  = home_url('/');
+	$ab_org_logo = ot_get_option('logo');
+	$ab_same_as  = array();
+	foreach (array('telegram', 'instagram', 'facebook', 'twitter', 'youtube', 'aparat') as $soc_key) {
+		$s_val = trim((string) ot_get_option($soc_key));
+		if ('' === $s_val) {
+			continue;
+		}
+
+		/* v3.8.0 — در دادهٔ ساختاریافته، «صفحهٔ اصلیِ فیسبوک/یوتیوب/آپارات»
+		   به‌عنوان حسابِ همین سایت ثبت بود (http://facebook.com و…). این
+		   حسابِ کسی نیست و گوگل هم آن را حسابِ سایت نمی‌شناسد؛ آدرس‌های
+		   بی‌مسیر کنار گذاشته می‌شوند. */
+		$ab_host = strtolower((string) wp_parse_url($s_val, PHP_URL_HOST));
+		$ab_path = (string) wp_parse_url($s_val, PHP_URL_PATH);
+		$ab_host = preg_replace('/^www\./', '', $ab_host);
+		if (in_array($ab_host, array('facebook.com', 'youtube.com', 'aparat.com', 'twitter.com', 'x.com', 'instagram.com', 't.me'), true) && ('' === trim($ab_path, '/') || '/' === $ab_path)) {
+			continue;
+		}
+
+		$ab_same_as[] = esc_url(set_url_scheme($s_val, 'https'));
+	}
+	$ab_schema = array(
+		'@context'    => 'https://schema.org',
+		'@type'       => 'Organization',
+		'name'        => $ab_org_name,
+		'url'         => $ab_org_url,
+		'inLanguage'  => 'fa-IR',
+	);
+	if (!empty($ab_org_logo)) {
+		/* v3.8.0 — آدرس لوگو در تنظیمات با http ذخیره شده بود و همین‌جا هم
+		   http می‌ماند؛ برای گوگل «لوگوی سایتِ https با آدرس http» ناسازگار
+		   است. با همان مسیر، فقط پروتکل امن می‌شود. */
+		$ab_schema['logo'] = esc_url(set_url_scheme($ab_org_logo, 'https'));
+	}
+	if (!empty($ab_same_as)) {
+		$ab_schema['sameAs'] = $ab_same_as;
+	}
+	?>
+	<script type="application/ld+json">
+	<?php echo wp_json_encode($ab_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
+	</script>
+	<div class="clear"></div>
+</div>
+</footer>
+<?php wp_footer(''); ?>
+</body>
+</html>

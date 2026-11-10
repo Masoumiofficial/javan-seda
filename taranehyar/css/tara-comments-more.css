@@ -1,0 +1,6 @@
+#comments .tara-cmore-control{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;margin:12px 0}
+#comments .tara-cmore-button{padding:8px 18px;border:1px solid var(--ab-line, #d5dff1);border-radius:var(--ab-radius-pill,999px);background:var(--ab-surface,#fff);color:var(--ab-blue-accent,#185adb);font:inherit;line-height:1.8;cursor:pointer}
+#comments .tara-cmore-button:hover{border-color:var(--ab-blue,#185adb);background:var(--ab-blue-soft,#eaf1fe)}
+#comments .tara-cmore-button:disabled{opacity:.65;cursor:wait}
+#comments .tara-cmore-status{color:var(--ab-muted,#555);font-size:12px}
+#comments .tara-cmore .children:empty{display:none}

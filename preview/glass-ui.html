@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa-IR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پیش‌نمایش رابط شیشه‌ای جوان‌صدا — 3.3.0</title>
+<link rel="stylesheet" href="../javanseda/css/icofont.min.css" id="ab-icofont">
+<link rel="stylesheet" href="../javanseda/style.css" id="ab-style">
+<link rel="stylesheet" href="../javanseda/css/ab-glass.css" id="ab-glass">
+<style>
+/* ---- فقط ابزارهای همین صفحۀ پیش‌نمایش (در قالب چیزی اضافه نشده) ---- */
+body{padding:0 0 90px;background:var(--ab-page)}
+/* همان دو خطِ header.php قالب، تا هدر موبایل اینجا هم مثل سایت واقعی رفتار کند */
+#mobiles_header{display:none}
+@media (max-width:800px){#mobiles_header{display:block}body{padding-top:90px}.pv-bar{top:70px}}
+.pv-bar{position:sticky;top:0;z-index:99;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:9px 14px;background:var(--ab-surface);border-bottom:1px solid var(--ab-line);font-size:12px}
+.pv-bar b{font-size:12.5px;color:var(--ab-text)}
+.pv-bar button{margin:0;padding:6px 12px;border:1px solid var(--ab-line);border-radius:999px;background:var(--ab-blue-soft);color:var(--ab-text);font:inherit;cursor:pointer}
+.pv-bar button:hover{border-color:var(--ab-blue);color:var(--ab-blue-accent)}
+.pv-w{max-width:520px;flex:1 1 220px;min-width:0;height:26px;border:1px solid var(--ab-line);border-radius:6px;background:var(--ab-blue-soft);display:flex;align-items:center;justify-content:center;color:var(--ab-muted)}
+.pv-h{margin:34px 0 2px;font-size:16px;font-weight:700;color:var(--ab-text)}
+.pv-h + p{margin:0 0 14px;font-size:12px;line-height:1.9;color:var(--ab-muted)}
+.pv-note{margin:36px 0 0;padding:14px 16px;border:1px dashed var(--ab-line);border-radius:14px;font-size:12px;line-height:2;color:var(--ab-muted)}
+.pv-note b{color:var(--ab-text)}
+.pv-note code{direction:ltr;display:inline-block;font-size:11px}
+.pv-switch button{padding:5px 11px;border:1px solid var(--ab-line);border-radius:999px;background:var(--ab-surface);color:var(--ab-text);font:inherit;font-size:12px;cursor:pointer}
+.pv-switch button:hover,.pv-switch button:focus{border-color:var(--ab-blue);color:var(--ab-blue)}
+.pv-switch button.pv-on{background:var(--ab-blue);border-color:var(--ab-blue);color:var(--ab-white)}
+.pv-switch input[type=range]{height:18px;margin:0}
+
+/* v3.3.8 — لینک پرش (بلوک ۳۲ style.css) در همین‌جا هم شبیه‌سازی می‌شود تا
+   رفتار «با Tab ظاهر شدن» قابل دیدن باشد. */
+.ab-skip-link{position:absolute;top:8px;right:8px;left:auto;z-index:99998;display:inline-block;padding:9px 15px;background:var(--ab-blue);color:#fff;font-size:13px;font-weight:700;line-height:1.4;border-radius:10px;text-decoration:none;box-shadow:0 6px 18px rgba(17,17,17,.18);transform:translateY(-220%);transition:transform .16s ease}
+.ab-skip-link:focus,.ab-skip-link:focus-visible{transform:none;outline:2px solid var(--ab-blue-accent);outline-offset:2px;color:#fff}
+.night .ab-skip-link{background:var(--ab-blue-accent);color:#0b0f16}
+/* v3.4.0 — پلیر: قواعد بلوک ۳۳ِ style.css روی همین دمو هم اعمال می‌شود
+   (این فایل style.css قالب را واقعی لینک کرده، پس پیش‌نمایش دقیق است). */
+</style>
+</head>
+<body>
+<!-- پرش به محتوا: با اولین Tab ظاهر می‌شود -->
+<a class="ab-skip-link" href="#centers_box">پرش به محتوای اصلی</a>
+
+<!-- هدر موبایل + کشو: همان نشانه‌گذاری inc/mobiles_header.php -->
+<header id="mobiles_header">
+<div class="logo_mobiles"><figure><a href="#n"><img src="../javanseda/images/nomusics.jpg" width="150" height="40" alt="لوگو"></a></figure></div>
+<div class="navicon" id="pv-navicon" role="button" tabindex="0" aria-label="باز کردن منو" aria-expanded="false"><i class="responsive-menu-button-inner"></i></div>
+<div class="circle_hlink search_mobile_box"><i class="icofont-search"></i></div>
+<div class="mobile_box">
+<div class="bodydeactive" id="pv-deactive"></div>
+<div class="mobiles_menu" id="pv-drawer">
+<div class="top_logo_title"><a href="#n"><img src="../javanseda/images/nomusics.jpg" width="150" height="40" alt="لوگو"></a><div class="clear"></div></div>
+<div id="cssmenu"><ul class="menu"><li class="current-menu-item"><a href="#n">صفحه اصلی</a></li><li><a href="#n">آهنگ‌ها</a><ul class="children"><li><a href="#n">تازه‌ترین‌ها</a></li><li><a href="#n">پربازدیدترین‌ها</a></li></ul></li><li><a href="#n">خواننده‌ها</a></li><li><a href="#n">آلبوم‌ها</a></li><li><a href="#n">موزیک ویدیو</a></li></ul><div class="clear"></div></div>
+<div class="socials_box"><a href="#n" class="icofont-facebook"></a><a href="#n" class="icofont-instagram"></a><a href="#n" class="icofont-paper-plane"></a><a href="#n" class="icofont-youtube-play"></a><div class="clear"></div></div>
+<div class="clear"></div>
+</div>
+</div>
+</header>
+
+<div class="pv-bar">
+  <b>پیش‌نمایش 3.3.0</b>
+  <button type="button" id="pv-night">حالت شب</button>
+  <button type="button" id="pv-glass">لایۀ شیشه‌ای: روشن</button>
+  <button type="button" id="pv-w">عرض باریک</button>
+  <button type="button" id="pv-flash">فلاشِ پیش از init</button>
+  <span class="pv-w" id="pv-width">viewport: —</span>
+</div>
+
+<!-- ================= هدر (همان نشانه‌گذاری header.php) ================= -->
+<header id="header">
+<div class="tarlanweb_center">
+<div class="logo_top"><figure><a href="#n"><img src="../javanseda/images/nomusics.jpg" width="150" height="40" alt="جوان‌صدا"></a></figure></div>
+<nav class="menu_right">
+<ul id="rkianoosh_ir"><li><a href="#n">صفحه اصلی</a></li>
+<li class="menu-item-has-children"><a href="#n">آهنگ‌ها</a>
+<ul class="sub-menu"><li><a href="#n">تازه‌ترین‌ها</a></li><li><a href="#n">پربازدیدترین‌ها</a></li><li><a href="#n">آلبوم‌ها</a></li></ul>
+</li>
+<li><a href="#n">خواننده‌ها</a></li><li><a href="#n">موزیک ویدیو</a></li></ul>
+</nav>
+<form id="searches"><input id="lsds" class="meta searchfield" type="text" placeholder="جستجو  ..."><button><i class="icofont-search"></i></button></form>
+<div class="dark_light_mode dark_active"><i aria-label="moon" class="icofont-moon"></i><div class="toggle_modes active"></div><i aria-label="sun" class="icofont-sun"></i></div>
+<div class="clear"></div>
+</div>
+</header>
+
+<div class="tarlanweb_center">
+<div id="centers_box">
+
+<!-- ================= نوار دسترسی سریع + اسلایدر ۱۶:۹ ================= -->
+<nav class="ab-quickbar" aria-label="دسترسی سریع صفحه اصلی">
+<ul class="ab-quickbar__list">
+<li class="ab-quickbar__item"><a href="#n" class="ab-quickbar__link"><i class="icofont-music-notes"></i><span>تازه‌ترین آهنگ‌ها</span></a></li>
+<li class="ab-quickbar__item"><a href="#n" class="ab-quickbar__link"><i class="icofont-microphone-alt"></i><span>همهٔ خواننده‌ها</span></a></li>
+<li class="ab-quickbar__item"><a href="#n" class="ab-quickbar__link"><i class="icofont-fire-alt"></i><span>پربازدیدترین‌ها</span></a></li>
+</ul>
+</nav>
+
+<div class="vip_img_box ab-vip-slider-box">
+<div class="vip_top_slider owl-carousel owl-theme owl-loaded" id="pv-vip">
+<article class="vip_post ab-vip-post"><figure><a href="#n"><img class="ab-vip-img" src="../javanseda/images/nomusics.jpg" width="640" height="360" alt="اسلاید" loading="eager" fetchpriority="high"></a></figure><header><h2><a href="#n">روزبه بمانی — بوسه آخر<span>تک‌آهنگ · ۱۴۰۴</span></a></h2></header></article>
+<article class="vip_post ab-vip-post"><figure><a href="#n"><img class="ab-vip-img" src="../javanseda/images/nomusics.jpg" width="640" height="360" alt="اسلاید" loading="lazy"></a></figure><header><h2><a href="#n">حامد حسینی — شب بی‌ستاره<span>آلبوم · ۹ قطعه</span></a></h2></header></article>
+<article class="vip_post ab-vip-post"><figure><a href="#n"><img class="ab-vip-img" src="../javanseda/images/nomusics.jpg" width="640" height="360" alt="اسلاید" loading="lazy"></a></figure><header><h2><a href="#n">معین حبیبی — تا صبح<span>تک‌آهنگ · ۱۴۰۳</span></a></h2></header></article>
+</div>
+</div>
+
+<!-- ================= ریل کارت‌ها (netz: grid با gap، بدون margin منفی) ================= -->
+<div class="song_boxs" id="new-songs">
+<div class="songs_title_box"><h3>تازه‌ترین آهنگ‌ها</h3><a href="#n">مشاهده بیشتر</a><div class="clear"></div><div class="liner"></div></div>
+<div class="song_boxs_posts"><ul id="pv-cards"></ul><div class="clear"></div></div>
+<div class="clear"></div>
+</div>
+
+<div class="song_boxs song_boxs_posts">
+<div class="songs_title_box"><h3>خواننده‌ها</h3><a href="#n">همهٔ خواننده‌ها</a><div class="clear"></div><div class="liner"></div></div>
+<div class="artist_boxs">
+<div class="artists_slider owl-carousel owl-theme owl-loaded" id="pv-artists"></div>
+<div class="clear"></div>
+</div>
+<div class="clear"></div>
+</div>
+
+<!-- ============ پلیر بالای صفحۀ اصلی (v3.4.0) ============ -->
+<h2 class="pv-h">۵) پلیرِ صفحۀ اصلی — <span dir="ltr">#index_music_player</span> <span>«یک باکس، نه دو تا» · v3.4.0</span></h2>
+<p>همان نشانه‌گذاری <code>inc/tarlanweb_player.php</code>؛ در صفحۀ واقعی «فهرست آلبوم» با دکمۀ
+<code>.album_show_hide</code> باز می‌شود (<code>slideToggle</code>) — اینجا برای دیدنِ چیدمان، باز است.
+با کلید <code>JAVANSEDA_GLASS_UI=false</code> هم کارت سرِ جایش می‌ماند، چون جعبه از لایۀ شیشه‌ای
+به style.css منتقل شد.</p>
+<p class="pv-note" style="margin:0 0 10px">v3.4.1 — شکل پلیر، نمای فهرست آلبوم، دکمۀ صدا و فاصلۀ پایینِ آن حالا
+<b>گزینه در تنظیمات قالب</b> هستند (تنظیمات قالب ← کنترل رابط). این‌جا همان کلاس‌ها و توکن‌ها را با
+دکمه امتحان می‌کند ⇒ چیزی که می‌بینید دقیقاً خروجیِ قاعدۀ ۳۳/۳۴ در <code>style.css</code> است.</p>
+<div class="pv-switch" style="display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:0 0 14px;font-size:12px">
+	<span style="color:var(--ab-muted)">شکل:</span>
+	<button type="button" data-pv-mode="card" class="pv-on">کارت</button>
+	<button type="button" data-pv-mode="compact">فشرده</button>
+	<button type="button" data-pv-mode="legacy">ساده (قالب مادر)</button>
+	<span style="color:var(--ab-muted);margin-inline-start:10px">فهرست آلبوم:</span>
+	<button type="button" data-pv-list="btn" class="pv-on">دکمه</button>
+	<button type="button" data-pv-list="open">باز</button>
+	<button type="button" data-pv-list="hide">مخفی</button>
+	<span style="color:var(--ab-muted);margin-inline-start:10px">صدا:</span>
+	<button type="button" data-pv-vol="off" class="pv-on">روشن</button>
+	<label style="display:inline-flex;align-items:center;gap:7px;margin-inline-start:10px;color:var(--ab-muted)">
+		<span>فاصلۀ پایین</span>
+		<input type="range" min="0" max="96" step="2" value="30" data-pv-gap style="width:120px;accent-color:var(--ab-blue)">
+		<output data-pv-gap-out dir="ltr">30px</output>
+	</label>
+	<label style="display:inline-flex;align-items:center;gap:7px;color:var(--ab-muted)">
+		<span>گردی</span>
+		<input type="range" min="0" max="40" step="2" value="20" data-pv-rad style="width:110px;accent-color:var(--ab-blue)">
+		<output data-pv-rad-out dir="ltr">20px</output>
+	</label>
+</div>
+<div class="tarlanweb_center">
+<div id="index_music_player">
+<div class="music_box_player" data-ab-player="1">
+<audio id="audio-pv" preload="none"><source src="#" data-track-number="1"><source src="#" data-track-number="2"><source src="#" data-track-number="3"></audio>
+<div class="player">
+  <div class="player_controls">
+    <i class="previous-track-btn disabled"><span class="screen-reader-text">Previous track button</span></i>
+    <div class="large-toggle-btn"><i class="icofont-play-alt-1"><span class="screen-reader-text">Large toggle button</span></i></div>
+    <div class="album_show_hide"><i class="icofont-navigation-menu"></i></div>
+    <i class="next-track-btn"><span class="screen-reader-text">Next track button</span></i>
+  </div>
+  <div class="info-box">
+    <div class="track-info-box">
+      <div class="track-title-text"> روزبه بمانی - بوسه آخر (نسخهٔ استودیویی ۳۲۰ کیلوبیت)</div>
+      <div class="audio-time"><span class="duration">03:41</span> / <span class="current-time">01:12</span></div>
+    </div>
+    <div class="progress-box">
+      <div class="progress-cell"><div class="progress"><div class="progress-buffer" style="width:74%"></div><div class="progress-indicator" style="width:33%"></div></div></div>
+      <div class="volume_box"><i class="icofont-volume-bar"></i><input type="range" id="volume-bar-pv" min="0" max="100" step="5" value="80"></div>
+    </div>
+  </div>
+</div>
+<div class="play-list" style="display:block" data-open="1">
+  <div class="play-list-row"><div class="small-toggle-btn"><i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i></div><div class="track-number">1.</div><div class="track-title active-track"><a class="playlist-track" href="#" data-play-track="1">روزبه بمانی - بوسه آخر</a></div></div>
+  <div class="play-list-row"><div class="small-toggle-btn"><i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i></div><div class="track-number">2.</div><div class="track-title"><a class="playlist-track" href="#" data-play-track="2">هما - شب بی‌پاسخ</a></div></div>
+  <div class="play-list-row"><div class="small-toggle-btn"><i class="small-play-btn"><span class="screen-reader-text">Small toggle button</span></i></div><div class="track-number">3.</div><div class="track-title"><a class="playlist-track" href="#" data-play-track="3">محسن یگانه - تا صبح منتظرتم (ریمیکس طولانی)</a></div></div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- ================= صفحۀ نوشته تکی ================= -->
+<h2 class="pv-h">صفحۀ نوشته تکی — همان بلوک‌های single.php</h2>
+<p>کاور، پلیر، شناسنامۀ آهنگ (چیپ‌ها)، باکس اجتماعی و لینک‌های دانلود. اولویت: وضوح اطلاعات و دسترسی سریع.</p>
+<div class="song_boxs song_boxs_posts">
+<div class="songs_title_box"><h1 style="font-size:20px">دانلود آهنگ بوسه آخر از روزبه بمانی</h1><div class="clear"></div><div class="liner"></div></div>
+<div class="single_content_box">
+<div class="single_featured_cover"><div class="single_featured_image"><img src="../javanseda/images/nomusics.jpg" width="700" height="700" alt="کاور"></div></div>
+
+<div class="music_box_player taktarcks" data-ab-player="1">
+<audio id="audio" preload="none"><source src="#" data-track-number="1"></audio>
+<div class="player"><div class="player_controls"><i class="previous-track-btn disabled"><span class="screen-reader-text">Previous</span></i><div class="large-toggle-btn"><i class="icofont-play-alt-1"></i></div><i class="next-track-btn"><span class="screen-reader-text">Next</span></i></div>
+<div class="info-box"><div class="track-info-box"><div class="track-title-text"> روزبه بمانی - بوسه آخر</div><div class="audio-time"><span class="duration">03:42</span> / <span class="current-time">00:00</span></div></div>
+<div class="progress-box"><div class="progress-cell"><div class="progress"><div class="progress-buffer"></div><div class="progress-indicator"></div></div></div></div></div></div>
+<div class="play-list"><div class="play-list-row plylodd"><div class="track-number">1.</div><div class="track-title"><span class="nowPlayingIcon"><span></span><span></span><span></span><span></span></span><a class="playlist-track" href="#">بوسه آخر</a></div><div class="download_box"><a target="_blank" href="#">دانلود 128</a></div></div>
+<div class="play-list-row"><div class="track-number">2.</div><div class="track-title"><a class="playlist-track" href="#">شب بی‌پاسخ — عنوان بسیار بلند برای آزمون یک‌خطی‌شدن</a></div><div class="download_box"><a target="_blank" href="#">دانلود 128</a></div></div>
+<div class="clear"></div></div>
+</div>
+
+<section class="ab-credits" aria-label="شناسنامۀ آهنگ">
+<h2 class="ab-credits__title"><i class="icofont-info-circle"></i>شناسنامۀ آهنگ</h2>
+<div class="ab-credits__row">
+<span class="ab-credit"><i class="icofont-radio-mic"></i><b class="ab-credit__k">خواننده</b><span class="ab-credit__v"><a href="#n">روزبه بمانی</a></span></span>
+<span class="ab-credit"><i class="icofont-music-alt"></i><b class="ab-credit__k">آهنگساز</b><span class="ab-credit__v"><a href="#n">حامد حسینی</a></span></span>
+<span class="ab-credit"><i class="icofont-edit"></i><b class="ab-credit__k">ترانه‌سرا</b><span class="ab-credit__v"><a href="#n">روزبه بمانی</a></span></span>
+<span class="ab-credit"><i class="icofont-headphone"></i><b class="ab-credit__k">تنظیم</b><span class="ab-credit__v"><a href="#n">سعید زمانی</a></span></span>
+</div>
+<div class="clear"></div>
+</section>
+
+<div class="download_box">
+<div class="dl_title">دانلود آهنگ بوسه آخر</div>
+<div class="dl_links_box">
+<a class="dl_link_128" href="#n"><i class="icofont-download"></i>دانلود با کیفیت 128</a>
+<a class="dl_links_320" href="#n"><i class="icofont-download"></i>دانلود با کیفیت 320</a>
+<div class="clear"></div>
+</div>
+</div>
+
+<section class="music_lyrics_box" aria-labelledby="pv-ly-t" lang="fa" dir="rtl">
+<div class="music_lyrics_head">
+<h2 class="music_lyrics_title" id="pv-ly-t"><i class="icofont-quote-right"></i>متن آهنگ <span class="music_lyrics_song">بوسه آخر</span> <span class="music_lyrics_artist">از روزبه بمانی</span></h2>
+<div class="music_lyrics_actions"><a class="music_lyrics_artist_link" href="#n"><i class="icofont-radio-mic"></i>روزبه بمانی</a><button type="button" class="music_lyrics_copy"><i class="icofont-copy-to-clipboard"></i><span class="lbl">کپی متن ترانه</span></button></div>
+</div>
+<div class="music_lyrics_text"><p>بوسه‌ات هنوز روی این لب است<br>شب، نیمه‌تمام و بی‌پاسخ…</p><p>هر جا که رفتم عطر تو هست<br>این دیوارها هم یاد تو هستند</p></div>
+</section>
+
+<!-- v3.3.2: متن ترانه از «بالای پلیر» به «زیر لینک‌های دانلود» رفت؛ توضیحات کوتاهِ نوشته همان‌جا می‌ماند -->
+<p>ترانه‌ای از روزبه بمانی با تنظیم سعید زمانی و میکس میلاد ملیحی؛ mastered برای پخش آنلاین با کیفیت ۱۲۸ و ۳۲۰.</p>
+<ul><li>کیفیت ۱۲۸ (حجم کمتر)</li><li>کیفیت ۳۲۰ (پیشنهادی)</li><li>متن ترانه در ادامهٔ همین صفحه</li></ul>
+<blockquote>اگر خطی از ترانه را دوست دارید، همین‌جا نقل می‌شود — کنتراست و ارتفاع خط فارسی در این بلوک تست می‌شود.</blockquote>
+</div>
+<div class="clear"></div>
+</div>
+
+<h2 class="pv-h">دیدگاه‌ها — همان نشانه‌گذاری comments.php</h2>
+<p>قاعدۀ قدیمی قالب برای هر دیدگاه «پس‌زمینۀ ۲۰٪ سفید روی صفحۀ سفید + حاشیۀ خاکستریِ خشن + نامِ سبزِ کاربر» بود؛ حالا کارتِ روشن با مرز نازک، آواتار دایره‌ای، تورفتگیِ راست‌به‌چپ برای پاسخ‌ها و فرم در یک ظرف.</p>
+<div id="comments">
+<h3 class="comments-title">۲ دیدگاه</h3>
+<ol class="commentlist">
+<li class="comment depth-1" id="li-comment-1">
+<footer><div class="comment-author vcard"><img class="avatar" src="../javanseda/images/no-artist.jpg" width="45" height="45" alt=""><span class="fn">مهمان</span></div><div class="comment-date">۱۴ آبان ۱۴۰۴ · ۱۸:۲۰</div><div class="clear"></div></footer>
+<div class="comment-content"><p>ترانۀ خیلی خوبی بود، کیفیت ۳۲۰ هم تمیز در اومد. ممنون از سایتتون 🙏</p></div>
+<div class="reply"><a class="comment-reply-link" href="#n">پاسخ</a></div>
+<ul class="children">
+<li class="comment depth-2" id="li-comment-2">
+<footer><div class="comment-author vcard"><img class="avatar" src="../javanseda/images/no-artist.jpg" width="45" height="45" alt=""><span class="fn"><a href="#n">پشتیبانی جوان‌صدا</a></span></div><div class="comment-date">۱۴ آبان ۱۴۰۴ · ۱۹:۰۲</div><div class="clear"></div></footer>
+<div class="comment-content"><p>ممنون از لطفتون. اگر لینکی خراب بود همین‌جا گزارش بدید تا سریع درست می‌کنیم.</p></div>
+<div class="reply"><a class="comment-reply-link" href="#n">پاسخ</a></div>
+</li>
+</ul>
+</li>
+</ol>
+<div id="respond">
+<h3 id="reply-title">دیدگاه خود را بنویسید <a class="cancel-comment-reply-link" href="#n">لغو پاسخ</a></h3>
+<form class="comment-form" id="commentform">
+<p class="comment-notes"><span id="email-notes">نشانی ایمیل شما منتشر نخواهد شد.</span></p>
+<p class="comment-form-comment"><label for="comment">دیدگاه</label><textarea id="comment" name="comment"></textarea></p>
+<p class="comment-form-author"><label for="author">نام <span class="required">*</span></label><input id="author" name="author" type="text"></p>
+<p class="comment-form-email"><label for="email">ایمیل <span class="required">*</span></label><input id="email" name="email" type="text"></p>
+<p class="comment-form-url"><label for="url">وب‌سایت</label><input id="url" name="url" type="text"></p>
+<p class="form-submit"><input name="submit" type="submit" id="submit" value="ارسال دیدگاه"></p>
+</form>
+</div>
+</div>
+
+<!-- ================= نوار چسبان پخش ================= -->
+<div id="ab-sticky-player" class="ab-sticky" role="region" aria-label="پخش آهنگ" data-ab-sp-mode="links" data-ab-sp-index="1">
+<div class="ab-sp__in">
+<span class="ab-sp-thumb ab-sp-thumb--none" aria-hidden="true"><i class="icofont-music-note"></i><span class="ab-sp-eq" aria-hidden="true"><i></i><i></i><i></i></span></span>
+<a class="ab-sp-nav" href="#n" data-ab-sp-go="prev" aria-label="آهنگ قبلی" title="آهنگ قبلی"><i class="icofont-forward"></i></a>
+<button type="button" class="ab-sp-play" aria-label="پخش"><i class="icofont-play-alt-2"></i></button>
+<a class="ab-sp-nav" href="#n" data-ab-sp-go="next" aria-label="آهنگ بعدی" title="آهنگ بعدی"><i class="icofont-rewind"></i></a>
+<span class="ab-sp__no" aria-hidden="true"><b class="ab-sp__now">۲</b>/۸</span>
+<div class="ab-sp__meta">
+<a class="ab-sp__title" href="#n" data-ab-sp-link>بوسه آخر</a>
+<span class="ab-sp__artist">روزبه بمانی</span>
+<span class="ab-sp__bar"><span class="ab-sp-slide"><span class="ab-sp-track" aria-hidden="true"><span class="ab-sp-fill" data-ab-sp-fill style="width:38%"></span></span><input type="range" class="ab-sp-range" min="0" max="1000" value="380" aria-label="محل پخش" dir="ltr"></span><span class="ab-sp-time"><b class="ab-sp-cur">۰۱:۲۴</b>/<b class="ab-sp-tot">۰۳:۴۲</b></span></span>
+</div>
+<a class="ab-sp__dl" href="#n" data-ab-sp-dl><i class="icofont-download"></i><span>دانلود</span></a>
+<button type="button" class="ab-sp-close" aria-label="بستن"><i class="icofont-close-line"></i></button>
+</div>
+</div>
+
+<!-- ================= ۴۰۴ ================= -->
+<h2 class="pv-h">صفحۀ ۴۰۴ — نشانه‌گذاری جدید 404.php</h2>
+<p>HTTP همچنان ۴۰۴ واقعی است؛ جست‌وجوی واقعی، بازگشت به صفحه اصلی، میان‌بُرهای مفید و شش آینۀ تازه از دادهٔ واقعی.</p>
+<div id="centers_box-404">
+<section class="ab-404-hero ab-404-panel">
+<span class="ab-404-badge" aria-hidden="true">۴۰۴</span>
+<div class="ab-404-hero__body">
+<h1>این صفحه پیدا نشد (۴۰۴)</h1>
+<div class="archive_txt_box"><p>ممکن است آهنگ حذف شده باشد، نشانی را اشتباه تایپ کرده باشید، یا لینک از جای دیگری شکسته باشد. نام آهنگ یا خواننده را جست‌وجو کنید — یا از فهرستِ زیر استفاده کنید.</p><div class="clear"></div></div>
+<form role="search" method="get" class="ab-404-search" action="#n">
+<input id="ab-404-q" class="meta searchfield" type="search" name="s" placeholder="نام آهنگ یا خواننده …" aria-label="جست‌وجوی آهنگ">
+<button type="submit"><i class="icofont-search"></i> جست‌وجو</button>
+</form>
+<div class="ab-404-actions">
+<a class="ab-404-home" href="#n"><i class="icofont-home"></i>بازگشت به صفحۀ اصلی</a>
+<a class="ab-404-back" href="#n"><i class="icofont-long-arrow-right"></i>صفحۀ قبلی</a>
+</div>
+</div>
+</section>
+<ul class="ab-404-links">
+<li><a href="#n"><i class="icofont-music-note"></i> تازه‌ترین آهنگ‌ها</a></li>
+<li><a href="#n"><i class="icofont-video"></i> موزیک‌ویدیوها</a></li>
+<li><a href="#n"><i class="icofont-music-disk"></i> آلبوم‌ها</a></li>
+<li><a href="#n"><i class="icofont-microphone-alt"></i> همهٔ خواننده‌ها</a></li>
+</ul>
+<img class="ab-404-art" src="../javanseda/images/error404.jpg" width="626" height="496" alt="صفحه پیدا نشد">
+</div>
+
+<h2 class="pv-h">۶) صفحۀ دسته/بایگانی — v3.3.5 <span>عنوان بلند باید بشکند و «کادر سفیدِ بی‌توضیح» نباید باشد</span></h2>
+<div class="pv-card">
+	<div class="songs_title_box" style="border:0;background:none;box-shadow:none;padding:0">
+		<h1 style="color:var(--ab-text)">آهنگ جدید، بهترین آهنگ‌های فارسی ماه و مجموعه‌ای از موزیک‌های بی‌کلام و ریمیکس</h1>
+		<span class="liner"></span>
+		<a class="ab-see-all" href="#">مشاهده همه</a>
+	</div>
+	<div class="song_boxs song_boxs_posts">
+		<!-- توضیح دسته خالی: با گارد v3.3.5 هیچ کادری رندر نمی‌شود -->
+		<div class="archive_txt_box"><div class="clear"></div></div>
+		<div class="songs_post"><div class="tarlanweb_border colr5" style="display:block;height:100%"><div class="img_hidden"><a href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3C/svg%3E" alt="نمونه ۱"></a><div class="ab-card-stats"><div class="ab-card-stats__in"><span class="ab-cs-num"><i class="icofont-eye-alt" aria-hidden="true"></i>252,870<span class="screen-reader-text">بازدید این اثر</span></span><span class="ab-cs-num ab-cs-num--rate"><span class="ab-cs-stars" aria-hidden="true"><span>☆☆☆☆☆</span><b style="width:92%">★★★★★</b></span><i>4.6<span class="screen-reader-text"> از ۵</span></i><em>963<span class="screen-reader-text"> رأی</span></em></span></div></div></div><h3><a href="#"><span>بهنام بانی — آهنگ نمونه (عنوان بلند برای آزمون شکستن خط)</span></a></h3></div></div>
+	</div>
+	<p class="pv-p">بالا: اگر <code>category_description()</code> خالی باشد، <code>&lt;div class=&quot;archive_txt_box&quot;&gt;</code> یا چاپ نمی‌شود (گارد PHP) و در صورت چاپ شدن هم کادر/مرز ندارد (گارد CSS <code>:has()</code>) ⇒ آن «کادر خالی سفید» زیر عنوان از بین می‌رود. عنوان بلند هم به‌جای «آهنگ ج…» تا دو خط می‌شکند.</p>
+</div>
+
+<div class="pv-note">
+<b>v3.3.8</b> = لینک «پرش به محتوای اصلی» (با Tab دیده می‌شود)، فونت woff2، srcset روی کاور،
+ id یکتا برای پلیر دومِ آلبوم (ردیف کنترل مرده‌اش پنهان: <code>[data-ab-player="2"] .player</code>)،
+ و <code>wp_body_open()</code> در <code>header.php</code>.<b>چیزی که اینجا می‌بینید</b> = نشانه‌گذاری واقعیِ <code>header.php</code> / <code>inc/songs_post.php</code> / <code>single.php</code> / <code>404.php</code> + CSS واقعیِ همین نسخه (<code>style.css</code> بلوک ۲۶ و <code>css/ab-glass.css</code>).<br>
+<b>دکمۀ «لایۀ شیشه‌ای»</b> دقیقاً همان کاری را می‌کند که <code>define('JAVANSEDA_GLASS_UI', false)</code> روی هاست می‌کند: فایل خاموش می‌شود و ساختار/تراز دست‌نخورده می‌ماند.<br>
+<b>فلاش رفرش</b> با دکمۀ «فلاشِ پیش از init» قابل دیدن است: تا لحظۀ اضافه‌شدن کلاس <code>owl-loaded</code> فقط آیند اول چیده می‌شود (بلوک ۲۸) — همان چیزی که بعد از init هم دیده می‌شود، پس پرش ارتفاع نداریم و JS تازه‌ای لازم نیست.<br>
+        <b>بخش هنرمندان</b> به حالت قبل برگشت: هر قاعدۀ من روی owl-item و سایز آیتم‌ها حذف شد و owl خودش تعداد/ظاهر را تعیین می‌کند.
+
+        <b>برای ریل‌های موبایل</b> پنجره را زیر ۷۶۸px بیاورید: خواننده‌ها و آهنگ‌های صفحۀ اصلی اسلایدرِ لمسی (scroll-snap) می‌شوند و فهرست‌های بلند (صفحۀ خواننده، جست‌وجو) دو ستون فشرده.<br>
+<b>کشوی منو</b> بالا-راست همین صفحه با همان CSS واقعی باز می‌شود؛ در 3.3.2 backdrop-filterِ هدر، فرزندِ <code>position:fixed</code> را داخل جعبۀ ۶۵px هدر گیر می‌انداخت (علت «منو کلا رفته»).
+
+<b>پنجره را بکشید</b> (یا دکمۀ «عرض باریک») تا ببینید ظرف از ۱۳۰۰pxِ پله‌ای به <code>max-width + gutter</code> پیوسته رسیده: ستون‌ها با <code>auto-fill</code> کم/زیاد می‌شوند و هیچ برشِ یک‌طرفه‌ای نیست.
+</div>
+</div>
+</div>
+
+<script>
+/* کنترل‌های دمو — دقیقاً همان دو چیزی که inc/ab-controls.php تولید می‌کند:
+   کلاس روی <body> + توکن‌های --ab-player-* در :root. هیچ CSS تازه‌ای این‌جا نیست. */
+(function(){
+	var box=document.querySelector('#index_music_player .music_box_player');
+	var list=document.querySelector('#index_music_player .play-list');
+	var btn=document.querySelector('#index_music_player .album_show_hide');
+	var st=document.createElement('style'); st.id='pv-controls'; document.head.appendChild(st);
+	var mode='card', lis='btn', vol='on', gap=30, rad=20;
+	function paint(){
+		document.body.className=document.body.className.replace(/\s*ab-player-[a-z-]+/g,'');
+		if(mode!=='card') document.body.classList.add('ab-player-'+mode);
+		if(lis!=='btn') document.body.classList.add('ab-player-list-'+lis);
+		if(vol==='off') document.body.classList.add('ab-player-novol');
+		var t=[];
+		t.push('--ab-player-gap:'+gap+'px');
+		t.push('--ab-player-radius:'+rad+'px');
+		if(mode==='compact'){t.push('--ab-player-pad:10px 12px 11px');t.push('--ab-player-row-gap:10px');t.push('--ab-player-btn:36px');t.push('--ab-player-play:44px');t.push('--ab-player-list-gap:10px');}
+		if(mode==='legacy'){t.push('--ab-player-bg:transparent');t.push('--ab-player-border:0');t.push('--ab-player-radius:0');t.push('--ab-player-shadow:none');t.push('--ab-player-pad:15px');t.push('--ab-player-list-bg:transparent');t.push('--ab-player-list-sep:0');}
+		st.textContent=':root{'+t.join(';')+'}';
+		/* حالت «دکمه» مثل صفحۀ واقعی: فهرست بسته است و با کلیک باز می‌شود */
+		if(list){ list.style.display = (lis==='open') ? 'block' : (lis==='hide' ? 'none' : (list.getAttribute('data-open')==='1' ? 'block' : 'none')); }
+		if(btn){ btn.style.visibility = (lis==='hide') ? 'hidden' : ''; }
+	}
+	document.querySelectorAll('[data-pv-mode]').forEach(function(b){ b.addEventListener('click',function(){
+		mode=b.getAttribute('data-pv-mode'); document.querySelectorAll('[data-pv-mode]').forEach(function(x){x.classList.toggle('pv-on',x===b);}); paint(); }); });
+	document.querySelectorAll('[data-pv-list]').forEach(function(b){ b.addEventListener('click',function(){
+		lis=b.getAttribute('data-pv-list'); document.querySelectorAll('[data-pv-list]').forEach(function(x){x.classList.toggle('pv-on',x===b);}); paint(); }); });
+	var vb=document.querySelector('[data-pv-vol]');
+	if(vb) vb.addEventListener('click',function(){ vol=(vol==='on')?'off':'on'; vb.textContent=vol==='on'?'روشن':'خاموش'; vb.classList.toggle('pv-on',vol==='off'); paint(); });
+	if(btn) btn.addEventListener('click',function(){ if(!list||lis!=='btn') return; var o=list.getAttribute('data-open')==='1'?'0':'1'; list.setAttribute('data-open',o); list.style.display=o==='1'?'block':'none'; });
+	function rng(sel,out,cb){ var i=document.querySelector(sel), o=document.querySelector(out); if(i) i.addEventListener('input',function(){ o.textContent=i.value+'px'; cb(+i.value); }); }
+	rng('[data-pv-gap]','[data-pv-gap-out]',function(v){ gap=v; paint(); });
+	rng('[data-pv-rad]','[data-pv-rad-out]',function(v){ rad=v; paint(); });
+	paint();
+})();
+/* کارت‌ها را با همان ساختار inc/songs_post.php می‌سازیم (فقط برای دمو) */
+(function(){
+	var titles=[['روزبه بمانی','بوسه آخر'],['حامد حسینی','شب بی‌ستاره'],['ناصر زینعلی','دل بی‌تو'],['معین حبیبی','تا صبح'],['آصف آریا','راه تو'],['شهرام صولتی','یاد تو'],['مهدی رجبیان','سراب'],['نیما مسیحا','گم'],['سیروان یوسفی','باران'],['علیرضا طلیسچی','برگرد'],['رضا صادقی','تنها'],['بهنام بانی','دخون']];
+	var abSt=[[252870,4.6,963],[184233,4.1,512],[97401,4.8,1204],[54210,3.9,88],[41877,4.4,301],[30988,3.6,44],[22140,4.9,770],[18302,4.0,150],[12980,4.3,66],[9114,3.8,29]];
+	function abStats(i){var a=abSt[i]||[1200,4,10];var p=Math.round(a[1]/5*1000)/10;
+		return '<div class="ab-card-stats"><div class="ab-card-stats__in"><span class="ab-cs-num"><i class="icofont-eye-alt" aria-hidden="true"></i>'+a[0].toLocaleString('en-US')+'<span class="screen-reader-text">بازدید این اثر</span></span><span class="ab-cs-num ab-cs-num--rate"><span class="ab-cs-stars" aria-hidden="true"><span>\u2606\u2606\u2606\u2606\u2606</span><b style="width:'+p+'%">\u2605\u2605\u2605\u2605\u2605</b></span><i>'+a[1].toFixed(1)+'<span class="screen-reader-text"> از ۵</span></i><em>'+a[2].toLocaleString('en-US')+'<span class="screen-reader-text"> رأی</span></em></span></div></div>';
+	}
+	var ul=document.getElementById('pv-cards'), html='';
+	for (var i=0;i<titles.length;i++){
+		var t = titles[i] || ['نام خواننده','نام آهنگ'];
+		html += '<li><article class="songs_post"><header><figure><a href="#n"><img src="../javanseda/images/nomusics.jpg" width="190" height="190" alt="'+t[1]+'"></a>'+abStats(i)+'</figure>'+
+		        '<h2><a href="#n">'+t[0]+'<span>'+t[1]+'</span></a></h2></header>'+
+		        '<footer><span class="ft_box_format">128 / 320</span></footer></article></li>';
+	}
+	ul.innerHTML = html;
+	var names=['روزبه بمانی','حامد حسینی','ناصر زینعلی','معین حبیبی','آصف آریا','شهرام صولتی','مهدی رجبیان','نیما مسیحا','علیرضا طلیسچی','رضا صادقی'];
+	var sl=document.getElementById('pv-artists'), ah='';
+	for (var k=0;k<names.length;k++){ ah += '<a href="#n"><img src="../javanseda/images/no-artist.jpg" width="150" height="150" alt="'+names[k]+'"><span>'+names[k]+'</span></a>'; }
+	if (sl) sl.innerHTML = ah;
+	var ico=document.getElementById('pv-navicon'), dr=document.getElementById('pv-drawer'), de=document.getElementById('pv-deactive');
+	function op(open){ if(!dr) return; dr.style.marginRight = open ? '0px' : '-262px'; if(de) de.style.display = open ? 'block' : 'none'; if(ico) ico.setAttribute('aria-expanded', open ? 'true':'false'); }
+	if (ico) ico.addEventListener('click', function(){ op(dr.style.marginRight !== '0px'); });
+	if (ico) ico.addEventListener('keydown', function(e){ if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); ico.click(); } });
+	if (de) de.addEventListener('click', function(){ op(false); });
+	op(false);
+	var flashOn=false, flashBtn=document.getElementById('pv-flash');
+	if (flashBtn) flashBtn.addEventListener('click', function(){
+		flashOn=!flashOn;
+		var list=[document.getElementById('pv-artists'), document.getElementById('pv-vip')];
+		for (var i=0;i<list.length;i++){ if(!list[i]) continue; if (flashOn) { list[i].className=list[i].className.replace(/\s*owl-loaded/,''); } else { list[i].className+=' owl-loaded'; } }
+		flashBtn.innerHTML = flashOn ? 'فلاش: روشن (قبل از init)' : 'فلاشِ پیش از init';
+	});
+	var night=document.getElementById('pv-night'), glass=document.getElementById('ab-glass'), gbtn=document.getElementById('pv-glass'), wbtn=document.getElementById('pv-w'), wrap=document.querySelector('.tarlanweb_center'), meter=document.getElementById('pv-width');
+	night.addEventListener('click',function(){ document.body.className = document.body.className.indexOf('night')>-1 ? document.body.className.replace(/ ?night/,'') : (document.body.className+' night').replace(/\s+/g,' '); });
+	gbtn.addEventListener('click',function(){
+		if (glass.disabled){ glass.disabled=false; gbtn.innerHTML='لایۀ شیشه‌ای: روشن'; }
+		else { glass.disabled=true; gbtn.innerHTML='لایۀ شیشه‌ای: خاموش'; }
+	});
+	var narrow=false;
+	wbtn.addEventListener('click',function(){ narrow=!narrow; wrap.style.maxWidth = narrow ? '420px' : ''; wbtn.innerHTML = narrow ? 'عرض کامل' : 'عرض باریک'; });
+	function m(){ meter.innerHTML = 'viewport: ' + (window.innerWidth||document.documentElement.clientWidth) + 'px'; }
+	window.addEventListener('resize', m); m();
+	var bar=document.querySelector('.ab-sp-play');
+	if (bar) bar.addEventListener('click',function(){ var b=document.getElementById('ab-sticky-player'); if(b.className.indexOf('ab-sp--playing')>-1){b.className=b.className.replace(' ab-sp--playing','');} else {b.className+=' ab-sp--playing';} });
+})();
+</script>
+</body>
+</html>

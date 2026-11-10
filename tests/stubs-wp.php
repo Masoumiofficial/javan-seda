@@ -210,9 +210,10 @@ function get_post_status( $post = null ) {
 	return $obj ? $obj->post_status : false;
 }
 
-function is_page() {
-	return false;
+function is_page( $page = '' ) {
+	return ! empty( $GLOBALS['__is_page'] ) && ( '' === $page || $page === $GLOBALS['__is_page'] );
 }
+function is_page_template( $template = '' ) { return ! empty( $GLOBALS['__page_template'] ) && ( '' === $template || $template === $GLOBALS['__page_template'] ); }
 function have_comments() {
 	return ! empty( $GLOBALS['__have_comments'] );
 }
@@ -501,7 +502,7 @@ function get_the_title( $post ) {
 	$p = get_post( $post );
 	return $p ? $p->post_title : '';
 }
-function get_permalink( $post ) {
+function get_permalink( $post = 0 ) {
 	$id = $post instanceof WP_Post ? $post->ID : (int) $post;
 	return 'https://ex/?p=' . $id;
 }
@@ -995,3 +996,5 @@ function wp_remote_retrieve_response_code( $res ) {
 function wp_remote_retrieve_body( $res ) {
 	return isset( $res['body'] ) ? (string) $res['body'] : '';
 }
+
+function wp_generate_uuid4() { return '01234567-89ab-4def-8123-456789abcdef'; }

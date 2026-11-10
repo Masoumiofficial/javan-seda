@@ -214,6 +214,7 @@ if ( ! function_exists( 'tara_seo_description' ) ) {
 			}
 		}
 
+		if ( function_exists( 'tara_release_owns_seo' ) && tara_release_owns_seo() ) { $txt = tara_release_public_description(); }
 		$txt = html_entity_decode( (string) $txt, ENT_QUOTES, 'UTF-8' );
 		$txt = str_replace( array( '"', "'", '[', ']', ']]>' ), ' ', $txt );
 		$txt = trim( preg_replace( '/\s+/u', ' ', $txt ) );

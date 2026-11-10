@@ -26,6 +26,10 @@ function tara_hub_request_lock( $user_id ) {
 	global $wpdb;
 	static $held = array();
 	if ( ! defined( 'TARA_RELEASE_INTEGRATED' ) || ! TARA_RELEASE_INTEGRATED ) { return true; }
+	$enabled = function_exists( 'ot_get_option' ) && 'on' === ot_get_option( 'release_enabled', 'off' );
+	$ever = (bool) get_option( 'tara_release_ever_enabled', false );
+	if ( ! $enabled && ! $ever ) { return true; }
+	if ( $enabled && ! $ever && ! update_option( 'tara_release_ever_enabled', '1', false ) && ! get_option( 'tara_release_ever_enabled', false ) ) { return false; }
 	$user_id = (int) $user_id;
 	if ( $user_id <= 0 || ! is_object( $wpdb ) ) { return false; }
 	if ( isset( $held[ $user_id ] ) ) { return true; }
@@ -515,6 +519,7 @@ if ( ! function_exists( 'tara_hub_status_label' ) ) {
 	/** برچسبِ فارسیِ وضعیت. */
 	function tara_hub_status_label( $status ) {
 		$map = array(
+			'new' => 'درخواست جدید', 'review' => 'در انتظار بررسی', 'documents' => 'نیازمند تکمیل مدارک', 'awaiting_payment' => 'در انتظار پرداخت', 'preparing' => 'آماده‌سازی', 'published' => 'منتشرشده', 'cancelled' => 'لغوشده',
 			'pending'  => 'در انتظار بررسی',
 			'approved' => 'تأیید شده',
 			'paid'     => 'پرداخت شده',
@@ -544,6 +549,7 @@ if ( ! function_exists( 'tara_hub_tab_artist' ) ) {
 		ob_start();
 		?>
 		<div class="ty-hub">
+			<?php if ( function_exists( 'tara_release_render_wizard' ) ) { echo tara_release_render_wizard( $user_id ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by renderer ?>
 			<header class="ty-hub__head">
 				<h2>پنل هنرمند</h2>
 				<p>اثر منتشر کنید، آمار ببینید، پلن بخرید و برای هر تغییری درخواست بدهید.</p>
@@ -867,7 +873,7 @@ if ( ! function_exists( 'tara_hub_admin_page' ) ) {
 				<?php if ( empty( $rows ) ) : ?>
 					<tr><td colspan="6">هنوز درخواستی ثبت نشده است.</td></tr>
 				<?php endif; ?>
-				<?php foreach ( $rows as $row ) : ?>
+				<?php foreach ( $rows as $row ) : if ( isset( $row['type'] ) && 'release' === $row['type'] ) { continue; } ?>
 					<tr>
 						<td><?php echo esc_html( $row['user'] ); ?> (#<?php echo esc_html( (string) $row['user_id'] ); ?>)</td>
 						<td><b><?php echo esc_html( $row['title'] ); ?></b><br><small><?php echo esc_html( date_i18n( 'Y/m/d H:i', (int) $row['created'] ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions ?></small></td>

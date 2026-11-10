@@ -12,5 +12,9 @@ check_release_file('valid cover metadata',is_array(tara_release_file_rule('cover
 check_release_file('executable disallowed',false===tara_release_file_rule('cover.jpg.php',100,'cover'));
 check_release_file('empty file disallowed',false===tara_release_file_rule('cover.png',0,'cover'));
 check_release_file('oversized disallowed',false===tara_release_file_rule('cover.png',10485761,'cover'));
+$GLOBALS['__ot']['release_max_cover_mb']='1';
+check_release_file('manager can lower maximum',false===tara_release_file_rule('cover.png',1048577,'cover'));
+$GLOBALS['__ot']['release_max_cover_mb']='9999';
+check_release_file('manager cannot exceed safe maximum',false===tara_release_file_rule('cover.png',10485761,'cover'));
 check_release_file('unknown category disallowed',false===tara_release_file_rule('a.mp3',100,'unknown'));
 echo "RESULT pass=$pass fail=$fail\n";

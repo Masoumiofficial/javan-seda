@@ -16,7 +16,7 @@ $GLOBALS['__ot']['release_price_song']='-50';
 t_release('invalid configured price',tara_release_catalog()['song']['amount']===1500000);
 $data=array('full_name'=>'نمونه','artist_name'=>'هنرمند','mobile'=>'۰۹۱۲۳۴۵۶۷۸۹','email'=>'a@example.com','country'=>'ایران','title'=>'اثر','performer'=>'هنرمند','service'=>'song','file_url'=>'https://example.org/song.mp3','rights'=>'1','terms'=>'1');
 $r=tara_release_validate($data);t_release('valid and Persian phone',!is_wp_error($r) && $r['mobile']==='09123456789');
-foreach(array(array('rights'=>'0'),array('terms'=>'0'),array('email'=>'bad'),array('file_url'=>''),array('service'=>'invalid'),array('release_date'=>'2026-02-30'),array('file_url'=>'javascript:alert(1)'),array('file_url'=>'https://user:pass@example.com/private'),array('title'=>array('x'))) as $i=>$bad){t_release('invalid request '.$i,is_wp_error(tara_release_validate(array_merge($data,$bad))));}
+foreach(array(array('rights'=>'0'),array('terms'=>'0'),array('email'=>'bad'),array('file_url'=>''),array('service'=>'invalid'),array('release_date'=>'2026-02-30'),array('file_url'=>'javascript:alert(1)'),array('file_url'=>'https://user:pass@example.com/private'),array('title'=>array('x')),array('title'=>str_repeat('a',181))) as $i=>$bad){t_release('invalid request '.$i,is_wp_error(tara_release_validate(array_merge($data,$bad))));}
 $row=array('id'=>'r1','type'=>'release','status'=>'awaiting_payment','service'=>'song','final_toman'=>1500000,'extra_costs'=>'ندارد','refund_terms'=>'تا پیش از شروع کار بازپرداخت می‌شود','quote_revision'=>'1');
 t_release('no payment without consent',!tara_release_quote_ready($row));$row['accepted_quote_hash']=tara_release_quote_hash($row);
 t_release('matching accepted quote',tara_release_quote_ready($row));
@@ -50,7 +50,7 @@ class ReleaseTestOrder {
  function get_id(){return $this->id;} function get_customer_id(){return $this->customer;} function get_meta($key,$single=true){return $this->meta[$key]??'';} function get_currency(){return $this->currency;} function get_total(){return $this->total;} function is_paid(){return $this->paid;} function has_status($s){return $this->bad;}
 }
 $req['accepted_quote_hash']=tara_release_quote_hash($req); $order=new ReleaseTestOrder();
-$order->meta=array('_tara_release_request'=>$req['id'],'_tara_release_user'=>42,'_tara_release_quote'=>$req['accepted_quote_hash']);
+$order->meta=array('_tara_release_request'=>$req['id'],'_tara_release_user'=>42,'_tara_release_quote'=>$req['accepted_quote_hash'],'_tara_release_currency'=>'IRR','_tara_release_expected'=>'12000');
 t_release('server verified IRR order',tara_release_order_matches_paid($req,$order,42));
 $order->paid=false;t_release('unpaid order cannot transition',!tara_release_order_matches_paid($req,$order,42));$order->paid=true;
 $order->total=11999;t_release('wrong total rejected',!tara_release_order_matches_paid($req,$order,42));$order->total=12000;

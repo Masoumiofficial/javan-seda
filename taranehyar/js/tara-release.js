@@ -27,7 +27,29 @@
       }
       if (current < steps.length - 1) { current += 1; render(); }
     });
-    form.addEventListener('submit', function (event) { event.preventDefault(); });
+    form.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (form.dataset.busy === '1') { return; }
+      var data = new FormData(form), cfg = window.TaraAccount || {}, message = form.querySelector('[data-release-message]');
+      data.set('action', 'tara_release_submit'); data.set('nonce', cfg.nonce || '');
+      form.dataset.busy = '1'; submit.disabled = true; if (message) { message.textContent = 'در حال ثبت…'; }
+      fetch(cfg.api || '/wp-admin/admin-ajax.php', { method: 'POST', credentials: 'same-origin', body: data }).then(function (r) { return r.json(); }).then(function (result) {
+        if (message) { message.textContent = result && result.data && result.data.message || 'خطایی رخ داد.'; }
+        if (result && result.success) { setTimeout(function () { window.location.reload(); }, 900); }
+      }).catch(function () { if (message) { message.textContent = 'خطای شبکه؛ با همین فرم دوباره تلاش کنید.'; } }).finally(function () { form.dataset.busy = '0'; submit.disabled = false; });
+    });
     render();
+  });
+  document.querySelectorAll('[data-release-checkout]').forEach(function (form) {
+    form.addEventListener('submit', function (event) {
+      event.preventDefault(); if (form.dataset.busy === '1' || !form.reportValidity()) { return; }
+      var data = new FormData(form), cfg = window.TaraAccount || {}, msg = form.querySelector('[data-release-message]'), button = form.querySelector('button');
+      data.set('action', 'tara_release_checkout'); data.set('nonce', cfg.nonce || ''); form.dataset.busy = '1'; button.disabled = true;
+      if (msg) { msg.textContent = 'در حال آماده‌سازی پرداخت…'; }
+      fetch(cfg.api || '/wp-admin/admin-ajax.php', { method: 'POST', credentials: 'same-origin', body: data }).then(function (r) { return r.json(); }).then(function (r) {
+        if (r && r.success && r.data && r.data.checkout) { window.location.href = r.data.checkout; }
+        else if (msg) { msg.textContent = r && r.data && r.data.message || 'خطا در آماده‌سازی پرداخت.'; }
+      }).catch(function () { if (msg) { msg.textContent = 'خطای شبکه؛ دوباره تلاش کنید.'; } }).finally(function () { form.dataset.busy = '0'; button.disabled = false; });
+    });
   });
 }());

@@ -560,7 +560,7 @@ if ( ! function_exists( 'tara_acc_tabs' ) ) {
 			'history'   => array( 'label' => 'تاریخچهٔ شنیدن', 'icon' => 'clock', 'on' => tara_acc_feature( 'history' ) ),
 			'notifs'    => array( 'label' => 'پیام‌ها', 'icon' => 'bell', 'on' => tara_acc_feature( 'notifs' ) ),
 			'messages'  => array( 'label' => 'دایرکت‌ها', 'icon' => 'chat', 'on' => function_exists( 'tara_dm_on' ) ? tara_dm_on() : false ),
-			'artist'    => array( 'label' => 'پنل هنرمند', 'icon' => 'mic', 'on' => function_exists( 'tara_hub_on' ) ? tara_hub_on() : false ),
+			'artist'    => array( 'label' => function_exists( 'tara_hub_opt' ) && 'on' === tara_hub_opt( 'release_enabled', 'off' ) ? 'انتشار آثار' : 'پنل هنرمند', 'icon' => 'mic', 'on' => function_exists( 'tara_hub_on' ) ? tara_hub_on() : false ),
 			'telegram'  => array( 'label' => 'اتصال به ربات', 'icon' => 'telegram', 'on' => true ),
 			'profile'   => array( 'label' => 'مشخصات', 'icon' => 'edit', 'on' => true ),
 		);

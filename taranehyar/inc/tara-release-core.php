@@ -25,7 +25,7 @@ function tara_release_catalog( $include_disabled = false ) {
 }
 
 function tara_release_statuses() {
-	return array( 'new' => 'درخواست جدید', 'review' => 'در انتظار بررسی', 'documents' => 'نیازمند تکمیل مدارک', 'approved' => 'تأییدشده', 'awaiting_payment' => 'در انتظار پرداخت', 'paid' => 'پرداخت‌شده', 'preparing' => 'آماده‌سازی', 'published' => 'منتشرشده', 'rejected' => 'ردشده', 'cancelled' => 'لغوشده' );
+	return array( 'new' => 'درخواست جدید', 'review' => 'در انتظار بررسی', 'documents' => 'نیازمند تکمیل مدارک', 'approved' => 'تأییدشده', 'awaiting_payment' => 'در انتظار پرداخت', 'paid' => 'پرداخت‌شده', 'preparing' => 'آماده‌سازی', 'published' => 'منتشرشده', 'refunded' => 'بازپرداخت‌شده', 'rejected' => 'ردشده', 'cancelled' => 'لغوشده' );
 }
 
 /** Allowed workflow transitions; a paid state must only come from a verified gateway event. */
@@ -54,7 +54,8 @@ function tara_release_validate( $input, $has_file = false ) {
 		$raw = isset( $input[ $field ] ) ? $input[ $field ] : '';
 		if ( ! is_string( $raw ) || strlen( $raw ) > $max * 4 ) { return new WP_Error( 'release_field', 'یکی از فیلدها نامعتبر یا بیش از حد طولانی است.' ); }
 		$clean = in_array( $field, array( 'description', 'legal' ), true ) ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw );
-		if ( function_exists( 'mb_strlen' ) && mb_strlen( $clean, 'UTF-8' ) > $max ) { return new WP_Error( 'release_length', 'یکی از فیلدها بیش از حد طولانی است.' ); }
+		$length = function_exists( 'mb_strlen' ) ? mb_strlen( $clean, 'UTF-8' ) : preg_match_all( '/./us', $clean, $unused );
+		if ( false === $length || $length > $max ) { return new WP_Error( 'release_length', 'یکی از فیلدها بیش از حد طولانی است.' ); }
 		$data[ $field ] = $clean;
 	}
 	$service = isset( $input['service'] ) && is_string( $input['service'] ) ? sanitize_key( $input['service'] ) : '';
@@ -160,6 +161,7 @@ function tara_release_accept_quote( $row, $submitted_hash, $now ) {
 /** State change is pure; persistence and authorization remain the caller's responsibility. */
 function tara_release_transition( $row, $to, $actor, $now ) {
 	if ( ! is_array( $row ) || ! isset( $row['type'], $row['status'] ) || 'release' !== $row['type'] || ! is_string( $to ) || ! is_string( $actor ) || ! is_int( $now ) || $now <= 0 || ! tara_release_transition_allowed( $row['status'], $to, $actor ) ) { return new WP_Error( 'release_transition', 'تغییر وضعیت مجاز نیست.' ); }
+	if ( ! empty( $row['order_id'] ) && 'awaiting_payment' === $row['status'] && 'paid' !== $to ) { return new WP_Error( 'release_order', 'ابتدا وضعیت سفارش ووکامرس را بررسی کنید.' ); }
 	if ( 'awaiting_payment' === $to && ( empty( $row['final_toman'] ) || empty( $row['quote_revision'] ) || empty( $row['extra_costs'] ) || empty( $row['refund_terms'] ) ) ) { return new WP_Error( 'release_quote', 'ابتدا مبلغ و شرایط اختصاصی سفارش را مشخص کنید.' ); }
 	if ( 'published' === $to && empty( $row['publication_url'] ) ) { return new WP_Error( 'release_publication', 'لینک انتشار لازم است.' ); }
 	if ( ! isset( $row['history'] ) || ! is_array( $row['history'] ) ) { $row['history'] = array(); }
@@ -181,6 +183,7 @@ function tara_release_order_matches_paid( $row, $order, $user_id ) {
 	$currency = $order->get_currency();
 	if ( ! in_array( $currency, array( 'IRT', 'IRR' ), true ) ) { return false; }
 	$expected = (int) $row['final_toman'] * ( 'IRR' === $currency ? 10 : 1 );
+	if ( (string) $order->get_meta( '_tara_release_currency', true ) !== $currency || (string) $order->get_meta( '_tara_release_expected', true ) !== (string) $expected ) { return false; }
 	$total = $order->get_total();
 	return is_numeric( $total ) && abs( (float) $total - (float) $expected ) < 0.001;
 }

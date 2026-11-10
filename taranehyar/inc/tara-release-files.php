@@ -36,7 +36,11 @@ function tara_release_file_rule( $name, $size, $kind ) {
 		'document' => array( 'max' => 10485760, 'extensions' => array( 'pdf', 'jpg', 'jpeg', 'png' ), 'mimes' => array( 'application/pdf', 'image/jpeg', 'image/png' ) ),
 		'video' => array( 'max' => 524288000, 'extensions' => array( 'mp4' ), 'mimes' => array( 'video/mp4' ) ),
 	);
-	if ( ! isset( $rules[ $kind ] ) || ! is_string( $name ) || ! is_numeric( $size ) || (int) $size < 1 || (int) $size > $rules[ $kind ]['max'] ) { return false; }
+	if ( ! isset( $rules[ $kind ] ) || ! is_string( $name ) || ! is_numeric( $size ) || (int) $size < 1 ) { return false; }
+	$cap_mb = (int) ( $rules[ $kind ]['max'] / 1048576 );
+	$configured = function_exists( 'ot_get_option' ) ? ot_get_option( 'release_max_' . $kind . '_mb', (string) $cap_mb ) : (string) $cap_mb;
+	if ( is_scalar( $configured ) && preg_match( '/^[1-9][0-9]{0,3}$/D', (string) $configured ) ) { $rules[ $kind ]['max'] = min( $cap_mb, (int) $configured ) * 1048576; }
+	if ( (int) $size > $rules[ $kind ]['max'] ) { return false; }
 	$ext = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );
 	if ( ! in_array( $ext, $rules[ $kind ]['extensions'], true ) ) { return false; }
 	return $rules[ $kind ];

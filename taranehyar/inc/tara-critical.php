@@ -95,8 +95,9 @@ if ( ! function_exists( 'tara_critical_css' ) ) {
 		@media (max-width: 600px) { #searches { width: 176px; } }
 
 		#tara-search-results { position: absolute; z-index: 100000; top: calc(100% + 10px);
-			inset-inline-start: 0; inset-inline-end: auto; width: 330px; max-width: 88vw;
-			display: none; overflow: hidden; border: 1px solid #e6e4ef;
+			left: 0; right: auto; width: 330px; max-width: calc(100vw - 16px); box-sizing: border-box;
+			max-height: min(65vh, 520px); overflow-x: hidden; overflow-y: auto; overflow-wrap: anywhere;
+			display: none; border: 1px solid #e6e4ef;
 			border-radius: 16px; background: #fff; box-shadow: 0 24px 44px -22px rgba(17, 16, 28, .55);
 			direction: rtl; text-align: right; }
 		body.night #tara-search-results, html[data-tara-night="1"] #tara-search-results {
@@ -340,6 +341,35 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 			var seq = 0;
 			var cache = {};
 			var active = -1;
+			var activeInput = null;
+			var positionFrame = 0;
+
+			/* پنجره زیر ورودی فعال است، نه الزاماً ورودی دسکتاپِ مخفی. */
+			function useInput(input) {
+				if (activeInput === input) { return; }
+				window.clearTimeout(timer);
+			close();
+				activeInput = input;
+				host = input.closest('#searches, #searches_mobile') || input.parentNode;
+				host.appendChild(box);
+				host.appendChild(status);
+				box.style.left = '0px';
+			}
+			function positionBox() {
+				if (positionFrame) { window.cancelAnimationFrame(positionFrame); }
+				positionFrame = window.requestAnimationFrame(function () {
+					positionFrame = 0;
+					if (!box.classList.contains('is-open') || !box.getClientRects().length) { return; }
+					/* ابتدا هم‌تراز با لبهٔ چپ فرم؛ سپس در هر دو سمت داخل صفحه. */
+					box.style.left = '0px';
+					var rect = box.getBoundingClientRect();
+					var width = document.documentElement.clientWidth;
+					if (!width) { return; }
+					var shift = rect.left < 8 ? 8 - rect.left : (rect.right > width - 8 ? width - 8 - rect.right : 0);
+					box.style.left = shift + 'px';
+				});
+			}
+			window.addEventListener('resize', positionBox);
 
 			function esc(s) {
 				return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
@@ -348,6 +378,8 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 			}
 
 			function close() {
+				window.clearTimeout(timer);
+				seq++;
 				box.classList.remove('is-open');
 				box.innerHTML = '';
 				box.setAttribute('aria-busy', 'false');
@@ -367,6 +399,7 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 					+ '<div class="tara-sr__row is-skeleton" aria-hidden="true"><span class="tara-sr__sk tara-sr__sk--img"></span><span class="tara-sr__sk-lines"><span class="tara-sr__sk"></span><span class="tara-sr__sk tara-sr__sk--sm"></span></span></div>'
 					+ '<div class="tara-sr__row is-skeleton" aria-hidden="true"><span class="tara-sr__sk tara-sr__sk--img"></span><span class="tara-sr__sk-lines"><span class="tara-sr__sk"></span><span class="tara-sr__sk tara-sr__sk--sm"></span></span></div>';
 				box.classList.add('is-open');
+				positionBox();
 				box.setAttribute('aria-busy', 'true');
 			}
 
@@ -400,6 +433,7 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 				if (!items.length) {
 					box.innerHTML = '<div class="tara-sr__empty">چیزی برای «' + esc(q) + '» پیدا نشد.</div>';
 					box.classList.add('is-open');
+					positionBox();
 					box.setAttribute('aria-busy', 'false');
 					status.textContent = 'نتیجه‌ای پیدا نشد.';
 					return;
@@ -418,6 +452,7 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 				}
 				box.innerHTML = html;
 				box.classList.add('is-open');
+				positionBox();
 				box.setAttribute('aria-busy', 'false');
 				status.textContent = items.length + ' نتیجه پیدا شد.';
 			}
@@ -458,8 +493,10 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 				input.setAttribute('aria-haspopup', 'listbox');
 
 				input.addEventListener('input', function () {
+					useInput(input);
 					var v = input.value;
-					input.setAttribute('aria-expanded', 'true');
+					seq++; /* پاسخِ عبارت پیشین پس از تایپ تازه معتبر نیست. */
+					input.setAttribute('aria-expanded', v.trim().length >= 2 ? 'true' : 'false');
 					window.clearTimeout(timer);
 					/* v3.8.3 — ۲۵۰ms: هم تایپِ سریع را دست‌نخورده می‌گذارد و
 					   هم نسبت به ۲۶۰ms قبلی یک درخواست کمتر می‌فرستد. */
@@ -492,8 +529,10 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 				});
 
 				input.addEventListener('focus', function () {
+					useInput(input);
 					if (input.value.trim().length >= 2 && box.innerHTML) {
 						box.classList.add('is-open');
+						positionBox();
 					}
 				});
 			});

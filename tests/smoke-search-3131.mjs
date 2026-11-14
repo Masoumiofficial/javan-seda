@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { JSDOM } from 'jsdom';
+const php=fs.readFileSync('taranehyar/inc/tara-critical.php','utf8');
+const script=php.match(/<script id="tara-search-inline">([\s\S]*?)<\/script>/)[1].replace(/<\?php[\s\S]*?\?>/g,'test');
+assert(php.includes('left: 0; right: auto; width: 330px; max-width: calc(100vw - 16px)'));
+const dom=new JSDOM('<!doctype html><body><form id="searches"><input id="lsds"></form><form id="searches_mobile"><input id="lsds_mobile"></form></body>',{url:'https://example.com/',runScripts:'outside-only',pretendToBeVisual:true});
+const w=dom.window, doc=w.document; Object.defineProperty(doc.documentElement,'clientWidth',{value:400,configurable:true});
+let xhr=[];w.XMLHttpRequest=class {open(){} send(){xhr.push(this)} respond(){this.readyState=4;this.status=200;this.responseText=JSON.stringify({data:{items:[{title:'آهنگ',artist:'هنرمند',url:'/song'}],more:'/search'}});this.onreadystatechange()}};
+w.eval(script);const main=doc.querySelector('#lsds'), mobile=doc.querySelector('#lsds_mobile'),box=doc.querySelector('#tara-search-results');
+let hostLeft=20; box.getClientRects=()=>[{}];box.getBoundingClientRect=()=>{let x=hostLeft+(parseFloat(box.style.left)||0);return {left:x,right:x+330}};
+const wait=(ms)=>new Promise(r=>setTimeout(r,ms));
+main.focus();main.value='محسن';main.dispatchEvent(new w.Event('input'));await wait(300);assert.equal(box.parentNode.id,'searches');assert.equal(box.style.left,'0px');assert(box.classList.contains('is-open'));xhr[0].respond();assert(box.textContent.includes('آهنگ'));assert.equal(main.getAttribute('aria-expanded'),'true');
+hostLeft=300;w.dispatchEvent(new w.Event('resize'));await wait(35);assert.equal(box.style.left,'-238px');
+hostLeft=-10;w.dispatchEvent(new w.Event('resize'));await wait(35);assert.equal(box.style.left,'18px');
+hostLeft=45; mobile.focus();mobile.value='دیگر';mobile.dispatchEvent(new w.Event('input'));await wait(300);assert.equal(box.parentNode.id,'searches_mobile');assert.equal(main.getAttribute('aria-expanded'),'false');assert.equal(box.style.left,'0px');
+mobile.dispatchEvent(new w.KeyboardEvent('keydown',{key:'Escape',bubbles:true}));assert(!box.classList.contains('is-open'));xhr[1].respond();assert(!box.classList.contains('is-open'),'late response must not reopen');
+console.log('theme search dropdown desktop, mobile, bounds, escape and stale response: passed');

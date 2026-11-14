@@ -145,6 +145,7 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 				'context'  => 'page',
 				'title'    => '',
 				'subtitle' => '',
+				'show_subtitle' => true,
 				'taxonomy' => $ctx['taxonomy'],
 				'term_id'  => $ctx['term_id'],
 				'mode'     => (string) tara_radio_option( 'mode', 'mixed' ),
@@ -275,7 +276,7 @@ if ( ! function_exists( 'tara_radio_box' ) ) {
 				</header>
 			<?php endif; ?>
 
-			<?php if ( ! $compact ) : ?>
+			<?php if ( ! $compact && ! empty( $args['show_subtitle'] ) && '' !== $sub ) : ?>
 				<p class="ty-radio__sub"><?php echo esc_html( $sub ); ?></p>
 			<?php endif; ?>
 

@@ -1461,6 +1461,174 @@ array(
 'section'=>'radio'
 ),
 array(
+'id'=>'radio_page_eyebrow_on',
+'label'=>'نمایش برچسب بالای صفحه',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_eyebrow',
+'label'=>'متن برچسب بالای صفحه',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'رادیو آهنگ',
+'type'=>'text',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_intro_on',
+'label'=>'نمایش توضیح صفحه رادیو',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_intro',
+'label'=>'متن توضیح صفحه رادیو',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'منبع دلخواهتان را انتخاب کنید و به آهنگ‌ها گوش دهید.',
+'type'=>'textarea',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_player_title',
+'label'=>'عنوان کارت رادیو در برگه',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'رادیو',
+'type'=>'text',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_player_sub_on',
+'label'=>'نمایش توضیح کارت رادیو در برگه',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'on',
+'type'=>'on-off',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_player_sub',
+'label'=>'متن توضیح کارت رادیو در برگه',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'منبع را انتخاب کنید و فهرست خودتان را بسازید.',
+'type'=>'textarea',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_how_on',
+'label'=>'نمایش بخش راهنمای رادیو',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'off',
+'type'=>'on-off',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_how_title',
+'label'=>'عنوان راهنمای رادیو',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'راهنمای رادیو',
+'type'=>'text',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_1_on',
+'label'=>'نمایش مورد 1 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'off',
+'type'=>'on-off',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_1_title',
+'label'=>'عنوان مورد 1 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'',
+'type'=>'text',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_1_text',
+'label'=>'متن مورد 1 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'',
+'type'=>'textarea',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_2_on',
+'label'=>'نمایش مورد 2 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'off',
+'type'=>'on-off',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_2_title',
+'label'=>'عنوان مورد 2 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'',
+'type'=>'text',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_2_text',
+'label'=>'متن مورد 2 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'',
+'type'=>'textarea',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_3_on',
+'label'=>'نمایش مورد 3 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'off',
+'type'=>'on-off',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_3_title',
+'label'=>'عنوان مورد 3 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'',
+'type'=>'text',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_3_text',
+'label'=>'متن مورد 3 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'',
+'type'=>'textarea',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_4_on',
+'label'=>'نمایش مورد 4 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'off',
+'type'=>'on-off',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_4_title',
+'label'=>'عنوان مورد 4 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'',
+'type'=>'text',
+'section'=>'radio'
+),
+array(
+'id'=>'radio_page_step_4_text',
+'label'=>'متن مورد 4 راهنما',
+'desc'=>'مخصوص قالب برگهٔ رادیو؛ محتوای خود برگه مستقل است.',
+'std'=>'',
+'type'=>'textarea',
+'section'=>'radio'
+),
+array(
 'id'=>'radio_station_text',
 'label'=>'متنِ معرفیِ سایت',
 'desc'=>'این جمله با گفتارِ مرورگر خوانده می‌شود. جای‌نگهدارها: <code>{site}</code> نام سایت، <code>{title}</code> نام آهنگ، <code>{artist}</code> نام خواننده.',

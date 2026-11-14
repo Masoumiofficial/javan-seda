@@ -142,7 +142,7 @@
 			return queue[index] || null;
 		}
 
-		function load(list, start, ownerNode, autoplay) {
+		function load(list, start, ownerNode, autoplay, initialDock) {
 			queue = (list || []).slice();
 			if (!queue.length) {
 				return;
@@ -157,7 +157,7 @@
 			el.src = item.src;
 			el.load();
 
-			emit('load', { track: item, index: index, owner: owner, queue: queue });
+			emit('load', { track: item, index: index, owner: owner, queue: queue, initialDock: !!initialDock });
 
 			if (autoplay) {
 				play();
@@ -581,6 +581,7 @@
 			if (dock.hidden) {
 				dock.hidden = false;
 				window.requestAnimationFrame(function () {
+					if (dock.hidden || !Engine.state().track) { return; }
 					dock.classList.add('is-visible');
 					document.body.classList.add('has-tara-dock');
 				});
@@ -619,6 +620,7 @@
 				if (refs.fill) {
 					refs.fill.style.width = '0%';
 				}
+				if (data.initialDock) { show(); }
 			}
 
 			if (type === 'playing') {
@@ -1711,6 +1713,12 @@
 		Engine.on();
 		Resume();
 		bindZoom();
+
+		/* فقط صف همین صفحه، بدون پخش خودکار و پس از ثبت همهٔ شنونده‌ها. */
+		var single = document.querySelector('[data-tara-player="single"]');
+		if (dock && single && single.__taraTracks && single.__taraTracks.length && !Engine.state().track) {
+			Engine.load(single.__taraTracks, 0, single, false, true);
+		}
 
 		/* نشانهٔ سلامت برای عیب‌یابی: اگر این صفت روی <html> نبود، یعنی همین فایل
 		   اجرا نشده است (کش/CDN/خطای اسکریپت). */

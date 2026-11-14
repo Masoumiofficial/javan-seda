@@ -690,7 +690,7 @@ if ( ! function_exists( 'tara_queue_attrs' ) ) {
 		if ( empty( $tracks ) ) {
 			return '';
 		}
-		$json = wp_json_encode( $tracks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$json = wp_json_encode( $tracks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP );
 		if ( ! is_string( $json ) ) {
 			return '';
 		}
@@ -1142,7 +1142,7 @@ if ( ! function_exists( 'tara_player' ) ) {
 
 		$uid   = 'tara-player-' . wp_unique_id();
 		$first = isset( $tracks[ $args['start'] ] ) ? $tracks[ $args['start'] ] : $tracks[0];
-		$json  = wp_json_encode( $tracks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$json  = wp_json_encode( $tracks, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP );
 
 		/* v3.7.5 — سه حالت «بی‌مصرف» پنهان می‌شود:
 		   • یک قطعه ⇒ «فهرست پخش» معنا ندارد

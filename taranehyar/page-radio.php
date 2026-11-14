@@ -16,16 +16,22 @@
 get_header();
 
 $tara_radio_page_title = get_the_title();
+$radio_text = static function ( $key, $default ) {
+    $value = function_exists( 'ot_get_option' ) ? ot_get_option( 'radio_page_' . $key, $default ) : $default;
+    return is_scalar( $value ) ? (string) $value : $default;
+};
+
 ?>
 <div class="ty-archive tarlanweb_center" dir="rtl">
 
 	<header class="ty-radio-page__head">
-		<span class="ty-radio-page__eyebrow"><i class="icofont-sound-wave-alt" aria-hidden="true"></i> پخشِ پیوسته · بدونِ توقف</span>
+		<?php if ( 'on' === $radio_text( 'eyebrow_on', 'on' ) ) : ?>
+		<span class="ty-radio-page__eyebrow"><i class="icofont-sound-wave-alt" aria-hidden="true"></i> <?php echo esc_html( $radio_text( 'eyebrow', 'رادیو آهنگ' ) ); ?></span>
+		<?php endif; ?>
 		<h1 class="ty-radio-page__title"><?php echo esc_html( '' !== $tara_radio_page_title ? $tara_radio_page_title : 'رادیو ترانه یار' ); ?></h1>
-		<p class="ty-radio-page__sub">
-			رادیو خودش آهنگ انتخاب می‌کند، آن‌ها را با کراس‌فید به هم می‌چسباند و بینشان سایت را معرفی می‌کند.
-			هر چه بخواهید به صف اضافه کنید، در همین مرورگر ذخیره می‌شود.
-		</p>
+		<?php if ( 'on' === $radio_text( 'intro_on', 'on' ) ) : ?>
+		<p class="ty-radio-page__sub"><?php echo esc_html( $radio_text( 'intro', 'منبع دلخواهتان را انتخاب کنید و به آهنگ‌ها گوش دهید.' ) ); ?></p>
+		<?php endif; ?>
 	</header>
 
 	<?php
@@ -33,8 +39,9 @@ $tara_radio_page_title = get_the_title();
 		echo tara_radio_box( // phpcs:ignore WordPress.Security.EscapeOutput -- مارکاپِ همین قالب
 			array(
 				'context'  => 'page',
-				'title'    => 'ایستگاهِ زندهٔ ' . get_bloginfo( 'name' ),
-				'subtitle' => 'منبع را عوض کنید، طولِ میکس را بکشید و فهرستِ خودتان را بسازید.',
+				'title'    => $radio_text( 'player_title', 'رادیو ' . get_bloginfo( 'name' ) ),
+				'subtitle' => 'on' === $radio_text( 'player_sub_on', 'on' ) ? $radio_text( 'player_sub', 'منبع را انتخاب کنید و فهرست خودتان را بسازید.' ) : '',
+                'show_subtitle' => 'on' === $radio_text( 'player_sub_on', 'on' ),
 				'limit'    => 24,
 				'sources'  => true,
 			)
@@ -48,31 +55,18 @@ $tara_radio_page_title = get_the_title();
 	}
 	?>
 
+	<?php if ( 'on' === $radio_text( 'how_on', 'off' ) ) : ?>
 	<section class="ty-radio-page__how" aria-labelledby="ty-radio-how">
-		<h2 id="ty-radio-how">میکس چطور ساخته می‌شود؟</h2>
+		<h2 id="ty-radio-how"><?php echo esc_html( $radio_text( 'how_title', 'راهنمای رادیو' ) ); ?></h2>
 		<ol class="ty-radio-page__steps">
-			<li>
-				<span class="ty-radio-page__num">۱</span>
-				<strong>دو دِک، یک خروجی</strong>
-				<p>دو پخش‌کنندهٔ هم‌زمان در مرورگرِ شما کار می‌کنند؛ یکی کم‌صدا می‌شود و دیگری هم‌زمان بلند می‌شود. هیچ‌وقت سکوتِ بین دو آهنگ نمی‌شنوید.</p>
-			</li>
-			<li>
-				<span class="ty-radio-page__num">۲</span>
-				<strong>تنظیمِ سرعت و باس</strong>
-				<p>آهنگِ تازه کمی کندتر وارد می‌شود و باسش اول کم است؛ درست مثل دی‌جی که پیچ را می‌چرخاند. بعد از چند ثانیه همه‌چیز سر جای خودش می‌نشیند.</p>
-			</li>
-			<li>
-				<span class="ty-radio-page__num">۳</span>
-				<strong>معرفیِ صوتی</strong>
-				<p>هر چند آهنگ، یک جملهٔ کوتاه دربارهٔ سایت پخش می‌شود و موسیقی زیرش کم می‌شود تا حرف شنیده شود.</p>
-			</li>
-			<li>
-				<span class="ty-radio-page__num">۴</span>
-				<strong>هیچ‌وقت تمام نمی‌شود</strong>
-				<p>وقتی صف به آخر برسد، رادیو از سرور آهنگ‌های تازه می‌گیرد؛ منبع را هم می‌توانید بین «جدیدترین»، «پربازدیدترین»، «داغ» و «تصادفی» عوض کنید.</p>
-			</li>
+		<?php for ( $i = 1; $i <= 4; $i++ ) : ?>
+			<?php if ( 'on' === $radio_text( 'step_' . $i . '_on', 'off' ) ) : ?>
+			<li><span class="ty-radio-page__num"><?php echo esc_html( function_exists( 'tara_fa_number' ) ? tara_fa_number( $i ) : $i ); ?></span><strong><?php echo esc_html( $radio_text( 'step_' . $i . '_title', '' ) ); ?></strong><p><?php echo esc_html( $radio_text( 'step_' . $i . '_text', '' ) ); ?></p></li>
+			<?php endif; ?>
+		<?php endfor; ?>
 		</ol>
 	</section>
+	<?php endif; ?>
 
 	<?php
 	$tara_radio_taxes = array();

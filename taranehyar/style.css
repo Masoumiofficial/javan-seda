@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.12.16-beta.2
+Version: 3.13.0
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -3807,3 +3807,6 @@ html[data-tara-night="1"] {
 	.single .tarlanweb_post_box header{margin-bottom: 10px}
 	.single .tarlanweb_post_box header h1{font-size: 17px;line-height: 1.65;padding-bottom: 8px}
 }
+
+/* جعبهٔ نتایج افزونه در عرض‌های کوچک و متن‌های بلند. */
+.searchwp-live-search-results { box-sizing: border-box; max-width: calc(100vw - 16px); overflow-x: hidden; overflow-wrap: anywhere; }

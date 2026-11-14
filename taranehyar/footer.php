@@ -222,7 +222,7 @@ if ( function_exists( 'tara_ui_footer_cols_count' ) ) {
 	}
 	?>
 	<script type="application/ld+json">
-	<?php echo wp_json_encode($ab_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>
+	<?php echo wp_json_encode($ab_schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP); ?>
 	</script>
 	<div class="clear"></div>
 </div>

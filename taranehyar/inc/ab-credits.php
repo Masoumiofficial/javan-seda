@@ -906,7 +906,7 @@ if ( ! function_exists( 'tara_person_card' ) ) {
 			'url'      => get_term_link( $term ),
 			'sameAs'   => array_values( array_unique( $same ) ),
 		);
-		$json   = wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		$json   = wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP );
 		if ( is_string( $json ) ) {
 			$html .= '<script type="application/ld+json">' . $json . '</script>';
 		}

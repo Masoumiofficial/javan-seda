@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.12.16-beta.2' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.13.0' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -266,6 +266,10 @@ if ( ! function_exists( 'taranehyar_assets' ) ) {
 		/* v3.7.8 — اسلایدر تازهٔ خانه فقط همان‌جا بار می‌شود (بدون jQuery). */
 		if ( tara_page_is_home() && file_exists( TARANEHYAR_DIR . '/js/hero-slider.js' ) ) {
 			wp_enqueue_script( 'taranehyar-hero', TARANEHYAR_URI . '/js/hero-slider.js', array(), taranehyar_asset_ver( '/js/hero-slider.js' ), true );
+		}
+
+		if ( file_exists( TARANEHYAR_DIR . '/js/tara-search-bounds.js' ) ) {
+			wp_enqueue_script( 'taranehyar-search-bounds', TARANEHYAR_URI . '/js/tara-search-bounds.js', array(), taranehyar_asset_ver( '/js/tara-search-bounds.js' ), true );
 		}
 
 		if ( file_exists( TARANEHYAR_DIR . '/js/tara-player.js' ) ) {

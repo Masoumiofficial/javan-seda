@@ -248,8 +248,8 @@ if ( ! function_exists( 'tara_expected_hashes' ) ) {
 		'single.php'                => 'da24c5148021c0e228ab23311bc308840260aa0f1d8b666bd9d03b2deb5414ff',
 		'page.php'                  => 'eed2370a3205d53f58bf0d5721275ae8896daf6c32e862403d9fe3a2982aac50',
 		'myfunctions.php'           => '04b63b53dab707ab426215216bcf8978fab0b15ce1d0536f98d23bf2995a4080',
-		'style.css'                 => '07b0906258653aa34a510de9db55a5914db849544380cb3fedb522684c0e7163',
-		'footer.php'                => '8d0779d9ac7f59fc6009e2f959d0939018f9fb1abd06b79662e6d7aa2d1dfce0',
+		'style.css'                 => '5ee0fb0ddcae67f9a809f7fa593671a0add2a603aceb8e4b4da74ac34d92878d',
+		'footer.php'                => 'cc67f4adb6d351ec79d433b5c000dc50baac68a3495c688feb4aa1faf365001d',
 		'header.php'                => 'ceb4e5701bb38570828be9867f5c5b55141d16f145c5b29c9148d79edd51caed',
 		'home.php'                  => '7618169dc3d921700f58d5741b974b4ae170bdec836713ec5849ac64c62adde3',
 		'404.php'                   => 'de46550d0330193634db14ca6da44d5279dbf4d11c2b454959c4dabbc30d224f',
@@ -259,13 +259,13 @@ if ( ! function_exists( 'tara_expected_hashes' ) ) {
 		'inc/tarlanweb_player.php'  => 'b255117a82a5bea5e59c2cf06ddd72b2884044042538084388d56c3195adfe14',
 		'inc/ab-news-ticker.php'    => 'e75c2a1dd86cc632c01d253a6f199935c8fb674b508c3986ba1855ae751a15fc',
 		'inc/ab-perf.php'           => 'dc305da6590c6b4002214f7db71412c0d11965f9a024c3e77ea35517f85234f4',
-		'inc/ab-seo.php'            => '579cd2327edfa6c378af2a68448753f8f051d2da1417c68f8fdbf7aa6e89b0c1',
+		'inc/ab-seo.php'            => '923e553b887f0ed91211b0aa029b0904cd9313a9b0072e858c33216d7c223838',
 		'inc/ab-controls.php'       => 'eed236181fe745999f0c150e4cec8c2e8c6b6daf3b52bf4e98a2347f60851176',
-		'inc/theme-options.php'     => '8d03b6ecb33858bcef0dc3200adaf94392da8ab2c3d206f1a4b31eecfa47e0df',
+		'inc/theme-options.php'     => '9fc2d8646fe8e0c821343cd6db8dea4d259468170e9324846f7cf1b0ffd6a47c',
 		'taxonomy-artist.php'       => '0e2a19b4eac410a4ca932d12d7a51bccc59207b2926c9e7e182c80aaae083483',
 		'taxonomy-singer.php'       => '38ed6b25f0146a900e1c580a85d64698497caf73c561abbadc0e9e4d245f9fce',
 		'inc/ab-tax-artist.php'     => '8aaa995ae6658ecbb7a2dd1ea32afc5c881edfaf1abc1594e89ee3a4c1bba9b0',
-		'inc/ab-credits.php'        => 'e61a7a795a9ce15db3c56bfdd4a2e16e7f23e3831518f7a789fb39c9daddbe3c',
+		'inc/ab-credits.php'        => '9002fc488607bcd21ccae41c68647962125b9aa9c5e11c8aa9c5c076a82e5062',
 	);
 }
 }

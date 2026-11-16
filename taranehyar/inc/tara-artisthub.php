@@ -1,13 +1,13 @@
 <?php
 /**
- * پنلِ هنرمند، ارتقا، پلن‌های پخش و تبلیغ — v3.12.0
+ * پنل هنرمند، ارتقا، پلن‌های پخش و تبلیغ — v3.12.0
  * =========================================================================
- * مسیرِ کاملِ «شنونده → هنرمند»:
- *   ۱) کاربر از تبِ «پنل هنرمند» درخواستِ ارتقا می‌دهد.
- *   ۲) مدیر در «درخواست‌های هنرمندان» آن را بررسی و به یک ترمِ هنرمند وصل
+ * مسیر کامل «شنونده → هنرمند»:
+ *   ۱) کاربر از تب «پنل هنرمند» درخواست ارتقا می‌دهد.
+ *   ۲) مدیر در «درخواست‌های هنرمندان» آن را بررسی و به یک ترم هنرمند وصل
  *      می‌کند (همان لحظه tara_artist_term / tara_artist_user ست می‌شود).
- *   ۳) هنرمندِ وصل‌شده آثارِ خودش را می‌بیند، اثر تازه می‌فرستد (پیش‌نویس)،
- *      برای ویرایشِ متنِ ترانه/مشخصات درخواست می‌دهد و پلن می‌خرد.
+ *   ۳) هنرمند وصل‌شده آثار خودش را می‌بیند، اثر تازه می‌فرستد (پیش‌نویس)،
+ *      برای ویرایش متن ترانه/مشخصات درخواست می‌دهد و پلن می‌خرد.
  *
  * پرداخت:
  *   • سفارش و مبلغ سمت سرور در ووکامرس ساخته و بعد از تأیید پرداخت ثبت می‌شود.
@@ -41,21 +41,21 @@ function tara_hub_request_lock( $user_id ) {
 }
 
 if ( ! function_exists( 'tara_hub_opt' ) ) {
-	/** خواندنِ تنظیماتِ پنلِ هنرمند. */
+	/** خواندن تنظیمات پنل هنرمند. */
 	function tara_hub_opt( $key, $default = '' ) {
 		return function_exists( 'ot_get_option' ) ? ot_get_option( $key, $default ) : $default;
 	}
 }
 
 if ( ! function_exists( 'tara_hub_on' ) ) {
-	/** پنلِ هنرمند روشن است؟ */
+	/** پنل هنرمند روشن است؟ */
 	function tara_hub_on() {
 		return 'off' !== (string) tara_hub_opt( 'artisthub_on', 'on' );
 	}
 }
 
 if ( ! function_exists( 'tara_hub_money' ) ) {
-	/** نمایشِ مبلغ با واحدِ تومان. */
+	/** نمایش مبلغ با واحد تومان. */
 	function tara_hub_money( $amount ) {
 		$amount = max( 0, (int) $amount );
 		if ( 0 === $amount ) {
@@ -68,7 +68,7 @@ if ( ! function_exists( 'tara_hub_money' ) ) {
 
 if ( ! function_exists( 'tara_hub_plans' ) ) {
 	/**
-	 * پلن‌های قابلِ خرید.
+	 * پلن‌های قابل خرید.
 	 *
 	 * @return array<string,array>
 	 */
@@ -77,20 +77,20 @@ if ( ! function_exists( 'tara_hub_plans' ) ) {
 			'std'   => array(
 				'name'  => 'پخش عادی',
 				'price' => (int) tara_hub_opt( 'artisthub_std_price', 0 ),
-				'desc'  => 'انتشارِ اثر در سایت، صفحهٔ هنرمند، رادیو و ربات تلگرام.',
-				'feats' => array( 'صفحهٔ اختصاصی هنرمند', 'نمایش در جست‌وجو و رادیو', 'آمار بازدیدِ آثار' ),
+				'desc'  => 'انتشار اثر در سایت، صفحه هنرمند، رادیو و ربات تلگرام.',
+				'feats' => array( 'صفحه اختصاصی هنرمند', 'نمایش در جست‌وجو و رادیو', 'آمار بازدید آثار' ),
 			),
 			'vip'   => array(
 				'name'  => 'پخش VIP',
 				'price' => (int) tara_hub_opt( 'artisthub_vip_price', 490000 ),
-				'desc'  => 'همهٔ امکاناتِ پخش عادی + جایگاهِ ویژه و معرفی در صفحهٔ اصلی.',
-				'feats' => array( 'جایگاهِ ویژه در صفحهٔ اصلی', 'بنر و معرفیِ ویژه', 'اولویت در رادیو و پیشنهادها' ),
+				'desc'  => 'همه امکانات پخش عادی + جایگاه ویژه و معرفی در صفحه اصلی.',
+				'feats' => array( 'جایگاه ویژه در صفحه اصلی', 'بنر و معرفی ویژه', 'اولویت در رادیو و پیشنهادها' ),
 			),
 			'promo' => array(
 				'name'  => 'تبلیغ و افزایش بازدید',
 				'price' => (int) tara_hub_opt( 'artisthub_promo_price', 290000 ),
-				'desc'  => 'کمپینِ تبلیغِ یک اثر؛ هر ۱۰۰۰ بازدیدِ واقعی از مبلغ کم می‌کند.',
-				'feats' => array( 'نمایش در بخش‌های پرترافیک', 'گزارشِ بازدیدِ کمپین', 'تخفیف بر اساس بازدیدِ واقعی' ),
+				'desc'  => 'کمپین تبلیغ یک اثر؛ هر ۱۰۰۰ بازدید واقعی از مبلغ کم می‌کند.',
+				'feats' => array( 'نمایش در بخش‌های پرترافیک', 'گزارش بازدید کمپین', 'تخفیف بر اساس بازدید واقعی' ),
 			),
 		);
 		return apply_filters( 'tara_hub_plans', $plans );
@@ -105,7 +105,7 @@ if ( ! function_exists( 'tara_hub_wc_ready' ) ) {
 	}
 }
 
-/** تبدیل قیمت‌های تنظیمات (تومان) به واحد فروشگاه؛ سایر ارزها عمداً مسدودند. */
+/** تبدیل قیمت‌های تنظیمات (تومان) به واحد فروشگاه؛ سایر ارزها عمدا مسدودند. */
 function tara_hub_wc_amount( $toman ) {
 	$currency = function_exists( 'get_woocommerce_currency' ) ? get_woocommerce_currency() : '';
 	if ( ! in_array( $currency, array( 'IRT', 'IRR' ), true ) ) {
@@ -114,7 +114,7 @@ function tara_hub_wc_amount( $toman ) {
 	return max( 0, (int) $toman ) * ( 'IRR' === $currency ? 10 : 1 );
 }
 
-/** سفارش فقط با مبلغِ محاسبه‌شده در سرور ساخته می‌شود، نه مبلغ ارسالی مرورگر. */
+/** سفارش فقط با مبلغ محاسبه‌شده در سرور ساخته می‌شود، نه مبلغ ارسالی مرورگر. */
 function tara_hub_wc_order( $user_id, $request_id, $plan, $amount ) {
 	if ( ! tara_hub_wc_ready() ) {
 		return new WP_Error( 'tara_wc_unavailable', 'پرداخت فعال نیست؛ ووکامرس و واحد پول تومان (IRT) یا ریال (IRR) را بررسی کنید.' );
@@ -194,7 +194,7 @@ if ( function_exists( 'add_action' ) ) {
 }
 
 if ( ! function_exists( 'tara_hub_user_term' ) ) {
-	/** ترمِ هنرمندِ این کاربر (۰ = هنرمند نیست). */
+	/** ترم هنرمند این کاربر (۰ = هنرمند نیست). */
 	function tara_hub_user_term( $user_id = 0 ) {
 		return function_exists( 'tara_artist_term_of_user' ) ? (int) tara_artist_term_of_user( (int) $user_id ) : 0;
 	}
@@ -222,11 +222,11 @@ if ( ! function_exists( 'tara_hub_requests' ) ) {
 
 if ( ! function_exists( 'tara_hub_request_add' ) ) {
 	/**
-	 * ثبتِ درخواست.
+	 * ثبت درخواست.
 	 *
 	 * @param int   $user_id کاربر.
 	 * @param array $data    type, plan, title, body, post_id, price.
-	 * @return string شناسهٔ درخواست.
+	 * @return string شناسه درخواست.
 	 */
 	function tara_hub_request_add( $user_id, $data ) {
 		$user_id = (int) $user_id;
@@ -259,7 +259,7 @@ if ( ! function_exists( 'tara_hub_request_add' ) ) {
 
 if ( ! function_exists( 'tara_hub_tracks' ) ) {
 	/**
-	 * آثارِ یک هنرمند.
+	 * آثار یک هنرمند.
 	 *
 	 * @param int $term_id ترم.
 	 * @param int $limit   تعداد.
@@ -291,7 +291,7 @@ if ( ! function_exists( 'tara_hub_tracks' ) ) {
 }
 
 if ( ! function_exists( 'tara_hub_total_views' ) ) {
-	/** مجموعِ بازدیدِ آثارِ هنرمند. */
+	/** مجموع بازدید آثار هنرمند. */
 	function tara_hub_total_views( $term_id ) {
 		$total = 0;
 		foreach ( tara_hub_tracks( $term_id, 200 ) as $post ) {
@@ -303,13 +303,13 @@ if ( ! function_exists( 'tara_hub_total_views' ) ) {
 
 if ( ! function_exists( 'tara_hub_promo_quote' ) ) {
 	/**
-	 * پیش‌فاکتورِ تبلیغ: تخفیف بر اساس بازدید.
+	 * پیش‌فاکتور تبلیغ: تخفیف بر اساس بازدید.
 	 *
-	 * قانون (قابلِ تنظیم در قالب): به‌ازای هر ۱۰۰۰ بازدیدِ واقعیِ اثر،
-	 * مبلغِ `artisthub_promo_discount` تومان از قیمتِ پلنِ تبلیغ کم می‌شود
-	 * (تا سقفِ خودِ قیمت).
+	 * قانون (قابل تنظیم در قالب): به‌ازای هر ۱۰۰۰ بازدید واقعی اثر،
+	 * مبلغ `artisthub_promo_discount` تومان از قیمت پلن تبلیغ کم می‌شود
+	 * (تا سقف خود قیمت).
 	 *
-	 * @param int $views بازدیدِ اثر.
+	 * @param int $views بازدید اثر.
 	 * @return array{price:int,discount:int,final:int,units:int}
 	 */
 	function tara_hub_promo_quote( $views ) {
@@ -328,7 +328,7 @@ if ( ! function_exists( 'tara_hub_promo_quote' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * AJAX — ثبتِ درخواست/اثر تازه
+ * AJAX — ثبت درخواست/اثر تازه
  * ---------------------------------------------------------------------- */
 
 /** بررسی امضای ابتدایی MP3؛ کنترل پسوند به‌تنهایی کافی نیست. */
@@ -347,7 +347,7 @@ function tara_hub_mp3_header_valid( $path ) {
 }
 
 if ( ! function_exists( 'tara_hub_ajax' ) ) {
-	/** نقطهٔ پایانیِ AJAXِ پنلِ هنرمند. */
+	/** نقطه پایانی AJAX پنل هنرمند. */
 	function tara_hub_ajax() {
 		check_ajax_referer( 'tara_account', 'nonce' );
 		$user_id = (int) get_current_user_id();
@@ -355,7 +355,7 @@ if ( ! function_exists( 'tara_hub_ajax' ) ) {
 			wp_send_json_error( array( 'message' => 'برای این کار باید وارد شوید.', 'login' => 1 ) );
 		}
 		if ( ! tara_hub_on() ) {
-			wp_send_json_error( array( 'message' => 'پنلِ هنرمند در این سایت خاموش است.' ) );
+			wp_send_json_error( array( 'message' => 'پنل هنرمند در این سایت خاموش است.' ) );
 		}
 
 		if ( ! tara_hub_request_lock( $user_id ) ) { wp_send_json_error( array( 'message' => 'درخواست دیگری در حال پردازش است؛ دوباره تلاش کنید.' ) ); }
@@ -367,17 +367,17 @@ if ( ! function_exists( 'tara_hub_ajax' ) ) {
 				$name = isset( $_POST['artist_name'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['artist_name'] ) ) : '';
 				$body = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( (string) $_POST['body'] ) ) : '';
 				if ( '' === $name ) {
-					wp_send_json_error( array( 'message' => 'نامِ هنری را بنویسید.' ) );
+					wp_send_json_error( array( 'message' => 'نام هنری را بنویسید.' ) );
 				}
 				$id = tara_hub_request_add(
 					$user_id,
 					array(
 						'type'  => 'upgrade',
-						'title' => 'درخواستِ ارتقا — ' . $name,
+						'title' => 'درخواست ارتقا — ' . $name,
 						'body'  => $body,
 					)
 				);
-				wp_send_json_success( array( 'id' => $id, 'message' => 'درخواستِ ارتقا ثبت شد؛ بعد از بررسیِ مدیر، پنلِ هنرمند برایتان باز می‌شود.' ) );
+				wp_send_json_success( array( 'id' => $id, 'message' => 'درخواست ارتقا ثبت شد؛ بعد از بررسی مدیر، پنل هنرمند برایتان باز می‌شود.' ) );
 				break;
 
 			case 'buy':
@@ -483,19 +483,19 @@ if ( ! function_exists( 'tara_hub_ajax' ) ) {
 
 			case 'request':
 				if ( $term <= 0 ) {
-					wp_send_json_error( array( 'message' => 'هنوز حسابِ هنرمندیِ شما تأیید نشده است.' ) );
+					wp_send_json_error( array( 'message' => 'هنوز حساب هنرمندی شما تأیید نشده است.' ) );
 				}
 				$type  = isset( $_POST['rtype'] ) ? sanitize_key( wp_unslash( (string) $_POST['rtype'] ) ) : 'support';
 				$title = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( (string) $_POST['title'] ) ) : '';
 				$body  = isset( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( (string) $_POST['body'] ) ) : '';
 				if ( '' === $title && '' === $body ) {
-					wp_send_json_error( array( 'message' => 'متنِ درخواست خالی است.' ) );
+					wp_send_json_error( array( 'message' => 'متن درخواست خالی است.' ) );
 				}
 				$id = tara_hub_request_add(
 					$user_id,
 					array(
 						'type'    => in_array( $type, array( 'lyrics', 'edit', 'promo', 'support' ), true ) ? $type : 'support',
-						'title'   => '' !== $title ? $title : 'درخواستِ هنرمند',
+						'title'   => '' !== $title ? $title : 'درخواست هنرمند',
 						'body'    => $body,
 						'post_id' => isset( $_POST['post'] ) ? (int) $_POST['post'] : 0,
 					)
@@ -504,7 +504,7 @@ if ( ! function_exists( 'tara_hub_ajax' ) ) {
 				break;
 		}
 
-		wp_send_json_error( array( 'message' => 'درخواستِ نامشخص.' ) );
+		wp_send_json_error( array( 'message' => 'درخواست نامشخص.' ) );
 	}
 }
 if ( function_exists( 'add_action' ) ) {
@@ -512,11 +512,11 @@ if ( function_exists( 'add_action' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * خروجیِ تب‌ها
+ * خروجی تب‌ها
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_hub_status_label' ) ) {
-	/** برچسبِ فارسیِ وضعیت. */
+	/** برچسب فارسی وضعیت. */
 	function tara_hub_status_label( $status ) {
 		$map = array(
 			'new' => 'درخواست جدید', 'review' => 'در انتظار بررسی', 'documents' => 'نیازمند تکمیل مدارک', 'awaiting_payment' => 'در انتظار پرداخت', 'preparing' => 'آماده‌سازی', 'published' => 'منتشرشده', 'cancelled' => 'لغوشده',
@@ -533,7 +533,7 @@ if ( ! function_exists( 'tara_hub_status_label' ) ) {
 
 if ( ! function_exists( 'tara_hub_tab_artist' ) ) {
 	/**
-	 * تبِ «پنل هنرمند» در حسابِ کاربری.
+	 * تب «پنل هنرمند» در حساب کاربری.
 	 *
 	 * @param int $user_id کاربر.
 	 * @return string
@@ -701,7 +701,7 @@ if ( ! function_exists( 'tara_hub_tab_artist' ) ) {
 
 if ( ! function_exists( 'tara_dm_tab' ) ) {
 	/**
-	 * تبِ «دایرکت» در حسابِ کاربری.
+	 * تب «دایرکت» در حساب کاربری.
 	 *
 	 * @param int $user_id کاربر.
 	 * @return string
@@ -714,7 +714,7 @@ if ( ! function_exists( 'tara_dm_tab' ) ) {
 		ob_start();
 		?>
 		<div class="ty-hub">
-			<header class="ty-hub__head"><h2>دایرکت‌ها</h2><p>گفت‌وگوهای مستقیم با هنرمندان؛ درست مثلِ اینستاگرام.</p></header>
+			<header class="ty-hub__head"><h2>دایرکت‌ها</h2><p>گفت‌وگوهای مستقیم با هنرمندان؛ درست مثل اینستاگرام.</p></header>
 			<?php if ( $term > 0 && function_exists( 'tara_dm_threads_for_artist' ) ) : ?>
 				<section class="ty-hub__card">
 					<h3>پیام‌های طرفداران</h3>
@@ -741,7 +741,7 @@ if ( ! function_exists( 'tara_dm_tab' ) ) {
 				<h3>گفت‌وگوهای من با هنرمندان</h3>
 				<?php $mine = function_exists( 'tara_dm_threads_for_user' ) ? tara_dm_threads_for_user( $user_id ) : array(); ?>
 				<?php if ( empty( $mine ) ) : ?>
-					<p class="ty-hub__empty">هنوز به هنرمندی پیام نداده‌اید. از صفحهٔ هر هنرمندِ تأییدشده، دکمهٔ «پیام مستقیم» را بزنید.</p>
+					<p class="ty-hub__empty">هنوز به هنرمندی پیام نداده‌اید. از صفحه هر هنرمند تأییدشده، دکمه «پیام مستقیم» را بزنید.</p>
 				<?php else : ?>
 					<ul class="ty-hub__threads">
 						<?php foreach ( $mine as $row ) : ?>
@@ -763,7 +763,7 @@ if ( ! function_exists( 'tara_dm_tab' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * صفحهٔ مدیر: بررسیِ درخواست‌ها
+ * صفحه مدیر: بررسی درخواست‌ها
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_hub_admin_menu' ) ) {
@@ -777,7 +777,7 @@ if ( function_exists( 'add_action' ) ) {
 }
 
 if ( ! function_exists( 'tara_hub_all_requests' ) ) {
-	/** همهٔ درخواست‌ها از متای کاربران. */
+	/** همه درخواست‌ها از متای کاربران. */
 	function tara_hub_all_requests() {
 		$out   = array();
 		$users = get_users( array( 'meta_key' => 'tara_artist_requests', 'number' => 200 ) ); // phpcs:ignore WordPress.DB.SlowDBQuery
@@ -799,7 +799,7 @@ if ( ! function_exists( 'tara_hub_all_requests' ) ) {
 }
 
 if ( ! function_exists( 'tara_hub_admin_handle' ) ) {
-	/** انجامِ عملیاتِ مدیر روی یک درخواست. */
+	/** انجام عملیات مدیر روی یک درخواست. */
 	function tara_hub_admin_handle() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -851,7 +851,7 @@ if ( function_exists( 'add_action' ) ) {
 }
 
 if ( ! function_exists( 'tara_hub_admin_page' ) ) {
-	/** صفحهٔ مدیر. */
+	/** صفحه مدیر. */
 	function tara_hub_admin_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			return;
@@ -862,7 +862,7 @@ if ( ! function_exists( 'tara_hub_admin_page' ) ) {
 		?>
 		<div class="wrap">
 			<h1>درخواست‌های هنرمندان</h1>
-			<p>برای تأییدِ ارتقا: هنرمند را از فهرست انتخاب و «تأیید» را بزنید؛ حسابِ کاربر همان لحظه به صفحهٔ هنرمند وصل می‌شود.</p>
+			<p>برای تأیید ارتقا: هنرمند را از فهرست انتخاب و «تأیید» را بزنید؛ حساب کاربر همان لحظه به صفحه هنرمند وصل می‌شود.</p>
 			<table class="widefat striped">
 				<thead><tr><th>کاربر</th><th>درخواست</th><th>جزئیات</th><th>مبلغ</th><th>وضعیت</th><th>عملیات</th></tr></thead>
 				<tbody>

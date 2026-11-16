@@ -134,7 +134,7 @@ function tara_release_quote_ready( $row ) {
  * Caller provides an unpredictable per-submission token and handles locking and persistence.
  */
 function tara_release_build_request( $input, $token, $now, $has_file = false ) {
-	if ( ! is_string( $token ) || ! preg_match( '/^[a-f0-9]{32,64}$/D', $token ) || ! is_int( $now ) || $now <= 0 ) { return new WP_Error( 'release_token', 'شناسهٔ درخواست نامعتبر است.' ); }
+	if ( ! is_string( $token ) || ! preg_match( '/^[a-f0-9]{32,64}$/D', $token ) || ! is_int( $now ) || $now <= 0 ) { return new WP_Error( 'release_token', 'شناسه درخواست نامعتبر است.' ); }
 	$data = tara_release_validate( $input, $has_file );
 	if ( is_wp_error( $data ) ) { return $data; }
 	$catalog = tara_release_catalog();

@@ -1,14 +1,14 @@
 <?php
 /**
- * ترانه یار — رابطِ حسابِ کاربری (نسخهٔ ۳.۱۰.۰)
+ * ترانه یار — رابط حساب کاربری (نسخه ۳.۱۰.۰)
  * =========================================================================
- * همهٔ مارکاپِ حساب این‌جاست: دکمهٔ هدر، مودالِ ورودِ پیامکی و پنلِ کاربری.
+ * همه مارکاپ حساب این‌جاست: دکمه هدر، مودال ورود پیامکی و پنل کاربری.
  * داده و منطق در `inc/tara-account.php` است.
  *
- * این فایل عمداً آیکون‌ها را SVGِ درون‌خطی می‌سازد (نه فونتِ آیکون):
- *   • هیچ وابستگی به فایلِ فونت و هیچ آیکونِ ناموجودی وجود ندارد
- *   • رنگِ آیکون از `currentColor` می‌آید و در حالتِ شب هم درست است
- *   • چند کیلوبایت برای ۲۰ آیکون کافی است و درخواستِ شبکه اضافه نمی‌کند
+ * این فایل عمدا آیکون‌ها را SVG درون‌خطی می‌سازد (نه فونت آیکون):
+ *   • هیچ وابستگی به فایل فونت و هیچ آیکون ناموجودی وجود ندارد
+ *   • رنگ آیکون از `currentColor` می‌آید و در حالت شب هم درست است
+ *   • چند کیلوبایت برای ۲۰ آیکون کافی است و درخواست شبکه اضافه نمی‌کند
  *
  * @package Taranehyar
  */
@@ -23,10 +23,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! function_exists( 'tara_acc_icon' ) ) {
 	/**
-	 * آیکونِ SVGِ درون‌خطی.
+	 * آیکون SVG درون‌خطی.
 	 *
-	 * @param string $name نامِ آیکون.
-	 * @param string $class کلاسِ اضافه.
+	 * @param string $name نام آیکون.
+	 * @param string $class کلاس اضافه.
 	 * @return string
 	 */
 	function tara_acc_icon( $name, $class = '' ) {
@@ -65,7 +65,7 @@ if ( ! function_exists( 'tara_acc_icon' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۲) تنظیماتِ جاوااسکریپت و دارایی‌ها
+ * ۲) تنظیمات جاوااسکریپت و دارایی‌ها
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_config' ) ) {
@@ -115,11 +115,11 @@ if ( ! function_exists( 'tara_acc_config' ) ) {
 				'error'    => 'خطایی رخ داد؛ دوباره تلاش کنید.',
 				'needLogin' => 'برای این کار باید وارد شوید.',
 				'codeSent' => 'کد برای شما پیامک شد.',
-				'resendIn' => 'ارسالِ دوباره تا %s ثانیه',
-				'resend'   => 'ارسالِ دوبارهٔ کد',
+				'resendIn' => 'ارسال دوباره تا %s ثانیه',
+				'resend'   => 'ارسال دوباره کد',
 				'added'    => 'به پلی‌لیست اضافه شد.',
 				'removed'  => 'از پلی‌لیست برداشته شد.',
-				'newList'  => 'نامِ پلی‌لیستِ تازه',
+				'newList'  => 'نام پلی‌لیست تازه',
 				'confirmDelete' => 'این پلی‌لیست پاک شود؟',
 			),
 		);
@@ -128,7 +128,7 @@ if ( ! function_exists( 'tara_acc_config' ) ) {
 
 if ( ! function_exists( 'tara_acc_assets' ) ) {
 	/**
-	 * بارگذاریِ CSS/JS — سبک، فقط وقتی لازم است.
+	 * بارگذاری CSS/JS — سبک، فقط وقتی لازم است.
 	 *
 	 * @return void
 	 */
@@ -166,14 +166,14 @@ if ( function_exists( 'add_action' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۳) دکمهٔ هدر و مودال
+ * ۳) دکمه هدر و مودال
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_button' ) ) {
 	/**
-	 * دکمهٔ حساب برای هدر (دسکتاپ/موبایل).
+	 * دکمه حساب برای هدر (دسکتاپ/موبایل).
 	 *
-	 * @param string $context محلِ نمایش.
+	 * @param string $context محل نمایش.
 	 * @return string
 	 */
 	function tara_acc_button( $context = 'desktop' ) {
@@ -188,11 +188,11 @@ if ( ! function_exists( 'tara_acc_button' ) ) {
 			$name   = (string) get_user_meta( $user_id, 'nickname', true );
 			$name   = '' !== $name ? $name : 'حساب من';
 			$unread = tara_acc_unread( $user_id );
-			$html   = '<a class="' . esc_attr( $class ) . ' is-in" href="' . esc_url( tara_acc_profile_url() ) . '" aria-label="' . esc_attr( 'حساب کاربریِ ' . $name ) . '">';
+			$html   = '<a class="' . esc_attr( $class ) . ' is-in" href="' . esc_url( tara_acc_profile_url() ) . '" aria-label="' . esc_attr( 'حساب کاربری ' . $name ) . '">';
 			$html  .= '<img class="ty-acct-btn__img" src="' . esc_url( tara_acc_avatar_url( $user_id, 64 ) ) . '" width="32" height="32" alt="" loading="lazy">';
 			$html  .= '<span class="ty-acct-btn__txt">' . esc_html( $name ) . '</span>';
 			if ( $unread > 0 ) {
-				$html .= '<span class="ty-acct-btn__dot" aria-label="' . esc_attr( tara_acc_fa( $unread ) . ' پیامِ تازه' ) . '">' . esc_html( tara_acc_fa( $unread ) ) . '</span>';
+				$html .= '<span class="ty-acct-btn__dot" aria-label="' . esc_attr( tara_acc_fa( $unread ) . ' پیام تازه' ) . '">' . esc_html( tara_acc_fa( $unread ) ) . '</span>';
 			}
 			$html .= '</a>';
 			if ( 'desktop' === (string) $context ) {
@@ -218,7 +218,7 @@ if ( ! function_exists( 'tara_acc_button' ) ) {
 
 if ( ! function_exists( 'tara_acc_modal' ) ) {
 	/**
-	 * مودالِ ورود/ثبت‌نام (یک‌بار در پاصفحه).
+	 * مودال ورود/ثبت‌نام (یک‌بار در پاصفحه).
 	 *
 	 * @return void
 	 */
@@ -245,17 +245,17 @@ if ( ! function_exists( 'tara_acc_modal' ) ) {
 				</div>
 
 				<div class="ty-acct-modal__body">
-					<p class="ty-acct-modal__eyebrow"><span class="ty-acct-modal__pulse"></span><?php echo esc_html( $site ); ?> · ورودِ سریع</p>
+					<p class="ty-acct-modal__eyebrow"><span class="ty-acct-modal__pulse"></span><?php echo esc_html( $site ); ?> · ورود سریع</p>
 					<h2 class="ty-acct-modal__title" id="ty-acct-modal-title">
-						<span data-tara-title-phone>با شمارهٔ موبایل وارد شوید</span>
+						<span data-tara-title-phone>با شماره موبایل وارد شوید</span>
 					</h2>
 					<p class="ty-acct-modal__sub" data-tara-sub-phone>
-						فقط شماره‌تان را بدهید؛ یک کدِ ۶رقمی پیامک می‌شود. حساب اگر نباشد، همین‌جا ساخته می‌شود — بدونِ رمز و بدونِ ایمیل.
+						فقط شماره‌تان را بدهید؛ یک کد ۶رقمی پیامک می‌شود. حساب اگر نباشد، همین‌جا ساخته می‌شود — بدون رمز و بدون ایمیل.
 					</p>
 
 					<form class="ty-acct-form" data-tara-form="phone" novalidate>
 						<label class="ty-acct-field">
-							<span class="ty-acct-field__label">شمارهٔ موبایل</span>
+							<span class="ty-acct-field__label">شماره موبایل</span>
 							<span class="ty-acct-field__box ty-acct-field__box--phone">
 								<span class="ty-acct-field__pre" aria-hidden="true">+۹۸</span>
 								<input type="tel" inputmode="numeric" autocomplete="tel-national" name="phone" dir="ltr"
@@ -266,7 +266,7 @@ if ( ! function_exists( 'tara_acc_modal' ) ) {
 						</label>
 
 						<button type="submit" class="ty-acct-submit">
-							<span class="ty-acct-submit__txt">دریافتِ کد</span>
+							<span class="ty-acct-submit__txt">دریافت کد</span>
 							<span class="ty-acct-submit__spin" aria-hidden="true"></span>
 						</button>
 
@@ -275,16 +275,16 @@ if ( ! function_exists( 'tara_acc_modal' ) ) {
 
 					<form class="ty-acct-form" data-tara-form="code" hidden novalidate>
 						<div class="ty-acct-code__head">
-							<button type="button" class="ty-acct-back" data-tara-back aria-label="تغییرِ شماره">
+							<button type="button" class="ty-acct-back" data-tara-back aria-label="تغییر شماره">
 								<?php echo tara_acc_icon( 'arrow' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 							</button>
 							<p class="ty-acct-code__sent">کد به <b data-tara-phone-shown></b> پیامک شد.</p>
 						</div>
 
-						<div class="ty-acct-code" data-tara-code-inputs aria-label="کدِ ۶رقمی">
+						<div class="ty-acct-code" data-tara-code-inputs aria-label="کد ۶رقمی">
 							<?php for ( $i = 0; $i < 6; $i++ ) : ?>
 								<input type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="1" dir="ltr"
-									aria-label="<?php echo esc_attr( 'رقمِ ' . ( $i + 1 ) . ' کد' ); ?>">
+									aria-label="<?php echo esc_attr( 'رقم ' . ( $i + 1 ) . ' کد' ); ?>">
 							<?php endfor; ?>
 						</div>
 
@@ -299,7 +299,7 @@ if ( ! function_exists( 'tara_acc_modal' ) ) {
 
 						<div class="ty-acct-resend">
 							<span data-tara-resend-txt>می‌توانید کد را دوباره بگیرید.</span>
-							<button type="button" class="ty-acct-link" data-tara-resend hidden>ارسالِ دوبارهٔ کد</button>
+							<button type="button" class="ty-acct-link" data-tara-resend hidden>ارسال دوباره کد</button>
 						</div>
 					</form>
 
@@ -328,10 +328,10 @@ if ( ! function_exists( 'tara_acc_modal' ) ) {
 					<?php endif; ?>
 
 					<div class="ty-acct-modal__foot">
-						<button type="button" class="ty-acct-link" data-tara-mode="password" <?php echo $allow_password ? '' : 'hidden'; ?>>ورود با رمزِ عبور</button>
+						<button type="button" class="ty-acct-link" data-tara-mode="password" <?php echo $allow_password ? '' : 'hidden'; ?>>ورود با رمز عبور</button>
 						<button type="button" class="ty-acct-link" data-tara-mode="phone" hidden>ورود با پیامک</button>
 						<?php
-						/* v3.11.0 — لینکِ راهنما از تنظیمات می‌آید (پیش‌تر ثابت و به
+						/* v3.11.0 — لینک راهنما از تنظیمات می‌آید (پیش‌تر ثابت و به
 						   جست‌وجوی سایت بود). خالی ⇒ لینک چاپ نمی‌شود. */
 						$tara_help_url = function_exists( 'tara_acc_help_url' ) ? tara_acc_help_url() : '';
 						if ( '' !== $tara_help_url ) :
@@ -342,7 +342,7 @@ if ( ! function_exists( 'tara_acc_modal' ) ) {
 						<?php endif; ?>
 					</div>
 
-					<p class="ty-acct-modal__terms">با ورود، قواعدِ سایت و نگه‌داریِ شماره برای ورود را می‌پذیرید. شماره هیچ‌جا عمومی نمایش داده نمی‌شود.</p>
+					<p class="ty-acct-modal__terms">با ورود، قواعد سایت و نگه‌داری شماره برای ورود را می‌پذیرید. شماره هیچ‌جا عمومی نمایش داده نمی‌شود.</p>
 				</div>
 			</div>
 		</div>
@@ -360,7 +360,7 @@ if ( function_exists( 'add_action' ) ) {
 
 if ( ! function_exists( 'tara_acc_like_button' ) ) {
 	/**
-	 * قلبِ «ذخیره» برای یک آهنگ.
+	 * قلب «ذخیره» برای یک آهنگ.
 	 *
 	 * @param int   $post_id شناسه.
 	 * @param array $args    class/size/label.
@@ -403,9 +403,9 @@ if ( ! function_exists( 'tara_acc_like_button' ) ) {
 
 if ( ! function_exists( 'tara_acc_follow_button' ) ) {
 	/**
-	 * دکمهٔ «دنبال‌کردن» برای صفحهٔ خواننده.
+	 * دکمه «دنبال‌کردن» برای صفحه خواننده.
 	 *
-	 * @param int   $term_id شناسهٔ ترم.
+	 * @param int   $term_id شناسه ترم.
 	 * @param array $args    class.
 	 * @return string
 	 */
@@ -438,11 +438,11 @@ if ( ! function_exists( 'tara_acc_follow_button' ) ) {
 
 if ( ! function_exists( 'tara_acc_row_actions' ) ) {
 	/**
-	 * دکمه‌های کنارِ هر ردیف در پنل.
+	 * دکمه‌های کنار هر ردیف در پنل.
 	 *
-	 * @param int    $post_id شناسهٔ آهنگ.
+	 * @param int    $post_id شناسه آهنگ.
 	 * @param string $mode    favorites | playlist | history | feed.
-	 * @param string $key     کلیدِ پلی‌لیست (برای mode=playlist).
+	 * @param string $key     کلید پلی‌لیست (برای mode=playlist).
 	 * @return string
 	 */
 	function tara_acc_row_actions( $post_id = 0, $mode = 'favorites', $key = '' ) {
@@ -469,12 +469,12 @@ if ( ! function_exists( 'tara_acc_row_actions' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۵) فهرستِ آهنگِ پنل (با صفِ پخشِ همان فهرست)
+ * ۵) فهرست آهنگ پنل (با صف پخش همان فهرست)
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_track_list' ) ) {
 	/**
-	 * فهرستِ آهنگ با دکمه‌های حساب.
+	 * فهرست آهنگ با دکمه‌های حساب.
 	 *
 	 * @param int[]  $ids  شناسه‌ها.
 	 * @param array  $args mode/key/title/empty.
@@ -542,7 +542,7 @@ if ( ! function_exists( 'tara_acc_track_list' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۶) پنلِ کاربری
+ * ۶) پنل کاربری
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_tabs' ) ) {
@@ -557,7 +557,7 @@ if ( ! function_exists( 'tara_acc_tabs' ) ) {
 			'favorites' => array( 'label' => 'علاقه‌مندی‌ها', 'icon' => 'heart', 'on' => tara_acc_feature( 'likes' ) ),
 			'playlists' => array( 'label' => 'پلی‌لیست‌ها', 'icon' => 'list', 'on' => tara_acc_feature( 'playlists' ) ),
 			'follows'   => array( 'label' => 'خواننده‌ها', 'icon' => 'user', 'on' => tara_acc_feature( 'follows' ) ),
-			'history'   => array( 'label' => 'تاریخچهٔ شنیدن', 'icon' => 'clock', 'on' => tara_acc_feature( 'history' ) ),
+			'history'   => array( 'label' => 'تاریخچه شنیدن', 'icon' => 'clock', 'on' => tara_acc_feature( 'history' ) ),
 			'notifs'    => array( 'label' => 'پیام‌ها', 'icon' => 'bell', 'on' => tara_acc_feature( 'notifs' ) ),
 			'messages'  => array( 'label' => 'دایرکت‌ها', 'icon' => 'chat', 'on' => function_exists( 'tara_dm_on' ) ? tara_dm_on() : false ),
 			'artist'    => array( 'label' => function_exists( 'tara_hub_opt' ) && 'on' === tara_hub_opt( 'release_enabled', 'off' ) ? 'انتشار آثار' : 'پنل هنرمند', 'icon' => 'mic', 'on' => function_exists( 'tara_hub_on' ) ? tara_hub_on() : false ),
@@ -571,7 +571,7 @@ if ( ! function_exists( 'tara_acc_tabs' ) ) {
 
 if ( ! function_exists( 'tara_acc_current_tab' ) ) {
 	/**
-	 * تبِ جاری از آدرس.
+	 * تب جاری از آدرس.
 	 *
 	 * @return string
 	 */
@@ -587,11 +587,11 @@ if ( ! function_exists( 'tara_acc_current_tab' ) ) {
 
 if ( ! function_exists( 'tara_acc_login_card' ) ) {
 	/**
-	 * کارتِ «وارد شوید» برای کاربرِ مهمان.
+	 * کارت «وارد شوید» برای کاربر مهمان.
 	 *
-	 * v3.11.0 — دو حالتِ جدا: `login` (ورودِ کاربرِ قبلی) و `register`
-	 * (ثبت‌نامِ تازه). متن‌ها و عنوان فرق می‌کنند ولی هر دو یک مسیرِ امنِ
-	 * پیامکی دارند؛ برای همین هیچ فرمِ دومی ساخته نشده و همان مودال باز می‌شود.
+	 * v3.11.0 — دو حالت جدا: `login` (ورود کاربر قبلی) و `register`
+	 * (ثبت‌نام تازه). متن‌ها و عنوان فرق می‌کنند ولی هر دو یک مسیر امن
+	 * پیامکی دارند؛ برای همین هیچ فرم دومی ساخته نشده و همان مودال باز می‌شود.
 	 *
 	 * @param array $args mode (login|register)، class.
 	 * @return string
@@ -614,13 +614,13 @@ if ( ! function_exists( 'tara_acc_login_card' ) ) {
 		}
 
 		if ( 'register' === $mode ) {
-			$title = 'ساختِ حساب در ' . $site;
-			$sub   = 'همین حالا با شمارهٔ موبایل حساب بسازید؛ نه رمزی لازم است نه ایمیلی. کدِ پیامکی را وارد کنید و تمام.';
-			$cta   = 'ثبت‌نام با شمارهٔ موبایل';
+			$title = 'ساخت حساب در ' . $site;
+			$sub   = 'همین حالا با شماره موبایل حساب بسازید؛ نه رمزی لازم است نه ایمیلی. کد پیامکی را وارد کنید و تمام.';
+			$cta   = 'ثبت‌نام با شماره موبایل';
 		} else {
-			$title = 'حسابِ شما در ' . $site;
-			$sub   = 'با شمارهٔ موبایل در چند ثانیه وارد شوید: آهنگ‌ها را ذخیره کنید، پلی‌لیست بسازید، خواننده‌های محبوبتان را دنبال کنید و آهنگ‌های تازه‌شان را از دست ندهید.';
-			$cta   = 'ورود با شمارهٔ موبایل';
+			$title = 'حساب شما در ' . $site;
+			$sub   = 'با شماره موبایل در چند ثانیه وارد شوید: آهنگ‌ها را ذخیره کنید، پلی‌لیست بسازید، خواننده‌های محبوبتان را دنبال کنید و آهنگ‌های تازه‌شان را از دست ندهید.';
+			$cta   = 'ورود با شماره موبایل';
 		}
 
 		ob_start();
@@ -633,8 +633,8 @@ if ( ! function_exists( 'tara_acc_login_card' ) ) {
 			<p class="ty-acct-guest__sub"><?php echo esc_html( $sub ); ?></p>
 			<ul class="ty-acct-guest__list">
 				<li><?php echo tara_acc_icon( 'heart' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>علاقه‌مندی‌ها و پلی‌لیست‌های خودتان</span></li>
-				<li><?php echo tara_acc_icon( 'user' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>دنبال‌کردنِ خواننده‌ها و فیدِ آهنگ‌های تازه</span></li>
-				<li><?php echo tara_acc_icon( 'telegram' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>اتصال به رباتِ تلگرام برای اعلان‌ها</span></li>
+				<li><?php echo tara_acc_icon( 'user' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>دنبال‌کردن خواننده‌ها و فید آهنگ‌های تازه</span></li>
+				<li><?php echo tara_acc_icon( 'telegram' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>اتصال به ربات تلگرام برای اعلان‌ها</span></li>
 			</ul>
 			<button type="button" class="ty-acct-submit ty-acct-submit--wide" data-tara-open="account">
 				<span class="ty-acct-submit__txt"><?php echo esc_html( $cta ); ?></span>
@@ -646,7 +646,7 @@ if ( ! function_exists( 'tara_acc_login_card' ) ) {
 					</a>
 				</p>
 			<?php endif; ?>
-			<p class="ty-acct-guest__note">بدونِ رمز، بدونِ ایمیل، بدونِ فرمِ طولانی.</p>
+			<p class="ty-acct-guest__note">بدون رمز، بدون ایمیل، بدون فرم طولانی.</p>
 		</div>
 		<?php
 		return (string) ob_get_clean();
@@ -655,13 +655,13 @@ if ( ! function_exists( 'tara_acc_login_card' ) ) {
 
 if ( ! function_exists( 'tara_acc_panel' ) ) {
 	/**
-	 * پنلِ کاملِ کاربری.
+	 * پنل کامل کاربری.
 	 *
 	 * @return string
 	 */
 	function tara_acc_panel() {
 		if ( ! tara_acc_on() ) {
-			return '<p class="ty-acct-empty">حسابِ کاربری در تنظیماتِ قالب خاموش است.</p>';
+			return '<p class="ty-acct-empty">حساب کاربری در تنظیمات قالب خاموش است.</p>';
 		}
 
 		$user_id = function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0;
@@ -671,7 +671,7 @@ if ( ! function_exists( 'tara_acc_panel' ) ) {
 
 		$tab    = tara_acc_current_tab();
 		$tabs = tara_acc_tabs();
-		/* v3.11.0 — با باز شدنِ تبِ «پیام‌ها»، اعلان‌های مدیر «دیده‌شده» می‌شوند. */
+		/* v3.11.0 — با باز شدن تب «پیام‌ها»، اعلان‌های مدیر «دیده‌شده» می‌شوند. */
 		if ( 'notifs' === $tab && function_exists( 'tara_acc_notice_mark' ) ) {
 			tara_acc_notice_mark( $user_id );
 		}
@@ -758,7 +758,7 @@ if ( ! function_exists( 'tara_acc_panel' ) ) {
 						break;
 					default:
 						echo tara_acc_tab_overview( $user_id ); // phpcs:ignore WordPress.Security.EscapeOutput
-						/* v3.11.0 — نوارِ کوتاهِ اعلان‌های مدیر در پیشخوان. */
+						/* v3.11.0 — نوار کوتاه اعلان‌های مدیر در پیشخوان. */
 						echo tara_acc_notice_card( array( 'compact' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
 				}
 				?>
@@ -772,7 +772,7 @@ if ( ! function_exists( 'tara_acc_panel' ) ) {
 
 if ( ! function_exists( 'tara_acc_date' ) ) {
 	/**
-	 * تاریخِ خوانا با پشتیبان.
+	 * تاریخ خوانا با پشتیبان.
 	 *
 	 * @param int    $ts      زمان.
 	 * @param string $format  قالب.
@@ -792,7 +792,7 @@ if ( ! function_exists( 'tara_acc_date' ) ) {
 
 if ( ! function_exists( 'tara_acc_stat' ) ) {
 	/**
-	 * کارتِ عددیِ داشبورد.
+	 * کارت عددی داشبورد.
 	 *
 	 * @param string $label برچسب.
 	 * @param int    $num   عدد.
@@ -812,9 +812,9 @@ if ( ! function_exists( 'tara_acc_stat' ) ) {
 
 if ( ! function_exists( 'tara_acc_artist_cards' ) ) {
 	/**
-	 * کارت‌های خوانندهٔ دنبال‌شده.
+	 * کارت‌های خواننده دنبال‌شده.
 	 *
-	 * @param int[] $terms شناسهٔ ترم‌ها.
+	 * @param int[] $terms شناسه ترم‌ها.
 	 * @return string
 	 */
 	function tara_acc_artist_cards( $terms ) {
@@ -830,7 +830,7 @@ if ( ! function_exists( 'tara_acc_artist_cards' ) ) {
 			if ( '' === $img && function_exists( 'get_term_meta' ) ) {
 				$img = (string) get_term_meta( (int) $term_id, 'artist_image', true );
 			}
-			/* get_term_link ممکن است WP_Error بدهد؛ بدونِ گارد، آدرسِ خراب
+			/* get_term_link ممکن است WP_Error بدهد؛ بدون گارد، آدرس خراب
 			   در صفحه می‌نشیند. */
 			$term_url = function_exists( 'get_term_link' ) ? get_term_link( $term, $tax ) : '';
 			if ( is_wp_error( $term_url ) || ! is_string( $term_url ) ) {
@@ -867,7 +867,7 @@ if ( ! function_exists( 'tara_acc_tab_overview' ) ) {
 		$likes  = array_slice( tara_acc_likes( (int) $user_id ), 0, 6 );
 		$feed   = tara_acc_feed( (int) $user_id, array( 'limit' => 5 ) );
 		$hour   = (int) gmdate( 'G' );
-		$greet  = $hour < 12 ? 'صبح بخیر' : ( $hour < 18 ? 'وقتِ خوبِ شنیدن' : 'شب بخیر' );
+		$greet  = $hour < 12 ? 'صبح بخیر' : ( $hour < 18 ? 'وقت خوب شنیدن' : 'شب بخیر' );
 
 		ob_start();
 		?>
@@ -875,20 +875,20 @@ if ( ! function_exists( 'tara_acc_tab_overview' ) ) {
 			<header class="ty-acct-head">
 				<div>
 					<p class="ty-acct-head__eyebrow"><?php echo esc_html( $greet ); ?></p>
-					<h2 class="ty-acct-head__title"><?php echo esc_html( '' !== $name ? $name : 'شنوندهٔ ' . get_bloginfo( 'name' ) ); ?></h2>
-					<p class="ty-acct-head__sub">خلاصهٔ همه‌چیزِ شما در یک نگاه.</p>
+					<h2 class="ty-acct-head__title"><?php echo esc_html( '' !== $name ? $name : 'شنونده ' . get_bloginfo( 'name' ) ); ?></h2>
+					<p class="ty-acct-head__sub">خلاصه همه‌چیز شما در یک نگاه.</p>
 				</div>
 				<a class="ty-acct-btn2" href="<?php echo esc_url( tara_acc_profile_url( 'favorites' ) ); ?>">
 					<?php echo tara_acc_icon( 'play' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-					<span>پخشِ علاقه‌مندی‌ها</span>
+					<span>پخش علاقه‌مندی‌ها</span>
 				</a>
 			</header>
 
 			<div class="ty-acct-stats">
 				<?php
-				echo tara_acc_stat( 'آهنگِ ذخیره‌شده', $counts['likes'], 'heart', tara_acc_profile_url( 'favorites' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
+				echo tara_acc_stat( 'آهنگ ذخیره‌شده', $counts['likes'], 'heart', tara_acc_profile_url( 'favorites' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
 				echo tara_acc_stat( 'پلی‌لیست', $counts['playlists'], 'list', tara_acc_profile_url( 'playlists' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
-				echo tara_acc_stat( 'خوانندهٔ دنبال‌شده', $counts['follows'], 'user', tara_acc_profile_url( 'follows' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
+				echo tara_acc_stat( 'خواننده دنبال‌شده', $counts['follows'], 'user', tara_acc_profile_url( 'follows' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
 				echo tara_acc_stat( 'شنیده‌شده', $counts['history'], 'clock', tara_acc_profile_url( 'history' ) ); // phpcs:ignore WordPress.Security.EscapeOutput
 				?>
 			</div>
@@ -941,7 +941,7 @@ if ( ! function_exists( 'tara_acc_tab_overview' ) ) {
 					<h3>از این‌جا شروع کنید</h3>
 					<p>روی هر آهنگ قلب بزنید تا این‌جا ذخیره شود، یا یک خواننده را دنبال کنید تا آهنگ‌های تازه‌اش خودکار بیاید.</p>
 					<div class="ty-acct-start__btns">
-						<a class="ty-acct-btn2" href="<?php echo esc_url( home_url( '/' ) ); ?>">شنیدنِ آهنگ‌های تازه</a>
+						<a class="ty-acct-btn2" href="<?php echo esc_url( home_url( '/' ) ); ?>">شنیدن آهنگ‌های تازه</a>
 						<a class="ty-acct-btn2 ty-acct-btn2--ghost" href="<?php echo esc_url( tara_acc_profile_url( 'follows' ) ); ?>">خواننده‌ها</a>
 					</div>
 				</div>
@@ -970,7 +970,7 @@ if ( ! function_exists( 'tara_acc_tab_favorites' ) ) {
 			<header class="ty-acct-head">
 				<div>
 					<h2 class="ty-acct-head__title">علاقه‌مندی‌ها</h2>
-					<p class="ty-acct-head__sub"><?php echo esc_html( tara_acc_fa( count( $ids ) ) ); ?> آهنگ ذخیره شده — همه در یک صف قابلِ پخش.</p>
+					<p class="ty-acct-head__sub"><?php echo esc_html( tara_acc_fa( count( $ids ) ) ); ?> آهنگ ذخیره شده — همه در یک صف قابل پخش.</p>
 				</div>
 			</header>
 			<?php
@@ -979,7 +979,7 @@ if ( ! function_exists( 'tara_acc_tab_favorites' ) ) {
 				array(
 					'mode'  => 'favorites',
 					'title' => 'علاقه‌مندی‌های من',
-					'empty' => 'هنوز آهنگی ذخیره نکرده‌اید؛ روی قلبِ هر آهنگ بزنید.',
+					'empty' => 'هنوز آهنگی ذخیره نکرده‌اید؛ روی قلب هر آهنگ بزنید.',
 				)
 			);
 			?>
@@ -1001,7 +1001,7 @@ if ( ! function_exists( 'tara_acc_playlist_cards' ) ) {
 	 */
 	function tara_acc_playlist_cards( $user_id, $playlists ) {
 		if ( empty( $playlists ) ) {
-			return '<p class="ty-acct-empty">هنوز پلی‌لیستی نساخته‌اید. با دکمهٔ بالا یکی بسازید — مثلاً «مسیرِ صبح».</p>';
+			return '<p class="ty-acct-empty">هنوز پلی‌لیستی نساخته‌اید. با دکمه بالا یکی بسازید — مثلا «مسیر صبح».</p>';
 		}
 
 		$out = '<div class="ty-acct-pls">';
@@ -1023,10 +1023,10 @@ if ( ! function_exists( 'tara_acc_playlist_cards' ) ) {
 			$out .= '<a class="ty-acct-pl__name" href="' . esc_url( $url ) . '">' . esc_html( $pl['n'] ) . '</a>';
 			$out .= '<p class="ty-acct-pl__meta">' . esc_html( tara_acc_fa( $count ) ) . ' آهنگ' . ( $pl['p'] ? ' · عمومی' : ' · خصوصی' ) . '</p>';
 			$out .= '<div class="ty-acct-pl__tools">';
-			$out .= '<button type="button" class="ty-acct-mini" data-tara-pl-share="' . esc_url( $share ) . '" aria-label="کپیِ لینکِ اشتراک">' . tara_acc_icon( 'link' ) . '</button>';
-			$out .= '<button type="button" class="ty-acct-mini' . ( $pl['p'] ? ' is-on' : '' ) . '" data-tara-pl-public="' . esc_attr( $pl['k'] ) . '" data-tara-on="' . ( $pl['p'] ? '1' : '0' ) . '" aria-label="عمومی‌کردنِ پلی‌لیست">' . tara_acc_icon( 'share' ) . '</button>';
-			$out .= '<button type="button" class="ty-acct-mini" data-tara-pl-rename="' . esc_attr( $pl['k'] ) . '" aria-label="تغییرِ نام">' . tara_acc_icon( 'edit' ) . '</button>';
-			$out .= '<button type="button" class="ty-acct-mini ty-acct-mini--danger" data-tara-pl-delete="' . esc_attr( $pl['k'] ) . '" aria-label="حذفِ پلی‌لیست">' . tara_acc_icon( 'trash' ) . '</button>';
+			$out .= '<button type="button" class="ty-acct-mini" data-tara-pl-share="' . esc_url( $share ) . '" aria-label="کپی لینک اشتراک">' . tara_acc_icon( 'link' ) . '</button>';
+			$out .= '<button type="button" class="ty-acct-mini' . ( $pl['p'] ? ' is-on' : '' ) . '" data-tara-pl-public="' . esc_attr( $pl['k'] ) . '" data-tara-on="' . ( $pl['p'] ? '1' : '0' ) . '" aria-label="عمومی‌کردن پلی‌لیست">' . tara_acc_icon( 'share' ) . '</button>';
+			$out .= '<button type="button" class="ty-acct-mini" data-tara-pl-rename="' . esc_attr( $pl['k'] ) . '" aria-label="تغییر نام">' . tara_acc_icon( 'edit' ) . '</button>';
+			$out .= '<button type="button" class="ty-acct-mini ty-acct-mini--danger" data-tara-pl-delete="' . esc_attr( $pl['k'] ) . '" aria-label="حذف پلی‌لیست">' . tara_acc_icon( 'trash' ) . '</button>';
 			$out .= '</div></div></article>';
 		}
 		$out .= '</div>';
@@ -1053,11 +1053,11 @@ if ( ! function_exists( 'tara_acc_tab_playlists' ) ) {
 			<header class="ty-acct-head">
 				<div>
 					<h2 class="ty-acct-head__title">پلی‌لیست‌ها</h2>
-					<p class="ty-acct-head__sub">آهنگ‌ها را دسته‌بندی کنید و لینکِ برنامه را با دوستتان به اشتراک بگذارید.</p>
+					<p class="ty-acct-head__sub">آهنگ‌ها را دسته‌بندی کنید و لینک برنامه را با دوستتان به اشتراک بگذارید.</p>
 				</div>
 				<form class="ty-acct-newpl" data-tara-pl-new>
-					<label class="screen-reader-text" for="ty-acct-newpl-name">نامِ پلی‌لیستِ تازه</label>
-					<input id="ty-acct-newpl-name" type="text" name="name" placeholder="نامِ پلی‌لیستِ تازه…" maxlength="60" required>
+					<label class="screen-reader-text" for="ty-acct-newpl-name">نام پلی‌لیست تازه</label>
+					<input id="ty-acct-newpl-name" type="text" name="name" placeholder="نام پلی‌لیست تازه…" maxlength="60" required>
 					<button type="submit" class="ty-acct-btn2"><?php echo tara_acc_icon( 'plus' ); // phpcs:ignore WordPress.Security.EscapeOutput ?><span>ساختن</span></button>
 				</form>
 			</header>
@@ -1070,7 +1070,7 @@ if ( ! function_exists( 'tara_acc_tab_playlists' ) ) {
 							<h3 class="ty-acct-plview__name" data-tara-pl-title="<?php echo esc_attr( $current['k'] ); ?>"><?php echo esc_html( $current['n'] ); ?></h3>
 							<p class="ty-acct-plview__meta"><?php echo esc_html( tara_acc_fa( count( $current['t'] ) ) ); ?> آهنگ · <?php echo $current['p'] ? 'عمومی' : 'خصوصی'; ?></p>
 						</div>
-						<button type="button" class="ty-acct-mini" data-tara-pl-share="<?php echo esc_url( tara_acc_profile_url( 'playlists' ) . '&share=' . rawurlencode( $current['k'] ) ); ?>" aria-label="کپیِ لینکِ اشتراک"><?php echo tara_acc_icon( 'link' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
+						<button type="button" class="ty-acct-mini" data-tara-pl-share="<?php echo esc_url( tara_acc_profile_url( 'playlists' ) . '&share=' . rawurlencode( $current['k'] ) ); ?>" aria-label="کپی لینک اشتراک"><?php echo tara_acc_icon( 'link' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 					</div>
 					<?php if ( function_exists( 'tara_playlist_radio' ) ) { echo tara_playlist_radio( $current['t'], $current['n'], 'personal' ); } ?>
 					<?php
@@ -1080,7 +1080,7 @@ if ( ! function_exists( 'tara_acc_tab_playlists' ) ) {
 							'mode'  => 'playlist',
 							'key'   => $current['k'],
 							'title' => $current['n'],
-							'empty' => 'این پلی‌لیست خالی است؛ از تبِ «علاقه‌مندی‌ها» یا صفحهٔ هر آهنگ اضافه کنید.',
+							'empty' => 'این پلی‌لیست خالی است؛ از تب «علاقه‌مندی‌ها» یا صفحه هر آهنگ اضافه کنید.',
 						)
 					);
 					?>
@@ -1115,13 +1115,13 @@ if ( ! function_exists( 'tara_acc_tab_follows' ) ) {
 					<h2 class="ty-acct-head__title">خواننده‌ها</h2>
 					<p class="ty-acct-head__sub"><?php echo esc_html( tara_acc_fa( count( $terms ) ) ); ?> خواننده را دنبال می‌کنید؛ آهنگ‌های تازه‌شان خودکار این‌جا می‌آید.</p>
 				</div>
-				<a class="ty-acct-btn2 ty-acct-btn2--ghost" href="<?php echo esc_url( function_exists( 'tara_artist_archive_url' ) ? tara_artist_archive_url() : home_url( '/artists/' ) ); ?>">همهٔ خواننده‌ها</a>
+				<a class="ty-acct-btn2 ty-acct-btn2--ghost" href="<?php echo esc_url( function_exists( 'tara_artist_archive_url' ) ? tara_artist_archive_url() : home_url( '/artists/' ) ); ?>">همه خواننده‌ها</a>
 			</header>
 
 			<?php
 			echo tara_acc_artist_cards( $terms ); // phpcs:ignore WordPress.Security.EscapeOutput
 			if ( empty( $terms ) ) {
-				echo '<p class="ty-acct-empty">هنوز خواننده‌ای را دنبال نمی‌کنید؛ در صفحهٔ هر خواننده دکمهٔ «دنبال‌کردن» را بزنید.</p>';
+				echo '<p class="ty-acct-empty">هنوز خواننده‌ای را دنبال نمی‌کنید؛ در صفحه هر خواننده دکمه «دنبال‌کردن» را بزنید.</p>';
 			}
 			?>
 
@@ -1155,7 +1155,7 @@ if ( ! function_exists( 'tara_acc_tab_follows' ) ) {
 
 if ( ! function_exists( 'tara_acc_tab_history' ) ) {
 	/**
-	 * تاریخچهٔ شنیدن.
+	 * تاریخچه شنیدن.
 	 *
 	 * @param int $user_id شناسه.
 	 * @return string
@@ -1174,11 +1174,11 @@ if ( ! function_exists( 'tara_acc_tab_history' ) ) {
 		<section class="ty-acct-tab">
 			<header class="ty-acct-head">
 				<div>
-					<h2 class="ty-acct-head__title">تاریخچهٔ شنیدن</h2>
-					<p class="ty-acct-head__sub">۱۵۰ آهنگِ آخرِ شما. فقط خودتان می‌بینید.</p>
+					<h2 class="ty-acct-head__title">تاریخچه شنیدن</h2>
+					<p class="ty-acct-head__sub">۱۵۰ آهنگ آخر شما. فقط خودتان می‌بینید.</p>
 				</div>
 				<?php if ( ! empty( $ids ) ) : ?>
-					<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-history-clear>پاک‌کردنِ تاریخچه</button>
+					<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-history-clear>پاک‌کردن تاریخچه</button>
 				<?php endif; ?>
 			</header>
 			<?php
@@ -1186,7 +1186,7 @@ if ( ! function_exists( 'tara_acc_tab_history' ) ) {
 				$ids,
 				array(
 					'mode'  => 'history',
-					'title' => 'تاریخچهٔ من',
+					'title' => 'تاریخچه من',
 					'empty' => 'هنوز چیزی نشنیده‌اید. رادیو یا هر آهنگ را پخش کنید تا این‌جا ثبت شود.',
 				)
 			);
@@ -1201,10 +1201,10 @@ if ( ! function_exists( 'tara_acc_tab_history' ) ) {
 
 if ( ! function_exists( 'tara_acc_notice_card' ) ) {
 	/**
-	 * کارتِ «اعلان‌ها و بروزرسانی‌ها» (v3.11.0).
+	 * کارت «اعلان‌ها و بروزرسانی‌ها» (v3.11.0).
 	 *
-	 * متن‌ها از تنظیماتِ قالب می‌آیند (بخشِ «اعلان‌ها و بروزرسانی‌ها») و
-	 * همان‌جا برای همهٔ شنونده‌ها یک‌سان‌اند؛ هر اعلان می‌تواند لینک داشته باشد.
+	 * متن‌ها از تنظیمات قالب می‌آیند (بخش «اعلان‌ها و بروزرسانی‌ها») و
+	 * همان‌جا برای همه شنونده‌ها یک‌سان‌اند؛ هر اعلان می‌تواند لینک داشته باشد.
 	 *
 	 * @param array $args compact (نمای فشرده)، title.
 	 * @return string
@@ -1267,15 +1267,15 @@ if ( ! function_exists( 'tara_acc_tab_notifs' ) ) {
 			<header class="ty-acct-head">
 				<div>
 					<h2 class="ty-acct-head__title">پیام‌ها</h2>
-					<p class="ty-acct-head__sub">خبرهای حساب و آهنگ‌های تازهٔ خواننده‌هایی که دنبال می‌کنید.</p>
+					<p class="ty-acct-head__sub">خبرهای حساب و آهنگ‌های تازه خواننده‌هایی که دنبال می‌کنید.</p>
 				</div>
 				<?php if ( ! empty( $list ) ) : ?>
-					<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-read-all>خوانده‌شدنِ همه</button>
+					<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-read-all>خوانده‌شدن همه</button>
 				<?php endif; ?>
 			</header>
 
 			<?php
-			/* v3.11.0 — اعلان‌های مدیر (از تنظیماتِ قالب) بالای پیام‌های شخصی. */
+			/* v3.11.0 — اعلان‌های مدیر (از تنظیمات قالب) بالای پیام‌های شخصی. */
 			echo tara_acc_notice_card(); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
 			?>
 
@@ -1296,7 +1296,7 @@ if ( ! function_exists( 'tara_acc_tab_notifs' ) ) {
 					<?php endforeach; ?>
 				</ul>
 			<?php else : ?>
-				<p class="ty-acct-empty">پیامِ تازه‌ای ندارید.</p>
+				<p class="ty-acct-empty">پیام تازه‌ای ندارید.</p>
 			<?php endif; ?>
 
 			<?php if ( ! empty( $feed ) ) : ?>
@@ -1329,7 +1329,7 @@ if ( ! function_exists( 'tara_acc_tab_notifs' ) ) {
 
 if ( ! function_exists( 'tara_acc_tab_telegram' ) ) {
 	/**
-	 * اتصال به رباتِ تلگرام.
+	 * اتصال به ربات تلگرام.
 	 *
 	 * @param int $user_id شناسه.
 	 * @return string
@@ -1345,24 +1345,24 @@ if ( ! function_exists( 'tara_acc_tab_telegram' ) ) {
 		<section class="ty-acct-tab">
 			<header class="ty-acct-head">
 				<div>
-					<h2 class="ty-acct-head__title">اتصال به رباتِ تلگرام</h2>
-					<p class="ty-acct-head__sub">با یک کدِ هشت‌حرفی، حسابِ سایت به تلگرامِ شما وصل می‌شود و اعلانِ آهنگ‌های تازه را همان‌جا می‌گیرید.</p>
+					<h2 class="ty-acct-head__title">اتصال به ربات تلگرام</h2>
+					<p class="ty-acct-head__sub">با یک کد هشت‌حرفی، حساب سایت به تلگرام شما وصل می‌شود و اعلان آهنگ‌های تازه را همان‌جا می‌گیرید.</p>
 				</div>
 			</header>
 
 			<?php
-			/* v3.11.0 — بازطراحیِ «اتصال به ربات»: پیش از این دو دکمهٔ هم‌وزن
-			   («ساختِ کدِ اتصال» و «رفتن به ربات») کنارِ هم بودند و کاربر نمی‌دانست
-			   کدام را بزند. حالا فقط یک مسیرِ روشن وجود دارد:
-			   ۱) کد بگیر  ۲) کد را در ربات بفرست. دکمهٔ «رفتن به ربات» فقط بعد از
-			   ساختِ کد و به‌شکلِ «گامِ بعد» نشان داده می‌شود. */
+			/* v3.11.0 — بازطراحی «اتصال به ربات»: پیش از این دو دکمه هم‌وزن
+			   («ساخت کد اتصال» و «رفتن به ربات») کنار هم بودند و کاربر نمی‌دانست
+			   کدام را بزند. حالا فقط یک مسیر روشن وجود دارد:
+			   ۱) کد بگیر  ۲) کد را در ربات بفرست. دکمه «رفتن به ربات» فقط بعد از
+			   ساخت کد و به‌شکل «گام بعد» نشان داده می‌شود. */
 			?>
 			<div class="ty-acct-tg<?php echo $tg_id > 0 ? ' is-linked' : ''; ?>">
 				<div class="ty-acct-tg__hero">
 					<span class="ty-acct-tg__ico"><?php echo tara_acc_icon( 'telegram' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></span>
 					<div class="ty-acct-tg__intro">
 						<h3 class="ty-acct-tg__title">
-							<?php echo $tg_id > 0 ? 'تلگرام به حساب شما وصل است' : 'حسابِ تلگرام را به سایت وصل کنید'; ?>
+							<?php echo $tg_id > 0 ? 'تلگرام به حساب شما وصل است' : 'حساب تلگرام را به سایت وصل کنید'; ?>
 						</h3>
 						<p class="ty-acct-tg__sub">
 							<?php if ( $tg_id > 0 ) : ?>
@@ -1372,7 +1372,7 @@ if ( ! function_exists( 'tara_acc_tab_telegram' ) ) {
 									<span class="ty-acct-tg__since">اتصال از <?php echo esc_html( tara_acc_date( $at, 'j F Y' ) ); ?></span>
 								<?php endif; ?>
 							<?php else : ?>
-								با اتصالِ حساب، ربات شما را می‌شناسد؛ علاقه‌مندی‌ها و پلی‌لیست‌ها بین سایت و تلگرام یکی می‌شوند.
+								با اتصال حساب، ربات شما را می‌شناسد؛ علاقه‌مندی‌ها و پلی‌لیست‌ها بین سایت و تلگرام یکی می‌شوند.
 							<?php endif; ?>
 						</p>
 					</div>
@@ -1383,10 +1383,10 @@ if ( ! function_exists( 'tara_acc_tab_telegram' ) ) {
 						<?php if ( '' !== $bot ) : ?>
 							<a class="ty-acct-btn2" href="<?php echo esc_url( 'https://t.me/' . $bot ); ?>" target="_blank" rel="noopener nofollow">
 								<?php echo tara_acc_icon( 'telegram' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-								بازکردنِ ربات در تلگرام
+								بازکردن ربات در تلگرام
 							</a>
 						<?php endif; ?>
-						<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-tg-unlink>قطعِ اتصال</button>
+						<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-tg-unlink>قطع اتصال</button>
 					</div>
 
 				<?php else : ?>
@@ -1394,14 +1394,14 @@ if ( ! function_exists( 'tara_acc_tab_telegram' ) ) {
 						<div class="ty-acct-tg__step">
 							<span class="ty-acct-tg__num">۱</span>
 							<div>
-								<b>کدِ اتصال را بگیرید</b>
+								<b>کد اتصال را بگیرید</b>
 								<small>هشت‌حرفی و یک‌بارمصرف؛ خودکار کپی می‌شود.</small>
 							</div>
 						</div>
 						<div class="ty-acct-tg__step">
 							<span class="ty-acct-tg__num">۲</span>
 							<div>
-								<b>همان کد را در چتِ ربات بفرستید</b>
+								<b>همان کد را در چت ربات بفرستید</b>
 								<small>ربات لینک را می‌شناسد و اتصال را تأیید می‌کند.</small>
 							</div>
 						</div>
@@ -1410,7 +1410,7 @@ if ( ! function_exists( 'tara_acc_tab_telegram' ) ) {
 					<div class="ty-acct-tg__btns">
 						<button type="button" class="ty-acct-btn2 ty-acct-btn2--primary" data-tara-tg-code>
 							<?php echo tara_acc_icon( 'copy' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-							ساختِ کدِ اتصال
+							ساخت کد اتصال
 						</button>
 						<a class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-tg-link hidden href="<?php echo esc_url( 'https://t.me/' . ( '' !== $bot ? $bot : 'ahangbanbot' ) ); ?>" target="_blank" rel="noopener nofollow">
 							رفتن به ربات
@@ -1419,16 +1419,16 @@ if ( ! function_exists( 'tara_acc_tab_telegram' ) ) {
 					</div>
 
 					<?php if ( '' === $bot ) : ?>
-						<p class="ty-acct-tg__hint">نامِ ربات هنوز در تنظیماتِ قالب وارد نشده است؛ با مدیرِ سایت تماس بگیرید.</p>
+						<p class="ty-acct-tg__hint">نام ربات هنوز در تنظیمات قالب وارد نشده است؛ با مدیر سایت تماس بگیرید.</p>
 					<?php endif; ?>
 
 					<div class="ty-acct-tg__code" data-tara-tg-box hidden>
-						<span class="ty-acct-tg__code-lbl">کدِ اتصالِ شما</span>
+						<span class="ty-acct-tg__code-lbl">کد اتصال شما</span>
 						<div class="ty-acct-tg__code-row">
 							<span class="ty-acct-tg__codeval" data-tara-tg-value dir="ltr"></span>
-							<button type="button" class="ty-acct-mini" data-tara-tg-copy aria-label="کپیِ کد"><?php echo tara_acc_icon( 'copy' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
+							<button type="button" class="ty-acct-mini" data-tara-tg-copy aria-label="کپی کد"><?php echo tara_acc_icon( 'copy' ); // phpcs:ignore WordPress.Security.EscapeOutput ?></button>
 						</div>
-						<p class="ty-acct-tg__ttl">این کد ۱۰ دقیقه معتبر است. بعد از فرستادنش در ربات، دکمهٔ زیر را بزنید.</p>
+						<p class="ty-acct-tg__ttl">این کد ۱۰ دقیقه معتبر است. بعد از فرستادنش در ربات، دکمه زیر را بزنید.</p>
 						<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost ty-acct-btn2--wide" data-tara-tg-refresh>اتصال برقرار شد؟ بررسی کن</button>
 					</div>
 				<?php endif; ?>
@@ -1443,7 +1443,7 @@ if ( ! function_exists( 'tara_acc_tab_telegram' ) ) {
 
 if ( ! function_exists( 'tara_acc_tab_profile' ) ) {
 	/**
-	 * ویرایشِ مشخصات.
+	 * ویرایش مشخصات.
 	 *
 	 * @param int $user_id شناسه.
 	 * @return string
@@ -1460,7 +1460,7 @@ if ( ! function_exists( 'tara_acc_tab_profile' ) ) {
 			<header class="ty-acct-head">
 				<div>
 					<h2 class="ty-acct-head__title">مشخصات</h2>
-					<p class="ty-acct-head__sub">نام و توضیحِ کوتاه؛ همین‌ها کنارِ نظرات و پلی‌لیست‌های عمومی دیده می‌شود.</p>
+					<p class="ty-acct-head__sub">نام و توضیح کوتاه؛ همین‌ها کنار نظرات و پلی‌لیست‌های عمومی دیده می‌شود.</p>
 				</div>
 			</header>
 
@@ -1470,16 +1470,16 @@ if ( ! function_exists( 'tara_acc_tab_profile' ) ) {
 						<img src="<?php echo esc_url( $avatar ); ?>" width="96" height="96" alt="" data-tara-avatar-img>
 					</span>
 					<div class="ty-acct-profile__meta">
-						<p class="ty-acct-profile__phone">شمارهٔ شما: <b dir="ltr"><?php echo esc_html( tara_acc_phone_pretty( $phone ) ); ?></b></p>
-						<p class="ty-acct-profile__note">شماره قابلِ تغییر نیست و هیچ‌جا عمومی نشان داده نمی‌شود.</p>
+						<p class="ty-acct-profile__phone">شماره شما: <b dir="ltr"><?php echo esc_html( tara_acc_phone_pretty( $phone ) ); ?></b></p>
+						<p class="ty-acct-profile__note">شماره قابل تغییر نیست و هیچ‌جا عمومی نشان داده نمی‌شود.</p>
 
 						<?php
-						/* v3.11.0 — تصویر از فایل انتخاب می‌شود، نه از آدرسِ اینترنتی.
-						   با «انتخابِ عکس» فایل بلافاصله آپلود و پیش‌نمایش جایگزین می‌شود. */
+						/* v3.11.0 — تصویر از فایل انتخاب می‌شود، نه از آدرس اینترنتی.
+						   با «انتخاب عکس» فایل بلافاصله آپلود و پیش‌نمایش جایگزین می‌شود. */
 						if ( tara_acc_feature( 'avatar' ) ) :
 							?>
 							<div class="ty-acct-avatar" data-tara-avatar-box>
-								<span class="ty-acct-avatar__label">تصویرِ پروفایل</span>
+								<span class="ty-acct-avatar__label">تصویر پروفایل</span>
 								<div class="ty-acct-avatar__row">
 									<span class="ty-acct-avatar__preview">
 										<img src="<?php echo esc_url( $avatar ); ?>" width="72" height="72" alt="" data-tara-avatar-preview>
@@ -1487,13 +1487,13 @@ if ( ! function_exists( 'tara_acc_tab_profile' ) ) {
 									<div class="ty-acct-avatar__btns">
 										<label class="ty-acct-btn2 ty-acct-btn2--file">
 											<?php echo tara_acc_icon( 'camera' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-											<span>انتخابِ عکس</span>
+											<span>انتخاب عکس</span>
 											<input type="file" name="avatar" accept="image/jpeg,image/png,image/webp,image/gif" data-tara-avatar-file hidden>
 										</label>
-										<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-avatar-remove>حذفِ تصویر</button>
+										<button type="button" class="ty-acct-btn2 ty-acct-btn2--ghost" data-tara-avatar-remove>حذف تصویر</button>
 									</div>
 								</div>
-								<p class="ty-acct-avatar__hint">JPG، PNG یا WebP · حداکثر ۲ مگابایت · بهترین نتیجه با تصویرِ مربعی</p>
+								<p class="ty-acct-avatar__hint">JPG، PNG یا WebP · حداکثر ۲ مگابایت · بهترین نتیجه با تصویر مربعی</p>
 								<p class="ty-acct-form__msg" role="status" aria-live="polite" data-tara-avatar-msg></p>
 							</div>
 						<?php endif; ?>
@@ -1501,7 +1501,7 @@ if ( ! function_exists( 'tara_acc_tab_profile' ) ) {
 				</div>
 
 				<label class="ty-acct-field">
-					<span class="ty-acct-field__label">نامِ نمایشی</span>
+					<span class="ty-acct-field__label">نام نمایشی</span>
 					<span class="ty-acct-field__box">
 						<input type="text" name="name" maxlength="50" value="<?php echo esc_attr( $name ); ?>" required>
 						<?php echo tara_acc_icon( 'user', 'ty-acct-field__ico' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
@@ -1509,16 +1509,16 @@ if ( ! function_exists( 'tara_acc_tab_profile' ) ) {
 				</label>
 
 				<label class="ty-acct-field">
-					<span class="ty-acct-field__label">دربارهٔ من <em>(اختیاری)</em></span>
+					<span class="ty-acct-field__label">درباره من <em>(اختیاری)</em></span>
 					<span class="ty-acct-field__box ty-acct-field__box--area">
-						<textarea name="bio" rows="4" maxlength="300" placeholder="مثلاً: عاشقِ موسیقیِ سنتی و میکس‌های شبانه…"><?php echo esc_textarea( $bio ); ?></textarea>
+						<textarea name="bio" rows="4" maxlength="300" placeholder="مثلا: عاشق موسیقی سنتی و میکس‌های شبانه…"><?php echo esc_textarea( $bio ); ?></textarea>
 					</span>
 				</label>
 
 				<div class="ty-acct-form__foot">
 					<button type="submit" class="ty-acct-btn2">
 						<?php echo tara_acc_icon( 'check' ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-						<span>ذخیرهٔ تغییرات</span>
+						<span>ذخیره تغییرات</span>
 					</button>
 					<p class="ty-acct-form__msg" role="status" aria-live="polite" data-tara-msg></p>
 				</div>
@@ -1536,15 +1536,15 @@ if ( ! function_exists( 'tara_acc_tab_profile' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۷) نمای عمومیِ پلی‌لیستِ اشتراکی
+ * ۷) نمای عمومی پلی‌لیست اشتراکی
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_public_playlist' ) ) {
 	/**
-	 * پلی‌لیستی که با لینک به اشتراک گذاشته شده (بدونِ ورود).
+	 * پلی‌لیستی که با لینک به اشتراک گذاشته شده (بدون ورود).
 	 *
 	 * لینک فقط زمانی کار می‌کند که سازنده پلی‌لیست را «عمومی» کرده باشد؛
-	 * در غیرِ این صورت پیامِ مؤدبانه و لینکِ ورود نشان داده می‌شود.
+	 * در غیر این صورت پیام مؤدبانه و لینک ورود نشان داده می‌شود.
 	 *
 	 * @param string $key کلید.
 	 * @return string
@@ -1558,8 +1558,8 @@ if ( ! function_exists( 'tara_acc_public_playlist' ) ) {
 		$found = null;
 		$owner = 0;
 
-		/* جست‌وجو در متای کاربران — پلی‌لیست‌ها کوچک‌اند و تعدادِ کاربران
-		   در سایت‌های موسیقی محدود است؛ با شرطِ متا سریع است. */
+		/* جست‌وجو در متای کاربران — پلی‌لیست‌ها کوچک‌اند و تعداد کاربران
+		   در سایت‌های موسیقی محدود است؛ با شرط متا سریع است. */
 		$candidates = get_users(
 			array(
 				'meta_key'    => 'tara_playlists', // phpcs:ignore WordPress.DB.SlowDBQuery
@@ -1592,11 +1592,11 @@ if ( ! function_exists( 'tara_acc_public_playlist' ) ) {
 		?>
 		<section class="ty-acct-public">
 			<header class="ty-acct-public__head">
-				<span class="ty-acct-public__kicker"><?php echo tara_acc_icon( 'share' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> پلی‌لیستِ اشتراکی</span>
+				<span class="ty-acct-public__kicker"><?php echo tara_acc_icon( 'share' ); // phpcs:ignore WordPress.Security.EscapeOutput ?> پلی‌لیست اشتراکی</span>
 				<h1 class="ty-acct-public__title"><?php echo esc_html( $found['n'] ); ?></h1>
 				<p class="ty-acct-public__meta">
 					<?php echo esc_html( tara_acc_fa( count( $found['t'] ) ) ); ?> آهنگ
-					<?php echo '' !== $owner_name ? ' · ساختهٔ ' . esc_html( $owner_name ) : ''; ?>
+					<?php echo '' !== $owner_name ? ' · ساخته ' . esc_html( $owner_name ) : ''; ?>
 				</p>
 			</header>
 			<?php if ( function_exists( 'tara_playlist_radio' ) ) { echo tara_playlist_radio( $found['t'], $found['n'], 'personal' ); } ?>
@@ -1617,12 +1617,12 @@ if ( ! function_exists( 'tara_acc_public_playlist' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۸) قلاب‌ها در بقیهٔ قالب (صفحهٔ آهنگ و صفحهٔ خواننده)
+ * ۸) قلاب‌ها در بقیه قالب (صفحه آهنگ و صفحه خواننده)
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_single_actions' ) ) {
 	/**
-	 * مارکاپِ دکمه‌های حساب برای صفحهٔ آهنگ (از single.php صدا زده می‌شود).
+	 * مارکاپ دکمه‌های حساب برای صفحه آهنگ (از single.php صدا زده می‌شود).
 	 *
 	 * @param int $post_id شناسه.
 	 * @return string
@@ -1646,14 +1646,14 @@ if ( ! function_exists( 'tara_acc_single_actions' ) ) {
 
 if ( ! function_exists( 'tara_acc_bot_song_button' ) ) {
 	/**
-	 * دکمهٔ «مشاهده در ربات تلگرام» برای یک آهنگ.
+	 * دکمه «مشاهده در ربات تلگرام» برای یک آهنگ.
 	 *
 	 * کاربر با یک لمس از سایت به همان آهنگ در ربات می‌رود
 	 * (`https://t.me/<bot>?start=song_<id>`) و آنجا پخش، دانلود و
-	 * ذخیره‌کردن در علاقه‌مندی‌ها را دارد. ربات هم با همان حسابِ تلگرامی
-	 * که قبلاً به سایت وصل کرده شناخته می‌شود.
+	 * ذخیره‌کردن در علاقه‌مندی‌ها را دارد. ربات هم با همان حساب تلگرامی
+	 * که قبلا به سایت وصل کرده شناخته می‌شود.
 	 *
-	 * @param int   $post_id شناسهٔ آهنگ (۰ = آهنگِ جاری).
+	 * @param int   $post_id شناسه آهنگ (۰ = آهنگ جاری).
 	 * @param array $args    متن‌ها و کلاس.
 	 * @return string
 	 */
@@ -1672,7 +1672,7 @@ if ( ! function_exists( 'tara_acc_bot_song_button' ) ) {
 			array(
 				'class' => '',
 				'label' => 'مشاهده در ربات تلگرام',
-				'note'  => 'پخش، دانلود و ذخیره در تلگرام — بدونِ باز کردنِ سایت',
+				'note'  => 'پخش، دانلود و ذخیره در تلگرام — بدون باز کردن سایت',
 			)
 		);
 
@@ -1702,7 +1702,7 @@ if ( ! function_exists( 'tara_acc_bot_song_button' ) ) {
 
 if ( ! function_exists( 'tara_acc_playlist_picker' ) ) {
 	/**
-	 * مودالِ «افزودن به پلی‌لیست» (یک‌بار در پاصفحه).
+	 * مودال «افزودن به پلی‌لیست» (یک‌بار در پاصفحه).
 	 *
 	 * @return void
 	 */
@@ -1738,8 +1738,8 @@ if ( ! function_exists( 'tara_acc_playlist_picker' ) ) {
 					<?php endif; ?>
 				</ul>
 				<form class="ty-acct-sheet__new" data-tara-pl-new>
-					<label class="screen-reader-text" for="ty-acct-sheet-name">نامِ پلی‌لیستِ تازه</label>
-					<input id="ty-acct-sheet-name" type="text" name="name" placeholder="پلی‌لیستِ تازه…" maxlength="60" required>
+					<label class="screen-reader-text" for="ty-acct-sheet-name">نام پلی‌لیست تازه</label>
+					<input id="ty-acct-sheet-name" type="text" name="name" placeholder="پلی‌لیست تازه…" maxlength="60" required>
 					<button type="submit" class="ty-acct-btn2">ساختن و افزودن</button>
 				</form>
 				<p class="ty-acct-form__msg" role="status" aria-live="polite" data-tara-msg></p>
@@ -1754,12 +1754,12 @@ if ( function_exists( 'add_action' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۹) دکمهٔ هدر — در همهٔ صفحه‌ها (دسکتاپ و موبایل)
+ * ۹) دکمه هدر — در همه صفحه‌ها (دسکتاپ و موبایل)
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_header_button' ) ) {
 	/**
-	 * چاپِ دکمهٔ حساب در هدر قالب.
+	 * چاپ دکمه حساب در هدر قالب.
 	 *
 	 * @param string $context محل.
 	 * @return void
@@ -1770,15 +1770,15 @@ if ( ! function_exists( 'tara_acc_header_button' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۱۰) شورت‌کدها — برای هر برگه‌ای که با «برگهٔ تازه» ساخته می‌شود
- *     [tara_account]  → مهمان: کارتِ ورود، کاربر: پنلِ کامل (با ?tab=)
- *     [tara_login]    → همیشه کارتِ ورود (برای برگهٔ «ورود و ثبت‌نام»)
- *     [tara_account_button] → فقط دکمهٔ هدر/منو
+ * ۱۰) شورت‌کدها — برای هر برگه‌ای که با «برگه تازه» ساخته می‌شود
+ *     [tara_account]  → مهمان: کارت ورود، کاربر: پنل کامل (با ?tab=)
+ *     [tara_login]    → همیشه کارت ورود (برای برگه «ورود و ثبت‌نام»)
+ *     [tara_account_button] → فقط دکمه هدر/منو
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_shortcode_account' ) ) {
 	/**
-	 * `[tara_account]` — پنلِ کاربریِ کامل یا کارتِ ورود.
+	 * `[tara_account]` — پنل کاربری کامل یا کارت ورود.
 	 *
 	 * @param array $atts ویژگی‌ها: tab، class، title.
 	 * @return string
@@ -1798,7 +1798,7 @@ if ( ! function_exists( 'tara_acc_shortcode_account' ) ) {
 			return '';
 		}
 
-		/* تبِ مشخص‌شده در شورت‌کد، اگر منطقی بود، جای `?tab=` می‌نشیند. */
+		/* تب مشخص‌شده در شورت‌کد، اگر منطقی بود، جای `?tab=` می‌نشیند. */
 		if ( '' !== $atts['tab'] ) {
 			$tab  = sanitize_key( $atts['tab'] );
 			$tabs = tara_acc_tabs();
@@ -1832,7 +1832,7 @@ if ( ! function_exists( 'tara_acc_shortcode_account' ) ) {
 
 if ( ! function_exists( 'tara_acc_shortcode_login' ) ) {
 	/**
-	 * `[tara_login]` — کارتِ ورود (و اگر کاربر وارد شده باشد، پیامِ کوتاه).
+	 * `[tara_login]` — کارت ورود (و اگر کاربر وارد شده باشد، پیام کوتاه).
 	 *
 	 * @param array $atts ویژگی‌ها: redirect، title.
 	 * @return string
@@ -1861,7 +1861,7 @@ if ( ! function_exists( 'tara_acc_shortcode_login' ) ) {
 			$name  = function_exists( 'wp_get_current_user' ) ? (string) wp_get_current_user()->display_name : '';
 			$html .= '<div class="ty-acct-guest ty-acct-guest--in">'
 				. '<p class="ty-acct-guest__in">خوش آمدید' . ( '' !== $name ? '، ' . esc_html( $name ) : '' ) . '!</p>'
-				. '<a class="ty-acct-guest__btn" href="' . esc_url( $url ) . '">رفتن به حسابِ من</a>'
+				. '<a class="ty-acct-guest__btn" href="' . esc_url( $url ) . '">رفتن به حساب من</a>'
 				. '</div>';
 		} else {
 			$html .= '<div class="ty-acct-sc ty-acct-sc--login">' . tara_acc_login_card() . '</div>';
@@ -1873,7 +1873,7 @@ if ( ! function_exists( 'tara_acc_shortcode_login' ) ) {
 
 if ( ! function_exists( 'tara_acc_shortcode_button' ) ) {
 	/**
-	 * `[tara_account_button]` — دکمهٔ حساب برای برگه‌های دلخواه.
+	 * `[tara_account_button]` — دکمه حساب برای برگه‌های دلخواه.
 	 *
 	 * @param array $atts ویژگی‌ها: context.
 	 * @return string

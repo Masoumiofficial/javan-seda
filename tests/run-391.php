@@ -631,7 +631,7 @@ $modal = grab( 'tara_acc_modal' );
 foreach ( array( 'id="ty-acct-modal"', 'data-tara-form="phone"', 'data-tara-form="code"', 'data-tara-form="password"', 'ty-acct-submit', 'data-tara-code-inputs', 'data-tara-resend', 'data-tara-title-phone', 'data-tara-sub-phone', 'data-tara-msg' ) as $needle ) {
 	t( 'مودال: ' . $needle, false !== strpos( $modal, $needle ) );
 }
-t( 'مودال: شش خانهٔ کد', 6 === substr_count( $modal, 'aria-label="رقمِ' ), (string) substr_count( $modal, 'aria-label="رقمِ' ) );
+t( 'مودال: شش خانهٔ کد', 6 === substr_count( $modal, 'aria-label="رقم ' ), (string) substr_count( $modal, 'aria-label="رقم ' ) );
 t( 'مودال: نقشِ dialog', false !== strpos( $modal, 'role="dialog"' ) );
 t( 'مودال: بستن با aria-label', false !== strpos( $modal, 'aria-label="بستن"' ) );
 t( 'مودال: autocomplete یکی‌بارمصرف', false !== strpos( $modal, 'autocomplete="one-time-code"' ) );
@@ -709,10 +709,10 @@ t( 'پنل: بدونِ هشدار PHP', false === stripos( $panel, 'warning:' ) 
 wp_set_current_user( 0 );
 $login = tara_acc_login_card();
 t( 'کارتِ ورود: دکمهٔ بازکردنِ مودال', false !== strpos( $login, 'data-tara-open="account"' ) );
-t( 'کارتِ ورود: دکمهٔ ورود با موبایل', false !== strpos( $login, 'ورود با شمارهٔ موبایل' ) );
+t( 'کارتِ ورود: دکمهٔ ورود با موبایل', false !== strpos( $login, 'ورود با شماره موبایل' ) );
 $login_reg = tara_acc_login_card( array( 'mode' => 'register' ) );
-t( 'کارتِ ورود: حالتِ ثبت‌نام جدا', false !== strpos( $login_reg, 'ثبت‌نام با شمارهٔ موبایل' ) );
-t( 'کارتِ ورود: حالتِ ورود، متنِ ثبت‌نام ندارد', false === strpos( $login, 'ثبت‌نام با شمارهٔ موبایل' ) );
+t( 'کارتِ ورود: حالتِ ثبت‌نام جدا', false !== strpos( $login_reg, 'ثبت‌نام با شماره موبایل' ) );
+t( 'کارتِ ورود: حالتِ ورود، متنِ ثبت‌نام ندارد', false === strpos( $login, 'ثبت‌نام با شماره موبایل' ) );
 t( 'کارتِ ورود: متنِ مسیرِ مدیریتی حذف شده', false === strpos( $login, 'حساب مدیریتی' ) );
 
 /* ======================================================================
@@ -821,7 +821,7 @@ t( 'شورت‌کد: کلاسِ سالم می‌ماند', false !== strpos( $sc
 $in       = tara_acc_shortcode_login( array() );
 $expected = tara_acc_profile_url();
 t( 'شورت‌کدِ ورود برای کاربر: پیامِ خوش‌آمد', false !== strpos( $in, 'ty-acct-guest--in' ) );
-t( 'شورت‌کدِ ورود برای کاربر: لینکِ حساب', false !== strpos( $in, 'رفتن به حسابِ من' ) && '' !== $expected && false !== strpos( $in, $expected ) );
+t( 'شورت‌کدِ ورود برای کاربر: لینکِ حساب', false !== strpos( $in, 'رفتن به حساب من' ) && '' !== $expected && false !== strpos( $in, $expected ) );
 
 $btn = tara_acc_shortcode_button( array() );
 t( 'شورت‌کدِ دکمه: دکمهٔ حسابِ دسکتاپ', false !== strpos( $btn, 'ty-acct-btn' ) && false !== strpos( $btn, 'ty-acct-sc--btn' ) );

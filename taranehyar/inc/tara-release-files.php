@@ -89,7 +89,7 @@ function tara_release_store_upload( $upload, $kind ) {
 	if ( ! is_array( $upload ) || ! isset( $upload['error'], $upload['tmp_name'], $upload['name'], $upload['size'] ) || UPLOAD_ERR_OK !== $upload['error'] || ! is_string( $upload['tmp_name'] ) || ! is_uploaded_file( $upload['tmp_name'] ) ) { return new WP_Error( 'release_upload', 'آپلود معتبر نیست یا ناقص است.' ); }
 	$size = filesize( $upload['tmp_name'] );
 	$rule = tara_release_file_rule( $upload['name'], $size, $kind );
-	if ( false === $rule || ! function_exists( 'finfo_open' ) ) { return new WP_Error( 'release_file_type', 'نوع یا اندازهٔ فایل مجاز نیست.' ); }
+	if ( false === $rule || ! function_exists( 'finfo_open' ) ) { return new WP_Error( 'release_file_type', 'نوع یا اندازه فایل مجاز نیست.' ); }
 	$finfo = finfo_open( FILEINFO_MIME_TYPE );
 	if ( false === $finfo ) { return new WP_Error( 'release_file_type', 'تشخیص نوع فایل در دسترس نیست.' ); }
 	$mime = finfo_file( $finfo, $upload['tmp_name'] );

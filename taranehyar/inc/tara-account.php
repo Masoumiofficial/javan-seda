@@ -1,19 +1,19 @@
 <?php
 /**
- * ترانه یار — حسابِ کاربری، ورودِ پیامکی و اتصال به ربات (نسخهٔ ۳.۱۰.۰)
+ * ترانه یار — حساب کاربری، ورود پیامکی و اتصال به ربات (نسخه ۳.۱۰.۰)
  * =========================================================================
  * این فایل «مغز» است و مارکاپ در `inc/tara-account-ui.php` است. کاری که می‌کند:
  *
- *   ۱) ورود/ثبت‌نام با شمارهٔ موبایل و کدِ یک‌بارمصرف (OTP).
- *   ۲) ارسالِ پیامک با «ملی‌پیامک» (REST)، وب‌هوکِ دلخواه یا حالتِ آزمایشی.
- *   ۳) حسابِ کاربریِ سبک روی همان جدولِ کاربرانِ وردپرس (بدونِ جدولِ تازه).
- *   ۴) داده‌های کاربر: علاقه‌مندی‌ها، پلی‌لیست‌ها، دنبال‌کردنِ خواننده‌ها،
- *      تاریخچهٔ شنیدن و پیام‌ها — همه در user_meta.
- *   ۵) REST برای رباتِ «آهنگ‌بان» با همان قراردادِ Bearer token.
+ *   ۱) ورود/ثبت‌نام با شماره موبایل و کد یک‌بارمصرف (OTP).
+ *   ۲) ارسال پیامک با «ملی‌پیامک» (REST)، وب‌هوک دلخواه یا حالت آزمایشی.
+ *   ۳) حساب کاربری سبک روی همان جدول کاربران وردپرس (بدون جدول تازه).
+ *   ۴) داده‌های کاربر: علاقه‌مندی‌ها، پلی‌لیست‌ها، دنبال‌کردن خواننده‌ها،
+ *      تاریخچه شنیدن و پیام‌ها — همه در user_meta.
+ *   ۵) REST برای ربات «آهنگ‌بان» با همان قرارداد Bearer token.
  *
- * چرا جدولِ تازه ساخته نمی‌شود؟ چون هر جدولِ تازه یعنی نسخه‌بندی، مهاجرت و
- * پشتیبان‌گیریِ جدا. user_meta برای ده‌ها هزار کاربرِ یک سایتِ موسیقی کافی
- * است و با حذفِ کاربر، همه‌چیز خودش پاک می‌شود.
+ * چرا جدول تازه ساخته نمی‌شود؟ چون هر جدول تازه یعنی نسخه‌بندی، مهاجرت و
+ * پشتیبان‌گیری جدا. user_meta برای ده‌ها هزار کاربر یک سایت موسیقی کافی
+ * است و با حذف کاربر، همه‌چیز خودش پاک می‌شود.
  *
  * @package Taranehyar
  */
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/* این ثابت‌ها در وردپرس همیشه هستند؛ این گارد فقط برای محیطِ آزمون است. */
+/* این ثابت‌ها در وردپرس همیشه هستند؛ این گارد فقط برای محیط آزمون است. */
 if ( ! defined( 'MINUTE_IN_SECONDS' ) ) {
 	define( 'MINUTE_IN_SECONDS', 60 );
 }
@@ -31,53 +31,53 @@ if ( ! defined( 'HOUR_IN_SECONDS' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۱) تنظیمات — همه با پیشوندِ `account_` در همان option_tree
+ * ۱) تنظیمات — همه با پیشوند `account_` در همان option_tree
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_defaults' ) ) {
 	/**
-	 * پیش‌فرضِ همهٔ تنظیماتِ حساب.
+	 * پیش‌فرض همه تنظیمات حساب.
 	 *
 	 * @return array
 	 */
 	function tara_acc_defaults() {
 		$defaults = array(
-			'on'             => 'on',            // کلیدِ اصلی
-			'allow_password' => 'on',            // ورود با نام‌کاربری/رمزِ وردپرس هم ممکن باشد
-			'code_ttl'       => 180,             // عمرِ کد (ثانیه)
-			'resend'         => 60,              // فاصلهٔ ارسالِ دوباره (ثانیه)
-			'tries'          => 6,               // حداکثر تلاشِ اشتباه
+			'on'             => 'on',            // کلید اصلی
+			'allow_password' => 'on',            // ورود با نام‌کاربری/رمز وردپرس هم ممکن باشد
+			'code_ttl'       => 180,             // عمر کد (ثانیه)
+			'resend'         => 60,              // فاصله ارسال دوباره (ثانیه)
+			'tries'          => 6,               // حداکثر تلاش اشتباه
 			'per_phone'      => 5,               // ارسال در ساعت برای هر شماره
 			'per_ip'         => 12,              // ارسال در ساعت برای هر IP
 			'sms'            => 'dev',           // dev | melipayamak | webhook
-			'sms_user'       => '',              // نام‌کاربریِ ملی‌پیامک
-			'sms_pass'       => '',              // رمزِ ملی‌پیامک
-			'sms_from'       => '',              // شمارهٔ فرستنده
-			'sms_pattern'    => '',              // کدِ پترن (اختیاری)
+			'sms_user'       => '',              // نام‌کاربری ملی‌پیامک
+			'sms_pass'       => '',              // رمز ملی‌پیامک
+			'sms_from'       => '',              // شماره فرستنده
+			'sms_pattern'    => '',              // کد پترن (اختیاری)
 			'sms_hook'       => '',              // آدرس وب‌هوک برای پنل‌های دیگر
 			'sms_hook_auth'  => '',              // هدر Authorization اختیاری
-			'sms_text'       => 'کدِ ورود شما به {site}: {code}
+			'sms_text'       => 'کد ورود شما به {site}: {code}
 			این کد را به هیچ‌کس ندهید.',
-			'dev_show'       => 'on',            // در حالتِ آزمایشی کد روی صفحه دیده شود
-			'welcome'        => 'on',            // پیامِ خوش‌آمد بعد از ثبت‌نام
+			'dev_show'       => 'on',            // در حالت آزمایشی کد روی صفحه دیده شود
+			'welcome'        => 'on',            // پیام خوش‌آمد بعد از ثبت‌نام
 			'likes'          => 'on',
 			'playlists'      => 'on',
 			'follows'        => 'on',
 			'history'        => 'on',
 			'notifs'         => 'on',
-			'avatar'         => 'on',            // آپلودِ تصویرِ پروفایل
+			'avatar'         => 'on',            // آپلود تصویر پروفایل
 			'max_likes'      => 500,
 			'max_playlists'  => 30,
 			'max_tracks'     => 300,
 			'max_follows'    => 500,
 			'max_history'    => 100,
 			'redirect'       => '',              // بعد از ورود کجا برود (خالی = حساب من)
-			'tg_bot'         => '',              // نام‌کاربریِ ربات بدونِ @
-			'tg_token'       => '',              // توکنِ ۶۴رقمیِ REST برای ربات
-			'tg_code_ttl'    => 600,             // عمرِ کدِ اتصال به ربات
-			'tg_song'        => 'on',            // دکمهٔ «مشاهده در ربات» زیرِ لینک‌های دانلود
-			'help_url'       => '',              // لینکِ «راهنمای ورود و ثبت‌نام»
-			'help_text'      => 'راهنمای ورود',   // متنِ همان لینک
+			'tg_bot'         => '',              // نام‌کاربری ربات بدون @
+			'tg_token'       => '',              // توکن ۶۴رقمی REST برای ربات
+			'tg_code_ttl'    => 600,             // عمر کد اتصال به ربات
+			'tg_song'        => 'on',            // دکمه «مشاهده در ربات» زیر لینک‌های دانلود
+			'help_url'       => '',              // لینک «راهنمای ورود و ثبت‌نام»
+			'help_text'      => 'راهنمای ورود',   // متن همان لینک
 		);
 
 		return apply_filters( 'tara_acc_defaults', $defaults );
@@ -88,8 +88,8 @@ if ( ! function_exists( 'tara_acc_opt' ) ) {
 	/**
 	 * یک تنظیم با پیش‌فرض.
 	 *
-	 * @param string $key     کلید بدونِ پیشوند.
-	 * @param mixed  $default پیش‌فرضِ دستی (اختیاری).
+	 * @param string $key     کلید بدون پیشوند.
+	 * @param mixed  $default پیش‌فرض دستی (اختیاری).
 	 * @return mixed
 	 */
 	function tara_acc_opt( $key, $default = null ) {
@@ -103,7 +103,7 @@ if ( ! function_exists( 'tara_acc_opt' ) ) {
 
 if ( ! function_exists( 'tara_acc_on' ) ) {
 	/**
-	 * آیا حسابِ کاربری روشن است؟
+	 * آیا حساب کاربری روشن است؟
 	 *
 	 * @return bool
 	 */
@@ -114,7 +114,7 @@ if ( ! function_exists( 'tara_acc_on' ) ) {
 
 if ( ! function_exists( 'tara_acc_feature' ) ) {
 	/**
-	 * آیا یک قابلیتِ مشخص (likes/playlists/follows/history/notifs) روشن است؟
+	 * آیا یک قابلیت مشخص (likes/playlists/follows/history/notifs) روشن است؟
 	 *
 	 * @param string $name نام.
 	 * @return bool
@@ -133,7 +133,7 @@ if ( ! function_exists( 'tara_acc_feature' ) ) {
 
 if ( ! function_exists( 'tara_acc_limit' ) ) {
 	/**
-	 * سقفِ یک فهرست (با کف و سقفِ منطقی).
+	 * سقف یک فهرست (با کف و سقف منطقی).
 	 *
 	 * @param string $key کلید.
 	 * @return int
@@ -155,12 +155,12 @@ if ( ! function_exists( 'tara_acc_limit' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۲) شمارهٔ موبایل
+ * ۲) شماره موبایل
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_digits' ) ) {
 	/**
-	 * رقم‌های فارسی/عربی را به لاتین برمی‌گرداند و هر چیزِ دیگر را دور می‌ریزد.
+	 * رقم‌های فارسی/عربی را به لاتین برمی‌گرداند و هر چیز دیگر را دور می‌ریزد.
 	 *
 	 * @param string $raw ورودی.
 	 * @return string
@@ -181,13 +181,13 @@ if ( ! function_exists( 'tara_acc_digits' ) ) {
 
 if ( ! function_exists( 'tara_acc_phone' ) ) {
 	/**
-	 * شماره را به شکلِ استانداردِ ۰۹xxxxxxxxx برمی‌گرداند.
+	 * شماره را به شکل استاندارد ۰۹xxxxxxxxx برمی‌گرداند.
 	 *
 	 * ورودی‌های پذیرفته‌شده: 09121234567 · 9121234567 · 989121234567 ·
-	 * +989121234567 · 00989121234567 (با فاصله/خط تیره/رقمِ فارسی هم می‌شود).
+	 * +989121234567 · 00989121234567 (با فاصله/خط تیره/رقم فارسی هم می‌شود).
 	 *
-	 * @param string $raw ورودیِ کاربر.
-	 * @return string شمارهٔ ۱۱رقمی یا رشتهٔ خالی.
+	 * @param string $raw ورودی کاربر.
+	 * @return string شماره ۱۱رقمی یا رشته خالی.
 	 */
 	function tara_acc_phone( $raw ) {
 		$d = tara_acc_digits( $raw );
@@ -220,9 +220,9 @@ if ( ! function_exists( 'tara_acc_phone' ) ) {
 
 if ( ! function_exists( 'tara_acc_phone_pretty' ) ) {
 	/**
-	 * نمایشِ خوانا: ۰۹۱۲ ۱۲۳ ۴۵۶۷
+	 * نمایش خوانا: ۰۹۱۲ ۱۲۳ ۴۵۶۷
 	 *
-	 * @param string $phone شمارهٔ استاندارد.
+	 * @param string $phone شماره استاندارد.
 	 * @return string
 	 */
 	function tara_acc_phone_pretty( $phone ) {
@@ -240,7 +240,7 @@ if ( ! function_exists( 'tara_acc_phone_pretty' ) ) {
 
 if ( ! function_exists( 'tara_acc_phone_mask' ) ) {
 	/**
-	 * پوشاندنِ وسطِ شماره برای نمایشِ عمومی (۰۹۱۲***۴۵۶۷).
+	 * پوشاندن وسط شماره برای نمایش عمومی (۰۹۱۲***۴۵۶۷).
 	 *
 	 * @param string $phone شماره.
 	 * @return string
@@ -257,7 +257,7 @@ if ( ! function_exists( 'tara_acc_phone_mask' ) ) {
 
 if ( ! function_exists( 'tara_acc_client_ip' ) ) {
 	/**
-	 * IPِ مشتری با نگاهِ محتاطانه به پراکسی (X-Forwarded-For فقط اولین مقدار).
+	 * IP مشتری با نگاه محتاطانه به پراکسی (X-Forwarded-For فقط اولین مقدار).
 	 *
 	 * @return string
 	 */
@@ -279,16 +279,16 @@ if ( ! function_exists( 'tara_acc_client_ip' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۳) سقفِ نرخ (throttle) و کدِ یک‌بارمصرف
+ * ۳) سقف نرخ (throttle) و کد یک‌بارمصرف
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_throttle' ) ) {
 	/**
-	 * شمارندهٔ سادهٔ پنجرهٔ ثابت.
+	 * شمارنده ساده پنجره ثابت.
 	 *
-	 * @param string $key   کلیدِ یگانه (بدونِ دادهٔ حساس؛ هش می‌شود).
+	 * @param string $key   کلید یگانه (بدون داده حساس؛ هش می‌شود).
 	 * @param int    $max   حداکثر در پنجره.
-	 * @param int    $ttl   طولِ پنجره (ثانیه).
+	 * @param int    $ttl   طول پنجره (ثانیه).
 	 * @return bool true = اجازه دارد (و یکی به شمارنده اضافه شد).
 	 */
 	function tara_acc_throttle( $key, $max, $ttl ) {
@@ -303,7 +303,7 @@ if ( ! function_exists( 'tara_acc_throttle' ) ) {
 }
 
 if ( ! function_exists( 'tara_acc_otp_key' ) ) {
-	/** کلیدِ ترنزینتِ کدِ یک شماره. */
+	/** کلید ترنزینت کد یک شماره. */
 	function tara_acc_otp_key( $phone ) {
 		return 'tara_otp_' . md5( (string) $phone );
 	}
@@ -311,7 +311,7 @@ if ( ! function_exists( 'tara_acc_otp_key' ) ) {
 
 if ( ! function_exists( 'tara_acc_otp_code' ) ) {
 	/**
-	 * تولیدِ کدِ ۶رقمیِ یک‌بارمصرف.
+	 * تولید کد ۶رقمی یک‌بارمصرف.
 	 *
 	 * @return string
 	 */
@@ -325,15 +325,15 @@ if ( ! function_exists( 'tara_acc_otp_code' ) ) {
 
 if ( ! function_exists( 'tara_acc_otp_send' ) ) {
 	/**
-	 * ساخت و ارسالِ کد.
+	 * ساخت و ارسال کد.
 	 *
-	 * @param string $phone شمارهٔ استاندارد.
+	 * @param string $phone شماره استاندارد.
 	 * @return array|WP_Error
 	 */
 	function tara_acc_otp_send( $phone ) {
 		$phone = tara_acc_phone( $phone );
 		if ( '' === $phone ) {
-			return new WP_Error( 'tara_bad_phone', 'شمارهٔ موبایل را درست وارد کنید (مثلِ ۰۹۱۲۱۲۳۴۵۶۷).' );
+			return new WP_Error( 'tara_bad_phone', 'شماره موبایل را درست وارد کنید (مثل ۰۹۱۲۱۲۳۴۵۶۷).' );
 		}
 
 		$ttl      = max( 60, min( 600, (int) tara_acc_opt( 'code_ttl', 180 ) ) );
@@ -346,17 +346,17 @@ if ( ! function_exists( 'tara_acc_otp_send' ) ) {
 			if ( $wait > 0 ) {
 				return new WP_Error(
 					'tara_cooldown',
-					sprintf( 'کدِ قبلی هنوز معتبر است؛ %s ثانیهٔ دیگر می‌توانید دوباره درخواست کنید.', tara_acc_fa( $wait ) ),
+					sprintf( 'کد قبلی هنوز معتبر است؛ %s ثانیه دیگر می‌توانید دوباره درخواست کنید.', tara_acc_fa( $wait ) ),
 					array( 'wait' => $wait )
 				);
 			}
 		}
 
 		if ( ! tara_acc_throttle( 'otp_phone_' . $phone, (int) tara_acc_opt( 'per_phone', 5 ), HOUR_IN_SECONDS ) ) {
-			return new WP_Error( 'tara_limit_phone', 'برای این شماره تعدادِ درخواست‌ها زیاد شد؛ یک ساعتِ دیگر تلاش کنید.' );
+			return new WP_Error( 'tara_limit_phone', 'برای این شماره تعداد درخواست‌ها زیاد شد؛ یک ساعت دیگر تلاش کنید.' );
 		}
 		if ( ! tara_acc_throttle( 'otp_ip_' . tara_acc_client_ip(), (int) tara_acc_opt( 'per_ip', 12 ), HOUR_IN_SECONDS ) ) {
-			return new WP_Error( 'tara_limit_ip', 'از این اتصال تعدادِ درخواست‌ها زیاد شد؛ کمی بعد تلاش کنید.' );
+			return new WP_Error( 'tara_limit_ip', 'از این اتصال تعداد درخواست‌ها زیاد شد؛ کمی بعد تلاش کنید.' );
 		}
 
 		$code = tara_acc_otp_code();
@@ -376,7 +376,7 @@ if ( ! function_exists( 'tara_acc_otp_send' ) ) {
 
 		if ( ! $sent && ! $debug ) {
 			delete_transient( $key );
-			return new WP_Error( 'tara_sms_failed', 'ارسالِ پیامک انجام نشد. لطفاً کمی بعد دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.' );
+			return new WP_Error( 'tara_sms_failed', 'ارسال پیامک انجام نشد. لطفا کمی بعد دوباره تلاش کنید یا با پشتیبانی تماس بگیرید.' );
 		}
 
 		$out = array(
@@ -395,10 +395,10 @@ if ( ! function_exists( 'tara_acc_otp_send' ) ) {
 
 if ( ! function_exists( 'tara_acc_otp_check' ) ) {
 	/**
-	 * بررسیِ کد.
+	 * بررسی کد.
 	 *
-	 * @param string $phone شمارهٔ استاندارد.
-	 * @param string $code  کدِ واردشده.
+	 * @param string $phone شماره استاندارد.
+	 * @param string $code  کد واردشده.
 	 * @return bool
 	 */
 	function tara_acc_otp_check( $phone, $code ) {
@@ -436,7 +436,7 @@ if ( ! function_exists( 'tara_acc_otp_check' ) ) {
 
 if ( ! function_exists( 'tara_acc_fa' ) ) {
 	/**
-	 * عددِ فارسی با پشتیبان.
+	 * عدد فارسی با پشتیبان.
 	 *
 	 * @param int|float $n عدد.
 	 * @return string
@@ -450,12 +450,12 @@ if ( ! function_exists( 'tara_acc_fa' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۴) پیامک — ملی‌پیامک، وب‌هوک یا حالتِ آزمایشی
+ * ۴) پیامک — ملی‌پیامک، وب‌هوک یا حالت آزمایشی
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_sms_text' ) ) {
 	/**
-	 * متنِ پیامک با جای‌گذاریِ نامِ سایت و کد.
+	 * متن پیامک با جای‌گذاری نام سایت و کد.
 	 *
 	 * @param string $code کد.
 	 * @return string
@@ -463,7 +463,7 @@ if ( ! function_exists( 'tara_acc_sms_text' ) ) {
 	function tara_acc_sms_text( $code ) {
 		$text = (string) tara_acc_opt( 'sms_text' );
 		if ( '' === trim( $text ) ) {
-			$text = 'کدِ ورود شما به {site}: {code}';
+			$text = 'کد ورود شما به {site}: {code}';
 		}
 		$text = str_replace(
 			array( '{site}', '{code}' ),
@@ -477,9 +477,9 @@ if ( ! function_exists( 'tara_acc_sms_text' ) ) {
 
 if ( ! function_exists( 'tara_acc_sms_send' ) ) {
 	/**
-	 * ارسالِ پیامک.
+	 * ارسال پیامک.
 	 *
-	 * @param string $phone شمارهٔ استاندارد.
+	 * @param string $phone شماره استاندارد.
 	 * @param string $code  کد.
 	 * @return bool
 	 */
@@ -497,8 +497,8 @@ if ( ! function_exists( 'tara_acc_sms_send' ) ) {
 				break;
 			case 'dev':
 			default:
-				/* حالتِ آزمایشی: پیامکی نمی‌رود؛ کد در پاسخِ AJAX برمی‌گردد
-				   (فقط وقتی «نمایشِ کد» روشن باشد). */
+				/* حالت آزمایشی: پیامکی نمی‌رود؛ کد در پاسخ AJAX برمی‌گردد
+				   (فقط وقتی «نمایش کد» روشن باشد). */
 				$result = true;
 				break;
 		}
@@ -509,7 +509,7 @@ if ( ! function_exists( 'tara_acc_sms_send' ) ) {
 
 if ( ! function_exists( 'tara_acc_http' ) ) {
 	/**
-	 * POSTِ JSON با `wp_remote_post` — با محافظ در برابر نبودِ تابع.
+	 * POST JSON با `wp_remote_post` — با محافظ در برابر نبود تابع.
 	 *
 	 * @param string $url     آدرس.
 	 * @param array  $body    بدنه.
@@ -548,8 +548,8 @@ if ( ! function_exists( 'tara_acc_sms_melipayamak' ) ) {
 	/**
 	 * ملی‌پیامک (rest.payamak-panel.com).
 	 *
-	 * اگر «کدِ پترن» پر شده باشد از سرویسِ پترن (BaseServiceNumber) استفاده
-	 * می‌شود که ارزان‌تر و سریع‌تر است؛ وگرنه ارسالِ متنیِ معمولی.
+	 * اگر «کد پترن» پر شده باشد از سرویس پترن (BaseServiceNumber) استفاده
+	 * می‌شود که ارزان‌تر و سریع‌تر است؛ وگرنه ارسال متنی معمولی.
 	 *
 	 * @param string $phone شماره.
 	 * @param string $code  کد.
@@ -567,7 +567,7 @@ if ( ! function_exists( 'tara_acc_sms_melipayamak' ) ) {
 		}
 
 		if ( '' !== $body ) {
-			/* سرویسِ پترن: متنِ پترن همان {code} است؛ پارامترها با , جدا می‌شوند. */
+			/* سرویس پترن: متن پترن همان {code} است؛ پارامترها با , جدا می‌شوند. */
 			$url = 'https://rest.payamak-panel.com/api/SendSMS/BaseServiceNumber';
 			$res = tara_acc_http(
 				$url,
@@ -617,10 +617,10 @@ if ( ! function_exists( 'tara_acc_sms_melipayamak' ) ) {
 
 if ( ! function_exists( 'tara_acc_sms_webhook' ) ) {
 	/**
-	 * وب‌هوکِ عمومی — برای هر پنلِ پیامکیِ دیگر (کاوه‌نگار، SMS.ir، اسکریپتِ خودتان).
+	 * وب‌هوک عمومی — برای هر پنل پیامکی دیگر (کاوه‌نگار، SMS.ir، اسکریپت خودتان).
 	 *
-	 * بدنهٔ JSON: {phone, code, text, site, name}
-	 * اگر «هدرِ احراز» پر شده باشد با همان مقدار فرستاده می‌شود.
+	 * بدنه JSON: {phone, code, text, site, name}
+	 * اگر «هدر احراز» پر شده باشد با همان مقدار فرستاده می‌شود.
 	 *
 	 * @param string $phone شماره.
 	 * @param string $code  کد.
@@ -659,9 +659,9 @@ if ( ! function_exists( 'tara_acc_sms_webhook' ) ) {
 
 if ( ! function_exists( 'tara_acc_login_name' ) ) {
 	/**
-	 * نام‌کاربریِ ساخته‌شده از شماره.
+	 * نام‌کاربری ساخته‌شده از شماره.
 	 *
-	 * @param string $phone شمارهٔ استاندارد.
+	 * @param string $phone شماره استاندارد.
 	 * @return string
 	 */
 	function tara_acc_login_name( $phone ) {
@@ -671,7 +671,7 @@ if ( ! function_exists( 'tara_acc_login_name' ) ) {
 
 if ( ! function_exists( 'tara_acc_user_by_phone' ) ) {
 	/**
-	 * کاربرِ متعلق به یک شماره.
+	 * کاربر متعلق به یک شماره.
 	 *
 	 * @param string $phone شماره.
 	 * @return WP_User|false
@@ -708,7 +708,7 @@ if ( ! function_exists( 'tara_acc_user_by_phone' ) ) {
 
 if ( ! function_exists( 'tara_acc_user_phone' ) ) {
 	/**
-	 * شمارهٔ یک کاربر (خالی = کاربرِ رمزدارِ وردپرس).
+	 * شماره یک کاربر (خالی = کاربر رمزدار وردپرس).
 	 *
 	 * @param int $user_id شناسه.
 	 * @return string
@@ -724,18 +724,18 @@ if ( ! function_exists( 'tara_acc_user_phone' ) ) {
 
 if ( ! function_exists( 'tara_acc_make_user' ) ) {
 	/**
-	 * ساختنِ حساب برای شماره‌ای که تازه تأیید شده است.
+	 * ساختن حساب برای شماره‌ای که تازه تأیید شده است.
 	 *
-	 * @param string $phone شمارهٔ تأییدشده.
-	 * @return int|WP_Error شناسهٔ کاربر.
+	 * @param string $phone شماره تأییدشده.
+	 * @return int|WP_Error شناسه کاربر.
 	 */
 	function tara_acc_make_user( $phone ) {
 		$phone = tara_acc_phone( $phone );
 		if ( '' === $phone ) {
-			return new WP_Error( 'tara_bad_phone', 'شمارهٔ نامعتبر.' );
+			return new WP_Error( 'tara_bad_phone', 'شماره نامعتبر.' );
 		}
 		if ( ! function_exists( 'wp_insert_user' ) ) {
-			return new WP_Error( 'tara_no_wp', 'ساختِ حساب در این محیط ممکن نیست.' );
+			return new WP_Error( 'tara_no_wp', 'ساخت حساب در این محیط ممکن نیست.' );
 		}
 
 		$login = tara_acc_login_name( $phone );
@@ -750,7 +750,7 @@ if ( ! function_exists( 'tara_acc_make_user' ) ) {
 		}
 
 		$last4 = substr( $phone, -4 );
-		$name  = 'شنوندهٔ ' . ( function_exists( 'tara_fa_number' ) ? tara_fa_number( $last4 ) : $last4 );
+		$name  = 'شنونده ' . ( function_exists( 'tara_fa_number' ) ? tara_fa_number( $last4 ) : $last4 );
 
 		$user_id = wp_insert_user(
 			array(
@@ -772,13 +772,13 @@ if ( ! function_exists( 'tara_acc_make_user' ) ) {
 		update_user_meta( $user_id, 'tara_phone_verified', time() );
 		update_user_meta( $user_id, 'tara_joined', time() );
 
-		/* پیامِ خوش‌آمد — در همان فهرستِ پیام‌های پنل. */
+		/* پیام خوش‌آمد — در همان فهرست پیام‌های پنل. */
 		if ( 'on' === (string) tara_acc_opt( 'welcome', 'on' ) ) {
 			tara_acc_notify(
 				$user_id,
 				array(
 					'k'     => 'welcome',
-					'title' => 'خوش آمدید به ' . get_bloginfo( 'name' ) . '! از پنلِ «حساب من» آهنگ‌های موردعلاقه‌تان را ذخیره کنید.',
+					'title' => 'خوش آمدید به ' . get_bloginfo( 'name' ) . '! از پنل «حساب من» آهنگ‌های موردعلاقه‌تان را ذخیره کنید.',
 					'url'   => tara_acc_profile_url( 'favorites' ),
 				)
 			);
@@ -792,9 +792,9 @@ if ( ! function_exists( 'tara_acc_make_user' ) ) {
 
 if ( ! function_exists( 'tara_acc_signin' ) ) {
 	/**
-	 * ورود به حساب (و ساختِ خودکار اگر نبود).
+	 * ورود به حساب (و ساخت خودکار اگر نبود).
 	 *
-	 * @param string $phone   شمارهٔ تأییدشده.
+	 * @param string $phone   شماره تأییدشده.
 	 * @param bool   $remember مرا به خاطر بسپار.
 	 * @return int|WP_Error
 	 */
@@ -811,7 +811,7 @@ if ( ! function_exists( 'tara_acc_signin' ) ) {
 		}
 
 		if ( $user_id <= 0 ) {
-			return new WP_Error( 'tara_no_user', 'ساختِ حساب انجام نشد.' );
+			return new WP_Error( 'tara_no_user', 'ساخت حساب انجام نشد.' );
 		}
 
 		if ( function_exists( 'wp_set_current_user' ) ) {
@@ -835,7 +835,7 @@ if ( ! function_exists( 'tara_acc_signin' ) ) {
 
 if ( ! function_exists( 'tara_acc_avatar_url' ) ) {
 	/**
-	 * تصویرِ پروفایل: آپلودِ کاربر ← گراواتار ← تصویرِ پیش‌فرضِ قالب.
+	 * تصویر پروفایل: آپلود کاربر ← گراواتار ← تصویر پیش‌فرض قالب.
 	 *
 	 * @param int $user_id شناسه.
 	 * @param int $size    اندازه.
@@ -869,16 +869,16 @@ if ( ! function_exists( 'tara_acc_avatar_url' ) ) {
 
 if ( ! function_exists( 'tara_acc_avatar_upload' ) ) {
 	/**
-	 * ذخیرهٔ تصویرِ پروفایلِ آپلودی (v3.11.0).
+	 * ذخیره تصویر پروفایل آپلودی (v3.11.0).
 	 *
-	 * چرا فایل و نه آدرس: کاربر گفت «آدرسِ تصویر را بردار و امکانِ آپلود بگذار».
-	 * فایل در کتابخانهٔ رسانه ذخیره می‌شود (wp_handle_upload + media_handle_upload)
-	 * و شناسهٔ پیوست در متای `tara_avatar` می‌نشیند؛ آدرسِ قبلی هم پاک می‌شود تا
-	 * تصویرِ تازه همیشه مقدم باشد.
+	 * چرا فایل و نه آدرس: کاربر گفت «آدرس تصویر را بردار و امکان آپلود بگذار».
+	 * فایل در کتابخانه رسانه ذخیره می‌شود (wp_handle_upload + media_handle_upload)
+	 * و شناسه پیوست در متای `tara_avatar` می‌نشیند؛ آدرس قبلی هم پاک می‌شود تا
+	 * تصویر تازه همیشه مقدم باشد.
 	 *
-	 * @param int   $user_id  شناسهٔ کاربر.
+	 * @param int   $user_id  شناسه کاربر.
 	 * @param array $file     یک عضو از $_FILES.
-	 * @return string|WP_Error آدرسِ تصویر یا خطا.
+	 * @return string|WP_Error آدرس تصویر یا خطا.
 	 */
 	function tara_acc_avatar_upload( $user_id, $file ) {
 		$user_id = (int) $user_id;
@@ -886,20 +886,20 @@ if ( ! function_exists( 'tara_acc_avatar_upload' ) ) {
 			return new WP_Error( 'tara_avatar_user', 'کاربر پیدا نشد.' );
 		}
 		if ( ! is_array( $file ) || empty( $file['tmp_name'] ) || ! isset( $file['error'] ) || 0 !== (int) $file['error'] ) {
-			return new WP_Error( 'tara_avatar_file', 'فایلی انتخاب نشده یا ارسالِ آن کامل نشد.' );
+			return new WP_Error( 'tara_avatar_file', 'فایلی انتخاب نشده یا ارسال آن کامل نشد.' );
 		}
 
 		$max = (int) apply_filters( 'tara_acc_avatar_max_bytes', 2 * 1024 * 1024 );
 		if ( isset( $file['size'] ) && (int) $file['size'] > $max ) {
-			return new WP_Error( 'tara_avatar_size', 'حجمِ تصویر باید کمتر از ۲ مگابایت باشد.' );
+			return new WP_Error( 'tara_avatar_size', 'حجم تصویر باید کمتر از ۲ مگابایت باشد.' );
 		}
 
 		$allowed = (array) apply_filters( 'tara_acc_avatar_mimes', array( 'jpg|jpeg|jpe' => 'image/jpeg', 'png' => 'image/png', 'webp' => 'image/webp', 'gif' => 'image/gif' ) );
 
-		/* پسوند و نوعِ واقعیِ فایل بررسی می‌شود؛ فقط تصویر. */
+		/* پسوند و نوع واقعی فایل بررسی می‌شود؛ فقط تصویر. */
 		$check = function_exists( 'wp_check_filetype_and_ext' ) ? wp_check_filetype_and_ext( $file['tmp_name'], isset( $file['name'] ) ? $file['name'] : '' ) : array( 'type' => '' );
 		if ( empty( $check['type'] ) || 0 !== strpos( (string) $check['type'], 'image/' ) ) {
-			return new WP_Error( 'tara_avatar_type', 'فقط فایلِ تصویری (JPG، PNG، WebP یا GIF) پذیرفته می‌شود.' );
+			return new WP_Error( 'tara_avatar_type', 'فقط فایل تصویری (JPG، PNG، WebP یا GIF) پذیرفته می‌شود.' );
 		}
 
 		if ( ! function_exists( 'media_handle_upload' ) ) {
@@ -912,7 +912,7 @@ if ( ! function_exists( 'tara_acc_avatar_upload' ) ) {
 		}
 
 		if ( ! function_exists( 'media_handle_upload' ) ) {
-			return new WP_Error( 'tara_avatar_env', 'کتابخانهٔ رسانهٔ وردپرس در دسترس نیست.' );
+			return new WP_Error( 'tara_avatar_env', 'کتابخانه رسانه وردپرس در دسترس نیست.' );
 		}
 
 		$_FILES['tara_avatar_tmp'] = $file;
@@ -932,10 +932,10 @@ if ( ! function_exists( 'tara_acc_avatar_upload' ) ) {
 
 		$attachment_id = (int) $attachment_id;
 		if ( $attachment_id <= 0 ) {
-			return new WP_Error( 'tara_avatar_save', 'ذخیرهٔ تصویر انجام نشد.' );
+			return new WP_Error( 'tara_avatar_save', 'ذخیره تصویر انجام نشد.' );
 		}
 
-		/* تصویرِ قبلی اگر خودمان آپلود کرده بودیم، از کتابخانهٔ رسانه هم برداشته
+		/* تصویر قبلی اگر خودمان آپلود کرده بودیم، از کتابخانه رسانه هم برداشته
 		   می‌شود تا فایل‌های بی‌استفاده روی هاست انبار نشوند. */
 		$previous = (int) get_user_meta( $user_id, 'tara_avatar', true );
 		if ( $previous > 0 && $previous !== $attachment_id && function_exists( 'wp_delete_attachment' ) ) {
@@ -957,10 +957,10 @@ if ( ! function_exists( 'tara_acc_avatar_upload' ) ) {
 
 if ( ! function_exists( 'tara_acc_avatar_remove' ) ) {
 	/**
-	 * برداشتنِ تصویرِ پروفایل (بازگشت به تصویرِ پیش‌فرض/گراواتار).
+	 * برداشتن تصویر پروفایل (بازگشت به تصویر پیش‌فرض/گراواتار).
 	 *
-	 * @param int $user_id شناسهٔ کاربر.
-	 * @return string آدرسِ تصویرِ جایگزین.
+	 * @param int $user_id شناسه کاربر.
+	 * @return string آدرس تصویر جایگزین.
 	 */
 	function tara_acc_avatar_remove( $user_id ) {
 		$user_id = (int) $user_id;
@@ -973,7 +973,7 @@ if ( ! function_exists( 'tara_acc_avatar_remove' ) ) {
 
 if ( ! function_exists( 'tara_acc_profile_url' ) ) {
 	/**
-	 * آدرسِ پنلِ کاربری (با تبِ دلخواه).
+	 * آدرس پنل کاربری (با تب دلخواه).
 	 *
 	 * @param string $tab تب.
 	 * @return string
@@ -995,9 +995,9 @@ if ( ! function_exists( 'tara_acc_profile_url' ) ) {
 
 if ( ! function_exists( 'tara_acc_page_url' ) ) {
 	/**
-	 * آدرسِ صفحه‌ای که یک قالبِ مشخص دارد (با کشِ یک‌ساعته).
+	 * آدرس صفحه‌ای که یک قالب مشخص دارد (با کش یک‌ساعته).
 	 *
-	 * @param string $template نامِ فایلِ قالب.
+	 * @param string $template نام فایل قالب.
 	 * @return string
 	 */
 	function tara_acc_page_url( $template ) {
@@ -1020,7 +1020,7 @@ if ( ! function_exists( 'tara_acc_page_url' ) ) {
 				$url = (string) get_permalink( $pages[0] );
 			}
 		}
-		/* برای کاربرِ مهمان، کشِ خالی دردسر می‌سازد اگر مدیر صفحه را تازه
+		/* برای کاربر مهمان، کش خالی دردسر می‌سازد اگر مدیر صفحه را تازه
 		   ساخته باشد؛ پس خالی را کوتاه‌تر کش می‌کنیم. */
 		set_transient( $key, $url, '' === $url ? 5 * MINUTE_IN_SECONDS : HOUR_IN_SECONDS );
 
@@ -1029,15 +1029,15 @@ if ( ! function_exists( 'tara_acc_page_url' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۶) دادهٔ کاربر — علاقه‌مندی، پلی‌لیست، دنبال‌کردن، تاریخچه، پیام
+ * ۶) داده کاربر — علاقه‌مندی، پلی‌لیست، دنبال‌کردن، تاریخچه، پیام
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_meta' ) ) {
 	/**
-	 * خواندنِ یک فهرست از user_meta با تضمینِ آرایه بودن.
+	 * خواندن یک فهرست از user_meta با تضمین آرایه بودن.
 	 *
-	 * @param int    $user_id شناسهٔ کاربر.
-	 * @param string $key     کلید بدونِ پیشوند.
+	 * @param int    $user_id شناسه کاربر.
+	 * @param string $key     کلید بدون پیشوند.
 	 * @param mixed  $default مقدار پیش‌فرض.
 	 * @return mixed
 	 */
@@ -1056,11 +1056,11 @@ if ( ! function_exists( 'tara_acc_meta' ) ) {
 
 if ( ! function_exists( 'tara_acc_uid' ) ) {
 	/**
-	 * شناسهٔ کاربر با پیش‌فرضِ «کاربرِ جاری».
+	 * شناسه کاربر با پیش‌فرض «کاربر جاری».
 	 *
-	 * چند تابع (پلی‌لیست، تاریخچه، پیام) بدونِ شناسه هم صدا زده می‌شوند؛
-	 * بدونِ این کمک، صدا زدنِ سادهٔ `tara_acc_playlists()` فهرستِ کاربرِ
-	 * صفر را می‌خواند و خالی برمی‌گشت. مقدارِ ۰ یعنی «کاربرِ جاری».
+	 * چند تابع (پلی‌لیست، تاریخچه، پیام) بدون شناسه هم صدا زده می‌شوند؛
+	 * بدون این کمک، صدا زدن ساده `tara_acc_playlists()` فهرست کاربر
+	 * صفر را می‌خواند و خالی برمی‌گشت. مقدار ۰ یعنی «کاربر جاری».
 	 *
 	 * @param int $user_id شناسه (۰ = جاری).
 	 * @return int
@@ -1076,7 +1076,7 @@ if ( ! function_exists( 'tara_acc_uid' ) ) {
 
 if ( ! function_exists( 'tara_acc_save' ) ) {
 	/**
-	 * نوشتنِ یک فهرست در user_meta.
+	 * نوشتن یک فهرست در user_meta.
 	 *
 	 * @param int    $user_id شناسه.
 	 * @param string $key     کلید.
@@ -1089,7 +1089,7 @@ if ( ! function_exists( 'tara_acc_save' ) ) {
 			return;
 		}
 		update_user_meta( $user_id, 'tara_' . (string) $key, $value );
-		/* کشِ سبکِ «تعدادها» را باطل می‌کنیم تا داشبورد کهنه نماند. */
+		/* کش سبک «تعدادها» را باطل می‌کنیم تا داشبورد کهنه نماند. */
 		if ( function_exists( 'delete_transient' ) ) {
 			delete_transient( 'tara_acc_counts_' . $user_id );
 		}
@@ -1100,7 +1100,7 @@ if ( ! function_exists( 'tara_acc_save' ) ) {
 
 if ( ! function_exists( 'tara_acc_likes' ) ) {
 	/**
-	 * شناسهٔ آهنگ‌های ذخیره‌شده (تازه‌ترین اول).
+	 * شناسه آهنگ‌های ذخیره‌شده (تازه‌ترین اول).
 	 *
 	 * @param int $user_id شناسه.
 	 * @return int[]
@@ -1131,10 +1131,10 @@ if ( ! function_exists( 'tara_acc_liked' ) ) {
 
 if ( ! function_exists( 'tara_acc_like' ) ) {
 	/**
-	 * افزودن/برداشتنِ علاقه‌مندی.
+	 * افزودن/برداشتن علاقه‌مندی.
 	 *
-	 * @param int  $post_id شناسهٔ آهنگ.
-	 * @param int  $user_id کاربر (۰ = کاربرِ جاری).
+	 * @param int  $post_id شناسه آهنگ.
+	 * @param int  $user_id کاربر (۰ = کاربر جاری).
 	 * @param bool $on      true=افزودن، false=برداشتن، null=وارونه.
 	 * @return array{liked:bool,count:int}|WP_Error
 	 */
@@ -1145,7 +1145,7 @@ if ( ! function_exists( 'tara_acc_like' ) ) {
 			$user_id = (int) get_current_user_id();
 		}
 		if ( $user_id <= 0 ) {
-			return new WP_Error( 'tara_guest', 'برای ذخیرهٔ آهنگ باید وارد شوید.' );
+			return new WP_Error( 'tara_guest', 'برای ذخیره آهنگ باید وارد شوید.' );
 		}
 		if ( $post_id <= 0 || ( function_exists( 'get_post' ) && ! get_post( $post_id ) ) ) {
 			return new WP_Error( 'tara_no_post', 'آهنگ پیدا نشد.' );
@@ -1157,7 +1157,7 @@ if ( ! function_exists( 'tara_acc_like' ) ) {
 
 		if ( $target && ! $has ) {
 			if ( count( $list ) >= tara_acc_limit( 'max_likes' ) ) {
-				return new WP_Error( 'tara_likes_full', 'فهرستِ علاقه‌مندی‌ها پر شده است؛ چند آهنگ را بردارید.' );
+				return new WP_Error( 'tara_likes_full', 'فهرست علاقه‌مندی‌ها پر شده است؛ چند آهنگ را بردارید.' );
 			}
 			array_unshift( $list, $post_id );
 		} elseif ( ! $target && $has ) {
@@ -1173,7 +1173,7 @@ if ( ! function_exists( 'tara_acc_like' ) ) {
 
 		tara_acc_save( $user_id, 'likes', array_slice( $list, 0, tara_acc_limit( 'max_likes' ) ) );
 
-		/* شمارندهٔ نمایشی (اصلِ حقیقت نیست) */
+		/* شمارنده نمایشی (اصل حقیقت نیست) */
 		$count = (int) get_post_meta( $post_id, 'tara_like_count', true );
 		$count += $target && ! $has ? 1 : 0;
 		$count -= ( ! $target && $has ) ? 1 : 0;
@@ -1186,11 +1186,11 @@ if ( ! function_exists( 'tara_acc_like' ) ) {
 	}
 }
 
-/* ---- ۶-۲) دنبال‌کردنِ خواننده‌ها ---- */
+/* ---- ۶-۲) دنبال‌کردن خواننده‌ها ---- */
 
 if ( ! function_exists( 'tara_acc_follows' ) ) {
 	/**
-	 * شناسهٔ ترم‌های «خواننده» که کاربر دنبال می‌کند.
+	 * شناسه ترم‌های «خواننده» که کاربر دنبال می‌کند.
 	 *
 	 * @param int $user_id شناسه.
 	 * @return int[]
@@ -1221,7 +1221,7 @@ if ( ! function_exists( 'tara_acc_following' ) ) {
 
 if ( ! function_exists( 'tara_acc_follower_count' ) ) {
 	/**
-	 * تعدادِ دنبال‌کننده‌های یک خواننده (شمارندهٔ term_meta).
+	 * تعداد دنبال‌کننده‌های یک خواننده (شمارنده term_meta).
 	 *
 	 * @param int $term_id شناسه.
 	 * @return int
@@ -1233,9 +1233,9 @@ if ( ! function_exists( 'tara_acc_follower_count' ) ) {
 
 if ( ! function_exists( 'tara_acc_follow' ) ) {
 	/**
-	 * دنبال‌کردن/رهاکردنِ یک خواننده.
+	 * دنبال‌کردن/رهاکردن یک خواننده.
 	 *
-	 * @param int  $term_id شناسهٔ ترمِ خواننده.
+	 * @param int  $term_id شناسه ترم خواننده.
 	 * @param int  $user_id کاربر (۰ = جاری).
 	 * @param bool $on      true/false/null.
 	 * @return array{following:bool,count:int}|WP_Error
@@ -1247,7 +1247,7 @@ if ( ! function_exists( 'tara_acc_follow' ) ) {
 			$user_id = (int) get_current_user_id();
 		}
 		if ( $user_id <= 0 ) {
-			return new WP_Error( 'tara_guest', 'برای دنبال‌کردنِ خواننده باید وارد شوید.' );
+			return new WP_Error( 'tara_guest', 'برای دنبال‌کردن خواننده باید وارد شوید.' );
 		}
 		if ( $term_id <= 0 ) {
 			return new WP_Error( 'tara_no_term', 'خواننده پیدا نشد.' );
@@ -1264,7 +1264,7 @@ if ( ! function_exists( 'tara_acc_follow' ) ) {
 
 		if ( $target && ! $has ) {
 			if ( count( $list ) >= tara_acc_limit( 'max_follows' ) ) {
-				return new WP_Error( 'tara_follows_full', 'تعدادِ خواننده‌های دنبال‌شده به سقف رسید.' );
+				return new WP_Error( 'tara_follows_full', 'تعداد خواننده‌های دنبال‌شده به سقف رسید.' );
 			}
 			array_unshift( $list, $term_id );
 		} elseif ( ! $target && $has ) {
@@ -1300,7 +1300,7 @@ if ( ! function_exists( 'tara_acc_follow' ) ) {
 
 if ( ! function_exists( 'tara_acc_playlists' ) ) {
 	/**
-	 * همهٔ پلی‌لیست‌های کاربر.
+	 * همه پلی‌لیست‌های کاربر.
 	 *
 	 * @param int $user_id شناسه.
 	 * @return array
@@ -1348,7 +1348,7 @@ if ( ! function_exists( 'tara_acc_playlist' ) ) {
 }
 
 if ( ! function_exists( 'tara_acc_playlist_key' ) ) {
-	/** کلیدِ تصادفی و کوتاه برای پلی‌لیست. */
+	/** کلید تصادفی و کوتاه برای پلی‌لیست. */
 	function tara_acc_playlist_key() {
 		$seed = function_exists( 'wp_generate_password' ) ? wp_generate_password( 8, false, false ) : (string) wp_rand( 100000, 999999 );
 		return strtolower( substr( preg_replace( '/[^a-zA-Z0-9]/', '', (string) $seed ), 0, 8 ) );
@@ -1357,7 +1357,7 @@ if ( ! function_exists( 'tara_acc_playlist_key' ) ) {
 
 if ( ! function_exists( 'tara_acc_playlist_save' ) ) {
 	/**
-	 * ذخیرهٔ کلِ فهرستِ پلی‌لیست‌ها (سقف‌دار).
+	 * ذخیره کل فهرست پلی‌لیست‌ها (سقف‌دار).
 	 *
 	 * @param int   $user_id شناسه.
 	 * @param array $list    فهرست.
@@ -1371,7 +1371,7 @@ if ( ! function_exists( 'tara_acc_playlist_save' ) ) {
 
 if ( ! function_exists( 'tara_acc_playlist_create' ) ) {
 	/**
-	 * ساختِ پلی‌لیستِ تازه.
+	 * ساخت پلی‌لیست تازه.
 	 *
 	 * @param string $name    نام.
 	 * @param int    $user_id شناسه.
@@ -1383,12 +1383,12 @@ if ( ! function_exists( 'tara_acc_playlist_create' ) ) {
 			$user_id = (int) get_current_user_id();
 		}
 		if ( $user_id <= 0 ) {
-			return new WP_Error( 'tara_guest', 'برای ساختِ پلی‌لیست باید وارد شوید.' );
+			return new WP_Error( 'tara_guest', 'برای ساخت پلی‌لیست باید وارد شوید.' );
 		}
 
 		$name = trim( sanitize_text_field( (string) $name ) );
 		if ( '' === $name ) {
-			$name = 'پلی‌لیستِ تازه';
+			$name = 'پلی‌لیست تازه';
 		}
 		if ( function_exists( 'mb_substr' ) ) {
 			$name = mb_substr( $name, 0, 60 );
@@ -1396,7 +1396,7 @@ if ( ! function_exists( 'tara_acc_playlist_create' ) ) {
 
 		$list = tara_acc_playlists( $user_id );
 		if ( count( $list ) >= tara_acc_limit( 'max_playlists' ) ) {
-			return new WP_Error( 'tara_pl_full', 'تعدادِ پلی‌لیست‌ها به سقف رسید.' );
+			return new WP_Error( 'tara_pl_full', 'تعداد پلی‌لیست‌ها به سقف رسید.' );
 		}
 
 		$key = tara_acc_playlist_key();
@@ -1420,7 +1420,7 @@ if ( ! function_exists( 'tara_acc_playlist_create' ) ) {
 
 if ( ! function_exists( 'tara_acc_playlist_update' ) ) {
 	/**
-	 * تغییرِ نام/عمومی‌بودنِ پلی‌لیست.
+	 * تغییر نام/عمومی‌بودن پلی‌لیست.
 	 *
 	 * @param string $key     کلید.
 	 * @param array  $args    name/public.
@@ -1462,7 +1462,7 @@ if ( ! function_exists( 'tara_acc_playlist_update' ) ) {
 
 if ( ! function_exists( 'tara_acc_playlist_delete' ) ) {
 	/**
-	 * حذفِ پلی‌لیست.
+	 * حذف پلی‌لیست.
 	 *
 	 * @param string $key     کلید.
 	 * @param int    $user_id شناسه.
@@ -1495,7 +1495,7 @@ if ( ! function_exists( 'tara_acc_playlist_delete' ) ) {
 
 if ( ! function_exists( 'tara_acc_playlist_toggle' ) ) {
 	/**
-	 * افزودن/برداشتنِ یک آهنگ در پلی‌لیست.
+	 * افزودن/برداشتن یک آهنگ در پلی‌لیست.
 	 *
 	 * @param string $key     کلید.
 	 * @param int    $post_id آهنگ.
@@ -1560,11 +1560,11 @@ if ( ! function_exists( 'tara_acc_playlist_toggle' ) ) {
 	}
 }
 
-/* ---- ۶-۴) تاریخچهٔ شنیدن ---- */
+/* ---- ۶-۴) تاریخچه شنیدن ---- */
 
 if ( ! function_exists( 'tara_acc_history' ) ) {
 	/**
-	 * تاریخچهٔ شنیدن (تازه‌ترین اول).
+	 * تاریخچه شنیدن (تازه‌ترین اول).
 	 *
 	 * @param int $user_id شناسه.
 	 * @return array<int,array{i:int,t:int}>
@@ -1588,7 +1588,7 @@ if ( ! function_exists( 'tara_acc_history' ) ) {
 
 if ( ! function_exists( 'tara_acc_history_push' ) ) {
 	/**
-	 * ثبتِ یک آهنگ در تاریخچه (بدونِ تکرار؛ سقف‌دار).
+	 * ثبت یک آهنگ در تاریخچه (بدون تکرار؛ سقف‌دار).
 	 *
 	 * @param int $post_id آهنگ.
 	 * @param int $user_id کاربر.
@@ -1623,7 +1623,7 @@ if ( ! function_exists( 'tara_acc_history_push' ) ) {
 
 if ( ! function_exists( 'tara_acc_notify' ) ) {
 	/**
-	 * افزودنِ یک پیام به فهرستِ پیام‌های کاربر.
+	 * افزودن یک پیام به فهرست پیام‌های کاربر.
 	 *
 	 * @param int   $user_id شناسه.
 	 * @param array $item    k/n/u (کلید، متن، آدرس).
@@ -1654,7 +1654,7 @@ if ( ! function_exists( 'tara_acc_notify' ) ) {
 
 if ( ! function_exists( 'tara_acc_notifs' ) ) {
 	/**
-	 * فهرستِ پیام‌ها.
+	 * فهرست پیام‌ها.
 	 *
 	 * @param int $user_id شناسه.
 	 * @return array
@@ -1667,7 +1667,7 @@ if ( ! function_exists( 'tara_acc_notifs' ) ) {
 
 if ( ! function_exists( 'tara_acc_unread' ) ) {
 	/**
-	 * تعدادِ پیامِ خوانده‌نشده + آهنگ‌های تازه از خواننده‌های دنبال‌شده.
+	 * تعداد پیام خوانده‌نشده + آهنگ‌های تازه از خواننده‌های دنبال‌شده.
 	 *
 	 * @param int $user_id شناسه.
 	 * @return int
@@ -1685,7 +1685,7 @@ if ( ! function_exists( 'tara_acc_unread' ) ) {
 		}
 		if ( tara_acc_feature( 'notifs' ) ) {
 			$count += count( tara_acc_feed( $user_id, array( 'since' => (int) tara_acc_meta( $user_id, 'feed_seen', 0 ), 'limit' => 20 ) ) );
-			/* v3.11.0 — اعلان‌های مدیر هم در شمارندهٔ پیام‌های نو حساب می‌شوند. */
+			/* v3.11.0 — اعلان‌های مدیر هم در شمارنده پیام‌های نو حساب می‌شوند. */
 			$count += tara_acc_notice_unseen( $user_id );
 		}
 		return max( 0, $count );
@@ -1694,7 +1694,7 @@ if ( ! function_exists( 'tara_acc_unread' ) ) {
 
 if ( ! function_exists( 'tara_acc_notifs_read' ) ) {
 	/**
-	 * خوانده‌شدنِ همهٔ پیام‌ها + به‌روزرسانیِ نشانگرِ فید.
+	 * خوانده‌شدن همه پیام‌ها + به‌روزرسانی نشانگر فید.
 	 *
 	 * @param int $user_id شناسه.
 	 * @return void
@@ -1716,7 +1716,7 @@ if ( ! function_exists( 'tara_acc_notifs_read' ) ) {
 	}
 }
 
-/* ---- ۶-۶) فیدِ «از خواننده‌هایی که دنبال می‌کنید» ---- */
+/* ---- ۶-۶) فید «از خواننده‌هایی که دنبال می‌کنید» ---- */
 
 if ( ! function_exists( 'tara_acc_feed' ) ) {
 	/**
@@ -1802,7 +1802,7 @@ if ( ! function_exists( 'tara_acc_feed' ) ) {
 
 if ( ! function_exists( 'tara_acc_counts' ) ) {
 	/**
-	 * عددهای داشبورد (با کشِ کوتاه).
+	 * عددهای داشبورد (با کش کوتاه).
 	 *
 	 * @param int $user_id شناسه.
 	 * @return array
@@ -1837,15 +1837,15 @@ if ( ! function_exists( 'tara_acc_counts' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۷) اتصال به رباتِ تلگرام — کدِ یک‌بارمصرف و لینک
+ * ۷) اتصال به ربات تلگرام — کد یک‌بارمصرف و لینک
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_user_by_tg' ) ) {
 	/**
-	 * کاربری که این شناسهٔ تلگرام به آن وصل است.
+	 * کاربری که این شناسه تلگرام به آن وصل است.
 	 *
-	 * @param int $tg_id شناسهٔ تلگرام.
-	 * @return int شناسهٔ کاربر (۰ = هیچ).
+	 * @param int $tg_id شناسه تلگرام.
+	 * @return int شناسه کاربر (۰ = هیچ).
 	 */
 	function tara_acc_user_by_tg( $tg_id ) {
 		$tg_id = (int) $tg_id;
@@ -1868,7 +1868,7 @@ if ( ! function_exists( 'tara_acc_user_by_tg' ) ) {
 }
 
 if ( ! function_exists( 'tara_acc_notice_on' ) ) {
-	/** آیا بخشِ «اعلان‌های مدیر» روشن است؟ (پیش‌فرض: روشن) */
+	/** آیا بخش «اعلان‌های مدیر» روشن است؟ (پیش‌فرض: روشن) */
 	function tara_acc_notice_on() {
 		return 'on' === (string) ot_get_option( 'notice_on', 'on' );
 	}
@@ -1876,7 +1876,7 @@ if ( ! function_exists( 'tara_acc_notice_on' ) ) {
 
 if ( ! function_exists( 'tara_acc_notice_title' ) ) {
 	/**
-	 * عنوانِ بخشِ اعلان‌ها از تنظیماتِ قالب.
+	 * عنوان بخش اعلان‌ها از تنظیمات قالب.
 	 *
 	 * @return string
 	 */
@@ -1889,7 +1889,7 @@ if ( ! function_exists( 'tara_acc_notice_title' ) ) {
 
 if ( ! function_exists( 'tara_acc_notice_date' ) ) {
 	/**
-	 * تاریخِ آخرین بروزرسانی (متنِ آزاد از تنظیمات).
+	 * تاریخ آخرین بروزرسانی (متن آزاد از تنظیمات).
 	 *
 	 * @return string
 	 */
@@ -1900,11 +1900,11 @@ if ( ! function_exists( 'tara_acc_notice_date' ) ) {
 
 if ( ! function_exists( 'tara_acc_notice_list' ) ) {
 	/**
-	 * فهرستِ اعلان‌های مدیر از تنظیماتِ قالب → «اعلان‌ها و بروزرسانی‌ها».
+	 * فهرست اعلان‌های مدیر از تنظیمات قالب → «اعلان‌ها و بروزرسانی‌ها».
 	 *
 	 * هر خط یک اعلان است و «|» متن را از لینک جدا می‌کند. خروجی همیشه
-	 * یک آرایهٔ مرتب است (تازه‌ترین بالا نمی‌آید؛ ترتیبِ نوشتن حفظ می‌شود)
-	 * تا مدیر دقیقاً همان چیزی را ببیند که نوشته است.
+	 * یک آرایه مرتب است (تازه‌ترین بالا نمی‌آید؛ ترتیب نوشتن حفظ می‌شود)
+	 * تا مدیر دقیقا همان چیزی را ببیند که نوشته است.
 	 *
 	 * @return array فهرستی از array( 'n' => متن، 'u' => لینک ).
 	 */
@@ -1943,7 +1943,7 @@ if ( ! function_exists( 'tara_acc_notice_list' ) ) {
 			);
 
 			if ( count( $out ) >= 20 ) {
-				break; // سقفِ سالم برای جلوگیری از فهرستِ بی‌پایان
+				break; // سقف سالم برای جلوگیری از فهرست بی‌پایان
 			}
 		}
 
@@ -1953,7 +1953,7 @@ if ( ! function_exists( 'tara_acc_notice_list' ) ) {
 
 if ( ! function_exists( 'tara_acc_notice_count' ) ) {
 	/**
-	 * تعدادِ اعلان‌های مدیر (برای شمارندهٔ «نخوانده» در پنل).
+	 * تعداد اعلان‌های مدیر (برای شمارنده «نخوانده» در پنل).
 	 *
 	 * @return int
 	 */
@@ -1964,7 +1964,7 @@ if ( ! function_exists( 'tara_acc_notice_count' ) ) {
 
 if ( ! function_exists( 'tara_acc_notice_sig' ) ) {
 	/**
-	 * اثرِ انگشتِ فهرستِ اعلان‌ها؛ برای فهمیدنِ «اعلانِ تازه آمده یا نه».
+	 * اثر انگشت فهرست اعلان‌ها؛ برای فهمیدن «اعلان تازه آمده یا نه».
 	 *
 	 * @return string
 	 */
@@ -1984,9 +1984,9 @@ if ( ! function_exists( 'tara_acc_notice_sig' ) ) {
 
 if ( ! function_exists( 'tara_acc_notice_unseen' ) ) {
 	/**
-	 * تعدادِ اعلان‌های مدیر که کاربر هنوز ندیده (۰ = همه دیده شده).
+	 * تعداد اعلان‌های مدیر که کاربر هنوز ندیده (۰ = همه دیده شده).
 	 *
-	 * @param int $user_id شناسهٔ کاربر.
+	 * @param int $user_id شناسه کاربر.
 	 * @return int
 	 */
 	function tara_acc_notice_unseen( $user_id = 0 ) {
@@ -2008,9 +2008,9 @@ if ( ! function_exists( 'tara_acc_notice_unseen' ) ) {
 
 if ( ! function_exists( 'tara_acc_notice_mark' ) ) {
 	/**
-	 * ثبتِ «اعلان‌ها دیده شد» برای همین نسخه از اعلان‌ها.
+	 * ثبت «اعلان‌ها دیده شد» برای همین نسخه از اعلان‌ها.
 	 *
-	 * @param int $user_id شناسهٔ کاربر.
+	 * @param int $user_id شناسه کاربر.
 	 * @return void
 	 */
 	function tara_acc_notice_mark( $user_id = 0 ) {
@@ -2025,11 +2025,11 @@ if ( ! function_exists( 'tara_acc_notice_mark' ) ) {
 
 if ( ! function_exists( 'tara_acc_help_url' ) ) {
 	/**
-	 * آدرسِ «راهنمای ورود و ثبت‌نام» از تنظیماتِ قالب.
+	 * آدرس «راهنمای ورود و ثبت‌نام» از تنظیمات قالب.
 	 *
-	 * قبلاً یک لینکِ ثابت به جست‌وجوی سایت (`/?s=`) بود؛ حالا مدیر هر آدرسی
-	 * بگذارد (برگهٔ راهنما، ویدیوی آموزش، پستِ پرسش‌های رایج…) و اگر خالی
-	 * باشد، لینک اصلاً چاپ نمی‌شود تا چیزی به مقصدِ بی‌ربط نرود.
+	 * قبلا یک لینک ثابت به جست‌وجوی سایت (`/?s=`) بود؛ حالا مدیر هر آدرسی
+	 * بگذارد (برگه راهنما، ویدیوی آموزش، پست پرسش‌های رایج…) و اگر خالی
+	 * باشد، لینک اصلا چاپ نمی‌شود تا چیزی به مقصد بی‌ربط نرود.
 	 *
 	 * @return string
 	 */
@@ -2045,7 +2045,7 @@ if ( ! function_exists( 'tara_acc_help_url' ) ) {
 
 if ( ! function_exists( 'tara_acc_help_text' ) ) {
 	/**
-	 * متنِ لینکِ راهنما (پیش‌فرض: «راهنمای ورود»).
+	 * متن لینک راهنما (پیش‌فرض: «راهنمای ورود»).
 	 *
 	 * @return string
 	 */
@@ -2058,11 +2058,11 @@ if ( ! function_exists( 'tara_acc_help_text' ) ) {
 
 if ( ! function_exists( 'tara_acc_bot_user' ) ) {
 	/**
-	 * نامِ کاربریِ رباتِ تلگرام (بدونِ @).
+	 * نام کاربری ربات تلگرام (بدون @).
 	 *
-	 * اگر در تنظیمات خالی باشد، رباتِ رسمیِ همین سایت (`ahangbanbot`) برمی‌گردد
-	 * تا دکمهٔ «مشاهده در ربات» و لینکِ اتصال از روزِ اول کار کنند؛ مدیر با
-	 * گذاشتنِ نامِ دلخواه در تنظیمات قالب، آن را عوض می‌کند.
+	 * اگر در تنظیمات خالی باشد، ربات رسمی همین سایت (`ahangbanbot`) برمی‌گردد
+	 * تا دکمه «مشاهده در ربات» و لینک اتصال از روز اول کار کنند؛ مدیر با
+	 * گذاشتن نام دلخواه در تنظیمات قالب، آن را عوض می‌کند.
 	 *
 	 * @return string
 	 */
@@ -2078,13 +2078,13 @@ if ( ! function_exists( 'tara_acc_bot_user' ) ) {
 
 if ( ! function_exists( 'tara_acc_bot_song_url' ) ) {
 	/**
-	 * لینکِ دیپ‌لینکِ آهنگ در ربات تلگرام.
+	 * لینک دیپ‌لینک آهنگ در ربات تلگرام.
 	 *
-	 * قالبِ قراردادِ ربات: `start=song_<شناسهٔ نوشته>` — همان چیزی که
+	 * قالب قرارداد ربات: `start=song_<شناسه نوشته>` — همان چیزی که
 	 * کانال/ربات برای هر آهنگ می‌سازد و در `handlers/start.py` با
 	 * `song_([1-9][0-9]*)` خوانده می‌شود.
 	 *
-	 * @param int $post_id شناسهٔ آهنگ.
+	 * @param int $post_id شناسه آهنگ.
 	 * @return string خالی اگر دکمه در تنظیمات خاموش باشد یا شناسه نامعتبر باشد.
 	 */
 	function tara_acc_bot_song_url( $post_id = 0 ) {
@@ -2112,9 +2112,9 @@ if ( ! function_exists( 'tara_acc_bot_song_url' ) ) {
 
 if ( ! function_exists( 'tara_acc_link_code' ) ) {
 	/**
-	 * ساختِ کدِ اتصال به ربات (۸ کاراکترِ بی‌ابهام).
+	 * ساخت کد اتصال به ربات (۸ کاراکتر بی‌ابهام).
 	 *
-	 * @param int $user_id شناسهٔ کاربر.
+	 * @param int $user_id شناسه کاربر.
 	 * @return array{code:string,ttl:int,deeplink:string}|WP_Error
 	 */
 	function tara_acc_link_code( $user_id = 0 ) {
@@ -2149,13 +2149,13 @@ if ( ! function_exists( 'tara_acc_link_code' ) ) {
 
 if ( ! function_exists( 'tara_acc_link_consume' ) ) {
 	/**
-	 * مصرفِ کدِ اتصال و وصل‌کردنِ تلگرام به حساب.
+	 * مصرف کد اتصال و وصل‌کردن تلگرام به حساب.
 	 *
-	 * @param string $code     کدِ ۸کاراکتری (بدونِ پیشوندِ tara_).
-	 * @param int    $tg_id    شناسهٔ تلگرام.
-	 * @param string $username نام‌کاربریِ تلگرام (اختیاری).
-	 * @param string $name     نامِ نمایشی در تلگرام (اختیاری).
-	 * @return int|WP_Error شناسهٔ کاربر.
+	 * @param string $code     کد ۸کاراکتری (بدون پیشوند tara_).
+	 * @param int    $tg_id    شناسه تلگرام.
+	 * @param string $username نام‌کاربری تلگرام (اختیاری).
+	 * @param string $name     نام نمایشی در تلگرام (اختیاری).
+	 * @return int|WP_Error شناسه کاربر.
 	 */
 	function tara_acc_link_consume( $code, $tg_id, $username = '', $name = '' ) {
 		$code  = strtoupper( preg_replace( '/[^A-Za-z0-9]/', '', (string) $code ) );
@@ -2165,16 +2165,16 @@ if ( ! function_exists( 'tara_acc_link_consume' ) ) {
 			$code = substr( $code, 4 );
 		}
 		if ( strlen( $code ) < 6 || $tg_id <= 0 ) {
-			return new WP_Error( 'tara_bad_link', 'کدِ اتصال نامعتبر است.' );
+			return new WP_Error( 'tara_bad_link', 'کد اتصال نامعتبر است.' );
 		}
 
 		$key     = 'tara_link_' . $code;
 		$user_id = (int) get_transient( $key );
 		if ( $user_id <= 0 ) {
-			return new WP_Error( 'tara_link_expired', 'این کد منقضی شده است؛ از پنلِ «حساب من» کدِ تازه بگیرید.' );
+			return new WP_Error( 'tara_link_expired', 'این کد منقضی شده است؛ از پنل «حساب من» کد تازه بگیرید.' );
 		}
 
-		/* هر حسابِ دیگر که به همین تلگرام وصل بود، جدا می‌شود. */
+		/* هر حساب دیگر که به همین تلگرام وصل بود، جدا می‌شود. */
 		$other = tara_acc_user_by_tg( $tg_id );
 		if ( $other > 0 && $other !== $user_id ) {
 			delete_user_meta( $other, 'tara_tg_id' );
@@ -2192,7 +2192,7 @@ if ( ! function_exists( 'tara_acc_link_consume' ) ) {
 			$user_id,
 			array(
 				'k'     => 'tg',
-				'title' => 'تلگرامِ شما به حساب وصل شد؛ از این به بعد پیام‌های ربات هم به همین حساب می‌رسد.',
+				'title' => 'تلگرام شما به حساب وصل شد؛ از این به بعد پیام‌های ربات هم به همین حساب می‌رسد.',
 				'url'   => tara_acc_profile_url( 'telegram' ),
 			)
 		);
@@ -2202,15 +2202,15 @@ if ( ! function_exists( 'tara_acc_link_consume' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۸) AJAX — همهٔ کنش‌های پنل از یک نقطه
+ * ۸) AJAX — همه کنش‌های پنل از یک نقطه
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_json_error' ) ) {
 	/**
-	 * خطای AJAX با پیامِ فارسی و کدِ وضعیت.
+	 * خطای AJAX با پیام فارسی و کد وضعیت.
 	 *
 	 * @param string $message پیام.
-	 * @param array  $extra   دادهٔ اضافه.
+	 * @param array  $extra   داده اضافه.
 	 * @return void
 	 */
 	function tara_acc_json_error( $message, $extra = array() ) {
@@ -2222,7 +2222,7 @@ if ( ! function_exists( 'tara_acc_require_login' ) ) {
 	/**
 	 * کاربر را می‌خواهد یا با خطای «نیاز به ورود» برمی‌گردد.
 	 *
-	 * @return int شناسهٔ کاربر (در صورتِ نبود، پاسخ داده و ۰ برمی‌گردد).
+	 * @return int شناسه کاربر (در صورت نبود، پاسخ داده و ۰ برمی‌گردد).
 	 */
 	function tara_acc_require_login() {
 		$user_id = function_exists( 'get_current_user_id' ) ? (int) get_current_user_id() : 0;
@@ -2236,18 +2236,18 @@ if ( ! function_exists( 'tara_acc_require_login' ) ) {
 
 if ( ! function_exists( 'tara_acc_ajax' ) ) {
 	/**
-	 * مسیریابِ AJAX.
+	 * مسیریاب AJAX.
 	 *
 	 * @return void
 	 */
 	function tara_acc_ajax() {
 		if ( ! tara_acc_on() ) {
-			tara_acc_json_error( 'حسابِ کاربری در این سایت خاموش است.' );
+			tara_acc_json_error( 'حساب کاربری در این سایت خاموش است.' );
 		}
 
 		$nonce = isset( $_REQUEST['nonce'] ) ? sanitize_text_field( wp_unslash( (string) $_REQUEST['nonce'] ) ) : '';
 		if ( ! wp_verify_nonce( $nonce, 'tara_account' ) ) {
-			tara_acc_json_error( 'نشستِ صفحه منقضی شده است؛ صفحه را یک‌بار تازه کنید.', array( 'reload' => 1 ) );
+			tara_acc_json_error( 'نشست صفحه منقضی شده است؛ صفحه را یک‌بار تازه کنید.', array( 'reload' => 1 ) );
 		}
 
 		$do   = isset( $_REQUEST['do'] ) ? sanitize_key( wp_unslash( (string) $_REQUEST['do'] ) ) : '';
@@ -2260,7 +2260,7 @@ if ( ! function_exists( 'tara_acc_ajax' ) ) {
 			case 'send':
 				$phone = tara_acc_phone( (string) $post( 'phone' ) );
 				if ( '' === $phone ) {
-					tara_acc_json_error( 'شمارهٔ موبایل را کامل و درست وارد کنید.' );
+					tara_acc_json_error( 'شماره موبایل را کامل و درست وارد کنید.' );
 				}
 				$res = tara_acc_otp_send( $phone );
 				if ( function_exists( 'is_wp_error' ) && is_wp_error( $res ) ) {
@@ -2277,7 +2277,7 @@ if ( ! function_exists( 'tara_acc_ajax' ) ) {
 					tara_acc_json_error( 'شماره یا کد را درست وارد کنید.' );
 				}
 				if ( ! tara_acc_throttle( 'otp_verify_' . $phone, 12, HOUR_IN_SECONDS ) ) {
-					tara_acc_json_error( 'تلاشِ زیاد؛ کمی بعد دوباره امتحان کنید.' );
+					tara_acc_json_error( 'تلاش زیاد؛ کمی بعد دوباره امتحان کنید.' );
 				}
 				if ( ! tara_acc_otp_check( $phone, $code ) ) {
 					tara_acc_json_error( 'کد نادرست یا منقضی است. دوباره درخواست کنید.' );
@@ -2305,8 +2305,8 @@ if ( ! function_exists( 'tara_acc_ajax' ) ) {
 				break;
 
 			case 'password':
-				/* ورودِ کلاسیکِ وردپرس برای حساب‌های مدیریتی/قدیمی. فقط اگر
-				   گزینه‌اش روشن باشد؛ پیامِ خطا عمداً کلی است تا نامِ کاربری
+				/* ورود کلاسیک وردپرس برای حساب‌های مدیریتی/قدیمی. فقط اگر
+				   گزینه‌اش روشن باشد؛ پیام خطا عمدا کلی است تا نام کاربری
 				   لو نرود. */
 				if ( 'on' !== (string) tara_acc_opt( 'allow_password', 'on' ) ) {
 					tara_acc_json_error( 'ورود با رمز خاموش است؛ از پیامک استفاده کنید.' );
@@ -2315,7 +2315,7 @@ if ( ! function_exists( 'tara_acc_ajax' ) ) {
 					tara_acc_json_error( 'ورود با رمز در این محیط ممکن نیست.' );
 				}
 				if ( ! tara_acc_throttle( 'login_ip_' . tara_acc_client_ip(), 10, HOUR_IN_SECONDS ) ) {
-					tara_acc_json_error( 'تلاشِ زیاد از این اتصال؛ یک ساعتِ دیگر تلاش کنید.' );
+					tara_acc_json_error( 'تلاش زیاد از این اتصال؛ یک ساعت دیگر تلاش کنید.' );
 				}
 				$login = sanitize_text_field( (string) $post( 'login' ) );
 				$pass  = (string) $post( 'password' );
@@ -2413,7 +2413,7 @@ if ( ! function_exists( 'tara_acc_ajax' ) ) {
 					$on  = isset( $_POST['on'] ) ? (bool) absint( $post( 'on' ) ) : null;
 					$res = tara_acc_playlist_toggle( $key, (int) $post( 'post' ), $user_id, $on );
 				} else {
-					$res = new WP_Error( 'tara_pl_op', 'درخواستِ نامعتبر.' );
+					$res = new WP_Error( 'tara_pl_op', 'درخواست نامعتبر.' );
 				}
 
 				if ( function_exists( 'is_wp_error' ) && is_wp_error( $res ) ) {
@@ -2479,15 +2479,15 @@ if ( ! function_exists( 'tara_acc_ajax' ) ) {
 				);
 				break;
 
-			/* ---------- تصویرِ پروفایل ---------- */
-			/* v3.11.0 — آپلودِ تصویرِ پروفایل (فایل، نه آدرس). */
+			/* ---------- تصویر پروفایل ---------- */
+			/* v3.11.0 — آپلود تصویر پروفایل (فایل، نه آدرس). */
 			case 'avatar':
 				$user_id = tara_acc_require_login();
 				if ( ! $user_id ) {
 					return;
 				}
 				if ( ! tara_acc_feature( 'avatar' ) ) {
-					tara_acc_json_error( 'تغییرِ تصویرِ پروفایل در تنظیماتِ سایت خاموش است.' );
+					tara_acc_json_error( 'تغییر تصویر پروفایل در تنظیمات سایت خاموش است.' );
 				}
 				$file = isset( $_FILES['avatar'] ) ? $_FILES['avatar'] : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput -- فایل از media_handle_upload می‌گذرد
 				$res  = tara_acc_avatar_upload( (int) $user_id, $file );
@@ -2512,7 +2512,7 @@ if ( ! function_exists( 'tara_acc_ajax' ) ) {
 				}
 				$url = esc_url_raw( (string) $post( 'url' ) );
 				if ( '' !== $url && ! preg_match( '#^https?://#i', $url ) ) {
-					tara_acc_json_error( 'آدرسِ تصویر معتبر نیست.' );
+					tara_acc_json_error( 'آدرس تصویر معتبر نیست.' );
 				}
 				update_user_meta( (int) $user_id, 'tara_avatar_url', $url );
 				update_user_meta( (int) $user_id, 'tara_avatar', 0 );
@@ -2553,7 +2553,7 @@ if ( ! function_exists( 'tara_acc_ajax' ) ) {
 				break;
 
 			default:
-				tara_acc_json_error( 'درخواستِ ناشناخته.' );
+				tara_acc_json_error( 'درخواست ناشناخته.' );
 		}
 	}
 }
@@ -2564,18 +2564,18 @@ if ( function_exists( 'add_action' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۹) REST برای رباتِ «آهنگ‌بان»
+ * ۹) REST برای ربات «آهنگ‌بان»
  * ----------------------------------------------------------------------
- * همان قراردادِ افزونهٔ اتصالِ ربات: هدرِ `Authorization: Bearer <توکن>`،
- * توکنِ ۶۴رقمیِ هگز، مقایسهٔ زمان‌ثابت با hash_equals و سقفِ نرخ.
+ * همان قرارداد افزونه اتصال ربات: هدر `Authorization: Bearer <توکن>`،
+ * توکن ۶۴رقمی هگز، مقایسه زمان‌ثابت با hash_equals و سقف نرخ.
  *
- * اگر توکن در تنظیماتِ قالب نباشد، همان گزینهٔ افزونهٔ ربات
- * (`ahangban_connector_token`) خوانده می‌شود تا با نصبِ فعلی هم کار کند.
+ * اگر توکن در تنظیمات قالب نباشد، همان گزینه افزونه ربات
+ * (`ahangban_connector_token`) خوانده می‌شود تا با نصب فعلی هم کار کند.
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_rest_token' ) ) {
 	/**
-	 * توکنِ REST.
+	 * توکن REST.
 	 *
 	 * @return string
 	 */
@@ -2593,7 +2593,7 @@ if ( ! function_exists( 'tara_acc_rest_token' ) ) {
 
 if ( ! function_exists( 'tara_acc_rest_auth' ) ) {
 	/**
-	 * احرازِ هویتِ درخواست‌های ربات.
+	 * احراز هویت درخواست‌های ربات.
 	 *
 	 * @param WP_REST_Request $request درخواست.
 	 * @return bool|WP_Error
@@ -2622,14 +2622,14 @@ if ( ! function_exists( 'tara_acc_rest_auth' ) ) {
 
 		$expected = tara_acc_rest_token();
 		if ( '' === $expected ) {
-			return new WP_Error( 'tara_auth_unset', 'توکنِ ربات در تنظیمات قالب تنظیم نشده است.', array( 'status' => 503 ) );
+			return new WP_Error( 'tara_auth_unset', 'توکن ربات در تنظیمات قالب تنظیم نشده است.', array( 'status' => 503 ) );
 		}
 		if ( ! hash_equals( $expected, $token ) ) {
 			return new WP_Error( 'tara_forbidden', 'توکن نامعتبر است.', array( 'status' => 403 ) );
 		}
 
 		if ( ! tara_acc_throttle( 'rest_ip_' . tara_acc_client_ip(), 120, MINUTE_IN_SECONDS ) ) {
-			return new WP_Error( 'tara_rate_ip', 'تعدادِ درخواست‌ها زیاد است.', array( 'status' => 429 ) );
+			return new WP_Error( 'tara_rate_ip', 'تعداد درخواست‌ها زیاد است.', array( 'status' => 429 ) );
 		}
 
 		return true;
@@ -2638,7 +2638,7 @@ if ( ! function_exists( 'tara_acc_rest_auth' ) ) {
 
 if ( ! function_exists( 'tara_acc_rest_user' ) ) {
 	/**
-	 * کاربرِ متناظر با شناسهٔ تلگرام.
+	 * کاربر متناظر با شناسه تلگرام.
 	 *
 	 * @param WP_REST_Request $request درخواست.
 	 * @return int|WP_Error
@@ -2646,14 +2646,14 @@ if ( ! function_exists( 'tara_acc_rest_user' ) ) {
 	function tara_acc_rest_user( $request ) {
 		$tg_id = (int) $request->get_param( 'telegram_id' );
 		if ( $tg_id <= 0 ) {
-			return new WP_Error( 'tara_no_tg', 'شناسهٔ تلگرام لازم است.', array( 'status' => 400 ) );
+			return new WP_Error( 'tara_no_tg', 'شناسه تلگرام لازم است.', array( 'status' => 400 ) );
 		}
 		if ( ! tara_acc_throttle( 'rest_tg_' . $tg_id, 80, MINUTE_IN_SECONDS ) ) {
-			return new WP_Error( 'tara_rate_tg', 'تعدادِ درخواست‌ها زیاد است.', array( 'status' => 429 ) );
+			return new WP_Error( 'tara_rate_tg', 'تعداد درخواست‌ها زیاد است.', array( 'status' => 429 ) );
 		}
 		$user_id = tara_acc_user_by_tg( $tg_id );
 		if ( $user_id <= 0 ) {
-			return new WP_Error( 'tara_unlinked', 'حسابِ سایت به این تلگرام وصل نیست.', array( 'status' => 404 ) );
+			return new WP_Error( 'tara_unlinked', 'حساب سایت به این تلگرام وصل نیست.', array( 'status' => 404 ) );
 		}
 		return $user_id;
 	}
@@ -2661,7 +2661,7 @@ if ( ! function_exists( 'tara_acc_rest_user' ) ) {
 
 if ( ! function_exists( 'tara_acc_rest_summary' ) ) {
 	/**
-	 * خلاصهٔ کاربر برای ربات.
+	 * خلاصه کاربر برای ربات.
 	 *
 	 * @param int $user_id شناسه.
 	 * @return array
@@ -2676,7 +2676,7 @@ if ( ! function_exists( 'tara_acc_rest_summary' ) ) {
 			if ( ! $term || ( function_exists( 'is_wp_error' ) && is_wp_error( $term ) ) ) {
 				continue;
 			}
-			/* get_term_link می‌تواند WP_Error برگرداند؛ castِ مستقیم روی
+			/* get_term_link می‌تواند WP_Error برگرداند؛ cast مستقیم روی
 			   PHP 8 خطای کشنده می‌دهد. */
 			$link = function_exists( 'get_term_link' ) ? get_term_link( $term, $tax ) : '';
 			if ( is_wp_error( $link ) || ! is_string( $link ) ) {
@@ -2704,7 +2704,7 @@ if ( ! function_exists( 'tara_acc_rest_summary' ) ) {
 
 if ( ! function_exists( 'tara_acc_rest_routes' ) ) {
 	/**
-	 * ثبتِ مسیرهای REST.
+	 * ثبت مسیرهای REST.
 	 *
 	 * @return void
 	 */
@@ -2715,8 +2715,8 @@ if ( ! function_exists( 'tara_acc_rest_routes' ) ) {
 
 		$namespaces = array( 'tara/v1' );
 		if ( ! class_exists( 'AhangBan_API' ) ) {
-			/* اگر افزونهٔ ربات نصب نیست، همان مسیر را در فضای‌نامِ ربات هم
-			   می‌گذاریم تا ربات بدونِ تغییرِ تنظیمات پیدایش کند. */
+			/* اگر افزونه ربات نصب نیست، همان مسیر را در فضای‌نام ربات هم
+			   می‌گذاریم تا ربات بدون تغییر تنظیمات پیدایش کند. */
 			$namespaces[] = 'ahangban/v1';
 		}
 		$namespaces = (array) apply_filters( 'tara_acc_rest_namespaces', $namespaces );
@@ -2938,7 +2938,7 @@ if ( ! function_exists( 'tara_acc_rest_routes' ) ) {
 						} elseif ( 'rename' === $op ) {
 							$res = tara_acc_playlist_update( $key, array( 'name' => (string) $request->get_param( 'name' ) ), (int) $user_id ) ? array( 'ok' => true ) : new WP_Error( 'tara_pl', 'پلی‌لیست پیدا نشد.' );
 						} else {
-							$res = new WP_Error( 'tara_pl_op', 'درخواستِ نامعتبر.', array( 'status' => 400 ) );
+							$res = new WP_Error( 'tara_pl_op', 'درخواست نامعتبر.', array( 'status' => 400 ) );
 						}
 
 						if ( function_exists( 'is_wp_error' ) && is_wp_error( $res ) ) {
@@ -2996,7 +2996,7 @@ if ( ! function_exists( 'tara_acc_rest_routes' ) ) {
 
 if ( ! function_exists( 'tara_acc_rest_playlist' ) ) {
 	/**
-	 * شکلِ سبکِ پلی‌لیست برای ربات (بدونِ شناسه‌های اضافی).
+	 * شکل سبک پلی‌لیست برای ربات (بدون شناسه‌های اضافی).
 	 *
 	 * @param array $pl پلی‌لیست.
 	 * @return array
@@ -3025,11 +3025,11 @@ if ( function_exists( 'add_action' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۱۰) پیشخوان — ستونِ موبایل در فهرستِ کاربران
+ * ۱۰) پیشخوان — ستون موبایل در فهرست کاربران
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_users_column' ) ) {
-	/** افزودنِ ستونِ «موبایل». */
+	/** افزودن ستون «موبایل». */
 	function tara_acc_users_column( $columns ) {
 		$columns = (array) $columns;
 		$out     = array();
@@ -3047,7 +3047,7 @@ if ( ! function_exists( 'tara_acc_users_column' ) ) {
 }
 
 if ( ! function_exists( 'tara_acc_users_column_value' ) ) {
-	/** مقدارِ ستونِ موبایل. */
+	/** مقدار ستون موبایل. */
 	function tara_acc_users_column_value( $value, $column, $user_id ) {
 		if ( 'tara_phone' !== $column ) {
 			return $value;
@@ -3067,12 +3067,12 @@ if ( function_exists( 'add_filter' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۱۱) ساختِ خودکارِ برگه‌های «حساب من» و «ورود» هنگام تغییرِ قالب
+ * ۱۱) ساخت خودکار برگه‌های «حساب من» و «ورود» هنگام تغییر قالب
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_ensure_pages' ) ) {
 	/**
-	 * اگر صفحهٔ قالب‌دار نباشد، یکی می‌سازد؛ بعد از تغییرِ قالب یک‌بار صدا
+	 * اگر صفحه قالب‌دار نباشد، یکی می‌سازد؛ بعد از تغییر قالب یک‌بار صدا
 	 * زده می‌شود تا کاربر مجبور نباشد برگه‌ها را دستی بسازد.
 	 *
 	 * @return void
@@ -3122,7 +3122,7 @@ if ( function_exists( 'add_action' ) ) {
 }
 
 /* -------------------------------------------------------------------------
- * ۱۲) هشدارِ پیشخوان وقتی پیامک تنظیم نیست
+ * ۱۲) هشدار پیشخوان وقتی پیامک تنظیم نیست
  * ---------------------------------------------------------------------- */
 
 if ( ! function_exists( 'tara_acc_admin_notice' ) ) {
@@ -3141,7 +3141,7 @@ if ( ! function_exists( 'tara_acc_admin_notice' ) ) {
 		if ( ! $missing ) {
 			return;
 		}
-		echo '<div class="notice notice-warning"><p><strong>ورودِ پیامکی:</strong> پنلِ پیامک تنظیم نشده است؛ کاربران کدِ ورود را نمی‌گیرند. به «ترانه یار ← تنظیمات قالب ← حساب کاربری» بروید.</p></div>';
+		echo '<div class="notice notice-warning"><p><strong>ورود پیامکی:</strong> پنل پیامک تنظیم نشده است؛ کاربران کد ورود را نمی‌گیرند. به «ترانه یار ← تنظیمات قالب ← حساب کاربری» بروید.</p></div>';
 	}
 }
 

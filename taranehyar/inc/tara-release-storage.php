@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) { exit; }
 function tara_release_save_request( $user_id, $input, $token, $now, $files = array() ) {
 	$user_id = (int) $user_id;
 	if ( $user_id <= 0 || ! defined( 'TARA_RELEASE_INTEGRATED' ) || ! TARA_RELEASE_INTEGRATED || ! function_exists( 'tara_hub_request_lock' ) || ! tara_hub_request_lock( $user_id ) ) { return new WP_Error( 'release_lock', 'ثبت درخواست در حال حاضر امکان‌پذیر نیست.' ); }
-	if ( ! is_string( $token ) || ! preg_match( '/^[a-f0-9]{32,64}$/D', $token ) ) { return new WP_Error( 'release_token', 'شناسهٔ درخواست نامعتبر است.' ); }
+	if ( ! is_string( $token ) || ! preg_match( '/^[a-f0-9]{32,64}$/D', $token ) ) { return new WP_Error( 'release_token', 'شناسه درخواست نامعتبر است.' ); }
 	$rows = tara_hub_requests( $user_id );
 	$existing = tara_release_find_submission( $rows, $token );
 	if ( null !== $existing ) { return $existing['id']; }
@@ -19,7 +19,7 @@ function tara_release_save_request( $user_id, $input, $token, $now, $files = arr
 	if ( is_wp_error( $request ) ) { return $request; }
 	$request['files'] = $files;
 	array_unshift( $rows, $request );
-	if ( false === update_user_meta( $user_id, 'tara_artist_requests', $rows ) ) { return new WP_Error( 'release_store', 'ذخیرهٔ درخواست انجام نشد.' ); }
+	if ( false === update_user_meta( $user_id, 'tara_artist_requests', $rows ) ) { return new WP_Error( 'release_store', 'ذخیره درخواست انجام نشد.' ); }
 	return $request['id'];
 }
 
@@ -29,7 +29,7 @@ function tara_release_save_request( $user_id, $input, $token, $now, $files = arr
 function tara_release_change_request( $user_id, $request_id, $callback ) {
 	$user_id = (int) $user_id;
 	if ( $user_id <= 0 || ! defined( 'TARA_RELEASE_INTEGRATED' ) || ! TARA_RELEASE_INTEGRATED || ! function_exists( 'tara_hub_request_lock' ) || ! tara_hub_request_lock( $user_id ) ) { return new WP_Error( 'release_lock', 'ویرایش درخواست در حال حاضر امکان‌پذیر نیست.' ); }
-	if ( ! is_string( $request_id ) || ! preg_match( '/^release_[a-f0-9]{32,64}$/D', $request_id ) || ! is_callable( $callback ) ) { return new WP_Error( 'release_id', 'شناسهٔ درخواست نامعتبر است.' ); }
+	if ( ! is_string( $request_id ) || ! preg_match( '/^release_[a-f0-9]{32,64}$/D', $request_id ) || ! is_callable( $callback ) ) { return new WP_Error( 'release_id', 'شناسه درخواست نامعتبر است.' ); }
 	$rows = tara_hub_requests( $user_id );
 	foreach ( $rows as $index => $row ) {
 		if ( ! is_array( $row ) || ! isset( $row['type'], $row['id'] ) || 'release' !== $row['type'] || $request_id !== $row['id'] ) { continue; }
@@ -38,7 +38,7 @@ function tara_release_change_request( $user_id, $request_id, $callback ) {
 		if ( ! is_array( $changed ) || ! isset( $changed['type'], $changed['id'] ) || 'release' !== $changed['type'] || $request_id !== $changed['id'] ) { return new WP_Error( 'release_update', 'تغییر درخواست نامعتبر است.' ); }
 		if ( $changed === $row ) { return $row; }
 		$rows[ $index ] = $changed;
-		if ( false === update_user_meta( $user_id, 'tara_artist_requests', $rows ) ) { return new WP_Error( 'release_store', 'ذخیرهٔ تغییرات انجام نشد.' ); }
+		if ( false === update_user_meta( $user_id, 'tara_artist_requests', $rows ) ) { return new WP_Error( 'release_store', 'ذخیره تغییرات انجام نشد.' ); }
 		return $changed;
 	}
 	return new WP_Error( 'release_missing', 'درخواست پیدا نشد.' );

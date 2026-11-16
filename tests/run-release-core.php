@@ -57,4 +57,11 @@ $order->total=11999;t_release('wrong total rejected',!tara_release_order_matches
 t_release('wrong owner rejected',!tara_release_order_matches_paid($req,$order,43));
 $order->currency='USD';t_release('unsupported currency rejected',!tara_release_order_matches_paid($req,$order,42));$order->currency='IRR';
 $order->meta['_tara_release_quote']=str_repeat('0',64);t_release('different quote rejected',!tara_release_order_matches_paid($req,$order,42));
+$v2=array('wizard_version'=>'2','plan'=>'std','service'=>'song','title'=>'اثر تازه','title_en'=>'New Song','performer'=>'هنرمند','performer_en'=>'Artist','rights'=>'1','terms'=>'1');
+$r=tara_release_validate($v2,true);t_release('new form accepts upload without identity fields',!is_wp_error($r) && $r['title_en']==='New Song' && 'std'===$r['plan']);
+t_release('new form requires an audio file',is_wp_error(tara_release_validate($v2,false)));
+t_release('new form rejects unknown plan',is_wp_error(tara_release_validate(array_merge($v2,array('plan'=>'gold')),true)));
+t_release('new form still requires Persian title',is_wp_error(tara_release_validate(array_merge($v2,array('title'=>'')),true)));
+t_release('new form still requires Persian performer',is_wp_error(tara_release_validate(array_merge($v2,array('performer'=>'')),true)));
+$built=tara_release_build_request($v2,str_repeat('e',32),1000,true);t_release('new form stores plan and details',!is_wp_error($built) && 2===$built['details']['wizard_version'] && 'std'===$built['details']['plan']);
 echo "RESULT pass=$pass fail=$fail\n";

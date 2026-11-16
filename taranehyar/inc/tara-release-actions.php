@@ -15,12 +15,13 @@ function tara_release_ajax_submit() {
 	if ( $existing ) { wp_send_json_success( array( 'id' => $existing['id'], 'message' => 'درخواست پیش‌تر ثبت شده است.' ) ); }
 	$uploads = tara_release_file_inputs( $_FILES );
 	if ( is_wp_error( $uploads ) ) { wp_send_json_error( array( 'message' => $uploads->get_error_message() ), 400 ); }
-	$valid = tara_release_validate( $input, isset( $uploads['work'] ) );
+	if ( isset( $input['wizard_version'] ) && '2' === $input['wizard_version'] && ( ! isset( $uploads['audio128'] ) && ! isset( $uploads['audio320'] ) || isset( $uploads['work'] ) ) ) { wp_send_json_error( array( 'message' => 'حداقل یک فایل MP3 با کیفیت ۱۲۸ یا ۳۲۰ لازم است.' ), 400 ); }
+	$valid = tara_release_validate( $input, ( isset( $uploads['work'] ) || isset( $uploads['audio128'] ) || isset( $uploads['audio320'] ) ) );
 	if ( is_wp_error( $valid ) ) { wp_send_json_error( array( 'message' => $valid->get_error_message() ), 400 ); }
 	$stored = array();
 	foreach ( $uploads as $key => $upload ) {
 		if ( 'on' !== ot_get_option( 'release_uploads_on', 'on' ) ) { $file = new WP_Error( 'release_upload', 'آپلود خصوصی فعال نیست.' ); }
-		else { $extension = isset( $upload['name'] ) && is_string( $upload['name'] ) ? strtolower( pathinfo( $upload['name'], PATHINFO_EXTENSION ) ) : ''; $is_work = 'work' === $key || 0 === strpos( $key, 'work_' ); $kind = $is_work ? ( 'mp4' === $extension ? 'video' : 'audio' ) : $key; $file = tara_release_store_upload( $upload, $kind ); }
+		else { $extension = isset( $upload['name'] ) && is_string( $upload['name'] ) ? strtolower( pathinfo( $upload['name'], PATHINFO_EXTENSION ) ) : ''; $is_work = 'work' === $key || 0 === strpos( $key, 'work_' ); $kind = $is_work ? ( 'mp4' === $extension ? 'video' : 'audio' ) : $key; if ( 'cover' === $key && isset( $input['wizard_version'] ) && '2' === $input['wizard_version'] ) { $kind = 'cover_v2'; } $file = tara_release_store_upload( $upload, $kind ); }
 		if ( is_wp_error( $file ) ) {
 			$dir = tara_release_private_dir(); if ( ! is_wp_error( $dir ) ) { foreach ( $stored as $old ) { @unlink( $dir . DIRECTORY_SEPARATOR . $old['token'] . '.bin' ); } }
 			wp_send_json_error( array( 'message' => $file->get_error_message() ), 400 );
@@ -58,6 +59,13 @@ function tara_release_admin_update( $user_id, $request_id, $input, $now ) {
 			}
 			$changed['publication_url'] = $url;
 		}
+		$send_quote = ! empty( $input['send_quote'] );
+		if ( $send_quote ) {
+			if ( empty( $input['quote_revision'] ) || ! isset( $input['final_toman'], $input['extra_costs'], $input['refund_terms'] ) ) { return new WP_Error( 'release_quote', 'مبلغ، هزینه‌ها و شرایط پیش‌فاکتور الزامی است.' ); }
+			if ( ! empty( $changed['order_id'] ) ) { return new WP_Error( 'release_quote_state', 'برای این درخواست سفارش ساخته شده است.' ); }
+			if ( 'new' === $changed['status'] || 'documents' === $changed['status'] ) { $changed = tara_release_transition( $changed, 'review', 'admin', $now ); if ( is_wp_error( $changed ) ) { return $changed; } }
+			if ( 'review' === $changed['status'] ) { $changed = tara_release_transition( $changed, 'approved', 'admin', $now ); if ( is_wp_error( $changed ) ) { return $changed; } }
+		}
 		if ( ! empty( $input['quote_revision'] ) ) {
 			$changed = tara_release_set_quote( $changed, isset( $input['final_toman'] ) ? $input['final_toman'] : '', isset( $input['extra_costs'] ) ? $input['extra_costs'] : '', isset( $input['refund_terms'] ) ? $input['refund_terms'] : '', $input['quote_revision'] );
 			if ( is_wp_error( $changed ) ) { return $changed; }
@@ -68,10 +76,15 @@ function tara_release_admin_update( $user_id, $request_id, $input, $now ) {
 			if ( ! empty( $input['quote_revision'] ) ) { foreach ( array( 'final_toman', 'extra_costs', 'refund_terms', 'quote_revision' ) as $field ) { $event[ $field ] = $changed[ $field ]; } }
 			$changed['history'][] = $event;
 		}
+		if ( ( $send_quote || ( isset( $input['status'] ) && 'awaiting_payment' === $input['status'] ) ) && ( empty( $changed['final_toman'] ) || ! isset( $changed['extra_costs'], $changed['refund_terms'] ) || '' === trim( (string) $changed['extra_costs'] ) || '' === trim( (string) $changed['refund_terms'] ) ) ) { return new WP_Error( 'release_quote', 'پیش از آماده‌سازی پرداخت، مبلغ، هزینه‌ها و شرایط بازپرداخت را ذخیره کنید.' ); }
+		if ( $send_quote && 'awaiting_payment' !== $changed['status'] ) { $changed = tara_release_transition( $changed, 'awaiting_payment', 'admin', $now ); if ( is_wp_error( $changed ) ) { return $changed; } }
 		if ( isset( $input['status'] ) && is_string( $input['status'] ) && '' !== $input['status'] && $input['status'] !== $changed['status'] ) {
 			$changed = tara_release_transition( $changed, $input['status'], 'admin', $now );
 			if ( is_wp_error( $changed ) ) { return $changed; }
-			if ( 'published' === $changed['status'] && function_exists( 'tara_release_sms_queue' ) ) { $changed = tara_release_sms_queue( $changed, 'published' ); }
+		}
+		if ( function_exists( 'tara_release_sms_queue' ) ) {
+			if ( 'awaiting_payment' === $changed['status'] && empty( $changed['order_id'] ) ) { $changed = tara_release_sms_queue( $changed, 'quote_ready' ); }
+			if ( 'published' === $changed['status'] ) { $changed = tara_release_sms_queue( $changed, 'published' ); }
 		}
 		return $changed;
 	} );
@@ -108,8 +121,13 @@ function tara_release_prepare_checkout( $user_id, $id, $hash ) {
 		$order->calculate_totals( false ); $order->save();
 		if ( abs( (float) $order->get_total() - (float) $amount ) > 0.001 || $order->get_currency() !== get_woocommerce_currency() ) { $order->update_status( 'cancelled', 'مبلغ یا واحد پول معتبر نیست.' ); return new WP_Error( 'release_amount', 'مبلغ سفارش معتبر نیست.' ); }
 		$accepted['order_id'] = (int) $order->get_id();
+		if ( function_exists( 'tara_release_sms_queue' ) ) {
+			$accepted['sms_events']['payment_ready'] = array( 'status' => 'pending', 'time' => time(), 'url' => $order->get_checkout_payment_url() );
+			$accepted = tara_release_sms_queue( $accepted, 'payment_ready' );
+		}
 		$saved = tara_release_change_request( $user_id, $id, function () use ( $accepted ) { return $accepted; } );
 		if ( is_wp_error( $saved ) ) { $order->update_status( 'cancelled', 'ثبت ارتباط درخواست ناموفق بود.' ); return $saved; }
+		if ( function_exists( 'tara_release_sms_schedule' ) ) { tara_release_sms_schedule( $user_id, $id, 'payment_ready' ); }
 		return $order->get_checkout_payment_url();
 	} catch ( Throwable $e ) {
 		if ( is_object( $order ) && ! is_wp_error( $order ) ) { $order->update_status( 'cancelled', 'خطا در ساخت سفارش.' ); }

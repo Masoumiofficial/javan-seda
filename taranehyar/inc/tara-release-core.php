@@ -2,6 +2,19 @@
 /** Domain logic for artist release requests. */
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 
+/** Plan choices shared with the artist hub; safe fallback for tests and fresh installs. */
+function tara_release_plans() {
+	$plans = function_exists( 'tara_hub_plans' ) ? tara_hub_plans() : array();
+	if ( ! is_array( $plans ) || empty( $plans ) ) {
+		$plans = array(
+			'std' => array( 'name' => 'پخش عادی', 'price' => 0 ),
+			'vip' => array( 'name' => 'پخش VIP', 'price' => 490000 ),
+			'promo' => array( 'name' => 'تبلیغ ویژه', 'price' => 990000 ),
+		);
+	}
+	return $plans;
+}
+
 /** Prices are in toman; international prices are indicative, not a payment quote. */
 function tara_release_catalog( $include_disabled = false ) {
 	$services = array(
@@ -48,12 +61,12 @@ function tara_release_transition_allowed( $from, $to, $source = 'admin' ) {
 /** Caller must authenticate, verify nonce and unslash before invoking. */
 function tara_release_validate( $input, $has_file = false ) {
 	if ( ! is_array( $input ) ) { return new WP_Error( 'release_input', 'اطلاعات درخواست نامعتبر است.' ); }
-	$fields = array( 'full_name'=>120, 'artist_name'=>120, 'mobile'=>30, 'email'=>254, 'country'=>100, 'instagram'=>500, 'website'=>500, 'title'=>180, 'performer'=>120, 'composer'=>120, 'lyricist'=>120, 'arranger'=>120, 'description'=>4000, 'release_date'=>10, 'file_url'=>1000, 'cover_url'=>1000, 'legal'=>4000 );
+	$fields = array( 'full_name'=>120, 'artist_name'=>120, 'mobile'=>30, 'email'=>254, 'country'=>100, 'instagram'=>500, 'website'=>500, 'title'=>180, 'performer'=>120, 'composer'=>120, 'lyricist'=>120, 'arranger'=>120, 'description'=>4000, 'release_date'=>10, 'file_url'=>1000, 'cover_url'=>1000, 'legal'=>4000, 'title_en'=>180, 'performer_en'=>120, 'lyrics'=>20000, 'mixer'=>120, 'producer'=>120 );
 	$data = array();
 	foreach ( $fields as $field => $max ) {
 		$raw = isset( $input[ $field ] ) ? $input[ $field ] : '';
 		if ( ! is_string( $raw ) || strlen( $raw ) > $max * 4 ) { return new WP_Error( 'release_field', 'یکی از فیلدها نامعتبر یا بیش از حد طولانی است.' ); }
-		$clean = in_array( $field, array( 'description', 'legal' ), true ) ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw );
+		$clean = in_array( $field, array( 'description', 'legal', 'lyrics' ), true ) ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw );
 		$length = function_exists( 'mb_strlen' ) ? mb_strlen( $clean, 'UTF-8' ) : preg_match_all( '/./us', $clean, $unused );
 		if ( false === $length || $length > $max ) { return new WP_Error( 'release_length', 'یکی از فیلدها بیش از حد طولانی است.' ); }
 		$data[ $field ] = $clean;
@@ -61,12 +74,13 @@ function tara_release_validate( $input, $has_file = false ) {
 	$service = isset( $input['service'] ) && is_string( $input['service'] ) ? sanitize_key( $input['service'] ) : '';
 	$catalog = tara_release_catalog();
 	if ( ! isset( $catalog[ $service ] ) ) { return new WP_Error( 'release_service', 'نوع خدمت نامعتبر است.' ); }
-	foreach ( array( 'full_name', 'artist_name', 'mobile', 'email', 'country', 'title', 'performer' ) as $field ) {
+	$v2 = isset( $input['wizard_version'] ) && '2' === $input['wizard_version'];
+	foreach ( $v2 ? array( 'title', 'performer' ) : array( 'full_name', 'artist_name', 'mobile', 'email', 'country', 'title', 'performer' ) as $field ) {
 		if ( '' === trim( $data[ $field ] ) ) { return new WP_Error( 'release_required', 'فیلدهای ضروری را کامل کنید.' ); }
 	}
-	if ( ! is_email( $data['email'] ) ) { return new WP_Error( 'release_email', 'ایمیل معتبر وارد کنید.' ); }
+	if ( '' !== $data['email'] && ! is_email( $data['email'] ) ) { return new WP_Error( 'release_email', 'ایمیل معتبر وارد کنید.' ); }
 	$data['mobile'] = strtr( $data['mobile'], array( '۰'=>'0', '۱'=>'1', '۲'=>'2', '۳'=>'3', '۴'=>'4', '۵'=>'5', '۶'=>'6', '۷'=>'7', '۸'=>'8', '۹'=>'9', '٠'=>'0', '١'=>'1', '٢'=>'2', '٣'=>'3', '٤'=>'4', '٥'=>'5', '٦'=>'6', '٧'=>'7', '٨'=>'8', '٩'=>'9' ) );
-	if ( ! preg_match( '/^\+?[0-9 ()-]{7,25}$/D', $data['mobile'] ) ) { return new WP_Error( 'release_mobile', 'شماره تماس معتبر وارد کنید.' ); }
+	if ( '' !== $data['mobile'] && ! preg_match( '/^\+?[0-9 ()-]{7,25}$/D', $data['mobile'] ) ) { return new WP_Error( 'release_mobile', 'شماره تماس معتبر وارد کنید.' ); }
 	foreach ( array( 'instagram', 'website', 'file_url', 'cover_url' ) as $field ) {
 		if ( '' === $data[ $field ] ) { continue; }
 		$parts = wp_parse_url( $data[ $field ] );
@@ -74,12 +88,19 @@ function tara_release_validate( $input, $has_file = false ) {
 		$data[ $field ] = esc_url_raw( $data[ $field ], array( 'http', 'https' ) );
 		if ( '' === $data[ $field ] ) { return new WP_Error( 'release_url', 'پیوند نامعتبر است.' ); }
 	}
+	if ( $v2 && ! $has_file ) { return new WP_Error( 'release_file', 'حداقل یک فایل صوتی لازم است.' ); }
 	if ( '' === $data['file_url'] && ! $has_file ) { return new WP_Error( 'release_file', 'لینک یا فایل اثر لازم است.' ); }
 	if ( '' !== $data['release_date'] ) {
 		$date = DateTime::createFromFormat( '!Y-m-d', $data['release_date'] );
 		if ( ! $date || $date->format( 'Y-m-d' ) !== $data['release_date'] ) { return new WP_Error( 'release_date', 'تاریخ معتبر وارد کنید.' ); }
 	}
 	if ( ! isset( $input['rights'], $input['terms'] ) || '1' !== $input['rights'] || '1' !== $input['terms'] ) { return new WP_Error( 'release_consent', 'تأیید مالکیت و شرایط الزامی است.' ); }
+	if ( $v2 ) {
+		$plan = isset( $input['plan'] ) && is_string( $input['plan'] ) ? sanitize_key( $input['plan'] ) : '';
+		$plans = tara_release_plans();
+		if ( ! isset( $plans[ $plan ] ) ) { return new WP_Error( 'release_plan', 'پلن معتبر انتخاب کنید.' ); }
+		$data['plan'] = $plan; $data['wizard_version'] = 2;
+	}
 	$data['service'] = $service;
 	$data['rights'] = true;
 	$data['terms'] = true;

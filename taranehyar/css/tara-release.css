@@ -1,3 +1,24 @@
 .tara-release{--tr-blue:#195adb;background:#05080d;color:#f5f7fb;border-radius:20px;padding:clamp(18px,4vw,36px);line-height:1.9}.tara-release header h2{color:#f5f7fb;margin:0}.tara-release__prices{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px;margin:22px 0}.tara-release__prices>div,.tara-release aside,.tara-release fieldset{background:#07111f;border:1px solid #253d60;border-radius:14px;padding:16px}.tara-release__prices strong,.tara-release__prices span{display:block}.tara-release__prices span{color:#92b8ff}.tara-release aside{margin-bottom:20px}.tara-release fieldset[hidden],.tara-release button[hidden]{display:none}.tara-release fieldset{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:14px}.tara-release legend{padding:0 8px;font-weight:bold}.tara-release label{display:block}.tara-release input:not([type=checkbox]),.tara-release select,.tara-release textarea{display:block;width:100%;box-sizing:border-box;background:#101e30;color:#f5f7fb;border:1px solid #50617c;border-radius:8px;padding:10px}.tara-release a{color:#98bbff}.tara-release__actions{display:flex;gap:10px;margin-top:14px}.tara-release button{background:#195adb;color:#fff;border:0;border-radius:8px;padding:10px 20px;cursor:pointer}.tara-release button:disabled{opacity:.55;cursor:not-allowed}.tara-release :focus-visible{outline:3px solid #a9c8ff;outline-offset:2px}
 
 .tara-release h3,.tara-release legend,.tara-release summary{color:#f5f7fb}.tara-release__request{background:#07111f;border:1px solid #253d60;border-radius:14px;padding:16px;margin-top:16px}.tara-release details{margin:12px 0}.tara-release summary{cursor:pointer}
+
+/* v3.14 release workspace */
+.tara-release{background:linear-gradient(155deg,#05080d,#0b1930)}
+.tara-release__terms{margin:20px 0;padding:16px;border:1px solid #253d60;border-radius:14px;background:#07111f}
+.tara-release__terms h3,.tara-release__terms p{margin:0 0 8px}
+.tara-release__terms details{background:#101e30;border:1px solid #334d72;border-radius:10px;padding:10px 14px}
+.tara-release__terms details p{color:#dbe7fb;white-space:pre-line}
+.tara-release__progress{margin:16px 0;color:#dce8ff}
+.tara-release__progress p{margin:0 0 8px;font-weight:700}
+.tara-release__progress-track,.tara-release__request-progress{height:8px;border-radius:99px;background:#314362;overflow:hidden}
+.tara-release__progress-track span,.tara-release__request-progress span{display:block;height:100%;background:#83b0ff;border-radius:inherit;transition:width .2s ease}
+.tara-release__request-progress{margin:10px 0 4px}
+.tara-release__pay{display:inline-block;background:#195adb;color:#fff!important;padding:6px 12px;border-radius:8px;text-decoration:none;font-weight:700}
+.tara-release__request{overflow-wrap:anywhere}
+.tara-release label{min-width:0}
+.ty-hub__sections{display:flex;flex-wrap:wrap;gap:8px;padding:6px;background:var(--ab-surface,#fff);border:1px solid var(--ab-line,#e6e8ee);border-radius:14px;margin-bottom:16px}
+.ty-hub__sections a{display:block;padding:10px 14px;border-radius:10px;text-decoration:none;color:var(--ab-text,#222);font-weight:700}
+.ty-hub__sections a.is-active{background:#185adb;color:#fff}
+.ty-hub__sections a:focus-visible{outline:2px solid #185adb;outline-offset:2px}
+@media(max-width:600px){.tara-release{padding:16px;border-radius:14px}.tara-release fieldset{grid-template-columns:1fr}.tara-release__terms{padding:12px}.ty-hub__sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ty-hub__sections a{text-align:center;font-size:13px}}
+.tara-release__warning{border:1px solid #b26a00;background:#3a2607;color:#ffe0a8;border-radius:10px;padding:10px 12px}

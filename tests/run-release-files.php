@@ -24,4 +24,12 @@ check_release_file('ten track limit',is_wp_error(tara_release_file_inputs(array(
 $GLOBALS['__ot']['release_max_tracks']='1';check_release_file('manager can limit track count',is_wp_error(tara_release_file_inputs($multi)));unset($GLOBALS['__ot']['release_max_tracks']);
 check_release_file('valid work 10 slot',tara_release_file_key_valid('work_10'));
 check_release_file('reject traversal slot',!tara_release_file_key_valid('../work_1'));
+check_release_file('128 upload allows 30 MB',is_array(tara_release_file_rule('a.mp3',31457280,'audio128')));
+check_release_file('128 upload rejects over 30 MB',false===tara_release_file_rule('a.mp3',31457281,'audio128'));
+check_release_file('320 upload is MP3 only',false===tara_release_file_rule('a.wav',100,'audio320'));
+check_release_file('new cover allows 5 MB',is_array(tara_release_file_rule('cover.png',5242880,'cover_v2')));
+check_release_file('new cover rejects over 5 MB',false===tara_release_file_rule('cover.png',5242881,'cover_v2'));
+$newfiles=array('audio128'=>array('name'=>'a.mp3','tmp_name'=>'/tmp/a','error'=>0,'size'=>10),'audio320'=>array('name'=>'b.mp3','tmp_name'=>'/tmp/b','error'=>0,'size'=>20),'cover_file'=>array('name'=>'c.png','tmp_name'=>'/tmp/c','error'=>0,'size'=>30));
+$r=tara_release_file_inputs($newfiles);check_release_file('new audio slots flattened',isset($r['audio128'],$r['audio320'],$r['cover']));
+check_release_file('new audio slots are downloadable keys',tara_release_file_key_valid('audio128') && tara_release_file_key_valid('audio320'));
 echo "RESULT pass=$pass fail=$fail\n";

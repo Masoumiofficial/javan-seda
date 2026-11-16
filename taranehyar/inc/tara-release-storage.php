@@ -15,7 +15,7 @@ function tara_release_save_request( $user_id, $input, $token, $now, $files = arr
 	$existing = tara_release_find_submission( $rows, $token );
 	if ( null !== $existing ) { return $existing['id']; }
 	if ( ! is_array( $files ) ) { return new WP_Error( 'release_files', 'فایل‌ها نامعتبرند.' ); }
-	$request = tara_release_build_request( $input, $token, $now, isset( $files['work'] ) );
+	$request = tara_release_build_request( $input, $token, $now, ( isset( $files['work'] ) || isset( $files['audio128'] ) || isset( $files['audio320'] ) ) );
 	if ( is_wp_error( $request ) ) { return $request; }
 	$request['files'] = $files;
 	array_unshift( $rows, $request );

@@ -540,162 +540,158 @@ if ( ! function_exists( 'tara_hub_tab_artist' ) ) {
 	 */
 	function tara_hub_tab_artist( $user_id ) {
 		if ( ! tara_hub_on() ) {
-			return '<div class="ty-hub"><p class="ty-hub__empty">پنلِ هنرمند در این سایت خاموش است.</p></div>';
+			return '<div class="ty-hub"><p class="ty-hub__empty">پنل هنرمند در این سایت خاموش است.</p></div>';
 		}
 		$term_id = tara_hub_user_term( $user_id );
 		$plans   = tara_hub_plans();
 		$reqs    = tara_hub_requests( $user_id );
-
+		$release_on = function_exists( 'tara_release_render_wizard' ) && 'on' === tara_hub_opt( 'release_enabled', 'off' );
+		$has_release = false;
+		foreach ( $reqs as $request_row ) { if ( isset( $request_row['type'] ) && 'release' === $request_row['type'] ) { $has_release = true; break; } }
+		$view = isset( $_GET['artist_section'] ) ? sanitize_key( wp_unslash( (string) $_GET['artist_section'] ) ) : 'release'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! in_array( $view, array( 'release', 'requests', 'works', 'panel' ), true ) ) { $view = 'release'; }
+		if ( 'release' === $view && ! $release_on ) { $view = 'panel'; }
+		if ( 'requests' === $view && ! $release_on && ! $has_release ) { $view = 'panel'; }
+		$term    = $term_id > 0 ? get_term( $term_id ) : null;
+		$tracks  = $term_id > 0 ? tara_hub_tracks( $term_id, 100 ) : array();
+		$views   = $term_id > 0 ? tara_hub_total_views( $term_id ) : 0;
+		$follows = $term_id > 0 && function_exists( 'tara_artist_followers' ) ? tara_artist_followers( $term_id ) : 0;
+		$quote   = $term_id > 0 ? tara_hub_promo_quote( $views ) : array( 'discount' => 0, 'final' => 0 );
+		$tabs    = array( 'release' => 'ارسال اثر', 'requests' => 'درخواست‌های پخش آثار', 'works' => 'آثار من', 'panel' => 'پنل هنرمند' );
+		if ( ! $release_on ) { unset( $tabs['release'] ); }
+		if ( ! $release_on && ! $has_release ) { unset( $tabs['requests'] ); }
 		ob_start();
 		?>
 		<div class="ty-hub">
-			<?php if ( function_exists( 'tara_release_render_wizard' ) ) { echo tara_release_render_wizard( $user_id ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by renderer ?>
-			<header class="ty-hub__head">
-				<h2>پنل هنرمند</h2>
-				<p>اثر منتشر کنید، آمار ببینید، پلن بخرید و برای هر تغییری درخواست بدهید.</p>
-			</header>
+			<nav class="ty-hub__sections" aria-label="بخش‌های هنرمند">
+				<?php foreach ( $tabs as $section => $label ) : ?>
+					<a class="<?php echo $view === $section ? 'is-active' : ''; ?>" href="<?php echo esc_url( add_query_arg( 'artist_section', $section, tara_acc_profile_url( 'artist' ) ) ); ?>" <?php echo $view === $section ? 'aria-current="page"' : ''; ?>><?php echo esc_html( $label ); ?></a>
+				<?php endforeach; ?>
+			</nav>
 
-			<?php if ( $term_id <= 0 ) : ?>
-				<section class="ty-hub__card ty-hub__card--claim">
-					<h3>ارتقا به حسابِ هنرمند</h3>
-					<p>اگر خواننده، آهنگساز یا صاحبِ اثر هستید، درخواست بدهید. بعد از تأییدِ مدیر، صفحهٔ هنرمند به حسابِ شما وصل می‌شود، تیکِ آبی می‌گیرید و می‌توانید آثارتان را خودتان مدیریت کنید.</p>
-					<form class="ty-hub__form" data-tara-hub="claim">
-						<label>نامِ هنری<input type="text" name="artist_name" required maxlength="80" placeholder="مثلاً: نامِ خواننده"></label>
-						<label>لینکِ نمونه‌کار / مدرکِ مالکیت<textarea name="body" rows="3" maxlength="800" placeholder="لینکِ اینستاگرام، کانال، یا هر مدرکی که نشان بدهد این صفحه مالِ شماست…"></textarea></label>
-						<button type="submit" class="ty-hub__btn">ثبتِ درخواستِ ارتقا</button>
-						<p class="ty-hub__msg" role="status" data-tara-hub-msg></p>
-					</form>
-				</section>
-			<?php else : ?>
-				<?php
-				$term    = get_term( $term_id );
-				$tracks  = tara_hub_tracks( $term_id, 100 );
-				$views   = tara_hub_total_views( $term_id );
-				$follows = function_exists( 'tara_artist_followers' ) ? tara_artist_followers( $term_id ) : 0;
-				$quote   = tara_hub_promo_quote( $views );
-				?>
+			<?php if ( in_array( $view, array( 'release', 'requests' ), true ) ) : ?>
+				<?php if ( function_exists( 'tara_release_render_wizard' ) ) { echo tara_release_render_wizard( $user_id, 'release' === $view ? 'form' : 'requests' ); } // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped by renderer ?>
+			<?php endif; ?>
+
+			<?php if ( 'works' === $view ) : ?>
+				<?php if ( $term_id <= 0 ) : ?>
+					<section class="ty-hub__card ty-hub__card--claim">
+						<h3>ارتقا به حساب هنرمند</h3>
+						<p>برای دیدن آثار و صفحه اختصاصی، ابتدا درخواست ارتقا بدهید. پس از تأیید مدیر، صفحه هنرمند به حساب شما وصل می‌شود.</p>
+						<a class="ty-hub__btn" href="<?php echo esc_url( add_query_arg( 'artist_section', 'panel', tara_acc_profile_url( 'artist' ) ) ); ?>">رفتن به پنل هنرمند</a>
+					</section>
+				<?php else : ?>
+					<section class="ty-hub__card">
+						<h3>آثار من</h3>
+						<?php if ( empty( $tracks ) ) : ?>
+							<p class="ty-hub__empty">هنوز اثری به نام شما ثبت نشده است.</p>
+							<?php if ( $release_on ) : ?><a class="ty-hub__btn" href="<?php echo esc_url( add_query_arg( 'artist_section', 'release', tara_acc_profile_url( 'artist' ) ) ); ?>">ارسال اولین اثر</a><?php endif; ?>
+						<?php else : ?>
+							<ul class="ty-hub__tracks">
+								<?php foreach ( $tracks as $post ) : ?>
+									<li>
+										<a href="<?php echo esc_url( get_permalink( $post ) ); ?>"><?php echo esc_html( get_the_title( $post ) ); ?></a>
+										<span><?php echo esc_html( number_format_i18n( (int) get_post_meta( $post->ID, 'views', true ) ) ); ?> بازدید · <?php echo esc_html( get_post_status( $post ) === 'publish' ? 'منتشر شده' : 'در انتظار انتشار' ); ?></span>
+									</li>
+								<?php endforeach; ?>
+							</ul>
+							<?php if ( $release_on ) : ?><p><a class="ty-hub__link" href="<?php echo esc_url( add_query_arg( 'artist_section', 'release', tara_acc_profile_url( 'artist' ) ) ); ?>">ارسال اثر تازه ←</a></p><?php endif; ?>
+						<?php endif; ?>
+					</section>
+				<?php endif; ?>
+			<?php endif; ?>
+
+			<?php if ( 'panel' === $view ) : ?>
+				<header class="ty-hub__head">
+					<h2>پنل هنرمند</h2>
+					<p>آمار، پلن‌ها و درخواست‌های پشتیبانی در یک جا.</p>
+				</header>
+
+				<?php if ( $term_id <= 0 ) : ?>
+					<section class="ty-hub__card ty-hub__card--claim">
+						<h3>ارتقا به حساب هنرمند</h3>
+						<p>اگر خواننده، آهنگساز یا صاحب اثر هستید، درخواست بدهید. بعد از تأیید مدیر، صفحه هنرمند به حساب شما وصل می‌شود، تیک آبی می‌گیرید و می‌توانید آثارتان را مدیریت کنید.</p>
+						<form class="ty-hub__form" data-tara-hub="claim">
+							<label>نام هنری<input type="text" name="artist_name" required maxlength="80" placeholder="مثلا: نام خواننده"></label>
+							<label>لینک نمونه‌کار یا مدرک مالکیت<textarea name="body" rows="3" maxlength="800" placeholder="لینک اینستاگرام، کانال یا مدرکی که نشان بدهد این صفحه مال شماست…"></textarea></label>
+							<button type="submit" class="ty-hub__btn">ثبت درخواست ارتقا</button>
+							<p class="ty-hub__msg" role="status" data-tara-hub-msg></p>
+						</form>
+					</section>
+				<?php else : ?>
+					<section class="ty-hub__card">
+						<h3><?php echo esc_html( $term ? $term->name : 'هنرمند' ); ?><?php echo function_exists( 'tara_artist_verified_badge' ) ? tara_artist_verified_badge( $term_id ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?></h3>
+						<div class="ty-hub__stats">
+							<div><b><?php echo esc_html( number_format_i18n( count( $tracks ) ) ); ?></b><span>اثر</span></div>
+							<div><b><?php echo esc_html( number_format_i18n( $views ) ); ?></b><span>مجموع بازدید</span></div>
+							<div><b><?php echo esc_html( number_format_i18n( $follows ) ); ?></b><span>دنبال‌کننده</span></div>
+							<div><b><?php echo esc_html( tara_hub_money( $quote['discount'] ) ); ?></b><span>تخفیف تبلیغ فعلی</span></div>
+						</div>
+						<?php if ( $term ) : ?><a class="ty-hub__link" href="<?php echo esc_url( get_term_link( $term ) ); ?>">مشاهده صفحه عمومی هنرمند ←</a><?php endif; ?>
+					</section>
+
+					<section class="ty-hub__card">
+						<h3>درخواست تغییر یا پشتیبانی</h3>
+						<form class="ty-hub__form" data-tara-hub="request">
+							<label>نوع درخواست
+								<select name="rtype">
+									<option value="lyrics">ویرایش متن ترانه</option>
+									<option value="edit">ویرایش مشخصات اثر</option>
+									<option value="promo">تبلیغ یک اثر</option>
+									<option value="support">موضوع دیگر</option>
+								</select>
+							</label>
+							<label>عنوان<input type="text" name="title" maxlength="140" placeholder="مثلا: اصلاح متن ترانه"></label>
+							<label>توضیح<textarea name="body" rows="4" maxlength="2000" placeholder="دقیق بنویسید چه چیزی و چطور عوض شود…"></textarea></label>
+							<button type="submit" class="ty-hub__btn ty-hub__btn--ghost">ثبت درخواست</button>
+							<p class="ty-hub__msg" role="status" data-tara-hub-msg></p>
+						</form>
+					</section>
+				<?php endif; ?>
+
 				<section class="ty-hub__card">
-					<h3><?php echo esc_html( $term ? $term->name : 'هنرمند' ); ?>
-						<?php echo function_exists( 'tara_artist_verified_badge' ) ? tara_artist_verified_badge( $term_id ) : ''; // phpcs:ignore WordPress.Security.EscapeOutput ?>
-					</h3>
-					<div class="ty-hub__stats">
-						<div><b><?php echo esc_html( number_format_i18n( count( $tracks ) ) ); ?></b><span>اثر</span></div>
-						<div><b><?php echo esc_html( number_format_i18n( $views ) ); ?></b><span>مجموع بازدید</span></div>
-						<div><b><?php echo esc_html( number_format_i18n( $follows ) ); ?></b><span>دنبال‌کننده</span></div>
-						<div><b><?php echo esc_html( tara_hub_money( $quote['discount'] ) ); ?></b><span>تخفیفِ تبلیغِ فعلی</span></div>
+					<h3>پلن‌های انتشار و تبلیغ</h3>
+					<div class="ty-hub__plans">
+						<?php foreach ( $plans as $key => $plan ) : ?>
+							<article class="ty-hub__plan<?php echo 'vip' === $key ? ' is-vip' : ''; ?>">
+								<h4><?php echo esc_html( $plan['name'] ); ?></h4>
+								<p><?php echo esc_html( $plan['desc'] ); ?></p>
+								<ul>
+									<?php foreach ( (array) $plan['feats'] as $feat ) : ?><li><?php echo esc_html( $feat ); ?></li><?php endforeach; ?>
+								</ul>
+								<strong class="ty-hub__price"><?php echo esc_html( tara_hub_money( (int) $plan['price'] ) ); ?></strong>
+								<?php if ( 'promo' === $key && $term_id > 0 ) : ?><p class="ty-hub__quote">با بازدید فعلی، تخفیف شما: <b><?php echo esc_html( tara_hub_money( $quote['discount'] ) ); ?></b> — مبلغ نهایی: <b><?php echo esc_html( tara_hub_money( $quote['final'] ) ); ?></b></p><?php endif; ?>
+								<form data-tara-hub="buy">
+									<input type="hidden" name="plan" value="<?php echo esc_attr( $key ); ?>">
+									<button type="submit" class="ty-hub__btn">انتخاب و پرداخت پلن</button>
+									<p class="ty-hub__msg" role="status" data-tara-hub-msg></p>
+								</form>
+							</article>
+						<?php endforeach; ?>
 					</div>
-					<?php if ( $term ) : ?>
-						<a class="ty-hub__link" href="<?php echo esc_url( get_term_link( $term ) ); ?>">مشاهدهٔ صفحهٔ عمومیِ هنرمند ←</a>
-					<?php endif; ?>
+					<p class="ty-hub__hint">برای پرداخت آنلاین باید ووکامرس و درگاه پرداخت فعال باشند و واحد پول فروشگاه تومان (IRT) یا ریال (IRR) باشد. درخواست پس از پرداخت برای بررسی مدیر ارسال می‌شود.</p>
 				</section>
 
-				<section class="ty-hub__card">
-					<h3>آثارِ من</h3>
-					<?php if ( empty( $tracks ) ) : ?>
-						<p class="ty-hub__empty">هنوز اثری به نامِ شما ثبت نشده است؛ اولین اثر را از فرمِ زیر بفرستید.</p>
-					<?php else : ?>
-						<ul class="ty-hub__tracks">
-							<?php foreach ( $tracks as $post ) : ?>
+				<?php if ( ! empty( $reqs ) ) : ?>
+					<section class="ty-hub__card">
+						<h3>درخواست‌های من</h3>
+						<ul class="ty-hub__reqs">
+							<?php foreach ( $reqs as $row ) : if ( isset( $row['type'] ) && 'release' === $row['type'] ) { continue; } ?>
 								<li>
-									<a href="<?php echo esc_url( get_permalink( $post ) ); ?>"><?php echo esc_html( get_the_title( $post ) ); ?></a>
-									<span><?php echo esc_html( number_format_i18n( (int) get_post_meta( $post->ID, 'views', true ) ) ); ?> بازدید · <?php echo esc_html( get_post_status( $post ) === 'publish' ? 'منتشر شده' : 'در انتظار انتشار' ); ?></span>
+									<b><?php echo esc_html( isset( $row['title'] ) ? $row['title'] : 'درخواست' ); ?></b>
+									<span class="ty-hub__status is-<?php echo esc_attr( isset( $row['status'] ) ? $row['status'] : 'pending' ); ?>"><?php echo esc_html( tara_hub_status_label( isset( $row['status'] ) ? $row['status'] : 'pending' ) ); ?></span>
+									<small><?php echo esc_html( date_i18n( 'j F Y', isset( $row['created'] ) ? (int) $row['created'] : time() ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions ?></small>
+									<?php if ( 'pending' === $row['status'] && ! empty( $row['order_id'] ) && function_exists( 'wc_get_order' ) ) :
+										$order = wc_get_order( (int) $row['order_id'] );
+										if ( $order && (int) $order->get_customer_id() === (int) $user_id && $order->needs_payment() ) : ?>
+											<a href="<?php echo esc_url( $order->get_checkout_payment_url() ); ?>">ادامه پرداخت</a>
+										<?php endif; ?>
+									<?php endif; ?>
 								</li>
 							<?php endforeach; ?>
 						</ul>
-					<?php endif; ?>
-				</section>
-
-				<section class="ty-hub__card">
-					<h3>ارسالِ اثرِ تازه</h3>
-					<form class="ty-hub__form" data-tara-hub="submit_track" enctype="multipart/form-data">
-						<fieldset><legend>مشخصات اثر</legend>
-							<label>نام اثر فارسی *<input type="text" name="title" required maxlength="120"></label>
-							<label>نام اثر انگلیسی<input type="text" name="song_en" dir="ltr" maxlength="120"></label>
-							<label>نام هنرمند فارسی *<input type="text" name="artist_fa" required maxlength="120" value="<?php echo esc_attr( $term ? $term->name : '' ); ?>"></label>
-							<label>نام هنرمند انگلیسی<input type="text" name="artist_en" dir="ltr" maxlength="120"></label>
-						</fieldset>
-						<fieldset><legend>فایل‌ها</legend>
-							<label>فایل MP3 کیفیت ۱۲۸<input type="file" name="audio128" accept=".mp3,audio/mpeg"></label>
-							<label>فایل MP3 کیفیت ۳۲۰<input type="file" name="audio320" accept=".mp3,audio/mpeg"></label>
-							<label>کاور JPG یا PNG<input type="file" name="cover" accept=".jpg,.jpeg,.png,image/jpeg,image/png"></label>
-							<small>حداقل یک فایل صوتی لازم است؛ سقف هر فایل صوتی ۳۰ و کاور ۵ مگابایت است. سقف سرور ممکن است کمتر باشد.</small>
-						</fieldset>
-						<fieldset><legend>ترانه و عوامل</legend>
-							<label>متن ترانه<textarea name="lyrics" rows="5" maxlength="20000"></textarea></label>
-							<label>ترانه‌سرا<input name="lyricist" maxlength="120"></label><label>آهنگساز<input name="composer" maxlength="120"></label>
-							<label>تنظیم‌کننده<input name="arranger" maxlength="120"></label><label>میکس و مستر<input name="mixer" maxlength="120"></label>
-							<label>تهیه‌کننده<input name="producer" maxlength="120"></label><label>توضیحات و مدارک<textarea name="notes" rows="3" maxlength="4000"></textarea></label>
-						</fieldset>
-						<button type="submit" class="ty-hub__btn">ارسال برای بررسی</button>
-						<p class="ty-hub__msg" role="status" data-tara-hub-msg></p>
-					</form>
-				</section>
-
-				<section class="ty-hub__card">
-					<h3>درخواستِ تغییر یا پشتیبانی</h3>
-					<form class="ty-hub__form" data-tara-hub="request">
-						<label>نوعِ درخواست
-							<select name="rtype">
-								<option value="lyrics">ویرایشِ متنِ ترانه</option>
-								<option value="edit">ویرایشِ مشخصاتِ اثر</option>
-								<option value="promo">تبلیغِ یک اثر</option>
-								<option value="support">موضوعِ دیگر</option>
-							</select>
-						</label>
-						<label>عنوان<input type="text" name="title" maxlength="140" placeholder="مثلاً: اصلاحِ متنِ ترانهٔ «…»"></label>
-						<label>توضیح<textarea name="body" rows="4" maxlength="2000" placeholder=" دقیق بنویسید چه چیزی و چطور عوض شود…"></textarea></label>
-						<button type="submit" class="ty-hub__btn ty-hub__btn--ghost">ثبتِ درخواست</button>
-						<p class="ty-hub__msg" role="status" data-tara-hub-msg></p>
-					</form>
-				</section>
-			<?php endif; ?>
-
-			<section class="ty-hub__card">
-				<h3>پلن‌های انتشار و تبلیغ</h3>
-				<div class="ty-hub__plans">
-					<?php foreach ( $plans as $key => $plan ) : ?>
-						<article class="ty-hub__plan<?php echo 'vip' === $key ? ' is-vip' : ''; ?>">
-							<h4><?php echo esc_html( $plan['name'] ); ?></h4>
-							<p><?php echo esc_html( $plan['desc'] ); ?></p>
-							<ul>
-								<?php foreach ( (array) $plan['feats'] as $feat ) : ?>
-									<li><?php echo esc_html( $feat ); ?></li>
-								<?php endforeach; ?>
-							</ul>
-							<strong class="ty-hub__price"><?php echo esc_html( tara_hub_money( (int) $plan['price'] ) ); ?></strong>
-							<?php if ( 'promo' === $key && $term_id > 0 ) : ?>
-								<p class="ty-hub__quote">با بازدیدِ فعلی، تخفیفِ شما: <b><?php echo esc_html( tara_hub_money( $quote['discount'] ) ); ?></b> — مبلغِ نهایی: <b><?php echo esc_html( tara_hub_money( $quote['final'] ) ); ?></b></p>
-							<?php endif; ?>
-							<form data-tara-hub="buy">
-								<input type="hidden" name="plan" value="<?php echo esc_attr( $key ); ?>">
-								<button type="submit" class="ty-hub__btn">انتخاب و پرداخت پلن</button>
-								<p class="ty-hub__msg" role="status" data-tara-hub-msg></p>
-							</form>
-						</article>
-					<?php endforeach; ?>
-				</div>
-				<p class="ty-hub__hint">برای پرداخت آنلاین باید ووکامرس و درگاه پرداخت فعال باشند و واحد پول فروشگاه تومان (IRT) یا ریال (IRR) باشد. درخواست پس از پرداخت برای بررسی مدیر ارسال می‌شود.</p>
-			</section>
-
-			<?php if ( ! empty( $reqs ) ) : ?>
-				<section class="ty-hub__card">
-					<h3>درخواست‌های من</h3>
-					<ul class="ty-hub__reqs">
-						<?php foreach ( $reqs as $row ) : if ( isset( $row['type'] ) && 'release' === $row['type'] ) { continue; } ?>
-							<li>
-								<b><?php echo esc_html( isset( $row['title'] ) ? $row['title'] : 'درخواست' ); ?></b>
-								<span class="ty-hub__status is-<?php echo esc_attr( isset( $row['status'] ) ? $row['status'] : 'pending' ); ?>"><?php echo esc_html( tara_hub_status_label( isset( $row['status'] ) ? $row['status'] : 'pending' ) ); ?></span>
-								<small><?php echo esc_html( date_i18n( 'j F Y', isset( $row['created'] ) ? (int) $row['created'] : time() ) ); // phpcs:ignore WordPress.DateTime.RestrictedFunctions ?></small>
-								<?php if ( 'pending' === $row['status'] && ! empty( $row['order_id'] ) && function_exists( 'wc_get_order' ) ) :
-									$order = wc_get_order( (int) $row['order_id'] );
-									if ( $order && (int) $order->get_customer_id() === (int) $user_id && $order->needs_payment() ) : ?>
-										<a href="<?php echo esc_url( $order->get_checkout_payment_url() ); ?>">ادامه پرداخت</a>
-									<?php endif; ?>
-								<?php endif; ?>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				</section>
+					</section>
+				<?php endif; ?>
 			<?php endif; ?>
 		</div>
 		<?php

@@ -5,6 +5,11 @@ function tara_acc_phone($s){return preg_match('/^09[0-9]{9}$/',$s)?$s:'';}
 function tara_acc_digits($s){return preg_replace('/[^0-9]/','',$s);}
 function tara_acc_user_phone($id){return $GLOBALS['sms_phone']??'';}
 function tara_acc_http($url,$body,$headers=array()){$GLOBALS['sms_requests'][]=array($url,$body);return $GLOBALS['sms_response'];}
+function tara_acc_profile_url($tab){return 'https://example.com/account?tab='.$tab;}
+function add_query_arg($k,$v,$url){return $url.'&'.$k.'='.$v;}
+function is_email($s){return filter_var($s,FILTER_VALIDATE_EMAIL);}
+function get_userdata($id){return (object) array('user_email'=>'account@example.com');}
+function wp_mail($to,$subject,$text){$GLOBALS['mail_sent'][]=array($to,$subject,$text);return true;}
 function tara_acc_sms_webhook($phone,$code,$text){$GLOBALS['sms_requests'][]=array('webhook',array('phone'=>$phone,'text'=>$text,'code'=>$code));return true;}
 function tara_release_change_request($user,$id,$callback){$r=$GLOBALS['sms_row'];$r=$callback($r);if(!is_wp_error($r))$GLOBALS['sms_row']=$r;return $r;}
 function wp_next_scheduled($hook,$args){return !empty($GLOBALS['sms_scheduled']);}
@@ -24,4 +29,15 @@ $GLOBALS['sms_config']['sms']='melipayamak';$GLOBALS['sms_response']=array('ok'=
 $GLOBALS['sms_config']['sms']='webhook';$GLOBALS['sms_row']=tara_release_sms_queue(array('status'=>'published','publication_url'=>'https://example.com/old'),'published');$GLOBALS['sms_row']['publication_url']='https://example.com/new';$count=count($GLOBALS['sms_requests']);tara_release_sms_process(42,'release_a','published');sms_test('changed publication link fails closed',count($GLOBALS['sms_requests'])===$count && $GLOBALS['sms_row']['sms_events']['published']['status']==='failed');
 $GLOBALS['sms_row']=tara_release_sms_queue(array('status'=>'paid'),'paid');$GLOBALS['__ot']['release_sms_paid_on']='off';tara_release_sms_process(42,'release_a','paid');sms_test('manager can disable SMS',count($GLOBALS['sms_requests'])===$count && $GLOBALS['sms_row']['sms_events']['paid']['status']==='failed');unset($GLOBALS['__ot']['release_sms_paid_on']);
 $GLOBALS['sms_scheduled']=array();sms_test('scheduling event',tara_release_sms_schedule(42,'release_a','paid'));tara_release_sms_schedule(42,'release_a','paid');sms_test('scheduling duplicate avoided',count($GLOBALS['sms_scheduled'])===1);
+$GLOBALS['sms_config']['sms']='melipayamak';$GLOBALS['sms_response']=array('ok'=>true,'body'=>'{"RetStatus":1,"Value":12345}');$GLOBALS['sms_requests']=array();
+$row=tara_release_sms_queue(array('status'=>'awaiting_payment','service'=>'song'),'quote_ready');
+sms_test('quote ready queued with account link',isset($row['sms_events']['quote_ready']) && strpos($row['sms_events']['quote_ready']['url'],'artist_section=requests')!==false);
+$GLOBALS['sms_row']=$row;tara_release_sms_process(42,'release_a','quote_ready');
+sms_test('quote ready text contains link',$GLOBALS['sms_row']['sms_events']['quote_ready']['status']==='accepted' && strpos($GLOBALS['sms_requests'][0][1]['text'],'artist_section=requests')!==false);
+$count=count($GLOBALS['sms_requests']);tara_release_sms_process(42,'release_a','quote_ready');sms_test('quote ready never duplicates',count($GLOBALS['sms_requests'])===$count);
+$row=array('status'=>'awaiting_payment','service'=>'song','order_id'=>7,'sms_events'=>array('payment_ready'=>array('status'=>'pending','time'=>time(),'url'=>'https://example.com/pay/7')));$GLOBALS['sms_row']=$row;tara_release_sms_process(42,'release_a','payment_ready');
+sms_test('payment link sent after order',$GLOBALS['sms_row']['sms_events']['payment_ready']['status']==='accepted' && strpos($GLOBALS['sms_requests'][1][1]['text'],'https://example.com/pay/7')!==false);
+$row=tara_release_sms_queue(array('status'=>'review','service'=>'song'),'payment_ready');$GLOBALS['sms_row']=$row;$count=count($GLOBALS['sms_requests']);tara_release_sms_process(42,'release_a','payment_ready');sms_test('payment SMS cannot send before quote ready',count($GLOBALS['sms_requests'])===$count && $GLOBALS['sms_row']['sms_events']['payment_ready']['status']==='failed');
+$GLOBALS['sms_phone']='';$GLOBALS['mail_sent']=array();$row=tara_release_sms_queue(array('status'=>'awaiting_payment','service'=>'song','details'=>array('email'=>'artist@example.com')),'quote_ready');$GLOBALS['sms_row']=$row;tara_release_sms_process(42,'release_a','quote_ready');
+sms_test('email fallback when phone missing',count($GLOBALS['mail_sent'])===1 && $GLOBALS['mail_sent'][0][0]==='artist@example.com' && $GLOBALS['sms_row']['sms_events']['quote_ready']['email']==='sent');
 echo "RESULT pass=$pass fail=$fail\n";

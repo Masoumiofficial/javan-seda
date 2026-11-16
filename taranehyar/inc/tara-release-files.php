@@ -30,7 +30,7 @@ function tara_release_private_dir() {
 
 /** Fixed slot identifiers are safe for lookup and never become file paths. */
 function tara_release_file_key_valid( $key ) {
-	return is_string( $key ) && ( in_array( $key, array( 'work', 'cover', 'document' ), true ) || 1 === preg_match( '/^work_([2-9]|10)$/D', $key ) );
+	return is_string( $key ) && ( in_array( $key, array( 'work', 'cover', 'document', 'audio128', 'audio320' ), true ) || 1 === preg_match( '/^work_([2-9]|10)$/D', $key ) );
 }
 
 /** Flatten a PHP multi-file field without trusting its array shape or declared size. */
@@ -51,6 +51,7 @@ function tara_release_file_inputs( $files ) {
 			$result[ 1 === $n ? 'work' : 'work_' . $n ] = array( 'name' => $name, 'tmp_name' => $group['tmp_name'][ $i ], 'error' => $group['error'][ $i ], 'size' => $group['size'][ $i ] );
 		}
 	}
+	foreach ( array( 'audio128', 'audio320' ) as $slot ) { if ( isset( $files[ $slot ]['error'] ) && UPLOAD_ERR_NO_FILE !== $files[ $slot ]['error'] ) { $result[ $slot ] = $files[ $slot ]; } }
 	foreach ( array( 'cover_file' => 'cover', 'document_file' => 'document' ) as $field => $slot ) {
 		if ( isset( $files[ $field ]['error'] ) && UPLOAD_ERR_NO_FILE !== $files[ $field ]['error'] ) { $result[ $slot ] = $files[ $field ]; }
 	}
@@ -65,9 +66,11 @@ function tara_release_file_rule( $name, $size, $kind ) {
 		'document' => array( 'max' => 10485760, 'extensions' => array( 'pdf', 'jpg', 'jpeg', 'png' ), 'mimes' => array( 'application/pdf', 'image/jpeg', 'image/png' ) ),
 		'video' => array( 'max' => 524288000, 'extensions' => array( 'mp4' ), 'mimes' => array( 'video/mp4' ) ),
 	);
+	if ( 'audio128' === $kind || 'audio320' === $kind ) { $rules[ $kind ] = array( 'max' => 30 * 1048576, 'extensions' => array( 'mp3' ), 'mimes' => array( 'audio/mpeg' ) ); }
+	if ( 'cover_v2' === $kind ) { $rules[ $kind ] = $rules['cover']; $rules[ $kind ]['max'] = 5 * 1048576; }
 	if ( ! isset( $rules[ $kind ] ) || ! is_string( $name ) || ! is_numeric( $size ) || (int) $size < 1 ) { return false; }
 	$cap_mb = (int) ( $rules[ $kind ]['max'] / 1048576 );
-	$configured = function_exists( 'ot_get_option' ) ? ot_get_option( 'release_max_' . $kind . '_mb', (string) $cap_mb ) : (string) $cap_mb;
+	$configured = function_exists( 'ot_get_option' ) ? ot_get_option( 'release_max_' . ( in_array( $kind, array( 'audio128', 'audio320' ), true ) ? 'audio' : ( 'cover_v2' === $kind ? 'cover' : $kind ) ) . '_mb', (string) $cap_mb ) : (string) $cap_mb;
 	if ( is_scalar( $configured ) && preg_match( '/^[1-9][0-9]{0,3}$/D', (string) $configured ) ) { $rules[ $kind ]['max'] = min( $cap_mb, (int) $configured ) * 1048576; }
 	if ( (int) $size > $rules[ $kind ]['max'] ) { return false; }
 	$ext = strtolower( pathinfo( $name, PATHINFO_EXTENSION ) );

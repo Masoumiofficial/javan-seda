@@ -62,6 +62,8 @@ $r=tara_release_validate($v2,true);t_release('new form accepts upload without id
 t_release('new form requires an audio file',is_wp_error(tara_release_validate($v2,false)));
 t_release('new form rejects unknown plan',is_wp_error(tara_release_validate(array_merge($v2,array('plan'=>'gold')),true)));
 t_release('new form still requires Persian title',is_wp_error(tara_release_validate(array_merge($v2,array('title'=>'')),true)));
+t_release('new form requires English title',is_wp_error(tara_release_validate(array_merge($v2,array('title_en'=>'')),true)));
+t_release('new form requires English artist',is_wp_error(tara_release_validate(array_merge($v2,array('performer_en'=>'')),true)));
 t_release('new form still requires Persian performer',is_wp_error(tara_release_validate(array_merge($v2,array('performer'=>'')),true)));
 $built=tara_release_build_request($v2,str_repeat('e',32),1000,true);t_release('new form stores plan and details',!is_wp_error($built) && 2===$built['details']['wizard_version'] && 'std'===$built['details']['plan']);
 echo "RESULT pass=$pass fail=$fail\n";

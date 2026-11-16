@@ -75,7 +75,7 @@ function tara_release_validate( $input, $has_file = false ) {
 	$catalog = tara_release_catalog();
 	if ( ! isset( $catalog[ $service ] ) ) { return new WP_Error( 'release_service', 'نوع خدمت نامعتبر است.' ); }
 	$v2 = isset( $input['wizard_version'] ) && '2' === $input['wizard_version'];
-	foreach ( $v2 ? array( 'title', 'performer' ) : array( 'full_name', 'artist_name', 'mobile', 'email', 'country', 'title', 'performer' ) as $field ) {
+	foreach ( $v2 ? array( 'title', 'title_en', 'performer', 'performer_en' ) : array( 'full_name', 'artist_name', 'mobile', 'email', 'country', 'title', 'performer' ) as $field ) {
 		if ( '' === trim( $data[ $field ] ) ) { return new WP_Error( 'release_required', 'فیلدهای ضروری را کامل کنید.' ); }
 	}
 	if ( '' !== $data['email'] && ! is_email( $data['email'] ) ) { return new WP_Error( 'release_email', 'ایمیل معتبر وارد کنید.' ); }

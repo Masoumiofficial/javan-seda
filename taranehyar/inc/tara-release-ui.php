@@ -34,21 +34,19 @@ function tara_release_render_wizard( $user_id = 0, $view = 'all' ) {
 			<input type="hidden" name="submission_token" value="<?php echo esc_attr( str_replace( '-', '', wp_generate_uuid4() ) ); ?>">
 			<input type="hidden" name="wizard_version" value="2">
 			<div class="tara-release__progress"><p data-release-progress aria-live="polite"></p><div class="tara-release__progress-track" aria-hidden="true"><span data-release-progress-bar></span></div></div>
-			<fieldset data-release-step><legend>انتخاب نوع اثر و پلن</legend>
+			<fieldset data-release-step><legend>اطلاعات اثر و پلن</legend>
 			<label>نوع اثر *<select name="service" required><option value="">انتخاب کنید</option><?php foreach ( $catalog as $key => $service ) : ?><option value="<?php echo esc_attr( $key ); ?>" data-price="<?php echo esc_attr( (string) $service['amount'] ); ?>"><?php echo esc_html( $service['label'] ); ?></option><?php endforeach; ?></select></label>
-			<label>پلن مورد نظر *<select name="plan" required><option value="">انتخاب کنید</option><?php foreach ( tara_release_plans() as $key => $plan ) : ?><option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $plan['name'] ); ?></option><?php endforeach; ?></select></label>
+			<label>پلن مورد نظر *<select name="plan" required><option value="">انتخاب کنید</option><?php foreach ( tara_release_plans() as $key => $plan ) : ?><option value="<?php echo esc_attr( $key ); ?>"><?php echo esc_html( $plan['name'] . ' — ' . ( (int) $plan['price'] > 0 ? number_format_i18n( (int) $plan['price'] ) . ' تومان' : 'رایگان' ) ); ?></option><?php endforeach; ?></select></label>
+			<label>نام اثر فارسی *<input name="title" maxlength="180" required></label><label>نام اثر انگلیسی *<input name="title_en" dir="ltr" maxlength="180" required></label>
+			<label>نام هنرمند فارسی *<input name="performer" maxlength="120" required></label><label>نام هنرمند انگلیسی *<input name="performer_en" dir="ltr" maxlength="120" required></label>
 			<p>تعرفه پایه قطعی نیست؛ مبلغ و شرایط پس از بررسی و پیش از پرداخت اعلام می‌شود.</p></fieldset>
-			<fieldset data-release-step><legend>مشخصات اثر</legend>
-			<label>نام اثر فارسی *<input name="title" maxlength="180" required></label><label>نام اثر انگلیسی<input name="title_en" dir="ltr" maxlength="180"></label>
-			<label>نام هنرمند فارسی *<input name="performer" maxlength="120" required></label><label>نام هنرمند انگلیسی<input name="performer_en" dir="ltr" maxlength="120"></label></fieldset>
-			<fieldset data-release-step><legend>فایل‌ها</legend>
+			<fieldset data-release-step><legend>فایل‌ها و ترانه</legend>
 			<?php if ( 'on' === $opt( 'release_uploads_on', 'on' ) ) : ?>
 			<label>فایل MP3 کیفیت ۱۲۸<input type="file" name="audio128" accept=".mp3,audio/mpeg"></label><label>فایل MP3 کیفیت ۳۲۰<input type="file" name="audio320" accept=".mp3,audio/mpeg"></label>
 			<label>کاور JPG یا PNG<input type="file" name="cover_file" accept=".jpg,.jpeg,.png"></label><label>مدرک مالکیت (اختیاری)<input type="file" name="document_file" accept=".pdf,.jpg,.jpeg,.png"></label>
 			<?php if ( is_wp_error( tara_release_private_dir() ) ) : ?><p class="tara-release__warning">فضای خصوصی آپلود هنوز آماده نیست؛ تا تنظیم آن، ثبت درخواست با فایل ممکن نیست. با مدیر تماس بگیرید.</p><?php endif; ?>
 			<?php else : ?><p class="tara-release__warning">آپلود خصوصی خاموش است؛ برای ارسال فایل با مدیر تماس بگیرید.</p><?php endif; ?>
-			<p>حداقل یک فایل صوتی لازم است؛ سقف هر فایل صوتی ۳۰ و کاور ۵ مگابایت است. سقف تنظیمات یا سرور ممکن است کمتر باشد.</p></fieldset>
-			<fieldset data-release-step><legend>ترانه و عوامل</legend>
+			<p>حداقل یک فایل صوتی لازم است؛ سقف هر فایل صوتی ۳۰ و کاور ۵ مگابایت است. سقف تنظیمات یا سرور ممکن است کمتر باشد.</p>
 			<label>متن ترانه<textarea name="lyrics" rows="5" maxlength="20000"></textarea></label><label>ترانه‌سرا<input name="lyricist" maxlength="120"></label><label>آهنگساز<input name="composer" maxlength="120"></label><label>تنظیم‌کننده<input name="arranger" maxlength="120"></label><label>میکس و مستر<input name="mixer" maxlength="120"></label><label>تهیه‌کننده<input name="producer" maxlength="120"></label><label>توضیحات و مدارک<textarea name="legal" maxlength="4000"></textarea></label></fieldset>
 			<fieldset data-release-step><legend>تایید و ارسال</legend><p data-release-summary></p>
 			<label><input type="checkbox" name="rights" value="1" required> صاحب حقوق اثر هستم یا مجوز لازم را دارم. *</label>

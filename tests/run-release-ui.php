@@ -18,7 +18,7 @@ ui_release_test('condition enabled',false!==strpos($html,'قانون نمونه'
 ui_release_test('condition disabled',false===strpos($html,'نباید نمایش داده شود'));
 ui_release_test('price from options',false!==strpos($html,'1,234,000'));
 ui_release_test('service disabled',false===strpos($html,'value="video"'));
-ui_release_test('five stages',5===substr_count($html,'data-release-step'));
+ui_release_test('three short stages',3===substr_count($html,'data-release-step'));
 ui_release_test('submit is available when enabled',false!==strpos($html,'data-release-submit>'));
 ui_release_test('international explicitly review only',false!==strpos($html,'فقط بررسی'));
 $GLOBALS['__ot']['release_condition_1_text'] = '&lt;p&gt;متن قانون&lt;/p&gt;';
@@ -27,6 +27,7 @@ ui_release_test('encoded markup shown as plain text', false !== strpos( $html, '
 ui_release_test('form-only hides request list', false === strpos( tara_release_render_wizard( 0, 'form' ), 'tara-release__request' ));
 ui_release_test('progress bar present', false !== strpos( $html, 'data-release-progress-bar' ));
 ui_release_test('new release form fields', false !== strpos( $html, 'name="audio128"' ) && false !== strpos( $html, 'name="audio320"' ) && false !== strpos( $html, 'name="title_en"' ) && false !== strpos( $html, 'name="lyrics"' ));
+ui_release_test('english names are required', false !== strpos( $html, 'name="title_en" dir="ltr" maxlength="180" required' ) && false !== strpos( $html, 'name="performer_en" dir="ltr" maxlength="120" required' ));
 ui_release_test('plan choices rendered', false !== strpos( $html, 'name="plan"' ) && false !== strpos( $html, 'پخش عادی' ));
 ui_release_test('server upload policy shown', false !== strpos( $html, '۳۰' ) && false !== strpos( $html, '۵ مگابایت' ));
 echo "RESULT pass=$pass fail=$fail\n";

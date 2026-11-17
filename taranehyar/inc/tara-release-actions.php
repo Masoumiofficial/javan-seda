@@ -12,7 +12,11 @@ function tara_release_ajax_submit() {
 	$token = isset( $input['submission_token'] ) && is_string( $input['submission_token'] ) ? $input['submission_token'] : '';
 	if ( ! is_string( $token ) || ! preg_match( '/^[a-f0-9]{32,64}$/D', $token ) || ! tara_hub_request_lock( $user_id ) ) { wp_send_json_error( array( 'message' => 'شناسه نامعتبر است یا درخواست دیگری در حال پردازش است.' ), 400 ); }
 	$existing = tara_release_find_submission( tara_hub_requests( $user_id ), $token );
-	if ( $existing ) { wp_send_json_success( array( 'id' => $existing['id'], 'message' => 'درخواست پیش‌تر ثبت شده است.' ) ); }
+	if ( $existing ) {
+		$checkout = '';
+		if ( 'international' !== ( isset( $existing['service'] ) ? $existing['service'] : '' ) ) { $invoice = tara_release_auto_checkout( $user_id, $existing['id'] ); if ( ! is_wp_error( $invoice ) ) { $checkout = $invoice; } }
+		wp_send_json_success( array( 'id' => $existing['id'], 'checkout' => $checkout, 'message' => '' !== $checkout ? 'در حال انتقال به پرداخت…' : 'درخواست پیش‌تر ثبت شده است.' ) );
+	}
 	$uploads = tara_release_file_inputs( $_FILES );
 	if ( is_wp_error( $uploads ) ) { wp_send_json_error( array( 'message' => $uploads->get_error_message() ), 400 ); }
 	if ( isset( $input['wizard_version'] ) && '2' === $input['wizard_version'] && ( ! isset( $uploads['audio128'] ) && ! isset( $uploads['audio320'] ) || isset( $uploads['work'] ) ) ) { wp_send_json_error( array( 'message' => 'حداقل یک فایل MP3 با کیفیت ۱۲۸ یا ۳۲۰ لازم است.' ), 400 ); }
@@ -33,7 +37,89 @@ function tara_release_ajax_submit() {
 		$dir = tara_release_private_dir(); if ( ! is_wp_error( $dir ) ) { foreach ( $stored as $old ) { @unlink( $dir . DIRECTORY_SEPARATOR . $old['token'] . '.bin' ); } }
 		wp_send_json_error( array( 'message' => $result->get_error_message() ), 400 );
 	}
-	wp_send_json_success( array( 'id' => $result, 'message' => 'درخواست ثبت شد و در انتظار بررسی است.' ) );
+	$checkout = ''; $message = 'درخواست ثبت شد.';
+	if ( 'international' !== $valid['service'] ) {
+		$invoice = tara_release_auto_checkout( $user_id, $result );
+		if ( is_wp_error( $invoice ) ) { $message = 'درخواست ثبت شد اما فاکتور آنلاین صادر نشد: ' . $invoice->get_error_message(); }
+		else { $checkout = $invoice; $message = 'فاکتور صادر شد؛ در حال انتقال به پرداخت…'; }
+	} else { $message = 'درخواست بررسی بین‌المللی ثبت شد؛ این خدمت پرداخت آنلاین ندارد.'; }
+	wp_send_json_success( array( 'id' => $result, 'checkout' => $checkout, 'message' => $message ) );
+}
+
+/**
+ * Fixed-price invoice: the server-side catalog amount is the only accepted price.
+ * The artist saw the same amount on the form, so the order is created immediately.
+ * Payment itself is still verified only by the WooCommerce gateway callback.
+ */
+function tara_release_auto_checkout( $user_id, $request_id ) {
+	$user_id = (int) $user_id;
+	if ( ! function_exists( 'ot_get_option' ) || 'on' !== ot_get_option( 'release_payment_on', 'on' ) || ! function_exists( 'tara_hub_wc_ready' ) || ! tara_hub_wc_ready() ) { return new WP_Error( 'release_disabled', 'پرداخت آنلاین در حال حاضر فعال نیست.' ); }
+	if ( $user_id <= 0 || ! is_string( $request_id ) || ! function_exists( 'tara_hub_request_lock' ) || ! tara_hub_request_lock( $user_id ) ) { return new WP_Error( 'release_lock', 'درخواست دیگری در حال پردازش است؛ دوباره تلاش کنید.' ); }
+	$row = null;
+	foreach ( tara_hub_requests( $user_id ) as $candidate ) { if ( isset( $candidate['type'], $candidate['id'] ) && 'release' === $candidate['type'] && $request_id === $candidate['id'] ) { $row = $candidate; break; } }
+	if ( ! is_array( $row ) ) { return new WP_Error( 'release_missing', 'درخواست پیدا نشد.' ); }
+	if ( ! empty( $row['order_id'] ) ) {
+		$order = function_exists( 'wc_get_order' ) ? wc_get_order( (int) $row['order_id'] ) : null;
+		if ( ! $order || (int) $order->get_customer_id() !== $user_id ) { return new WP_Error( 'release_order', 'سفارش قابل بازیابی نیست.' ); }
+		if ( $order->needs_payment() ) { return $order->get_checkout_payment_url(); }
+		return new WP_Error( 'release_order', 'این درخواست پیش‌تر پرداخت شده یا سفارش آن بسته شده است.' );
+	}
+	$service = isset( $row['service'] ) ? (string) $row['service'] : '';
+	if ( 'international' === $service ) { return new WP_Error( 'release_service', 'برای انتشار بین‌المللی فاکتور آنلاین صادر نمی‌شود.' ); }
+	if ( ! in_array( isset( $row['status'] ) ? $row['status'] : '', array( 'new', 'review' ), true ) ) { return new WP_Error( 'release_state', 'برای این درخواست قبلاً فاکتور ثبت شده است.' ); }
+	$catalog = tara_release_catalog( true );
+	if ( ! isset( $catalog[ $service ] ) || (int) $catalog[ $service ]['amount'] <= 0 ) { return new WP_Error( 'release_service', 'تعرفه این خدمت معتبر نیست.' ); }
+	$toman = (int) $catalog[ $service ]['amount'];
+	$amount = function_exists( 'tara_hub_wc_amount' ) ? tara_hub_wc_amount( $toman ) : null;
+	if ( null === $amount || $amount <= 0 ) { return new WP_Error( 'release_currency', 'واحد پول فروشگاه برای پرداخت آنلاین پشتیبانی نمی‌شود.' ); }
+	$rules = esc_url_raw( (string) ot_get_option( 'release_rules_url', 'https://ahangban.ir/releases/' ), array( 'http', 'https' ) );
+	if ( '' === $rules ) { $rules = 'https://ahangban.ir/releases/'; }
+	$refund = 'قوانین، شرایط لغو و بازپرداخت مطابق صفحه انتشار و تعرفه‌ها: ' . $rules;
+	$extra = 'تعرفه ثابت؛ هزینه جانبی ندارد.';
+	try { $revision = bin2hex( random_bytes( 16 ) ); } catch ( Exception $e ) { return new WP_Error( 'release_quote', 'ساخت شناسه فاکتور ناموفق بود.' ); }
+	$quote_row = $row;
+	$quote_row['final_toman'] = $toman;
+	$quote_row['extra_costs'] = $extra;
+	$quote_row['refund_terms'] = $refund;
+	$quote_row['quote_revision'] = $revision;
+	$hash = tara_release_quote_hash( $quote_row );
+	$order = null;
+	try {
+		$order = wc_create_order( array( 'customer_id' => $user_id, 'created_via' => 'tara_artist_release' ) );
+		if ( is_wp_error( $order ) ) { return new WP_Error( 'release_order', 'ساخت سفارش ناموفق بود.' ); }
+		$item = new WC_Order_Item_Fee();
+		$item->set_name( 'انتشار اثر: ' . ( isset( $row['title'] ) ? $row['title'] : '' ) . ' — ' . $catalog[ $service ]['label'] );
+		$item->set_tax_status( 'none' ); $item->set_amount( $amount ); $item->set_total( $amount );
+		$order->add_item( $item );
+		$order->update_meta_data( '_tara_release_request', $request_id );
+		$order->update_meta_data( '_tara_release_user', $user_id );
+		$order->update_meta_data( '_tara_release_quote', $hash );
+		$order->update_meta_data( '_tara_release_currency', get_woocommerce_currency() );
+		$order->update_meta_data( '_tara_release_expected', (string) $amount );
+		$order->update_meta_data( '_tara_release_refund_terms', $refund );
+		$order->update_meta_data( '_tara_release_extra_costs', $extra );
+		$order->update_meta_data( '_tara_release_accepted_at', time() );
+		$order->calculate_totals( false ); $order->save();
+		if ( abs( (float) $order->get_total() - (float) $amount ) > 0.001 || $order->get_currency() !== get_woocommerce_currency() ) { $order->update_status( 'cancelled', 'مبلغ یا واحد پول معتبر نیست.' ); return new WP_Error( 'release_amount', 'مبلغ سفارش معتبر نیست.' ); }
+		$checkout = $order->get_checkout_payment_url();
+		$saved = tara_release_change_request( $user_id, $request_id, function ( $current ) use ( $toman, $extra, $refund, $revision, $hash, $order, $checkout ) {
+			if ( ! empty( $current['order_id'] ) ) { return $current; }
+			$current['final_toman'] = $toman; $current['extra_costs'] = $extra; $current['refund_terms'] = $refund; $current['quote_revision'] = $revision;
+			if ( 'new' === $current['status'] ) { $current = tara_release_transition( $current, 'review', 'system', time() ); if ( is_wp_error( $current ) ) { return $current; } }
+			if ( 'review' === $current['status'] ) { $current = tara_release_transition( $current, 'approved', 'system', time() ); if ( is_wp_error( $current ) ) { return $current; } }
+			$current = tara_release_transition( $current, 'awaiting_payment', 'system', time() );
+			if ( is_wp_error( $current ) ) { return $current; }
+			$current['accepted_quote_hash'] = $hash; $current['accepted_at'] = time(); $current['order_id'] = (int) $order->get_id();
+			$current['sms_events']['payment_ready'] = array( 'status' => 'pending', 'time' => time(), 'url' => $checkout );
+			return $current;
+		} );
+		if ( is_wp_error( $saved ) ) { $order->update_status( 'cancelled', 'ثبت ارتباط درخواست ناموفق بود.' ); return $saved; }
+		if ( function_exists( 'tara_release_sms_schedule' ) ) { tara_release_sms_schedule( $user_id, $request_id, 'payment_ready' ); }
+		return $checkout;
+	} catch ( Throwable $e ) {
+		if ( is_object( $order ) && ! is_wp_error( $order ) ) { $order->update_status( 'cancelled', 'خطا در ساخت سفارش.' ); }
+		return new WP_Error( 'release_order', 'ساخت سفارش ناموفق بود؛ با مدیر تماس بگیرید.' );
+	}
 }
 
 /**
@@ -42,7 +128,7 @@ function tara_release_ajax_submit() {
  */
 function tara_release_admin_update( $user_id, $request_id, $input, $now ) {
 	if ( ! current_user_can( 'manage_options' ) || ! is_array( $input ) ) { return new WP_Error( 'release_forbidden', 'دسترسی مجاز نیست.' ); }
-	return tara_release_change_request( $user_id, $request_id, function( $row ) use ( $input, $now ) {
+	return tara_release_change_request( $user_id, $request_id, function( $row ) use ( $input, $now, $user_id ) {
 		$changed = $row;
 		if ( isset( $input['note'] ) ) {
 			if ( ! is_string( $input['note'] ) || strlen( $input['note'] ) > 16000 ) { return new WP_Error( 'release_note', 'یادداشت نامعتبر است.' ); }
@@ -82,6 +168,7 @@ function tara_release_admin_update( $user_id, $request_id, $input, $now ) {
 			$changed = tara_release_transition( $changed, $input['status'], 'admin', $now );
 			if ( is_wp_error( $changed ) ) { return $changed; }
 		}
+		if ( 'cancelled' === $changed['status'] && ! empty( $changed['order_id'] ) && function_exists( 'wc_get_order' ) ) { $order = wc_get_order( (int) $changed['order_id'] ); if ( $order && (int) $order->get_customer_id() === (int) $user_id && ! $order->is_paid() && $order->needs_payment() ) { $order->update_status( 'cancelled', 'درخواست توسط مدیر لغو شد.' ); } }
 		if ( function_exists( 'tara_release_sms_queue' ) ) {
 			if ( 'awaiting_payment' === $changed['status'] && empty( $changed['order_id'] ) ) { $changed = tara_release_sms_queue( $changed, 'quote_ready' ); }
 			if ( 'published' === $changed['status'] ) { $changed = tara_release_sms_queue( $changed, 'published' ); }

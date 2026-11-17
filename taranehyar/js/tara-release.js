@@ -8,7 +8,6 @@
     var progress = form.querySelector('[data-release-progress]');
     var summary = form.querySelector('[data-release-summary]');
     var progressBar = form.querySelector('[data-release-progress-bar]');
-    var plan = form.querySelector('[name=plan]');
     var service = form.querySelector('[name=service]');
     var current = 0;
     if (!steps.length || !next || !prev || !submit || !progress || !summary || !service) { return; }
@@ -21,9 +20,9 @@
       var percent = Math.round(((current + 1) / steps.length) * 100);
       progress.textContent = 'مرحله ' + (current + 1) + ' از ' + steps.length + ' · ' + percent.toLocaleString('fa-IR') + '٪';
       if (progressBar) { progressBar.style.width = percent + '%'; }
-      var selected = service.options[service.selectedIndex], chosenPlan = plan ? plan.options[plan.selectedIndex] : null;
+      var selected = service.options[service.selectedIndex];
       var title = form.querySelector('[name=title]'), performer = form.querySelector('[name=performer]');
-      summary.textContent = selected && selected.value ? 'نوع اثر: ' + selected.textContent + (chosenPlan && chosenPlan.value ? ' — پلن: ' + chosenPlan.textContent : '') + (title && title.value ? ' — اثر: ' + title.value : '') + (performer && performer.value ? ' — هنرمند: ' + performer.value : '') + ' — تعرفه پایه: ' + Number(selected.dataset.price || 0).toLocaleString('fa-IR') + ' تومان' : '';
+      summary.textContent = selected && selected.value ? 'پلن: ' + selected.textContent + (title && title.value ? ' — اثر: ' + title.value : '') + (performer && performer.value ? ' — هنرمند: ' + performer.value : '') : '';
     }
     prev.addEventListener('click', function () { if (current > 0) { current -= 1; render(); } });
     next.addEventListener('click', function () {
@@ -54,7 +53,10 @@
       form.dataset.busy = '1'; submit.disabled = true; if (message) { message.textContent = 'در حال ثبت…'; }
       fetch(cfg.api || '/wp-admin/admin-ajax.php', { method: 'POST', credentials: 'same-origin', body: data }).then(function (r) { return r.json(); }).then(function (result) {
         if (message) { message.textContent = result && result.data && result.data.message || 'خطایی رخ داد.'; }
-        if (result && result.success) { setTimeout(function () { window.location.reload(); }, 900); }
+        if (result && result.success) {
+          if (result.data && result.data.checkout) { window.location.href = result.data.checkout; return; }
+          setTimeout(function () { window.location.reload(); }, 900);
+        }
       }).catch(function () { if (message) { message.textContent = 'خطای شبکه؛ با همین فرم دوباره تلاش کنید.'; } }).finally(function () { form.dataset.busy = '0'; submit.disabled = false; });
     });
     render();

@@ -22,3 +22,14 @@
 .ty-hub__sections a:focus-visible{outline:2px solid #185adb;outline-offset:2px}
 @media(max-width:600px){.tara-release{padding:16px;border-radius:14px}.tara-release fieldset{grid-template-columns:1fr}.tara-release__terms{padding:12px}.ty-hub__sections{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.ty-hub__sections a{text-align:center;font-size:13px}}
 .tara-release__warning{border:1px solid #b26a00;background:#3a2607;color:#ffe0a8;border-radius:10px;padding:10px 12px}
+
+/* v3.15 fixed-price checkout */
+.tara-release__notice{margin:16px 0;padding:14px 16px;border:1px solid #34527c;border-radius:12px;background:#0b1a2f}
+.tara-release__notice p{margin:0}
+.tara-release__review{grid-column:1/-1;padding:14px 16px;border:1px solid #2f4a70;border-radius:12px;background:#0b1930}
+.tara-release__review p{margin:0;font-weight:700}
+.tara-release__check{display:flex;gap:8px;align-items:flex-start;grid-column:1/-1;line-height:1.8}
+.tara-release__check input{margin-top:6px}
+.tara-release__hint{color:#c9d8f2;font-size:14px}
+.tara-release__prices>div span{color:#9cc0ff}
+@media(max-width:600px){.tara-release__notice,.tara-release__review{padding:12px}}

@@ -67,7 +67,7 @@ function tara_release_sms_process( $user_id, $id, $event ) {
 			: ( 'awaiting_payment' === $row['status'] && 'international' !== ( isset( $row['service'] ) ? $row['service'] : '' ) && ! empty( $event_data['url'] ) && ( 'quote_ready' === $event ? empty( $row['order_id'] ) : ! empty( $row['order_id'] ) ) ) );
 	$defaults = array(
 		'quote_ready' => 'پیش‌فاکتور درخواست انتشار شما آماده است. مبلغ و شرایط را در حساب کاربری ببینید و تأیید کنید: {url} {site}',
-		'payment_ready' => 'سفارش شما آماده پرداخت است. مبلغ و شرایط تأییدشده را در حساب یا این لینک ببینید: {url} {site}',
+		'payment_ready' => 'فاکتور انتشار اثر شما با تعرفه ثابت صادر شد. پرداخت از این لینک: {url} {site}',
 		'paid' => 'پرداخت شما تأیید و اثر ثبت شد. پس از بررسی و در صورت تأیید، درباره انتشار به شما اطلاع می‌دهیم. {site}',
 		'published' => 'اثر شما منتشر شد: {url} {site}',
 	);

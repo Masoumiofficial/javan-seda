@@ -74,4 +74,24 @@ $r=tara_release_admin_update(45,$id2,array('send_quote'=>1,'final_toman'=>'20000
 test_release_storage('send quote advances safely to payment',!is_wp_error($r) && $r['status']==='awaiting_payment' && 2000000===$r['final_toman']);
 test_release_storage('quote ready SMS queued',isset($r['sms_events']['quote_ready']['status']) && 'pending'===$r['sms_events']['quote_ready']['status']);
 test_release_storage('old request remains intact',count(tara_hub_requests(42))===2);
+$GLOBALS['__db_sum']=1; $GLOBALS['__ot']['release_payment_on']='on';
+$v3=array('wizard_version'=>'2','service'=>'song','title'=>'فاکتور فوری','title_en'=>'Instant','performer'=>'هنرمند','performer_en'=>'Artist','rights'=>'1','terms'=>'1');
+$id3=tara_release_save_request(46,$v3,'f'.str_repeat('a',31),3000,array('audio128'=>array('token'=>str_repeat('b',48),'mime'=>'audio/mpeg','size'=>100,'extension'=>'mp3')));
+$before=count($GLOBALS['__test_orders']??array());
+$url=tara_release_auto_checkout(46,$id3);
+$row3=null; foreach(tara_hub_requests(46) as $candidate){ if($candidate['id']===$id3){$row3=$candidate;break;} }
+test_release_storage('fixed price invoice is created on submit',!is_wp_error($url) && $url==='https://example.com/pay/'.($before+1) && 'awaiting_payment'===$row3['status']);
+test_release_storage('invoice stores exact catalog price',1500000===$row3['final_toman'] && !empty($row3['order_id']) && 'ندارد'!==$row3['extra_costs']);
+test_release_storage('auto invoice is accepted at the displayed price',tara_release_quote_ready($row3));
+$order3=wc_get_order($row3['order_id']);
+test_release_storage('order needs payment only for the matching fixed price',tara_release_order_needs_payment(true,$order3));
+test_release_storage('submitting twice reuses the same invoice',tara_release_auto_checkout(46,$id3)===$url && count($GLOBALS['__test_orders'])===$before+1);
+test_release_storage('payment reminder queued with checkout link','pending'===$row3['sms_events']['payment_ready']['status'] && $row3['sms_events']['payment_ready']['url']===$url);
+$v4=array_merge($v3,array('title'=>'بین‌الملل','title_en'=>'Intl'));
+$id4=tara_release_save_request(47,$v3,'a'.str_repeat('b',31),3001,array('audio128'=>array('token'=>str_repeat('c',48),'mime'=>'audio/mpeg','size'=>100,'extension'=>'mp3')));
+$r47=tara_release_change_request(47,$id4,function($row){$row['service']='international';return $row;});
+test_release_storage('international never gets an automatic invoice',is_wp_error(tara_release_auto_checkout(47,$id4)));
+$r=tara_release_admin_update(46,$id3,array('status'=>'cancelled'),4000);
+test_release_storage('admin can cancel an unpaid invoice',!is_wp_error($r) && 'cancelled'===$r['status'] && 'cancelled'===wc_get_order($row3['order_id'])->status);
+test_release_storage('cancelled invoice still cannot be marked paid',is_wp_error(tara_release_admin_update(46,$id3,array('status'=>'paid'),4001)));
 echo "RESULT pass=$pass fail=$fail\n";

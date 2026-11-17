@@ -55,7 +55,8 @@ function tara_release_transition_allowed( $from, $to, $source = 'admin' ) {
 	);
 	if ( ! isset( $transitions[ $from ] ) || ! in_array( $to, $transitions[ $from ], true ) ) { return false; }
 	if ( 'paid' === $to ) { return 'verified_gateway' === $source; }
-	return 'admin' === $source;
+	if ( 'cancelled' === $to && in_array( $source, array( 'admin', 'system' ), true ) ) { return true; }
+	return in_array( $source, array( 'admin', 'system' ), true );
 }
 
 /** Caller must authenticate, verify nonce and unslash before invoking. */
@@ -96,10 +97,8 @@ function tara_release_validate( $input, $has_file = false ) {
 	}
 	if ( ! isset( $input['rights'], $input['terms'] ) || '1' !== $input['rights'] || '1' !== $input['terms'] ) { return new WP_Error( 'release_consent', 'تأیید مالکیت و شرایط الزامی است.' ); }
 	if ( $v2 ) {
-		$plan = isset( $input['plan'] ) && is_string( $input['plan'] ) ? sanitize_key( $input['plan'] ) : '';
-		$plans = tara_release_plans();
-		if ( ! isset( $plans[ $plan ] ) ) { return new WP_Error( 'release_plan', 'پلن معتبر انتخاب کنید.' ); }
-		$data['plan'] = $plan; $data['wizard_version'] = 2;
+		if ( 'international' === $service ) { return new WP_Error( 'release_plan', 'این خدمت در فرم آنلاین قابل سفارش نیست.' ); }
+		$data['wizard_version'] = 2;
 	}
 	$data['service'] = $service;
 	$data['rights'] = true;
@@ -182,7 +181,7 @@ function tara_release_accept_quote( $row, $submitted_hash, $now ) {
 /** State change is pure; persistence and authorization remain the caller's responsibility. */
 function tara_release_transition( $row, $to, $actor, $now ) {
 	if ( ! is_array( $row ) || ! isset( $row['type'], $row['status'] ) || 'release' !== $row['type'] || ! is_string( $to ) || ! is_string( $actor ) || ! is_int( $now ) || $now <= 0 || ! tara_release_transition_allowed( $row['status'], $to, $actor ) ) { return new WP_Error( 'release_transition', 'تغییر وضعیت مجاز نیست.' ); }
-	if ( ! empty( $row['order_id'] ) && 'awaiting_payment' === $row['status'] && 'paid' !== $to ) { return new WP_Error( 'release_order', 'ابتدا وضعیت سفارش ووکامرس را بررسی کنید.' ); }
+	if ( ! empty( $row['order_id'] ) && 'awaiting_payment' === $row['status'] && ! in_array( $to, array( 'paid', 'cancelled' ), true ) ) { return new WP_Error( 'release_order', 'ابتدا وضعیت سفارش ووکامرس را بررسی کنید.' ); }
 	if ( 'awaiting_payment' === $to && ( empty( $row['final_toman'] ) || empty( $row['quote_revision'] ) || empty( $row['extra_costs'] ) || empty( $row['refund_terms'] ) ) ) { return new WP_Error( 'release_quote', 'ابتدا مبلغ و شرایط اختصاصی سفارش را مشخص کنید.' ); }
 	if ( 'published' === $to && empty( $row['publication_url'] ) ) { return new WP_Error( 'release_publication', 'لینک انتشار لازم است.' ); }
 	if ( ! isset( $row['history'] ) || ! is_array( $row['history'] ) ) { $row['history'] = array(); }

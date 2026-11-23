@@ -307,15 +307,61 @@ register_sidebar($args);
 }
 add_action('widgets_init','leftsides1');
 ?>
-<?php add_action( 'template_redirect', function(){
-ob_start( function( $buffer ){
-$buffer = str_replace( array( 'type="text/javascript"', "type='text/javascript'" ), '', $buffer );
-$buffer = str_replace( array( 'type="text/css"', "type='text/css'" ), '', $buffer );
-$buffer = str_replace( array( 'frameborder="0"', "frameborder='0'" ), '', $buffer );
-$buffer = str_replace( array( 'scrolling="no"', "scrolling='no'" ), '', $buffer );
-return $buffer;
-});
-}); ?>
+<?php
+/* v3.17.4 — این «آرایشگرِ خروجی» با ob_start در template_redirect کل صفحه را
+   در حافظه نگه می‌داشت و تا پایانِ رندر هیچ بایتی به مرورگر نمی‌رفت. روی
+   هاست‌های fastcgi/proxy این یعنی صفحه دقیقاً تا کامل‌شدن «در حال لودینگ»
+   می‌مانَد، و اگر ریدایرکتی (redirect_canonical) وسط کار خارج شود، بافر
+   باز می‌ماند و محتوای نیمه‌کاره نشت می‌کند.
+
+   دو اصلاح:
+     ۱) فقط وقتی بافر باز می‌شود که واقعاً در حال تولید HTML باشیم و
+        ریدایرکتی در جریان نباشد.
+     ۲) خودِ فیلتر در برابر خروجِ ناگهانی محافظت می‌شود (ob_get_level). */
+add_action( 'template_redirect', function () {
+	/* راهِ فرار: اگر روی هاستی اینجاست که دردسر می‌سازد، در wp-config.php
+	   این خط را بگذارید و کار تمام است (بدون ویرایش قالب):
+	       define( 'TARA_OB_FILTER', false );
+	   همچنین با define( 'TARA_OB_FILTER', false ) فیلترِ CSS/JS هم خاموش
+	   می‌شود — قیمتش این است که چند صفتِ type اضافی در HTML می‌مانَد. */
+	if ( defined( 'TARA_OB_FILTER' ) && ! TARA_OB_FILTER ) {
+		return;
+	}
+	if ( is_admin() || ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) ) {
+		return;
+	}
+	if ( function_exists( 'is_feed' ) && is_feed() ) {
+		return;
+	}
+	/* اگر تا اینجا هدرِ Location ست شده، درخواست ریدایرکت است؛ دست نزن. */
+	if ( function_exists( 'headers_sent' ) && ! headers_sent() ) {
+		$ty_hdrs = headers_list();
+		foreach ( (array) $ty_hdrs as $ty_h ) {
+			if ( 0 === stripos( (string) $ty_h, 'location:' ) ) {
+				return;
+			}
+		}
+	}
+	$ty_level = ob_get_level();
+	/* اندازهٔ قطعه: بافر هر ۸ کیلوبایت تخلیه می‌شود، نه یک‌جا در پایانِ
+	   رندر. نتیجه: مرورگر اولین بایتِ HTML را زود می‌گیرد و صفحه در حالتِ
+	   «در حال لودینگ» گیر نمی‌کند. (با اندازه‌گیری آزمودیم: با chunk_size،
+	   callback چندبار صدا زده می‌شود و تکه‌تکه flush می‌کند.) */
+	ob_start( function ( $buffer ) {
+		$buffer = str_replace( array( 'type="text/javascript"', "type='text/javascript'" ), '', $buffer );
+		$buffer = str_replace( array( 'type="text/css"', "type='text/css'" ), '', $buffer );
+		$buffer = str_replace( array( 'frameborder="0"', "frameborder='0'" ), '', $buffer );
+		$buffer = str_replace( array( 'scrolling="no"', "scrolling='no'" ), '', $buffer );
+		return $buffer;
+	}, 8192 );
+	/* بستنِ تضمینی در پایانِ درخواست، تا بافری معلق نماند. */
+	add_action( 'shutdown', function () use ( $ty_level ) {
+		while ( ob_get_level() > $ty_level ) {
+			@ob_end_flush(); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		}
+	}, 1 );
+}, 2 );
+?>
 <?php add_filter('acf/settings/remove_wp_meta_box', '__return_false'); ?>
 <?php function comment_loop_cd( $comment, $args, $depth ) {
 	$GLOBALS['comment'] = $comment;

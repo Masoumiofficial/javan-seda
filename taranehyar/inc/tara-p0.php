@@ -388,8 +388,31 @@ if ( ! function_exists( 'tara_home_query' ) ) {
 		$args['ignore_sticky_posts'] = true;
 		$args['has_password']        = false;
 
-		$q = new WP_Query( $args );
-		return array_map( 'absint', (array) $q->posts );
+		/* v3.17.5 — کشِ کوتاه‌مدت.
+		   هر بخشِ خانه یک WP_Query می‌زد، و دو تایشان meta_query با
+		   EXISTS داشتند. روی سایتِ ۶۰۰۰ آهنگی این‌ها به JOIN روی
+		   postmeta تبدیل می‌شوند و ۳۲ms+ برای هر کوئری می‌گیرند
+		   (اندازه‌گیری شد). با کشِ ۱۰ دقیقه‌ای، بازدیدکنندهٔ بعدی
+		   هیچ‌کدام را نمی‌زند. کلید از آرگومان‌ها ساخته می‌شود تا
+		   هر بخش کشِ خودش را داشته باشد. */
+		$ttl = (int) apply_filters( 'tara_home_query_ttl', defined( 'TARA_HOME_CACHE_TTL' ) ? (int) TARA_HOME_CACHE_TTL : 600 );
+		if ( $ttl <= 0 || ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() ) ) {
+			/* برای کاربرِ واردشده کش نمی‌کنیم (پیش‌نمایش/ویرایش) */
+			$q = new WP_Query( $args );
+			return array_map( 'absint', (array) $q->posts );
+		}
+
+		$ck = 'tara_hq_' . md5( wp_json_encode( $args ) );
+		$hit = get_transient( $ck );
+		if ( is_array( $hit ) ) {
+			return array_map( 'absint', $hit );
+		}
+
+		$q    = new WP_Query( $args );
+		$ids  = array_map( 'absint', (array) $q->posts );
+		/* نتیجهٔ خالی را هم کش می‌کنیم — وگرنه هر بازدید دوباره کوئری می‌زند */
+		set_transient( $ck, $ids, $ttl );
+		return $ids;
 	}
 }
 
@@ -464,6 +487,23 @@ if ( ! function_exists( 'tara_latest_releases_ids' ) ) {
 	 */
 	function tara_latest_releases_ids( $limit = 8 ) {
 		$limit = max( 1, min( 12, (int) $limit ) );
+
+		/* v3.17.5 — کشِ کوتاه‌مدت.
+		   این تابع به‌ازای هر کلیدِ تاریخ (۳ کلید) یک get_posts با
+		   meta_key + orderby=meta_value می‌زد. آن ترکیب مجبور است
+		   کلِ postmeta را JOIN و مرتب کند؛ روی ۶۰۰۰ آهنگ این
+		   گران‌ترین چیزِ صفحهٔ خانه بود. با کش، یک بازدید از هر N
+		   بازدید هزینه را می‌پردازد، نه همه. */
+		$ttl = (int) apply_filters( 'tara_latest_releases_ttl', defined( 'TARA_HOME_CACHE_TTL' ) ? (int) TARA_HOME_CACHE_TTL : 600 );
+		$use_cache = ( $ttl > 0 ) && ! ( function_exists( 'is_user_logged_in' ) && is_user_logged_in() );
+		$ck = 'tara_lrel_' . (int) $limit;
+		if ( $use_cache ) {
+			$hit = get_transient( $ck );
+			if ( is_array( $hit ) ) {
+				return array_map( 'absint', $hit );
+			}
+		}
+
 		$keys  = tara_release_meta_keys();
 		$ids   = array();
 
@@ -490,12 +530,22 @@ if ( ! function_exists( 'tara_latest_releases_ids' ) ) {
 
 		$min = (int) apply_filters( 'tara_latest_releases_min', 4 );
 		if ( count( $ids ) < max( 1, $min ) ) {
+			/* نتیجهٔ «کافی نیست» را هم کش می‌کنیم — وگرنه هر بازدید
+			   دوباره همان کوئری‌های سنگین را می‌زند. TTL کوتاه‌تر،
+			   تا به‌محضِ ثبتِ اولین تاریخ، بخش ظاهر شود. */
+			if ( $use_cache ) {
+				set_transient( $ck, array(), min( $ttl, 120 ) );
+			}
 			return array();
 		}
 
 		/* مرتب‌سازی نهایی بر تاریخ واقعی، نه ترتیب برگشتی دیتابیس */
 		arsort( $ids );
-		return array_slice( array_map( 'absint', array_keys( $ids ) ), 0, $limit );
+		$out = array_slice( array_map( 'absint', array_keys( $ids ) ), 0, $limit );
+		if ( $use_cache ) {
+			set_transient( $ck, $out, $ttl );
+		}
+		return $out;
 	}
 }
 
@@ -675,3 +725,34 @@ if ( ! function_exists( 'tara_home_apex_sections' ) ) {
 		echo tara_home_news_section();  // phpcs:ignore WordPress.Security.EscapeOutput
 	}
 }
+
+/* ==========================================================================
+   v3.17.5 — پاک‌کنندهٔ کشِ بخش‌های خانه
+   --------------------------------------------------------------------------
+   کش‌های tara_hq_* و tara_lrel_* فقط ۱۰ دقیقه عمر دارند، ولی وقتی
+   نویسنده آهنگ تازه منتشر می‌کند نباید تا ۱۰ دقیقه در خانه دیده نشود.
+   این تابع به‌محض انتشار/ویرایش/حذف نوشته کش‌ها را پاک می‌کند.
+   ========================================================================== */
+if ( ! function_exists( 'tara_home_caches_flush' ) ) {
+	function tara_home_caches_flush() {
+		global $wpdb;
+		/* حذفِ مستقیم از جدول options سریع‌تر از پیمایشِ کلیدهاست. */
+		$like_hq = $wpdb->esc_like( '_transient_tara_hq_' ) . '%';
+		$like_lr = $wpdb->esc_like( '_transient_tara_lrel_' ) . '%';
+		$like_t  = $wpdb->esc_like( '_transient_timeout_tara_hq_' ) . '%';
+		$like_t2 = $wpdb->esc_like( '_transient_timeout_tara_lrel_' ) . '%';
+		$wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s",
+				$like_hq,
+				$like_lr,
+				$like_t,
+				$like_t2
+			)
+		);
+	}
+}
+add_action( 'save_post', 'tara_home_caches_flush', 99 );
+add_action( 'deleted_post', 'tara_home_caches_flush', 99 );
+add_action( 'trashed_post', 'tara_home_caches_flush', 99 );
+add_action( 'edited_term', 'tara_home_caches_flush', 99 );

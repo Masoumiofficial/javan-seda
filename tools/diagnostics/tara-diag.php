@@ -11,6 +11,22 @@
  * پس از تشخیص، فایل را پاک کنید.
  */
 
+/* ------------------------------------------------------------------
+ * محافظت: این فایل اطلاعاتِ حساس (مسیرها، نام جدول‌ها، خطاها) را
+ * چاپ می‌کند. اگر TARA_DIAG_KEY را در wp-config.php گذاشته باشید،
+ * فقط با ?key=… باز می‌شود. اگر نگذاشته باشید، بدون کلید باز می‌شود
+ * ولی در خروجی هشدار می‌دهد که باید پس از تشخیص پاک شود.
+ * ------------------------------------------------------------------ */
+if ( defined( 'TARA_DIAG_KEY' ) && '' !== (string) TARA_DIAG_KEY ) {
+	$ty_k = isset( $_GET['key'] ) ? (string) $_GET['key'] : '';
+	if ( ! hash_equals( (string) TARA_DIAG_KEY, $ty_k ) ) {
+		header( 'HTTP/1.1 404 Not Found' );
+		echo 'Not found.';
+		exit;
+	}
+	unset( $ty_k );
+}
+
 header( 'Content-Type: text/plain; charset=utf-8' );
 header( 'X-Robots-Tag: noindex, nofollow' );
 header( 'Cache-Control: no-store, no-cache, must-revalidate, max-age=0' );
@@ -25,6 +41,11 @@ $line = function ( $mark, $label, $value = '' ) use ( &$out ) {
 };
 
 $out[] = '=== کاوشگر ترانه‌یار / ' . gmdate( 'Y-m-d H:i:s' ) . ' UTC ===';
+if ( ! defined( 'TARA_DIAG_KEY' ) || '' === (string) TARA_DIAG_KEY ) {
+	$out[] = '⚠ این فایل بدون کلید محافظت باز است. پس از تشخیص حتماً پاکش کنید.';
+	$out[] = '   برای محافظت، در wp-config.php بگذارید:';
+	$out[] = "       define( 'TARA_DIAG_KEY', 'یک-رمز-دلخواه' );";
+}
 $out[] = '';
 
 /* ---------------------------------------------------------------- 1) PHP */

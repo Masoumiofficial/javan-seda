@@ -54,6 +54,18 @@ html[data-tara-night="1"] .ty-taxabout {
 	background:
 		linear-gradient(155deg, color-mix(in srgb, var(--th-accent) 12%, var(--th-surface)) 0%, var(--th-surface) 46%, color-mix(in srgb, var(--th-accent-2) 8%, var(--th-surface)) 100%);
 	box-shadow: 0 30px 70px -58px rgba(17, 24, 39, 0.85);
+	/* v3.17.2 — کلاژ از «absolute روی متن» به یک ستونِ واقعیِ گرید
+	   تبدیل شد. پیش‌تر body فقط 150px حاشیه داشت ولی کلاژ تا 232px
+	   می‌رفت، پس بج/تعداد/تاریخ زیرِ عکس‌ها می‌افتادند. حالا هر ستون
+	   فضای خودش را دارد و هم‌پوشانی ساختاراً ناممکن است. */
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	grid-template-areas:
+		"body collage"
+		"chips chips";
+	column-gap: clamp(18px, 3vw, 40px);
+	row-gap: 20px;
+	align-items: center;
 }
 
 .ty-taxhero__glow {
@@ -70,37 +82,67 @@ html[data-tara-night="1"] .ty-taxabout {
 	z-index: 0;
 }
 
+/* کلاژ: ستونِ مستقلِ گرید (نه absolute) — بدون هم‌پوشانی با متن. */
 .ty-taxhero__collage {
-	position: absolute;
-	inset-block-start: 18px;
-	inset-inline-start: 22px;
-	display: block;
-	width: 210px;
-	height: 150px;
+	grid-area: collage;
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-template-rows: repeat(2, 1fr);
+	gap: 8px;
+	width: clamp(180px, 20vw, 232px);
+	/* v3.17.2 — ارتفاع ثابت حذف شد. قبلاً کلاژ ۲۳۲px بود ولی ستونِ
+	   متن (عنوان + توضیح + آمار + دکمه‌ها) بلندتر؛ نتیجه یک چالهٔ خالی
+	   زیر کلاژ. حالا کلاژ ارتفاعِ ردیف را می‌گیرد و کنارِ متن کشیده
+	   می‌شود؛ حداقل/حداکثر حفظ شده تا در ویوپورت کوچک جمع نشود. */
+	/* کلاژ مربع می‌ماند و در ستون وسط‌چین می‌شود. قبلاً تا ارتفاعِ ردیف
+	   کشیده می‌شد و زیرِ دکمه‌ها فضای مرده می‌ساخت. */
+	height: clamp(180px, 20vw, 232px);
+	align-self: center;
 	pointer-events: none;
-	z-index: 0;
-	opacity: 0.95;
+	z-index: 1;
 }
 
 .ty-taxhero__collage img {
-	position: absolute;
-	width: 104px;
-	height: 104px;
+	position: relative;
+	width: 100%;
+	height: 100%;
 	border-radius: 18px;
 	object-fit: cover;
-	box-shadow: 0 18px 34px -20px rgba(0, 0, 0, 0.55);
+	box-shadow: 0 18px 34px -22px rgba(0, 0, 0, 0.5);
 	border: 3px solid var(--th-surface);
+	background: var(--th-soft);
 }
 
-.ty-taxhero__collage img:nth-child(1) { inset-inline-start: 0; inset-block-start: 26px; transform: rotate(-7deg); }
-.ty-taxhero__collage img:nth-child(2) { inset-inline-start: 52px; inset-block-start: 0; transform: rotate(3deg); z-index: 2; }
-.ty-taxhero__collage img:nth-child(3) { inset-inline-start: 104px; inset-block-start: 34px; transform: rotate(9deg); }
+/* اولین تصویر بلندتر است: کلاژ ۲×۲ با یک قابِ بزرگ‌تر، بدون چرخشِ
+   کج که خوانایی را به‌هم می‌ریخت. */
+.ty-taxhero__collage img:nth-child(1) {
+	grid-row: span 2;
+	border-radius: 22px;
+}
+
+/* v3.17.2 — ژانرهای تازه اغلب ۱ یا ۲ کاور دارند، نه ۳. بدون این قواعد
+   خانهٔ سومِ گرید خالی و «بریده» دیده می‌شد.
+   با دو کاور، هر دو تمامِ عرض را می‌گیرند و روی هم می‌نشینند (نه دو
+   ستونِ باریکِ بلند)؛ با یک کاور، تصویرِ تنها کلِ قاب را پر می‌کند. */
+.ty-taxhero__collage img:first-child:nth-last-child(2),
+.ty-taxhero__collage img:nth-child(2):last-child,
+.ty-taxhero__collage img:only-child {
+	grid-column: span 2;
+}
+
+.ty-taxhero__collage img:only-child {
+	grid-row: span 2;
+	border-radius: 22px;
+}
 
 .ty-taxhero__body {
+	grid-area: body;
 	position: relative;
 	z-index: 2;
 	min-width: 0;
-	padding-inline-start: clamp(0px, 14vw, 150px);
+	/* ستونِ متن فضای خودش را از گرید می‌گیرد. */
+	padding-inline-start: 0;
 }
 
 .ty-taxhero__crumbs {
@@ -160,6 +202,9 @@ html[data-tara-night="1"] .ty-taxabout {
 }
 
 .ty-taxhero__desc p { margin: 0 0 6px; }
+
+/* v3.17.2 — وقتی ترم توضیح ندارد، عنصرِ desc رندر نمی‌شود ولی فاصلهٔ
+   زیرِ عنوان می‌ماند و یک «چاله» بین h1 و آمار می‌سازد. */
 
 .ty-taxhero__stats {
 	display: flex;
@@ -253,11 +298,13 @@ html[data-tara-night="1"] .ty-taxabout {
 }
 
 .ty-taxhero__chips {
+	grid-area: chips;
 	position: relative;
 	z-index: 2;
 	display: grid;
 	gap: 12px;
-	margin-top: 22px;
+	/* فاصله از گرید می‌آید، نه margin؛ تا در همهٔ عرض‌ها یکدست بماند. */
+	margin-top: 0;
 	padding-top: 18px;
 	border-top: 1px dashed var(--th-line);
 }
@@ -438,33 +485,39 @@ html[data-tara-night="1"] .ty-taxabout {
    ۴) واکنش‌گرایی
    ====================================================================== */
 @media (max-width: 1000px) {
-	.ty-taxhero__collage { width: 160px; height: 120px; inset-inline-start: 14px; }
-	.ty-taxhero__collage img { width: 82px; height: 82px; border-radius: 14px; }
-	.ty-taxhero__collage img:nth-child(1) { inset-block-start: 22px; }
-	.ty-taxhero__collage img:nth-child(2) { inset-inline-start: 40px; }
-	.ty-taxhero__collage img:nth-child(3) { inset-inline-start: 80px; inset-block-start: 28px; }
-	.ty-taxhero__body { padding-inline-start: 120px; }
+	.ty-taxhero__collage { width: 168px; height: 168px; gap: 6px; }
+	.ty-taxhero__collage img { border-radius: 15px; border-width: 2px; }
+	.ty-taxhero__collage img:nth-child(1) { border-radius: 18px; }
+	.ty-taxhero { column-gap: 18px; }
 }
 
 @media (max-width: 760px) {
-	.ty-taxhero { padding: 18px 14px 16px; border-radius: 20px; margin: 16px 0; }
+	.ty-taxhero {
+		padding: 18px 14px 16px;
+		border-radius: 20px;
+		margin: 16px 0;
+		/* موبایل: یک ستون، کلاژ بالای متن به‌صورت نوارِ افقی. */
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-areas:
+			"collage"
+			"body"
+			"chips";
+		row-gap: 16px;
+	}
 	.ty-taxhero__collage {
-		position: static;
 		display: flex;
-		gap: 6px;
+		gap: 7px;
 		width: auto;
 		height: auto;
-		margin-bottom: 14px;
 	}
 	.ty-taxhero__collage img {
-		position: static;
 		width: 62px;
 		height: 62px;
-		border-radius: 12px;
-		transform: none !important;
+		border-radius: 13px;
 		border-width: 2px;
+		grid-row: auto;
 	}
-	.ty-taxhero__body { padding-inline-start: 0; }
+	.ty-taxhero__collage img:only-child { width: 84px; height: 84px; }
 	.ty-taxhero__title { font-size: clamp(24px, 7vw, 32px); margin-top: 10px; }
 	.ty-taxhero__stats li { flex: 1 1 calc(50% - 8px); min-width: 0; padding: 8px 11px; }
 	.ty-taxhero__stats strong { font-size: 15px; }

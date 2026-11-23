@@ -33,6 +33,8 @@ export async function site(processId = 51) {
   if (!fs.existsSync(SITE + '/wp-load.php')) {
     throw new Error(rebuildHint());
   }
+  /* processId باید در همان لحظهٔ لود به runtime برسد؛ وگرنه بارگذار
+     init نمی‌شود و PHP بی‌صدا چیزی اجرا نمی‌کند. */
   const id = await loadNodeRuntime('8.4', { emscriptenOptions: { processId } });
   const php = new PHP(id);
   useHostFilesystem(php);

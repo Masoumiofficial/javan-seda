@@ -37,6 +37,13 @@ if ( ! function_exists( 'tara_acf_meta_value' ) ) {
 			if ( function_exists( 'get_the_ID' ) ) {
 				$post_id = get_the_ID();
 			}
+			/* v3.17.2 — در زمینهٔ آرشیوِ تاکسونومی، `get_the_ID()` می‌تواند
+			   شیءِ WP_Term برگرداند (نه شناسهٔ نوشته). کستِ مستقیم به int
+			   در PHP 8.2+ هشدار «Object could not be converted» می‌دهد و
+			   شناسهٔ بی‌معنا می‌سازد؛ پس فقط عددِ واقعی پذیرفته می‌شود. */
+			if ( is_object( $post_id ) ) {
+				$post_id = 0;
+			}
 			if ( ! $post_id && isset( $GLOBALS['post']->ID ) ) {
 				$post_id = (int) $GLOBALS['post']->ID;
 			}

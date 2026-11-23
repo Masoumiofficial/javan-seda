@@ -57,13 +57,13 @@
 | `inc/theme-options.php` | پنج کلید بخش‌های خانه + به‌روزرسانی توضیح `reltag1` |
 | `inc/admin-panel-views.php` | «در این نسخه چه شد؟» |
 | `functions.php`, `style.css` | نسخهٔ ۳.۱۶.۰ |
-| `tests/run-apex.php` | **جدید** — ۵۵ آزمون |
+| `tests/run-apex.php` | **جدید** — ۵۷ آزمون |
 | `tests/smoke-search-apex.mjs` | **جدید** — سناریوی خطا/تلاش دوباره/۴۰۳ در DOM |
 | `tools/php-test.mjs` | فهرست فایل‌های موجود و حذف تکراری‌ها |
 
 ## آزمون و محدودیت‌ها
 - `node tools/php-lint.mjs taranehyar` → ۱۰۲ فایل، ۰ خطا.
-- `tests/run-apex.php` → ۵۵/۵۵.
+- `tests/run-apex.php` → ۵۷/۵۷.
 - آزمون‌های موجود: release-core ۴۹، storage ۴۱، files ۲۵، http ۶، live ۹، sms ۱۸، ui ۱۶، run-391 ۳۶۷، run-312 ۲۸، cards ۷، dm ۱۰، payment ۱۴، playlists ۸، artist-radio ۲۰، category-links ۷، comments-more ۱۹، radio-dj ۸ — همه سبز.
 - `tests/smoke-search-3131.mjs`، `tests/smoke-search-apex.mjs`، `smoke-release-wizard.mjs`، `smoke-313.mjs`، `smoke-hub.mjs`، `smoke-account.mjs` سبز.
 - `python3 tools/minify-css.py` (۹ فایل، −۳۴٪) و `python3 tools/expected-hashes.py --check` (۲۱/۲۱) سبز. `python3 tools/verify-ot.py` بدون مشکل.
@@ -74,3 +74,10 @@
 - noindex جست‌وجو: `add_filter( 'tara_seo_noindex_search', '__return_false' );`
 - متای تاریخ: `add_filter( 'tara_release_meta_keys', … )` برای تغییر کلیدها.
 - ترتیب کامل عقب‌گرد: نسخهٔ ۳.۱۵.۰ قابل نصب روی همین سایت است؛ هیچ تغییر داده‌ای انجام نشده که برگشت‌ناپذیر باشد.
+
+## بسته و انتشار
+
+- ZIP: `artifacts/taranehyar-3.16.0.zip` (۲۰۳ فایل، ۲٬۴۱۴٬۳۴۷ بایت)
+- SHA-256: `76f202ec3549d7346e51a015200b01d86e455a88a685db97f07486a5c8f5b4dd`
+- لینک خام: <https://raw.githubusercontent.com/Masoumiofficial/javan-seda/v3.16.0/artifacts/taranehyar-3.16.0.zip>
+- انتشار: <https://github.com/Masoumiofficial/javan-seda/releases/tag/v3.16.0>

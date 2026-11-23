@@ -66,9 +66,11 @@ files.push({ parent: '/tmp/theme/js', name: 'tara-account.js', url: 'file://' + 
 for (const name of ['tara-player.js', 'hero-slider.js', 'admin-settings.js', 'ab-vip-image.js', 'tara-radio.js']) {
   files.push({ parent: '/tmp/theme/js', name, url: 'file://' + path.join(theme, 'js', name) });
 }
-for (const name of ['single.php', 'category.php', 'footer.php', '404.php', 'taxonomy-artist.php', 'taxonomy-tara_genre.php', 'home.php', 'search.php', 'page-radio.php', 'page-playlists.php', 'inc/songs_post.php', 'inc/mobiles_header.php', 'inc/no-content.php']) {
+/* v3.16.0 — فقط فایل‌های موجودِ قالب؛ نبودِ یک فایل نباید کل آزمون را بیاندازد. */
+for (const name of ['inc/tara-p0.php', 'inc/ab-seo.php', 'inc/ab-credits.php', 'inc/vip_slider.php', 'header.php', 'home.php', 'single.php', 'category.php', 'footer.php', '404.php', 'taxonomy-artist.php', 'taxonomy-tara_genre.php', 'search.php', 'page-radio.php', 'page-playlists.php', 'inc/songs_post.php', 'inc/mobiles_header.php', 'inc/no-content.php'].filter((n) => fs.existsSync(path.join(theme, n)))) {
   const parent = name.includes('/') ? '/tmp/theme/inc' : '/tmp/theme';
   const base = name.includes('/') ? name.split('/')[1] : name;
+  if (files.some((f) => f.parent === parent && f.name === base)) continue;
   files.push({ parent, name: base, url: 'file://' + path.join(theme, name) });
 }
 files.push({ parent: '/preload/tests', name: 'stubs-wp.php', url: 'file://' + path.join(root, 'tests', 'stubs-wp.php') });

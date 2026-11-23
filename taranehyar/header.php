@@ -76,7 +76,12 @@ if ( $darks_std ) { ?>
 <?php } /* TARA_SKIP_LINK */ ?>
 <header id="header">
 <div class="tarlanweb_center">
-<?php if(is_home()){ ?> <h1 class="h1_hidden_home"><?php echo esc_html( ot_get_option('head_h1') ); ?></h1> <?php } ?>
+<?php
+/* v3.16.0 — H1 پنهان صفحهٔ اصلی تا امروز فقط با `is_home()` چاپ می‌شد.
+   اگر مدیر یک «برگهٔ ثابت» را صفحهٔ اصلی کند، `is_home()` نادرست است و
+   صفحهٔ اصلی بدون H1 می‌ماند (خطای رایج سئو). صفحه‌بندی‌شده‌ها عمداً
+   بیرون‌اند تا H1 تکراری ساخته نشود. */
+if ( ( is_home() || is_front_page() ) && ! is_paged() ) { ?> <h1 class="h1_hidden_home"><?php echo esc_html( ot_get_option('head_h1') ); ?></h1> <?php } ?>
 <?php /* v3.8.3 — لوگوی روز و شب؛ CSS فقط یکی را نشان می‌دهد (بدون درخواستِ تازه). */ ?>
 <div class="logo_top"><figure><a href="<?php echo esc_url( home_url() ); ?>"><?php
 if ( function_exists( 'tara_logo_img' ) ) {

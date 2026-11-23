@@ -67,6 +67,15 @@ if ( function_exists( 'tara_radio_home_section' ) ) {
 <?php get_template_part('inc/new_posts'); ?>
 <div id="popular-songs" class="ab-section-anchor"></div>
 <?php get_template_part('inc/mostviews_posts'); ?>
+<?php
+/* v3.16.0 — بخش‌های تازهٔ APEX: موزیک‌ویدیو، آلبوم، حال‌وهوا و اخبار.
+   جای‌گیری: بعد از «تازه‌ترین‌ها» و «پربازدیدترین‌ها» تا اولویت فهرست
+   اصلی حفظ شود. هر بخش فقط با دادهٔ واقعی چاپ می‌شود و از تنظیمات قالب
+   (تب «صفحه اصلی») جداگانه خاموش/روشن می‌شود. */
+if ( function_exists( 'tara_home_apex_sections' ) ) {
+	echo tara_home_apex_sections(); // phpcs:ignore WordPress.Security.EscapeOutput -- مارک‌آپ همین قالب
+}
+?>
 <?php $artista = ot_get_option('hty',array()); foreach($artista as $artise){ ?>	
 <!-- song_boxs -->
 <div class="song_boxs">

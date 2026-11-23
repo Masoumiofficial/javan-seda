@@ -279,3 +279,135 @@
 @media (hover: none) {
 	.ty-hero-slide:hover .ty-hero-slide__img { transform: none; }
 }
+
+/* =====================================================================
+   v3.16.0 — بخش‌های تازهٔ APEX در صفحهٔ اصلی
+   (موزیک‌ویدیو / آلبوم / حال‌وهوا / اخبار) + تاریخ روی کارت
+   همه با متغیرهای موجود قالب؛ در حالت شب هم رنگ‌ها از توکن‌ها می‌آیند.
+   ===================================================================== */
+
+.tara-home-sec { margin: var(--ab-space-7, 44px) 0; }
+.tara-home-sec .songs_title_box > a { order: 3; }
+
+/* ---- چیپ‌های حال‌وهوا ---- */
+.tara-mood-chips {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+	gap: 10px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.tara-mood-chips li { margin: 0; }
+
+.tara-mood-chips a {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 12px 14px;
+	border: 1px solid var(--ab-line);
+	border-radius: var(--ab-radius-m, 12px);
+	background: var(--ab-surface, #fff);
+	text-decoration: none;
+	transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tara-mood-chips a:hover,
+.tara-mood-chips a:focus-visible {
+	border-color: var(--ab-blue);
+	box-shadow: 0 10px 24px -18px rgba(25, 90, 219, 0.85);
+	transform: translateY(-1px);
+}
+
+.tara-mood-chips__name { font-size: 14px; font-weight: 700; color: var(--ab-text); }
+.tara-mood-chips__count { font-size: 11.5px; color: var(--ab-muted); }
+
+/* ---- فهرست اخبار ---- */
+.tara-news-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.tara-news-list__item { margin: 0; }
+
+.tara-news-list__item > a {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	height: 100%;
+	padding: 10px;
+	border: 1px solid var(--ab-line);
+	border-radius: var(--ab-radius-m, 12px);
+	background: var(--ab-surface, #fff);
+	text-decoration: none;
+	transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.tara-news-list__item > a:hover,
+.tara-news-list__item > a:focus-visible {
+	border-color: var(--ab-blue);
+	box-shadow: 0 10px 24px -18px rgba(25, 90, 219, 0.85);
+}
+
+.tara-news-list__img {
+	width: 72px;
+	height: 72px;
+	flex: 0 0 72px;
+	border-radius: 10px;
+	object-fit: cover;
+}
+
+.tara-news-list__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+
+.tara-news-list__body strong {
+	font-size: 13px;
+	font-weight: 700;
+	line-height: 1.7;
+	color: var(--ab-text);
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.tara-news-list__body time { font-size: 11px; color: var(--ab-muted); }
+
+/* ---- تاریخ روی کارت آهنگ ---- */
+.tara-date {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 11px;
+	line-height: 1.6;
+	color: var(--ab-muted);
+}
+
+.tara-date i { font-size: 12px; opacity: 0.85; }
+
+.songs_post .tara-date--card {
+	margin: 0;
+	padding: 0 12px 10px;
+}
+
+.tara-date__label { font-weight: 600; }
+
+/* ---- تاریخ صفحهٔ آهنگ: همان کلاس قدیمی، فقط خوانا ---- */
+.single_posts .tara-date--single {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: var(--ab-muted);
+	font-size: 12px;
+}
+
+.night .tara-mood-chips a,
+.night .tara-news-list__item > a { background: var(--ab-surface, #1b1b22); }

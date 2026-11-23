@@ -341,6 +341,9 @@ if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw 
 		/* v3.2.2 — اگر inc/ab-credits.php نصب باشد، schema از همان فایل و در wp_head چاپ می‌شود
 		   (برای همهٔ نوشته‌ها، حتی وقتی متن ترانه خالی است) و این بلوکِ قدیمی اجرا نمی‌شود تا دو بار چاپ نشود. */
 			$taranehyar_permalink = get_permalink();
+			/* v3.16.0 — ISO تاریخ انتشار واقعی (اگر ثبت شده باشد) برای اسکیما */
+			$taranehyar_date_data = function_exists( 'tara_track_date' ) ? tara_track_date( get_the_ID() ) : array( 'iso' => '', 'source' => 'post' );
+			$taranehyar_date_iso  = ( ! empty( $taranehyar_date_data['iso'] ) && 'release' === $taranehyar_date_data['source'] ) ? $taranehyar_date_data['iso'] : '';
 			$taranehyar_audio     = '';
 			foreach ( array( 'music320', 'music128' ) as $taranehyar_audio_key ) {
 				/* v3.8.1 — باز هم بدون `get_field` خام: بدون ACF نباید فاتال شود. */
@@ -364,7 +367,10 @@ if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw 
 							'name'  => $taranehyar_artist,
 							'url'   => '' !== $taranehyar_artist_url ? $taranehyar_artist_url : $taranehyar_permalink,
 						),
-						'datePublished'    => get_the_date( 'c' ),
+						/* v3.16.0 — اگر تاریخ انتشار واقعی (متای معتبر) ثبت شده باشد،
+						   همان در اسکیما می‌آید؛ وگرنه رفتار قبلی (تاریخ نوشته) دست‌نخورده
+						   می‌ماند. این‌طوری نمایش صفحه، footer و اسکیما با هم هم‌سان‌اند. */
+						'datePublished'    => ( '' !== $taranehyar_date_iso ? $taranehyar_date_iso : get_the_date( 'c' ) ),
 						'dateModified'     => get_the_modified_date( 'c' ),
 						'recordingOf'      => array( '@id' => $taranehyar_permalink . '#composition' ),
 						'mainEntityOfPage' => array( '@id' => $taranehyar_permalink . '#webpage' ),
@@ -602,10 +608,17 @@ if ( function_exists( 'tara_credits_box' ) ) { tara_credits_box( get_the_ID() );
 </div>
 
 <footer>
-<div class="tarlanweb_post_ft"><i class="icofont-clock-time"></i> <?php the_time('j F Y'); ?></div>
+<?php
+/* v3.16.0 — تاریخ با برچسب صادقانه: اگر متای تاریخ انتشار واقعی موجود باشد
+   «تاریخ انتشار»، وگرنه «انتشار در سایت» (تاریخ نوشته). هیچ تاریخی ساخته
+   نمی‌شود و `<time datetime>` برای موتورهای جست‌وجو درست است. */
+echo function_exists( 'tara_track_date_html' )
+	? tara_track_date_html( get_the_ID(), array( 'class' => 'tarlanweb_post_ft tara-date--single' ) ) // phpcs:ignore WordPress.Security.EscapeOutput
+	: '<div class="tarlanweb_post_ft"><i class="icofont-clock-time"></i> ' . esc_html( get_the_time( 'j F Y' ) ) . '</div>';
+?>
 <div class="post-actions-input">
 <div class="post-actions-right"><i class="icofont-link"></i>لینک کوتاه</div>
-<input type="url" value="<?php bloginfo('url'); ?>/?p=<?php the_id(''); ?>" readonly="" onclick="this.setSelectionRange(0, this.value.length)">
+<input type="url" value="<?php echo esc_url( home_url( '/?p=' . absint( get_the_ID() ) ) ); ?>" readonly="" onclick="this.setSelectionRange(0, this.value.length)" aria-label="لینک کوتاه این اثر">
 <div class="clear"></div>
 </div>
 </footer>
@@ -646,81 +659,17 @@ $ab_share_title = rawurlencode( get_the_title() );
 	
 
 	
-<?php $reltag1 = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag1', false ) : ( 'off' != ot_get_option( 'reltag1' ) ); if ( $reltag1 ) {
-$reltag = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag', false ) : ( 'off' != ot_get_option( 'reltag' ) ); if ( $reltag ) { ?>	
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'artist' ) : (string) get_post_meta( get_the_ID(), 'artist', true );
-$my_custom_query= new WP_Query(
-array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,
-'meta_query'=>array(array('key'=>'artist','value'=>$artist,'compare'=>'LIKE')), ));
-if($my_custom_query->have_posts()) : ?>
-<div class="related_posts rel_sing_bbt">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php echo esc_html( $artist ); ?></h3>
-<?php if(has_tag()){ if(isset($artist) && !empty($artist)){ $post_tags = get_the_tags(); foreach( $post_tags as $tag) :
-if ( $tag->name === $artist ){ ?>
-<div class="left_artists_pp"><a class="artist_songs_page" href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo esc_html( $tag->name ); ?> </a></div>
-<?php } endforeach; } } ?>
-<div class="liner clear"></div>
-<div class="tarlanweb_side_box">
-<ul>
-<?php while($my_custom_query->have_posts()) : $my_custom_query->the_post(); ?>
-<li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
-<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
-<?php if(has_post_thumbnail()){
-the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
-<img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
-<?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
-<?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
-if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo esc_html( $artist ); ?> </span> <span> <?php echo esc_html( $track ); ?> </span> <?php } else{ the_title(''); } ?>	
-</a></li>
-<?php endwhile; ?>
-<?php if(has_tag()){ if(isset($artist) && !empty($artist)){ $post_tags = get_the_tags(); foreach( $post_tags as $tag) :
-if ( $tag->name === $artist ){ ?>
-<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo esc_html( $tag->name ); ?> </a></li>
-<?php } endforeach; } } ?>
-</ul>
-<div class="clear"></div>
-</div>
-<div class="clear"></div>
-</div>
-<?php endif; wp_reset_postdata(); ?>
-<?php } else{ ?>
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,tara_artist_tax(),'string'); $term_ids=wp_list_pluck($terms,'term_id');
-$second_query = new WP_Query( array('post_type'=>'post',
-'tax_query' => array( array('taxonomy'=>tara_artist_tax(),'field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
-'posts_per_page'=>$pppr,'ignore_sticky_posts'=>1,'orderby'=>'id'));
-if($second_query->have_posts()) { ?>	
-<div class="related_posts rel_sing_bbt">
-<div class="title_tarlanweb_box">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,tara_artist_tax());
-$terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_string; ?></h3>
-<?php $terms = get_the_terms($post->ID,tara_artist_tax()); foreach ($terms as $term){ ?>
-<div class="left_artists_pp"><a class="artist_songs_page" href="<?php echo esc_url( tara_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></div>
-<?php } ?>
-<div class="liner clear"></div>
-</div>
-<div class="tarlanweb_side_box">
-<ul>
-<?php while($second_query->have_posts()) : $second_query->the_post(); ?>
-<li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
-<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
-<?php if(has_post_thumbnail()){
-the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
-<img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
-<?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
-<?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
-if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo esc_html( $artist ); ?> </span> <span> <?php echo esc_html( $track ); ?> </span> <?php } else{ the_title(''); } ?>	
-</a></li>
-<?php endwhile; ?> 
-<?php $terms = get_the_terms($post->ID,tara_artist_tax()); foreach ($terms as $term){ ?>
-<li class="artist_songs_page_li mobile_more_artist"><a class="artist_songs_page" href="<?php echo esc_url( tara_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
-<?php } ?>
-</ul>
-<div class="clear"></div>
-</div>
-<div class="clear"></div>
-</div>	
-<?php } ?>
-<?php } } ?>
+<?php
+/* v3.16.0 — «سایر آهنگ‌های هنرمند» دیگر چهار نسخهٔ موازی در این فایل ندارد.
+   پیش از این دو شاخهٔ تنظیمات (`reltag1` روشن/خاموش) × دو ستون، هرکدام با
+   کوئری متفاوت (`meta LIKE` در برابر تاکسونومی) مارک‌آپ نزدیک به هم را
+   تکرار می‌کردند؛ نتیجه در دو تنظیم مختلف، دو فهرست متفاوت می‌شد.
+   حالا هر دو به یک تابع می‌رسند: اولویت تاکسونومی، بعد متای `artist`.
+   جایش عوض نشده و خروجی/کلاس‌ها همان قبلی است. */
+if ( function_exists( 'tara_related_by_artist_html' ) ) {
+	echo tara_related_by_artist_html( get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+}
+?>
 
 <?php
 /* v3.4.6 — رفع «کامنت در دیتابیس هست ولی در فرانت نمایش داده نمی‌شود».
@@ -760,75 +709,13 @@ if ( function_exists( 'tara_sidebar' ) ) {
 	endif;
 }
 ?>
-<?php $reltag1 = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag1', false ) : ( 'off' != ot_get_option( 'reltag1' ) ); if ( ! $reltag1 ) {
-$reltag = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'reltag', false ) : ( 'off' != ot_get_option( 'reltag' ) ); if ( $reltag ) { ?>	
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'artist' ) : (string) get_post_meta( get_the_ID(), 'artist', true );
-$my_custom_query= new WP_Query(
-array('post_type'=>'post','post_status'=>'publish','posts_per_page'=> $pppr,
-'meta_query'=>array(array('key'=>'artist','value'=>$artist,'compare'=>'LIKE')), ));
-if($my_custom_query->have_posts()) : ?>
-<aside class="related_posts">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php echo esc_html( $artist ); ?></h3>
-<div class="liner clear"></div>
-<div class="tarlanweb_side_box">
-<ul>
-<?php while($my_custom_query->have_posts()) : $my_custom_query->the_post(); ?>
-<li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
-<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
-<?php if(has_post_thumbnail()){
-the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
-<img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
-<?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
-<?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
-if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo esc_html( $artist ); ?> </span> <span> <?php echo esc_html( $track ); ?> </span> <?php } else{ the_title(''); } ?>	
-</a></li>
-<?php endwhile; ?>
-<?php if(has_tag()){ if(isset($artist) && !empty($artist)){ $post_tags = get_the_tags(); foreach( $post_tags as $tag) :
-if ( $tag->name === $artist ){ ?>
-<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php echo esc_url( get_tag_link( $tag->term_id ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo esc_html( $tag->name ); ?> </a></li>
-<?php } endforeach; } } ?>
-</ul>
-<div class="clear"></div>
-</div>
-<div class="clear"></div>
-</aside>
-<?php endif; wp_reset_postdata(); ?>
-<?php } else{ ?>
-<?php $current_post_id = $post->ID; $pppr=ot_get_option('pppf'); $terms=get_the_terms($post->ID ,tara_artist_tax(),'string'); $term_ids=wp_list_pluck($terms,'term_id');
-$second_query = new WP_Query( array('post_type'=>'post',
-'tax_query' => array( array('taxonomy'=>tara_artist_tax(),'field'=>'id','terms'=>$term_ids,'operator'=>'IN')),
-'posts_per_page'=>$pppr,'ignore_sticky_posts'=>1,'orderby'=>'id'));
-if($second_query->have_posts()) { ?>	
-<aside class="related_posts">
-<div class="title_tarlanweb_box">
-<h3 class="tarlanweb_side_titles">سایر آهنگهای <?php $term_obj_list=get_the_terms($post->ID,tara_artist_tax());
-$terms_string=join(' , ',wp_list_pluck($term_obj_list,'name')); echo $terms_string; ?></h3>
-<div class="liner clear"></div>
-</div>
-<div class="tarlanweb_side_box">
-<ul>
-<?php while($second_query->have_posts()) : $second_query->the_post(); ?>
-<li<?php if($current_post_id === $post->ID){ ?> class="inactive_songs"<?php } ?>><a href="<?php the_permalink(); ?>">
-<div class="tara-thumb-box"><?php if($current_post_id === $post->ID){ ?><i class="inactive_box_cir"></i><?php } ?>
-<?php if(has_post_thumbnail()){
-the_post_thumbnail('thumb3',array('alt'=>''.get_the_title(),'title'=>''.get_the_title().'')); } else { ?>
-<img src="<?php bloginfo('template_url');?>/images/nomusics.jpg" width="60" height="60" alt="تصویر پیدا نشد" title="تصویر پیدا نشد"><?php } ?>
-<?php if($current_post_id === $post->ID){ ?><div class="nowPlayingIcon"><span></span><span></span><span></span><span></span></div><?php } ?></div>
-<?php $artist=get_post_meta(get_the_ID(),'artist',true); $track=get_post_meta(get_the_ID(),'song',true);
-if(isset($artist) && !empty($artist)){?> <span class="song_artists"> <?php echo esc_html( $artist ); ?> </span> <span> <?php echo esc_html( $track ); ?> </span> <?php } else{ the_title(''); } ?>	
-</a></li>
-<?php endwhile; ?>
-<?php $terms = get_the_terms($post->ID,tara_artist_tax()); foreach ($terms as $term){ ?>
-<li class="artist_songs_page_li"><a class="artist_songs_page" href="<?php echo esc_url( tara_artist_term_link( $term ) ); ?>"> <i class="icofont-radio-mic"></i> صفحه اختصاصی <?php echo $term->name; ?> </a></li>
-<?php } ?>
-</ul>
-<div class="clear"></div>
-</div>
-<div class="clear"></div>
-</aside>	
-<?php } ?>
-<?php }
-	} ?>
+<?php
+/* v3.16.0 — نسخهٔ کناریِ «سایر آهنگ‌های هنرمند» حذف شد: همان داده یک‌بار و
+   از تابع مشترکِ ستون اصلی چاپ می‌شود. این بلوک فقط وقتی دیده می‌شد که
+   `reltag1` خاموش باشد و عملاً نسخهٔ دومِ همان فهرست بود؛ هیچ لینک یا
+   داده‌ای از دست نمی‌رود. اگر مدیر ستون کناریِ اختصاصی می‌خواهد، ویجت‌های
+   `left_side2` سر جایشان هستند. */
+?>
 <?php
 /* v3.0.2 — رندر امن ابزارک‌ها: در صورت نبودِ فایل کمکی، دقیقاً رفتار قبلی اعمال می‌شود */
 if ( function_exists( 'tara_sidebar' ) ) {

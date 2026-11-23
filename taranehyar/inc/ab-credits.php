@@ -490,13 +490,18 @@ if ( ! function_exists( 'tara_music_schema' ) ) {
 			$song = $title;
 		}
 
+		/* یک بار خواندن تاریخ، نه سه بار در آرایه */
+		$tara_credit_date     = function_exists( 'tara_track_date' ) ? tara_track_date( $post_id ) : array( 'iso' => '', 'source' => '' );
+		$tara_credit_date_iso = ( 'release' === $tara_credit_date['source'] && '' !== $tara_credit_date['iso'] ) ? $tara_credit_date['iso'] : get_the_date( 'c', $post_id );
+
 		$rec = array(
 			'@type'            => 'MusicRecording',
 			'@id'              => $permalink . '#recording',
 			'name'             => $song,
 			'url'              => $permalink,
 			'inLanguage'       => 'fa-IR',
-			'datePublished'    => get_the_date( 'c', $post_id ),
+			/* v3.16.0 — تاریخ انتشار واقعی در صورت وجود (هم‌سان با صفحه و footer) */
+			'datePublished'    => $tara_credit_date_iso,
 			'dateModified'     => get_the_modified_date( 'c', $post_id ),
 			'recordingOf'      => array( '@id' => $permalink . '#composition' ),
 			'mainEntityOfPage' => array( '@id' => $permalink . '#webpage' ),

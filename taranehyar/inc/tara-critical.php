@@ -122,7 +122,18 @@ if ( ! function_exists( 'tara_critical_css' ) ) {
 		#tara-search-results .tara-sr__t { display: block; font-size: 12.5px; font-weight: 700;
 			line-height: 1.6; }
 		#tara-search-results .tara-sr__a { display: block; font-size: 11px; color: #7a7790; }
+		#tara-search-results .tara-sr__row > span:last-child { min-width: 0; }
 		#tara-search-results .tara-sr__empty { padding: 12px; font-size: 12px; color: #56536b; }
+		/* v3.16.0 — برچسب نوع اثر و دکمهٔ تلاش دوباره در حالت خطا */
+		#tara-search-results .tara-sr__type { display: inline-block; margin-top: 3px; padding: 1px 8px;
+			border-radius: 999px; background: #eef3ff; color: #195adb; font-size: 10.5px; font-weight: 700; }
+		body.night #tara-search-results .tara-sr__type,
+		html[data-tara-night="1"] #tara-search-results .tara-sr__type { background: rgba(25,90,219,.28); color: #c9d8ff; }
+		#tara-search-results .tara-sr__empty--err { color: #7a2c2c; }
+		body.night #tara-search-results .tara-sr__empty--err,
+		html[data-tara-night="1"] #tara-search-results .tara-sr__empty--err { color: #ffbdbd; }
+		#tara-search-results .tara-sr__retry { margin-inline-start: 6px; padding: 3px 10px; border: 1px solid currentColor;
+			border-radius: 999px; background: transparent; color: inherit; font: inherit; font-weight: 700; cursor: pointer; }
 		#tara-search-results a.tara-sr__row.is-active,
 		#tara-search-results a.tara-sr__row:hover { background: #f4f1ff; }
 		body.night #tara-search-results a.tara-sr__row.is-active,
@@ -251,10 +262,24 @@ if ( ! function_exists( 'tara_ajax_search' ) ) {
 	 * خروجی JSON جست‌وجو برای دراپ‌داون سربرگ.
 	 */
 	function tara_ajax_search() {
-		check_ajax_referer( 'tara_search', 'nonce', false );
+		/* v3.16.0 — اعتبارسنجی **قاطع** nonce.
+		   پیش از این آرگومان سوم `false` بود: nonce نامعتبر فقط «هشدار» می‌داد و
+		   درخواست ادامه می‌یافت. حالا درخواست بدون nonce معتبر با خطای 403 و
+		   پیام JSON رد می‌شود. این endpoint فقط‌خواندنی است، ولی پرهزینه است
+		   (کوئری جست‌وجو) و باید مثل بقیهٔ endpointها محافظت شود. */
+		if ( ! check_ajax_referer( 'tara_search', 'nonce', false ) ) {
+			wp_send_json_error( array( 'message' => 'نشست شما منقضی شده است؛ صفحه را دوباره بارگذاری کنید.' ), 403 );
+		}
 
 		$term = isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
 		$term = trim( $term );
+
+		/* سقف طول: کوئری‌های بسیار بلند فقط هزینهٔ سرور دارند */
+		if ( function_exists( 'mb_substr' ) ) {
+			$term = mb_substr( $term, 0, 80, 'UTF-8' );
+		} else {
+			$term = substr( $term, 0, 80 );
+		}
 
 		if ( mb_strlen( $term ) < 2 ) {
 			wp_send_json_success( array( 'items' => array(), 'more' => '' ) );
@@ -273,16 +298,37 @@ if ( ! function_exists( 'tara_ajax_search' ) ) {
 
 		$items = array();
 		foreach ( (array) $query->posts as $post ) {
-			$cover = function_exists( 'tara_track_cover' ) ? tara_track_cover( $post->ID, 'thumb3' ) : '';
+			$cover  = function_exists( 'tara_track_cover' ) ? tara_track_cover( $post->ID, 'thumb3' ) : '';
 			$artist = '';
+			$song   = '';
+			$type   = '';
 			if ( function_exists( 'tara_music_field' ) ) {
 				$artist = (string) tara_music_field( 'artist', $post->ID );
+				$song   = (string) tara_music_field( 'song', $post->ID );
 			}
+			$raw_type = get_post_meta( $post->ID, 'musics_type', true );
+			if ( is_scalar( $raw_type ) && '' !== trim( (string) $raw_type ) ) {
+				$type = trim( (string) $raw_type );
+			} elseif ( function_exists( 'tara_post_has_video' ) && tara_post_has_video( $post->ID ) ) {
+				$type = 'موزیک‌ویدیو';
+			} elseif ( function_exists( 'tara_post_has_audio' ) && tara_post_has_audio( $post->ID ) ) {
+				$type = 'آهنگ';
+			}
+
+			/* v3.16.0 — تیتر جداشده: عنوان نوشته‌ها معمولاً «دانلود آهنگ …» است و
+			   در فهرست کوتاه بد می‌نشیند؛ اگر نام هنرمند/آهنگ ثبت شده باشد همان
+			   خوانا‌تر است. */
+			$title = get_the_title( $post );
+			if ( '' !== $artist || '' !== $song ) {
+				$title = trim( $artist . ( '' !== $song ? ' — ' . $song : '' ) );
+			}
+
 			$items[] = array(
-				'title'  => get_the_title( $post ),
+				'title'  => $title,
 				'url'    => get_permalink( $post ),
 				'artist' => $artist,
 				'cover'  => $cover,
+				'type'   => $type,
 			);
 		}
 
@@ -290,6 +336,7 @@ if ( ! function_exists( 'tara_ajax_search' ) ) {
 			array(
 				'items' => $items,
 				'more'  => get_search_link( $term ),
+				'count' => (int) $query->found_posts,
 			)
 		);
 	}
@@ -427,6 +474,27 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 				}
 			}
 
+			function renderError(q) {
+				active = -1;
+				box.innerHTML = '<div class="tara-sr__empty tara-sr__empty--err" role="alert">جست‌وجو ناموفق بود. اتصال را بررسی کنید و دوباره تلاش کنید.'
+					+ ' <button type="button" class="tara-sr__retry">تلاش دوباره</button></div>';
+				box.classList.add('is-open');
+				positionBox();
+				box.setAttribute('aria-busy', 'false');
+				status.textContent = 'جست‌وجو ناموفق بود.';
+				var retry = box.querySelector('.tara-sr__retry');
+				if (retry) {
+					retry.addEventListener('click', function (ev) {
+						/* دکمه با رندرِ اسکلت از DOM جدا می‌شود؛ بدون
+						   توقفِ انتشار، شنوندهٔ کلیکِ document آن را «بیرون از
+						   کادر» می‌بیند و پنجره را می‌بندد. */
+						ev.stopPropagation();
+						delete cache[q];
+						ask(q);
+					});
+				}
+			}
+
 			function render(data, q) {
 				var items = (data && data.items) || [];
 				active = -1;
@@ -438,13 +506,14 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 					status.textContent = 'نتیجه‌ای پیدا نشد.';
 					return;
 				}
-				var html = '<div class="tara-sr__head">نتایج جست‌وجو</div>';
+				var html = '<div class="tara-sr__head">' + (data && data.count > items.length ? 'نتایج جست‌وجو — ' + items.length + ' از ' + data.count : 'نتایج جست‌وجو') + '</div>';
 				for (var i = 0; i < items.length; i++) {
 					var it = items[i];
 					html += '<a class="tara-sr__row" role="option" aria-selected="false" id="tara-sr-opt-' + i + '" href="' + esc(it.url) + '">'
 						+ (it.cover ? '<img src="' + esc(it.cover) + '" width="40" height="40" alt="" loading="lazy" decoding="async">' : '')
 						+ '<span><span class="tara-sr__t">' + esc(it.title) + '</span>'
 						+ (it.artist ? '<span class="tara-sr__a">' + esc(it.artist) + '</span>' : '')
+						+ (it.type ? '<span class="tara-sr__type">' + esc(it.type) + '</span>' : '')
 						+ '</span></a>';
 				}
 				if (data && data.more) {
@@ -474,9 +543,14 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 				xhr.open('GET', url, true);
 				xhr.onreadystatechange = function () {
 					if (xhr.readyState !== 4 || mine !== seq) { return; }
-					if (xhr.status !== 200) { close(); return; }
 					var payload = null;
-					try { payload = JSON.parse(xhr.responseText); } catch (e) { close(); return; }
+					try { payload = JSON.parse(xhr.responseText); } catch (e) { payload = null; }
+					if (xhr.status !== 200 || !payload) {
+						/* v3.16.0 — پیش از این خطا بی‌صدا پنجره را می‌بست و کاربر فکر
+						   می‌کرد جست‌وجو «چیزی پیدا نکرد». حالا پیام + دکمهٔ تلاش. */
+						renderError(q);
+						return;
+					}
 					var data = payload && payload.data ? payload.data : { items: [] };
 					cache[q] = data;
 					render(data, q);

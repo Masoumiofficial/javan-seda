@@ -860,9 +860,11 @@ t(
 t( 'پانوشت: لوگوی schema با https', false !== strpos( $foot80, 'set_url_scheme($ab_org_logo, \'https\')' ) );
 
 /* --- صفحهٔ آهنگ --- */
+/* v3.16.0 — فهرست «سایر آهنگ‌ها» از single.php به تابع مشترک
+   `tara_related_by_artist_html()` رفت؛ همان escape در تابع انجام می‌شود. */
 t(
 	'صفحهٔ آهنگ: نام هنرمند escape می‌شود',
-	false !== strpos( $single80, '<?php echo esc_html( $artist ); ?>' )
+	( false !== strpos( $single80, '<?php echo esc_html( $artist ); ?>' ) || false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/tara-p0.php' ), 'esc_html( $title_name )' ) )
 		&& false === strpos( $single80, '<?php echo $artist; ?>' )
 );
 t(

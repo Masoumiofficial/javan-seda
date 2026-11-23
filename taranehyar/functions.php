@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.15.0' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.16.0' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -617,6 +617,14 @@ if ( is_readable( $taranehyar_vip_image ) ) {
 	require_once $taranehyar_vip_image;
 }
 unset( $taranehyar_vip_image );
+
+/* ۶-الف-۳-۳-۲) لایهٔ APEX (۳.۱۶.۰) — تاریخِ صادقانه، «سایر آهنگ‌های هنرمند»ی
+   یکپارچه و بخش‌های تازهٔ صفحهٔ اصلی. فقط‌خواندنی؛ هیچ داده‌ای نمی‌نویسد. */
+$taranehyar_p0 = TARANEHYAR_DIR . '/inc/tara-p0.php';
+if ( is_readable( $taranehyar_p0 ) ) {
+	require_once $taranehyar_p0;
+}
+unset( $taranehyar_p0 );
 
 /* ۶-الف-۴) لایهٔ تضمینیِ ظاهر + جست‌وجوی زنده (۳.۷.۶)
    CSS ضروری را درون‌خطی چاپ می‌کند و اگر فایل‌های قالب به صفحه نرسند،

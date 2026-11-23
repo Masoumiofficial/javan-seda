@@ -245,27 +245,28 @@ if ( ! function_exists( 'tara_sidebar' ) ) {
 if ( ! function_exists( 'tara_expected_hashes' ) ) {
 	function tara_expected_hashes() {
 	return array(
-		'single.php'                => 'da24c5148021c0e228ab23311bc308840260aa0f1d8b666bd9d03b2deb5414ff',
+		'single.php'                => '556c24c0e58818c40ad18d7869c9e09867ea2e262e51dd9dfa63b54cfa7a42be',
 		'page.php'                  => 'eed2370a3205d53f58bf0d5721275ae8896daf6c32e862403d9fe3a2982aac50',
 		'myfunctions.php'           => '04b63b53dab707ab426215216bcf8978fab0b15ce1d0536f98d23bf2995a4080',
-		'style.css'                 => '18e0b2d703323eddc3c8dba9c5ac97b61e867ff4aac74502b72fa690a2c05e04',
+		'style.css'                 => '5f52b41b03328afed202f9e659061a3935d75fba0cc9ff00022fbb978d14fa0d',
 		'footer.php'                => 'cc67f4adb6d351ec79d433b5c000dc50baac68a3495c688feb4aa1faf365001d',
-		'header.php'                => 'ceb4e5701bb38570828be9867f5c5b55141d16f145c5b29c9148d79edd51caed',
-		'home.php'                  => '7618169dc3d921700f58d5741b974b4ae170bdec836713ec5849ac64c62adde3',
+		'header.php'                => '3b97ec2c06a6008f0555406b8587d66b49fcd27bdfdaac240fc090e16abdf8fd',
+		'home.php'                  => '2f6600ca67e4e3213376aafb42e6731744b969f9faae7be409d53056d91b3faa',
 		'404.php'                   => 'de46550d0330193634db14ca6da44d5279dbf4d11c2b454959c4dabbc30d224f',
 		'search.php'                => 'a689af70588f5cd824b219601377667a6c6d6ba9b57b1e96c1ab3846321c5b5b',
-		'inc/vip_slider.php'        => 'd81f1e6e73d3f806eae7ba2f4018e7069270fcd3b7fb87f37e1c4bc908184b23',
-		'inc/songs_post.php'        => '6dad61074d6c86bfd4a085235834d3fb8a52b7842de83c0699286781f15d8f91',
+		'inc/vip_slider.php'        => 'fa8aa6f60d11b723dc46393c1d234fcdb12d7df2220b3db9116ba0118cac3803',
+		'inc/songs_post.php'        => '43766bec0f2371e9965afb5319a711690b8a5c7deb80b7b4315584b5805b11cb',
 		'inc/tarlanweb_player.php'  => 'b255117a82a5bea5e59c2cf06ddd72b2884044042538084388d56c3195adfe14',
 		'inc/ab-news-ticker.php'    => 'e75c2a1dd86cc632c01d253a6f199935c8fb674b508c3986ba1855ae751a15fc',
 		'inc/ab-perf.php'           => 'dc305da6590c6b4002214f7db71412c0d11965f9a024c3e77ea35517f85234f4',
-		'inc/ab-seo.php'            => '923e553b887f0ed91211b0aa029b0904cd9313a9b0072e858c33216d7c223838',
+		'inc/ab-seo.php'            => 'df77a1d8805c1da07d77c486710485380ad627e7040f1fa2f0cfc93c320ce9ad',
 		'inc/ab-controls.php'       => 'eed236181fe745999f0c150e4cec8c2e8c6b6daf3b52bf4e98a2347f60851176',
-		'inc/theme-options.php'     => 'bcdfd45936e214b1cecaa26640adc621ca802a220a8d24db55c14dbf3a1cf1cf',
+		'inc/theme-options.php'     => '6d450b0cb5fa483939b9e9ccabe16ec735ea1cc58a190a0d03b9369c89d42a13',
 		'taxonomy-artist.php'       => '0e2a19b4eac410a4ca932d12d7a51bccc59207b2926c9e7e182c80aaae083483',
 		'taxonomy-singer.php'       => '38ed6b25f0146a900e1c580a85d64698497caf73c561abbadc0e9e4d245f9fce',
 		'inc/ab-tax-artist.php'     => '8aaa995ae6658ecbb7a2dd1ea32afc5c881edfaf1abc1594e89ee3a4c1bba9b0',
-		'inc/ab-credits.php'        => '9002fc488607bcd21ccae41c68647962125b9aa9c5e11c8aa9c5c076a82e5062',
+		'inc/ab-credits.php'        => 'fbcb2b30341661d1b5d84ab0d36c23766685e37a71521f2eeffc3affdd7f2268',
+		'inc/tara-p0.php'           => 'd6b90fa0d7c9a2678f2fb0c2ad3f296e0d3267db1709b382f18813b48e55e512',
 	);
 }
 }

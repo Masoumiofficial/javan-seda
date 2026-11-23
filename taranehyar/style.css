@@ -5,7 +5,7 @@ Theme URI: https://ahangban.ir/
 Author: Taranehyar
 Author URI: https://ahangban.ir/
 Description: ترانه یار — قالب اختصاصی موسیقی با پنل مدیریت یکپارچه، آمار بازدید هنرمندان، صفحه‌بندی دیدگاه‌ها و پشتیبانی کامل راست‌به‌چپ.
-Version: 3.15.0
+Version: 3.16.0
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
@@ -165,6 +165,13 @@ display: block;height: 30px;line-height: 30px;}
 .menu_right > ul > li > ul.sub-menu {top:100%;right: 0;}
 .menu_right li li ul {top:0px;right:100%;}
 .menu_right li a {display: block;}
+/* v3.16.0 — زیرمنو فقط با hover باز بود؛ روی تبلت لمسی و با صفحه‌کلید
+   (Tab) هیچ راهی برای رسیدن به آیتم‌های زیرمنو نبود. حالا focus-within
+   هم همان رفتار hover را می‌دهد؛ ظاهر و مارک‌آپ تغییر نکرده است. */
+.menu_right li.menu-item-has-children:focus-within > ul.sub-menu{display:block;}
+.menu_right li.menu-item-has-children:focus-within > a{background:var(--ab-blue);color:#fff;}
+.menu_right li.menu-item-has-children:focus-within::after{transform:rotate(180deg);color:#fff;}
+.menu_right ul.sub-menu a:focus-visible{outline:2px solid var(--ab-blue);outline-offset:-2px;}
 #searches{
     width: 220px;
     height: 30px;

@@ -26,20 +26,37 @@ if ( $tara_fixbvip ) {
 		$tara_vip_num = 5; // سقف ۵ اسلاید در DOM: سبک‌تر برای موبایل
 	}
 
-	$tara_vip_query = new WP_Query(
-		array(
-			'post_type'      => 'post',
-			'post_status'    => 'publish',
-			'posts_per_page' => $tara_vip_num,
-			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-				array(
-					'key'     => 'vip_song',
-					'value'   => '1',
-					'compare' => 'LIKE',
-				),
+	$tara_vip_args = array(
+		'post_type'      => 'post',
+		'post_status'    => 'publish',
+		'posts_per_page' => $tara_vip_num,
+		'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+			array(
+				'key'     => 'vip_song',
+				'value'   => '1',
+				'compare' => 'LIKE',
 			),
-		)
+		),
 	);
+	$tara_vip_query = new WP_Query( $tara_vip_args );
+
+	/* v3.16.0 — «هیروِ خالی»: اگر هیچ نوشته‌ای `vip_song` نداشته باشد، اسلایدر
+	   ویژه کاملاً ناپدید می‌شد و صفحهٔ اصلی با یک نوار خالی شروع می‌شد.
+	   حالا (بدون ساختن داده یا ادعای «ویژه») همان اسلایدر با تازه‌ترین
+	   نوشته‌های منتشرشده پر می‌شود و برچسبش هم صریح است: «تازه‌ترین آثار».
+	   وقتی مدیر برای اثری تیک «ویژه» بزند، دوباره همان حالت قبلی برمی‌گردد. */
+	$tara_vip_fallback = false;
+	if ( ! $tara_vip_query->have_posts() ) {
+		$tara_vip_fallback = true;
+		$tara_vip_query    = new WP_Query(
+			array(
+				'post_type'           => 'post',
+				'post_status'         => 'publish',
+				'posts_per_page'      => $tara_vip_num,
+				'ignore_sticky_posts' => true,
+			)
+		);
+	}
 
 	if ( $tara_vip_query->have_posts() ) {
 		?>
@@ -52,7 +69,7 @@ if ( $tara_fixbvip ) {
 			   ساده (cross-fade + نشانگر) با چند خط جاوااسکریپت بدون وابستگی.
 			   مزیت جانبی: DOM سبک‌تر، بدون پرش ارتفاع، بدون درخواست اضافه. */
 			?>
-			<div class="vip_top_slider ty-hero-track" data-ty-hero data-interval="5200" role="region" aria-roledescription="carousel" aria-label="آثار ویژه">
+			<div class="vip_top_slider ty-hero-track" data-ty-hero data-interval="5200" role="region" aria-roledescription="carousel" aria-label="<?php echo esc_attr( $tara_vip_fallback ? 'تازه‌ترین آثار' : 'آثار ویژه' ); ?>" data-tara-hero-source="<?php echo esc_attr( $tara_vip_fallback ? 'latest' : 'vip' ); ?>">
 				<?php
 				$tara_slide = 0;
 				/* v3.7.9 — عدد کل برای برچسب «n از m» روی هر اسلاید (دسترس‌پذیری). */

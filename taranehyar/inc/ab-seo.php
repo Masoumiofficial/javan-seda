@@ -481,6 +481,16 @@ if ( TARA_SEO_ROBOTS && ! function_exists( 'tara_seo_robots' ) ) {
 			$robots['noindex'] = true;
 			$robots['follow']  = true;
 		}
+		/* ۵) نتایج جست‌وجوی داخلی (v3.16.0)
+		   صفحات `?s=` بی‌شمارند و برای هر عبارت یک URL تازه می‌سازند؛ محتوایشان
+		   تکراری/نازک است و می‌توانند هزاران صفحهٔ کم‌ارزش را ایندکس کنند.
+		   فقط همین نوع صفحه noindex می‌شود (follow باز) و با فیلتر زیر می‌توان
+		   خاموشش کرد. robots.txt و sitemap دست‌نخورده‌اند.
+		   بازگشت: add_filter( 'tara_seo_noindex_search', '__return_false' ); */
+		if ( is_search() && apply_filters( 'tara_seo_noindex_search', true ) ) {
+			$robots['noindex'] = true;
+			$robots['follow']  = true;
+		}
 		return $robots;
 	}
 	add_filter( 'wp_robots', 'tara_seo_robots', 20 );

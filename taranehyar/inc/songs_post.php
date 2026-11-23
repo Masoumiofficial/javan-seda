@@ -5,7 +5,7 @@
    خاموشی کامل:  define( 'TARA_CARD_STATS', false );   یا   add_filter( 'tara_card_stats', '__return_false' );
    بدون JS، بدون کوئری اضافه (get_post_meta از کشِ متای همان درخواست می‌خواند). */
 if ( ! function_exists( 'tara_card_stats' ) ) {
-	function tara_card_stats( $ab_post_id = 0 ) {
+	function tara_card_stats( $ab_post_id = 0, $return = false ) {
 		static $on = null;
 		if ( null === $on ) {
 			$on = ( ! defined( 'TARA_CARD_STATS' ) || TARA_CARD_STATS )
@@ -13,7 +13,7 @@ if ( ! function_exists( 'tara_card_stats' ) ) {
 				&& apply_filters( 'tara_card_stats', true );
 		}
 		if ( ! $on ) {
-			return;
+			return '';
 		}
 		$id    = $ab_post_id ? (int) $ab_post_id : (int) get_the_ID();
 		$views = (int) get_post_meta( $id, 'views', true );
@@ -25,7 +25,7 @@ if ( ! function_exists( 'tara_card_stats' ) ) {
 		}
 		$avg = max( 0.0, min( 5.0, (float) $avg ) );
 		if ( $views < 1 && $avg < 0.05 ) {
-			return; /* هیچ عددی ثبت نشده ⇒ کارۀ خالی نسازیم */
+			return ''; /* هیچ عددی ثبت نشده ⇒ کارۀ خالی نسازیم */
 		}
 		$out  = '<div class="ab-card-stats"><div class="ab-card-stats__in">';
 		if ( $views > 0 ) {
@@ -43,7 +43,68 @@ if ( ! function_exists( 'tara_card_stats' ) ) {
 			}
 			$out .= '</span>';
 		}
-		echo $out . '</div></div>';
+		$out .= '</div></div>';
+
+		if ( $return ) {
+			return $out;
+		}
+		echo $out; // phpcs:ignore WordPress.Security.EscapeOutput -- اجزای رشته در بالا escape شده‌اند
+		return '';
+	}
+}
+
+if ( ! function_exists( 'tara_post_card' ) ) {
+	/**
+	 * کارتِ آهنگ به‌صورت رشته (نسخهٔ ۳.۱۶.۰).
+	 *
+	 * همان مارک‌آپِ فایل است، ولی بدون وابستگی به حلقهٔ اصلی؛ بخش‌های تازهٔ
+	 * صفحهٔ اصلی باید کارتِ نوشته‌های دلخواه را چاپ کنند و `the_post()` دوباره
+	 * صدا زدن، حلقهٔ صفحه را می‌شکست.
+	 *
+	 * @param int $post_id شناسهٔ نوشته (۰ = نوشتهٔ جاری).
+	 * @return string
+	 */
+	function tara_post_card( $post_id = 0 ) {
+		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
+		if ( ! $post_id ) {
+			return '';
+		}
+
+		$title = get_the_title( $post_id );
+		if ( has_post_thumbnail( $post_id ) ) {
+			$thumb = get_the_post_thumbnail(
+				$post_id,
+				array( 'thumb2', 'thumb2x' ),
+				array( 'alt' => $title, 'title' => $title, 'loading' => 'lazy', 'decoding' => 'async' )
+			);
+		} else {
+			$thumb = '<img src="' . esc_url( get_template_directory_uri() . '/images/nomusics.jpg' ) . '" width="190" height="190" alt="'
+				. esc_attr( $title ) . '" loading="lazy" decoding="async">';
+		}
+
+		$badge = ( function_exists( 'tara_media_badge' ) ) ? tara_media_badge( $post_id, 'card' ) : '';
+		$play  = ( ! empty( $GLOBALS['tara_card_play'] ) && function_exists( 'tara_card_play' ) ) ? tara_card_play( $post_id ) : '';
+		$stats = ( function_exists( 'tara_card_stats' ) ) ? (string) tara_card_stats( $post_id, true ) : '';
+
+		$artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'artist', $post_id ) : (string) get_post_meta( $post_id, 'artist', true );
+		$song   = function_exists( 'tara_music_field' ) ? tara_music_field( 'song', $post_id ) : (string) get_post_meta( $post_id, 'song', true );
+
+		if ( '' !== $artist || '' !== $song ) {
+			$inner = esc_html( $artist ) . ( '' !== $song ? '<span>' . esc_html( $song ) . '</span>' : '' );
+		} else {
+			$inner = esc_html( $title );
+		}
+
+		/* تاریخ فقط وقتی چاپ می‌شود که دادهٔ واقعی باشد؛ برچسب هم صادق است */
+		$date = function_exists( 'tara_track_date_html' )
+			? tara_track_date_html( $post_id, array( 'class' => 'tara-date tara-date--card', 'label' => false ) )
+			: '';
+
+		return '<article class="songs_post"><header>'
+			. '<figure><a href="' . esc_url( get_permalink( $post_id ) ) . '">' . $thumb . $badge . $play . $stats . '</figure>'
+			. '<h2><a href="' . esc_url( get_permalink( $post_id ) ) . '">' . $inner . '</a></h2>'
+			. $date
+			. '</header></article>';
 	}
 }
 ?>
@@ -70,6 +131,15 @@ $ab_card_artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'art
 $ab_card_song   = function_exists( 'tara_music_field' ) ? tara_music_field( 'song' ) : '';
 ?>
 <h2><a href="<?php echo esc_url( get_permalink() ); ?>"><?php if ( '' !== $ab_card_artist || '' !== $ab_card_song ) { ?> <?php echo esc_html( $ab_card_artist ); ?><?php if ( '' !== $ab_card_song ) { ?><span><?php echo esc_html( $ab_card_song ); ?></span><?php } ?><?php } else { the_title( '' ); } ?></a></h2>
+<?php
+/* v3.16.0 — تاریخ روی کارت (درخواست APEX): فقط اگر دادهٔ واقعی باشد.
+   برای آثار عادی همان تاریخ انتشار در سایت با آیکون و بدون برچسب چاپ
+   می‌شود؛ اگر متای تاریخ انتشار (`_tara_release_date`) موجود باشد، همان
+   تاریخِ واقعی نمایش داده می‌شود. هیچ تاریخی ساخته نمی‌شود. */
+if ( function_exists( 'tara_track_date_html' ) ) {
+	echo tara_track_date_html( get_the_ID(), array( 'class' => 'tara-date tara-date--card', 'label' => false ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+}
+?>
 </header>
 <?php
 /* v3.7.8 — «mp3/mp4» روی کارت‌ها حذف شد (درخواست صریح) و خودِ <footer> هم

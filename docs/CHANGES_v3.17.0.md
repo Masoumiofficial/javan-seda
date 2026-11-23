@@ -123,3 +123,13 @@
 هیچ مهاجرت داده‌ای لازم نیست؛ عقب‌گرد به ۳.۱۶.۰ بدون تغییر پایگاه‌داده ممکن است
 (متای `_tara_release_date` در نسخهٔ قبل هم فقط خوانده می‌شد و نادیده‌گرفتنش
 خطا نمی‌دهد).
+
+## بسته و انتشار
+
+- ZIP: `artifacts/taranehyar-3.17.0.zip` — ۲۰۷ فایل، ۲٬۴۳۵٬۱۲۵ بایت، ساخته‌شده از
+  `git archive` همان کامیتِ تگ (بررسی بایت‌به‌بایت با درختِ تگ: بدون اختلاف).
+- SHA-256: `6d9977f544adfcba6eac66956e7dc137c52b7d3709242a9fac6a4c7d5266a4d2`
+- لینک خام: <https://raw.githubusercontent.com/Masoumiofficial/javan-seda/v3.17.0/artifacts/taranehyar-3.17.0.zip>
+- تگ: `v3.17.0` روی `052c179` (درختِ `taranehyar/` این کامیت با `7b4e68d` یکسان است).
+- انتشار: <https://github.com/Masoumiofficial/javan-seda/releases/tag/v3.17.0>
+- نصب‌پذیری: ZIP در پوشهٔ موقت باز شد ⇒ lint ۱۰۶/۱۰۶ و هش‌های انتظاری ۲۶/۲۶.

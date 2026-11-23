@@ -550,6 +550,20 @@ if ( 'old' === $taranehyar_sort && ! empty( $taranehyar_query->posts ) ) {
 }
 $taranehyar_latest_date = $taranehyar_latest_post ? get_the_date( get_option( 'date_format' ), $taranehyar_latest_post->ID ) : '';
 
+/* v3.17.0 — «آخرین انتشار واقعی» با تاریخِ صادقانه.
+   منبع: متای معتبرِ تاریخ انتشار (اگر بود) وگرنه تاریخ نوشته؛ برچسب هم
+   همین را می‌گوید. هیچ تاریخی ساخته نمی‌شود. */
+$taranehyar_latest_release = function_exists( 'tara_artist_latest_release' )
+	? tara_artist_latest_release( $taranehyar_term )
+	: null;
+$taranehyar_latest_release_human = ( is_array( $taranehyar_latest_release ) && function_exists( 'tara_p1_date_human' ) )
+	? tara_p1_date_human( $taranehyar_latest_release['date'] )
+	: '';
+if ( '' === $taranehyar_latest_release_human && is_array( $taranehyar_latest_release ) && function_exists( 'tara_track_date_html' ) ) {
+	$taranehyar_latest_release_human = (string) $taranehyar_latest_release['date'];
+}
+$taranehyar_social_links = function_exists( 'tara_artist_social_links' ) ? tara_artist_social_links( $taranehyar_term ) : array();
+
 $taranehyar_directory_url = tara_artist_directory_url();
 $taranehyar_term_norm     = tara_artist_normalize( $taranehyar_term->name );
 $taranehyar_term_chars    = preg_split( '//u', $taranehyar_term_norm, -1, PREG_SPLIT_NO_EMPTY );
@@ -670,6 +684,14 @@ $taranehyar_social_icons = array(
 				<p class="ty-artist__latin" lang="en" dir="ltr"><?php echo esc_html( $taranehyar_latin ); ?></p>
 			<?php endif; ?>
 
+			<?php if ( '' !== $taranehyar_latest_release_human ) : ?>
+				<p class="ty-artist__latest" data-tara-latest-release="<?php echo esc_attr( (int) $taranehyar_latest_release['id'] ); ?>">
+					<i class="icofont-calendar" aria-hidden="true"></i>
+					<span><?php echo esc_html( $taranehyar_latest_release['label'] ); ?>:</span>
+					<a href="<?php echo esc_url( get_permalink( (int) $taranehyar_latest_release['id'] ) ); ?>"><?php echo esc_html( $taranehyar_latest_release_human ); ?></a>
+				</p>
+			<?php endif; ?>
+
 			<?php
 			/* v3.11.0 — ردیفِ آمارِ اینستاگرامی: دنبال‌کننده · بازدید · اثر.
 			   مثل پروفایلِ اینستاگرام، اعداد درشت و برچسب‌ها ریز، زیرِ نام.
@@ -731,14 +753,28 @@ $taranehyar_social_icons = array(
 
 				<?php /* v3.12.0 — دایرکتِ مستقیم به هنرمندِ تأییدشده/وصل‌شده */ ?>
 
-				<span class="ty-artist__socials">
-					<?php foreach ( $taranehyar_social_icons as $taranehyar_field_key => $taranehyar_icon ) : ?>
-						<?php $taranehyar_social_url = $taranehyar_term_field( $taranehyar_field_key ); ?>
-						<?php if ( ! empty( $taranehyar_social_url ) ) : ?>
-							<a href="<?php echo esc_url( $taranehyar_social_url ); ?>" class="<?php echo esc_attr( $taranehyar_icon ); ?>" target="_blank" rel="noopener nofollow" aria-label="<?php echo esc_attr( $taranehyar_network = str_replace( array( 'afacebook', 'atelegram', 'ainstagram', 'atwitter', 'ayoutube' ), array( 'فیسبوک', 'تلگرام', 'اینستاگرام', 'توییتر', 'یوتیوب' ), $taranehyar_field_key ) ); ?>"></a>
-						<?php endif; ?>
-					<?php endforeach; ?>
-				</span>
+				<?php
+				/* v3.17.0 — همان لینک‌ها، ولی از یک جزءِ مشترک که فقط
+				   آدرس‌های ثبت‌شده و معتبر (http/https) را می‌پذیرد. اگر کمکی
+				   موجود نبود، همان رفتار قبلی حفظ می‌شود. */
+				$taranehyar_socials_html = function_exists( 'tara_artist_links_html' )
+					? tara_artist_links_html( $taranehyar_term, array( 'class' => 'ty-artist__socials', 'show_bio' => false ) )
+					: '';
+				if ( '' !== $taranehyar_socials_html ) {
+					echo $taranehyar_socials_html; // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+				} else {
+					?>
+					<span class="ty-artist__socials">
+						<?php foreach ( $taranehyar_social_icons as $taranehyar_field_key => $taranehyar_icon ) : ?>
+							<?php $taranehyar_social_url = $taranehyar_term_field( $taranehyar_field_key ); ?>
+							<?php if ( ! empty( $taranehyar_social_url ) ) : ?>
+								<a href="<?php echo esc_url( $taranehyar_social_url ); ?>" class="<?php echo esc_attr( $taranehyar_icon ); ?>" target="_blank" rel="noopener nofollow" aria-label="<?php echo esc_attr( str_replace( array( 'afacebook', 'atelegram', 'ainstagram', 'atwitter', 'ayoutube' ), array( 'فیسبوک', 'تلگرام', 'اینستاگرام', 'توییتر', 'یوتیوب' ), $taranehyar_field_key ) ); ?>"></a>
+							<?php endif; ?>
+						<?php endforeach; ?>
+					</span>
+					<?php
+				}
+				?>
 			</div>
 		</div>
 
@@ -757,6 +793,28 @@ $taranehyar_social_icons = array(
 
 			<?php if ( '' === $taranehyar_bio_short && '' === $taranehyar_bio_link ) : ?>
 				<p class="ty-artist__bio ty-artist__bio--empty">بیوگرافی این هنرمند هنوز ثبت نشده است.</p>
+			<?php endif; ?>
+
+			<?php
+			/* v3.17.0 — «همکاری‌ها» فقط از رابطهٔ واقعیِ تاکسونومی.
+			   اگر ترمی پیدا نشد، چیزی چاپ نمی‌شود (نه ادعای ساختگی). */
+			$taranehyar_collaborators = function_exists( 'tara_artist_collaborators' ) ? tara_artist_collaborators( $taranehyar_term, 8 ) : array();
+			if ( ! empty( $taranehyar_collaborators ) ) :
+				?>
+				<div class="ty-artist__collabs">
+					<span class="ty-artist__collabs-title">همکاری‌ها</span>
+					<ul>
+						<?php foreach ( $taranehyar_collaborators as $taranehyar_collab ) : ?>
+							<?php $taranehyar_collab_link = get_term_link( $taranehyar_collab ); ?>
+							<?php if ( is_wp_error( $taranehyar_collab_link ) ) : ?>
+								<?php continue; ?>
+							<?php endif; ?>
+							<li>
+								<a class="ty-chip" href="<?php echo esc_url( $taranehyar_collab_link ); ?>"><?php echo esc_html( $taranehyar_collab->name ); ?></a>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
 			<?php endif; ?>
 		</div>
 
@@ -803,6 +861,19 @@ $taranehyar_social_icons = array(
 	<?php if ( function_exists( 'tara_radio_box' ) && function_exists( 'tara_radio_option' ) && 'on' === (string) tara_radio_option( 'artist', 'on' ) ) : ?>
 		<?php echo tara_radio_box( array( 'context' => 'artist', 'title' => 'رادیو ' . $taranehyar_term->name, 'subtitle' => 'دی‌جی اختصاصی با آهنگ‌های همین هنرمند', 'taxonomy' => $taranehyar_term->taxonomy, 'term_id' => (int) $taranehyar_term->term_id, 'mode' => 'new', 'sources' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- خروجی قالب ?>
 	<?php endif; ?>
+
+	<!-- ۲٫۴) آخرین انتشارها — کارت‌های همان خانه، فقط با دادهٔ واقعی ------ -->
+	<?php
+	/* v3.17.0 — اگر هنرمند کمتر از دو اثر داشته باشد، این بخش تکرارِ
+	   فهرست پایین است؛ پس چاپ نمی‌شود. */
+	$taranehyar_total_works = 0;
+	foreach ( array( 'audio', 'album', 'video', 'other' ) as $taranehyar_tw_key ) {
+		$taranehyar_total_works += count( $taranehyar_buckets[ $taranehyar_tw_key ] );
+	}
+	if ( $taranehyar_total_works >= 2 && function_exists( 'tara_artist_latest_html' ) ) {
+		echo tara_artist_latest_html( $taranehyar_term, 6 ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+	}
+	?>
 
 	<!-- ۲٫۵) فهرست آهنگ‌ها با ترتیب مستقل ------------------------------ -->
 	<?php if ( ! empty( $taranehyar_buckets['audio'] ) ) : ?>
@@ -929,8 +1000,21 @@ if ( $taranehyar_found > 0 ) {
 	if ( '' !== $taranehyar_image_url ) {
 		$taranehyar_artist['image'] = $taranehyar_image_url;
 	}
-	if ( ! empty( $taranehyar_description ) ) {
-		$taranehyar_artist['description'] = trim( wp_strip_all_tags( $taranehyar_description ) );
+	/* v3.17.0 — توضیح فقط اگر دادهٔ واقعی موجود باشد. قبلاً متغیرِ
+	   `$taranehyar_description` هرگز مقدار نمی‌گرفت، پس این شرط همیشه
+	   خالی بود؛ حالا از بیوگرافی کوتاهِ ثبت‌شده پر می‌شود (بدون تکرارِ
+	   متن در HTML صفحه). */
+	$taranehyar_schema_bio = function_exists( 'tara_artist_bio_short' ) ? trim( (string) tara_artist_bio_short( $taranehyar_term, false ) ) : '';
+	if ( '' === $taranehyar_schema_bio && function_exists( 'term_description' ) ) {
+		$taranehyar_schema_bio = trim( wp_strip_all_tags( (string) term_description( $taranehyar_term->term_id, $taranehyar_term->taxonomy ) ) );
+	}
+	if ( '' !== $taranehyar_schema_bio ) {
+		$taranehyar_artist['description'] = wp_trim_words( $taranehyar_schema_bio, 60, '…' );
+	}
+	/* همان شبکه‌های ثبت‌شده — نه آدرسِ حدسی. */
+	$taranehyar_schema_socials = function_exists( 'tara_artist_social_links' ) ? tara_artist_social_links( $taranehyar_term ) : array();
+	if ( $taranehyar_schema_socials ) {
+		$taranehyar_artist['sameAs'] = array_values( wp_list_pluck( $taranehyar_schema_socials, 'url' ) );
 	}
 
 	$taranehyar_songs = array();

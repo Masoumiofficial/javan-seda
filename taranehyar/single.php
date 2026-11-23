@@ -669,6 +669,19 @@ $ab_share_title = rawurlencode( get_the_title() );
 if ( function_exists( 'tara_related_by_artist_html' ) ) {
 	echo tara_related_by_artist_html( get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
 }
+
+/* v3.17.0 — دو بلوک تکمیلی، هر کدام فقط با رابطهٔ واقعی:
+   ۱) «در این پلی‌لیست‌ها» (عضویتِ واقعی در متای پلی‌لیست)
+   ۲) «پیشنهادهای بیشتر» (ژانر/حال‌وهوای مشترک، و فقط آثاری که در بلوک
+      «سایر آهنگ‌های هنرمند» نیامده‌اند تا لینک تکراری ساخته نشود)
+   برای جلوگیری از تکرار بین این دو، پس از هرکدام شناسه‌های چاپ‌شده حذف
+   می‌شوند. هیچ‌کدام AJAX نیست؛ لینک‌ها HTMLِ خزش‌پذیرند. */
+if ( function_exists( 'tara_playlists_for_track_html' ) ) {
+	echo tara_playlists_for_track_html( get_the_ID() ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+}
+if ( function_exists( 'tara_related_tracks_html' ) ) {
+	echo tara_related_tracks_html( get_the_ID(), array( 'limit' => 4 ) ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+}
 ?>
 
 <?php

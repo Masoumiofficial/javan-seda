@@ -67,7 +67,7 @@ for (const name of ['tara-player.js', 'hero-slider.js', 'admin-settings.js', 'ab
   files.push({ parent: '/tmp/theme/js', name, url: 'file://' + path.join(theme, 'js', name) });
 }
 /* v3.16.0 — فقط فایل‌های موجودِ قالب؛ نبودِ یک فایل نباید کل آزمون را بیاندازد. */
-for (const name of ['inc/tara-p0.php', 'inc/ab-seo.php', 'inc/ab-credits.php', 'inc/vip_slider.php', 'header.php', 'home.php', 'single.php', 'category.php', 'footer.php', '404.php', 'taxonomy-artist.php', 'taxonomy-tara_genre.php', 'search.php', 'page-radio.php', 'page-playlists.php', 'inc/songs_post.php', 'inc/mobiles_header.php', 'inc/no-content.php'].filter((n) => fs.existsSync(path.join(theme, n)))) {
+for (const name of ['inc/tara-p1.php', 'inc/tara-release-date.php', 'inc/tara-artist-profile.php', 'inc/tara-playlists-p1.php', 'inc/tara-related-p1.php', 'inc/tara-p0.php', 'inc/ab-seo.php', 'inc/ab-credits.php', 'inc/vip_slider.php', 'header.php', 'home.php', 'single.php', 'category.php', 'footer.php', '404.php', 'taxonomy-artist.php', 'taxonomy-tara_genre.php', 'search.php', 'page-radio.php', 'page-playlists.php', 'inc/songs_post.php', 'inc/mobiles_header.php', 'inc/no-content.php'].filter((n) => fs.existsSync(path.join(theme, n)))) {
   const parent = name.includes('/') ? '/tmp/theme/inc' : '/tmp/theme';
   const base = name.includes('/') ? name.split('/')[1] : name;
   if (files.some((f) => f.parent === parent && f.name === base)) continue;

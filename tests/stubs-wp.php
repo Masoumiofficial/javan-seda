@@ -449,6 +449,16 @@ function wp_unique_id( $prefix = '' ) {
 	$GLOBALS['__uid'] = isset( $GLOBALS['__uid'] ) ? $GLOBALS['__uid'] + 1 : 1;
 	return $prefix . $GLOBALS['__uid'];
 }
+function wp_trim_words( $text, $num_words = 55, $more = null ) {
+	$words = preg_split( '/\s+/u', trim( (string) $text ), -1, PREG_SPLIT_NO_EMPTY );
+	if ( null === $more ) {
+		$more = '…';
+	}
+	if ( count( $words ) <= (int) $num_words ) {
+		return implode( ' ', $words );
+	}
+	return implode( ' ', array_slice( $words, 0, (int) $num_words ) ) . $more;
+}
 function wpautop( $text ) {
 	return '<p>' . str_replace( "\n\n", '</p>\n<p>', trim( (string) $text ) ) . '</p>';
 }
@@ -510,6 +520,27 @@ function get_the_date( $fmt, $post = null ) {
 	return '2026-01-01';
 }
 function get_post_time( $fmt = 'U', $gmt = false, $post = null, $translate = false ) {
+	/* v3.17.0 — آزمون‌های تازه به تاریخِ واقعیِ هر نوشته نیاز دارند؛ آزمون‌های
+	   قدیمی به مقدارِ ثابت تکیه می‌کنند. پس فقط با کلیدِ صریحِ
+	   `__post_time_real` رفتار واقعی می‌شود و بقیه دست‌نخورده می‌مانند. */
+	if ( ! empty( $GLOBALS['__post_time_real'] ) ) {
+		$id   = $post instanceof WP_Post ? (int) $post->ID : (int) $post;
+		$row  = isset( $GLOBALS['__posts'][ $id ] ) ? $GLOBALS['__posts'][ $id ] : null;
+		$date = '';
+		if ( $row instanceof WP_Post ) {
+			$date = (string) $row->post_date;
+		} elseif ( is_array( $row ) && isset( $row['post_date'] ) ) {
+			$date = (string) $row['post_date'];
+		}
+		if ( '' === $date ) {
+			$date = '2026-01-01 10:00:00';
+		}
+		$ts = strtotime( $date );
+		if ( 'U' === $fmt ) {
+			return (string) $ts;
+		}
+		return $ts ? gmdate( $fmt, $ts ) : $date;
+	}
 	return '2026-01-01 10:00:00';
 }
 function get_post_meta( $id, $key, $single = false ) {
@@ -536,7 +567,7 @@ function current_user_can( $cap, $arg = null ) {
 }
 function wp_verify_nonce( $nonce, $action ) {
 	if ( 'good' === $nonce && preg_match( '/^tara_comments_[1-9][0-9]*$/', (string) $action ) ) { return true; }
-	if ( 'good' === $nonce && in_array( (string) $action, array( 'tara_save_term', 'tara_account', 'tara_rest', 'tara_radio_bpm_save', 'tara_playlist_save' ), true ) ) {
+	if ( 'good' === $nonce && in_array( (string) $action, array( 'tara_save_term', 'tara_account', 'tara_rest', 'tara_radio_bpm_save', 'tara_playlist_save', 'tara_release_date_save' ), true ) ) {
 		return true;
 	}
 	return 'good-post' === $nonce && 'tara_post_artist' === $action;
@@ -546,6 +577,17 @@ function check_ajax_referer( $action, $name ) {
 }
 function wp_nonce_field( $action, $name = '_wpnonce' ) {
 	echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="good">';
+}
+/* ۳.۱۷.۰ — جعبهٔ متا و ذخیرهٔ فیلد تاریخ؛ آزمون run-p1 هر دو را صدا می‌زند. */
+function add_meta_box( $id, $title, $callback, $screen = null, $context = 'advanced', $priority = 'default' ) {
+	$GLOBALS['__metaboxes'][ (string) $id ] = array(
+		'title'    => $title,
+		'callback' => $callback,
+		'screen'   => $screen,
+		'context'  => $context,
+		'priority' => $priority,
+	);
+	return true;
 }
 
 /* ---------- پیشخوان (منو، آمار، ابزارک) ---------- */

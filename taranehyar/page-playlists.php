@@ -22,17 +22,52 @@ if ( $list && ( 'tara_playlist' !== $list->post_type || 'publish' !== $list->pos
 		<a href="<?php echo esc_url( $page_url ); ?>">بازگشت به پلی‌لیست‌ها</a>
 	<?php elseif ( $list ) : ?>
 		<a class="ty-playlists__back" href="<?php echo esc_url( $page_url ); ?>">← همهٔ پلی‌لیست‌ها</a>
-		<div class="ty-playlists__intro">
-			<?php if ( has_post_thumbnail( $list->ID ) ) : ?><?php echo get_the_post_thumbnail( $list->ID, 'medium', array( 'class' => 'ty-playlists__cover', 'alt' => '', 'loading' => 'lazy' ) ); ?><?php endif; ?>
-			<div><?php echo wp_kses_post( wpautop( $list->post_content ) ); ?></div>
+		<?php
+		/* v3.17.0 — پوشش: تصویر شاخص، وگرنه کاورِ اولین آهنگِ قابل‌پخش.
+		   برای پلی‌لیستِ بدون آهنگ، اصلاً به این شاخه نمی‌رسیم (پایین‌تر
+		   «منتشرنشده» یا «خالی» پیام می‌گیرد). */
+		$list_cover = function_exists( 'tara_playlist_cover' ) ? tara_playlist_cover( $list->ID, 'medium' ) : array( 'url' => '', 'alt' => '', 'source' => '' );
+		$list_ids   = function_exists( 'tara_playlist_audio_ids' ) ? tara_playlist_audio_ids( get_post_meta( $list->ID, '_tara_playlist_tracks', true ) ) : array();
+		$list_count = count( (array) $list_ids );
+		?>
+		<div class="ty-playlists__intro<?php echo '' === $list_cover['url'] ? ' ty-playlists__intro--nocover' : ''; ?>">
+			<?php if ( '' !== $list_cover['url'] ) : ?>
+				<img class="ty-playlists__cover" src="<?php echo esc_url( $list_cover['url'] ); ?>" width="150" height="150"
+					alt="<?php echo esc_attr( $list_cover['alt'] ); ?>" loading="eager" decoding="async">
+			<?php endif; ?>
+			<div class="ty-playlists__intro-body">
+				<?php if ( '' !== trim( (string) $list->post_content ) ) : ?>
+					<div class="ty-playlists__desc-full"><?php echo wp_kses_post( wpautop( $list->post_content ) ); ?></div>
+				<?php endif; ?>
+				<p class="ty-playlists__meta">
+					<span><?php echo esc_html( sprintf( '%s آهنگ', function_exists( 'tara_number_fa' ) ? tara_number_fa( $list_count ) : (string) $list_count ) ); ?></span>
+					<?php
+					$list_mood = (int) get_post_meta( $list->ID, '_tara_playlist_mood', true );
+					$list_term = $list_mood ? get_term( $list_mood, 'tara_mood' ) : null;
+					if ( $list_term && ! is_wp_error( $list_term ) ) :
+						$list_mood_link = get_term_link( $list_term );
+						?>
+						<span class="ty-playlists__mood">
+							<a href="<?php echo esc_url( is_wp_error( $list_mood_link ) ? add_query_arg( 'mood', $list_mood, $page_url ) : $list_mood_link ); ?>"><?php echo esc_html( $list_term->name ); ?></a>
+						</span>
+					<?php endif; ?>
+				</p>
+			</div>
 		</div>
-		<?php $ids = tara_playlist_audio_ids( get_post_meta( $list->ID, '_tara_playlist_tracks', true ) ); ?>
-		<?php echo tara_playlist_radio( $ids, $list->post_title ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-		<section class="ty-playlists__tracks"><h2>آهنگ‌های این پلی‌لیست</h2>
-		<?php if ( empty( $ids ) ) : ?><p class="ty-playlists__empty">هنوز آهنگ قابل پخشی در این پلی‌لیست نیست.</p>
-		<?php elseif ( function_exists( 'tara_acc_track_list' ) ) : ?>
-			<?php echo tara_acc_track_list( $ids, array( 'mode' => 'public', 'title' => $list->post_title ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
-		<?php endif; ?></section>
+		<?php echo tara_playlist_radio( $list_ids, $list->post_title ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+		<section class="ty-playlists__tracks" id="tracks"><h2>آهنگ‌های این پلی‌لیست</h2>
+		<?php
+		/* v3.17.0 — فهرستِ استانداردِ ردیفِ آهنگ با لینکِ هنرمند (خزش‌پذیر).
+		   اگر آهنگ نبود، پیام حالت خالی. اگر تابع تازه در دسترس نبود،
+		   همان فهرست حساب کاربری (رفتار ۳.۱۶.۰) حفظ می‌شود. */
+		if ( function_exists( 'tara_playlist_tracks_html' ) ) {
+			echo tara_playlist_tracks_html( $list->ID ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+		} elseif ( empty( $list_ids ) ) {
+			echo '<p class="ty-playlists__empty">هنوز آهنگ قابل پخشی در این پلی‌لیست نیست.</p>';
+		} elseif ( function_exists( 'tara_acc_track_list' ) ) {
+			echo tara_acc_track_list( $list_ids, array( 'mode' => 'public', 'title' => $list->post_title ) ); // phpcs:ignore WordPress.Security.EscapeOutput
+		}
+		?></section>
 	<?php else : ?>
 		<?php $moods = get_terms( array( 'taxonomy' => 'tara_mood', 'hide_empty' => false, 'orderby' => 'name' ) ); ?>
 		<nav class="ty-playlists__filters" aria-label="فیلتر حال‌وهوا">
@@ -45,17 +80,41 @@ if ( $list && ( 'tara_playlist' !== $list->post_type || 'publish' !== $list->pos
 		$args = array( 'post_type' => 'tara_playlist', 'post_status' => 'publish', 'posts_per_page' => 12, 'paged' => $number, 'ignore_sticky_posts' => true, 'has_password' => false );
 		if ( $mood_id ) { $args['meta_query'] = array( array( 'key' => '_tara_playlist_mood', 'value' => $mood_id, 'compare' => '=' ) ); }
 		$query = new WP_Query( $args );
-		?>
+		/* v3.17.0 — نمایشِ تعداد واقعی روی همان برگه؛ عددِ ساختگی نیست. */
+		$total_playlists = function_exists( 'tara_playlist_ids' ) ? count( tara_playlist_ids( array( 'limit' => 50 ) ) ) : (int) $query->found_posts;
+		if ( ! $mood_id && $total_playlists > 0 ) :
+			?>
+			<p class="ty-playlists__count-line"><?php echo esc_html( sprintf( '%s پلی‌لیست منتخب', function_exists( 'tara_number_fa' ) ? tara_number_fa( $total_playlists ) : (string) $total_playlists ) ); ?></p>
+		<?php endif; ?>
 		<div class="ty-playlists__grid">
-			<?php foreach ( $query->posts as $item ) : ?>
+			<?php
+			/* v3.17.0 — کارت از جزءِ مشترک: پوشش (شاخص یا اولین آهنگ)،
+			   توضیحِ واقعی و شمارشِ آهنگ. پلی‌لیست بی‌آهنگ کارت نمی‌گیرد
+			   تا صفحهٔ نازک ساخته نشود. */
+			foreach ( $query->posts as $item ) {
+				if ( function_exists( 'tara_playlist_card_html' ) ) {
+					echo tara_playlist_card_html( $item->ID, $page_url ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+					continue;
+				}
+				if ( ! function_exists( 'tara_playlist_audio_ids' ) || ! tara_playlist_audio_ids( get_post_meta( $item->ID, '_tara_playlist_tracks', true ) ) ) {
+					continue;
+				}
+				?>
 				<a class="ty-playlists__card" href="<?php echo esc_url( add_query_arg( 'list', $item->ID, $page_url ) ); ?>">
 					<?php if ( has_post_thumbnail( $item->ID ) ) : echo get_the_post_thumbnail( $item->ID, 'medium', array( 'alt' => '', 'loading' => 'lazy' ) ); else : ?><span class="ty-playlists__placeholder" aria-hidden="true">♫</span><?php endif; ?>
 					<strong><?php echo esc_html( $item->post_title ); ?></strong>
 					<span><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $item->post_content ), 16, '…' ) ); ?></span>
 				</a>
-			<?php endforeach; ?>
+				<?php
+			}
+			?>
 		</div>
-		<?php if ( empty( $query->posts ) ) : ?><p class="ty-playlists__empty">برای این حال‌وهوا هنوز پلی‌لیستی منتشر نشده است.</p><?php endif; ?>
+		<?php if ( empty( $query->posts ) ) : ?>
+			<p class="ty-playlists__empty"><?php echo $mood_id ? 'برای این حال‌وهوا هنوز پلی‌لیستی منتشر نشده است.' : 'هنوز پلی‌لیستی منتشر نشده است.'; ?></p>
+			<?php if ( ! $mood_id ) : ?>
+				<p class="ty-playlists__empty-hint">پلی‌لیست‌ها در پیشخوان ← «پلی‌لیست‌های منتخب» ساخته می‌شوند. تا وقتی پلی‌لیستی آهنگِ قابل‌پخش نداشته باشد، این‌جا نمایش داده نمی‌شود.</p>
+			<?php endif; ?>
+		<?php endif; ?>
 		<?php if ( $query->max_num_pages > 1 ) : ?>
 			<nav class="ty-playlists__pagination" aria-label="صفحات پلی‌لیست">
 				<?php if ( $number > 1 ) : ?><a href="<?php echo esc_url( add_query_arg( array( 'mood' => $mood_id, 'list_page' => $number - 1 ), $page_url ) ); ?>">صفحهٔ قبل</a><?php endif; ?>

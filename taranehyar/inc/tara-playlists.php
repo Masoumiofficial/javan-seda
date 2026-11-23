@@ -80,15 +80,27 @@ function tara_playlists_home() {
 	$pages = get_pages( array( 'meta_key' => '_wp_page_template', 'meta_value' => 'page-playlists.php', 'number' => 1, 'post_status' => 'publish' ) );
 	if ( empty( $pages ) ) { return ''; }
 	$url = get_permalink( $pages[0] );
-	$items = get_posts( array( 'post_type' => 'tara_playlist', 'post_status' => 'publish', 'numberposts' => 4, 'ignore_sticky_posts' => true, 'has_password' => false ) );
+	/* v3.17.0 — فقط پلی‌لیست‌های واقعیِ دارای آهنگِ قابل‌پخش؛ کارت از جزء
+	   مشترک (پوشش/توضیح/شمارش). پلی‌لیستِ خالی این‌جا هم دیده نمی‌شود. */
+	$items = function_exists( 'tara_playlist_ids' ) ? tara_playlist_ids( array( 'limit' => 4 ) ) : array();
 	if ( empty( $items ) ) { return ''; }
 	ob_start();
 	?>
 	<section class="ty-playlists ty-playlists--home" dir="rtl"><header class="ty-playlists__homehead"><h2>پلی‌لیست‌های منتخب</h2><a href="<?php echo esc_url( $url ); ?>">همهٔ پلی‌لیست‌ها</a></header><div class="ty-playlists__grid">
-	<?php foreach ( $items as $item ) : ?><a class="ty-playlists__card" href="<?php echo esc_url( add_query_arg( 'list', $item->ID, $url ) ); ?>">
-		<?php if ( has_post_thumbnail( $item->ID ) ) : echo get_the_post_thumbnail( $item->ID, 'medium', array( 'alt' => '', 'loading' => 'lazy' ) ); else : ?><span class="ty-playlists__placeholder" aria-hidden="true">♫</span><?php endif; ?>
-		<strong><?php echo esc_html( $item->post_title ); ?></strong><span><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $item->post_content ), 12, '…' ) ); ?></span>
-	</a><?php endforeach; ?>
+	<?php foreach ( $items as $item_id ) : ?>
+		<?php
+		if ( function_exists( 'tara_playlist_card_html' ) ) {
+			echo tara_playlist_card_html( $item_id, $url ); // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+			continue;
+		}
+		$item = get_post( $item_id );
+		if ( ! $item ) { continue; }
+		?>
+		<a class="ty-playlists__card" href="<?php echo esc_url( add_query_arg( 'list', $item->ID, $url ) ); ?>">
+			<?php if ( has_post_thumbnail( $item->ID ) ) : echo get_the_post_thumbnail( $item->ID, 'medium', array( 'alt' => '', 'loading' => 'lazy' ) ); else : ?><span class="ty-playlists__placeholder" aria-hidden="true">♫</span><?php endif; ?>
+			<strong><?php echo esc_html( $item->post_title ); ?></strong><span><?php echo esc_html( wp_trim_words( wp_strip_all_tags( $item->post_content ), 12, '…' ) ); ?></span>
+		</a>
+	<?php endforeach; ?>
 	</div></section>
 	<?php
 	return (string) ob_get_clean();

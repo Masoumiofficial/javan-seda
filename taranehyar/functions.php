@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.16.0' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.17.0' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -625,6 +625,18 @@ if ( is_readable( $taranehyar_p0 ) ) {
 	require_once $taranehyar_p0;
 }
 unset( $taranehyar_p0 );
+
+/* ۶-الف-۳-۳-۳) لایهٔ APEX دور P1 (۳.۱۷.۰) — فیلدِ تاریخ انتشار، اجزای
+   پروفایل هنرمند، پلی‌لیست‌های منتخب و مرتبط‌های اولویت‌دار. هر سه فایل
+   خودشان را با function_exists محافظت می‌کنند و بدون وابستگی به هم بارگذاری
+   می‌شوند؛ اگر یکی نبود، بقیه مثل قبل کار می‌کنند. */
+foreach ( array( 'tara-release-date.php', 'tara-artist-profile.php', 'tara-playlists-p1.php', 'tara-related-p1.php' ) as $taranehyar_p1_file ) {
+	$taranehyar_p1_path = TARANEHYAR_DIR . '/inc/' . $taranehyar_p1_file;
+	if ( is_readable( $taranehyar_p1_path ) ) {
+		require_once $taranehyar_p1_path;
+	}
+}
+unset( $taranehyar_p1_file, $taranehyar_p1_path );
 
 /* ۶-الف-۴) لایهٔ تضمینیِ ظاهر + جست‌وجوی زنده (۳.۷.۶)
    CSS ضروری را درون‌خطی چاپ می‌کند و اگر فایل‌های قالب به صفحه نرسند،

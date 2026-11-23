@@ -245,10 +245,10 @@ if ( ! function_exists( 'tara_sidebar' ) ) {
 if ( ! function_exists( 'tara_expected_hashes' ) ) {
 	function tara_expected_hashes() {
 	return array(
-		'single.php'                => '556c24c0e58818c40ad18d7869c9e09867ea2e262e51dd9dfa63b54cfa7a42be',
+		'single.php'                => 'c551338bc97909155232c6ef5b5c6be8e82ff6bae5f8d7e59e40501c49c0bfa2',
 		'page.php'                  => 'eed2370a3205d53f58bf0d5721275ae8896daf6c32e862403d9fe3a2982aac50',
 		'myfunctions.php'           => '04b63b53dab707ab426215216bcf8978fab0b15ce1d0536f98d23bf2995a4080',
-		'style.css'                 => '5f52b41b03328afed202f9e659061a3935d75fba0cc9ff00022fbb978d14fa0d',
+		'style.css'                 => '2b99379ecda664d0f113a1d68067c70022f70f54c1ed656660a5771c774adafc',
 		'footer.php'                => 'cc67f4adb6d351ec79d433b5c000dc50baac68a3495c688feb4aa1faf365001d',
 		'header.php'                => '3b97ec2c06a6008f0555406b8587d66b49fcd27bdfdaac240fc090e16abdf8fd',
 		'home.php'                  => '2f6600ca67e4e3213376aafb42e6731744b969f9faae7be409d53056d91b3faa',
@@ -262,11 +262,15 @@ if ( ! function_exists( 'tara_expected_hashes' ) ) {
 		'inc/ab-seo.php'            => 'df77a1d8805c1da07d77c486710485380ad627e7040f1fa2f0cfc93c320ce9ad',
 		'inc/ab-controls.php'       => 'eed236181fe745999f0c150e4cec8c2e8c6b6daf3b52bf4e98a2347f60851176',
 		'inc/theme-options.php'     => '6d450b0cb5fa483939b9e9ccabe16ec735ea1cc58a190a0d03b9369c89d42a13',
-		'taxonomy-artist.php'       => '0e2a19b4eac410a4ca932d12d7a51bccc59207b2926c9e7e182c80aaae083483',
+		'taxonomy-artist.php'       => '4838da42c1fdd8fe4d2abc1d5706547507eff5d2128a230829b13bbeaa5f1f3f',
 		'taxonomy-singer.php'       => '38ed6b25f0146a900e1c580a85d64698497caf73c561abbadc0e9e4d245f9fce',
 		'inc/ab-tax-artist.php'     => '8aaa995ae6658ecbb7a2dd1ea32afc5c881edfaf1abc1594e89ee3a4c1bba9b0',
 		'inc/ab-credits.php'        => 'fbcb2b30341661d1b5d84ab0d36c23766685e37a71521f2eeffc3affdd7f2268',
 		'inc/tara-p0.php'           => 'bf7cc04cee009c50cd98e9830a30f1bd811721abb2581e04522133d8c0b2d894',
+		'inc/tara-release-date.php' => '8f01e31526343eaf66a270a26b39cbf9e1d80004a7ecbdfbd270cf15aba9ee70',
+		'inc/tara-artist-profile.php' => '4d02141e2ff9ba8d6437fc5d73a77493ff5df68a0e11a1774aa66dfb8fbc19f5',
+		'inc/tara-playlists-p1.php' => '6ba792c1e59e4e5f8dd10f0b389e120d03d8bdcce27ac6ece4bc1930a5ec35bf',
+		'inc/tara-related-p1.php'   => 'ea36d417ae3e598baf58950eb2980db14fabca603f0036a81a7a22d2d12d2f23',
 	);
 }
 }

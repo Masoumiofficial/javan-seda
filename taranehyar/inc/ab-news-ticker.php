@@ -138,8 +138,13 @@ if ( ! function_exists( 'tara_news_posts' ) ) {
 			$items['fallback'] = 2;
 		}
 
-		if ( $ttl > 0 && $items['items'] ) {
-			set_transient( $ck, $items, $ttl );
+		/* v3.17.3 — نتیجهٔ «خالی» هم کش می‌شود، ولی با TTL کوتاه (۶۰
+		   ثانیه). پیش‌تر شرطِ `$items['items']` باعث می‌شد اگر دستهٔ خبر
+		   وجود نداشت یا خالی بود، کش هرگز ساخته نشود و در «هر» بازدید
+		   صفحهٔ اصلی یک WP_Query اضافه اجرا شود. ۶۰ ثانیه کوتاه است تا
+		   به‌محض انتشار نخستین خبر، نوار حداکثر یک دقیقه بعد پر شود. */
+		if ( $ttl > 0 ) {
+			set_transient( $ck, $items, $items['items'] ? $ttl : min( 60, $ttl ) );
 		}
 		return $items;
 	}

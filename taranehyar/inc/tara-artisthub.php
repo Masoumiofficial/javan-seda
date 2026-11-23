@@ -910,6 +910,12 @@ if ( ! function_exists( 'tara_hub_admin_page' ) ) {
 if ( ! function_exists( 'tara_hub_assets' ) ) {
 	/** CSS/JS پنل هنرمند و دایرکت — فقط برای کاربر واردشده. */
 	function tara_hub_assets() {
+		/* v3.17.3 — شرطِ «فقط کاربر واردشده» در مستندات بود ولی در کد نبود؛
+		   نتیجه: تارِهٔ دایرکت و JS پنل برای هر مهمان هم بار می‌شد.
+		   مهمان هیچ‌وقت این دارایی‌ها را لازم ندارد. */
+		if ( function_exists( 'is_user_logged_in' ) && ! is_user_logged_in() ) {
+			return;
+		}
 		$css = '/css/tara-hub.css';
 		if ( function_exists( 'tara_css_rel' ) ) {
 			$css = tara_css_rel( $css );

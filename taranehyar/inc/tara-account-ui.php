@@ -137,6 +137,12 @@ if ( ! function_exists( 'tara_acc_assets' ) ) {
 			return;
 		}
 
+		/* v3.17.3 — عمداً روی «همهٔ» صفحه‌ها بار می‌شود.
+		   `tara_acc_modal()` روی `wp_footer` در هر صفحه مارک‌آپِ دکمهٔ هدر و
+		   مودال را چاپ می‌کند؛ اگر این CSS فقط به برگه‌های حساب محدود شود،
+		   آن مودال در خانه و آرشیوها بی‌استایل و نیمه‌کاره دیده می‌شود.
+		   (این محدودسازی آزموده و عمداً برگردانده شد.) */
+
 		$css = '/css/tara-account.css';
 		if ( function_exists( 'tara_css_rel' ) ) {
 			$css = tara_css_rel( $css );

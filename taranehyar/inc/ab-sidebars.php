@@ -266,7 +266,7 @@ if ( ! function_exists( 'tara_expected_hashes' ) ) {
 		'taxonomy-singer.php'       => '38ed6b25f0146a900e1c580a85d64698497caf73c561abbadc0e9e4d245f9fce',
 		'inc/ab-tax-artist.php'     => '8aaa995ae6658ecbb7a2dd1ea32afc5c881edfaf1abc1594e89ee3a4c1bba9b0',
 		'inc/ab-credits.php'        => 'fbcb2b30341661d1b5d84ab0d36c23766685e37a71521f2eeffc3affdd7f2268',
-		'inc/tara-p0.php'           => 'd6b90fa0d7c9a2678f2fb0c2ad3f296e0d3267db1709b382f18813b48e55e512',
+		'inc/tara-p0.php'           => 'bf7cc04cee009c50cd98e9830a30f1bd811721abb2581e04522133d8c0b2d894',
 	);
 }
 }

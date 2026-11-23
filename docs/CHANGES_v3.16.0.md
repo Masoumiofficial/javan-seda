@@ -78,6 +78,6 @@
 ## بسته و انتشار
 
 - ZIP: `artifacts/taranehyar-3.16.0.zip` (۲۰۳ فایل، ۲٬۴۱۴٬۳۴۷ بایت)
-- SHA-256: `76f202ec3549d7346e51a015200b01d86e455a88a685db97f07486a5c8f5b4dd`
+- SHA-256: `87f440d10c72daedfb319bb68d13ffa75ccb0a13c07c81c153aa014f087ccc3d`
 - لینک خام: <https://raw.githubusercontent.com/Masoumiofficial/javan-seda/v3.16.0/artifacts/taranehyar-3.16.0.zip>
 - انتشار: <https://github.com/Masoumiofficial/javan-seda/releases/tag/v3.16.0>

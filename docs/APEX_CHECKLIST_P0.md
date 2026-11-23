@@ -55,6 +55,6 @@
 - ⚠ `run-370` و `run-380` و `run-390` نسخه‌های قدیمی را فرض می‌کنند و فقط برای همان نسخه‌ها معتبرند؛ اجرای آن‌ها روی ۳.۱۶.۰ بخش «نسخه» را رد می‌کند (نه منطق).
 - ✅ `tests/run-apex.php` ۵۷/۵۷ + `tests/smoke-search-apex.mjs` (خطا/تلاش/۴۰۳/برچسب نوع).
 - ✅ `tools/minify-css.py` (۹ فایل، −۳۴٪) و `tools/expected-hashes.py --check` (۲۲/۲۲، شامل `inc/tara-p0.php`) سبز.
-- ✅ بسته: `artifacts/taranehyar-3.16.0.zip` — ۲۰۳ فایل، ۲٬۴۱۴٬۳۴۷ بایت، SHA-256 `76f202ec3549d7346e51a015200b01d86e455a88a685db97f07486a5c8f5b4dd`
+- ✅ بسته: `artifacts/taranehyar-3.16.0.zip` — ۲۰۳ فایل، ۲٬۴۱۴٬۳۴۷ بایت، SHA-256 `87f440d10c72daedfb319bb68d13ffa75ccb0a13c07c81c153aa014f087ccc3d`
 - ✅ انتشار: <https://github.com/Masoumiofficial/javan-seda/releases/tag/v3.16.0> (تگ روی `3ef578e`)
 - ✅ نصب‌پذیری بسته: باز کردن ZIP در پوشهٔ موقت و lint دوباره ⇒ ۱۰۲/۱۰۲ سالم؛ تنها اختلاف با بستهٔ ۳.۱۵.۰ فایل تازهٔ `inc/tara-p0.php` است.

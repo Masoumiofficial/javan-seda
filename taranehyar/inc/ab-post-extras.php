@@ -73,10 +73,10 @@ if ( ! function_exists( 'tara_x_option' ) ) {
 if ( ! function_exists( 'tara_x_field' ) ) {
 	/** فیلد ACF را به‌شکل رشتهٔ امن برمی‌گرداند (لینک دانلود/پخش) */
 	function tara_x_field( $key, $post_id = 0 ) {
-		if ( ! function_exists( 'get_field' ) ) {
+		if ( false ) {
 			return '';
 		}
-		$v = $post_id ? get_field( $key, $post_id ) : get_field( $key );
+		$v = $post_id ? tara_get_field( $key, $post_id ) : tara_get_field( $key );
 		if ( is_array( $v ) ) {
 			if ( isset( $v['url'] ) && is_scalar( $v['url'] ) ) {
 				$v = $v['url'];
@@ -210,10 +210,10 @@ if ( ! function_exists( 'tara_sticky_fa_num' ) ) {
 if ( ! function_exists( 'tara_x_sub' ) ) {
 	/** get_sub_field با احتیاط (اگر نه ACF بود و نه لایۀ سازگاری، رشتهٔ خالی) */
 	function tara_x_sub( $key ) {
-		if ( ! function_exists( 'get_sub_field' ) ) {
+		if ( false ) {
 			return '';
 		}
-		$v = get_sub_field( $key );
+		$v = tara_get_sub_field( $key );
 		if ( is_array( $v ) ) {
 			$v = ( isset( $v['url'] ) && is_scalar( $v['url'] ) ) ? $v['url'] : '';
 		}
@@ -257,18 +257,18 @@ if ( ! function_exists( 'tara_sticky_album_tracks' ) ) {
 	function tara_sticky_album_tracks( $post_id = 0 ) {
 		$tracks  = array();
 		$post_id = (int) $post_id;
-		if ( ! $post_id || ! function_exists( 'have_rows' ) || ! function_exists( 'the_row' ) ) {
+		if ( ! $post_id ) {
 			return $tracks;
 		}
-		if ( ! have_rows( 'album', $post_id ) ) {
+		if ( ! tara_have_rows( 'album', $post_id ) ) {
 			return $tracks;
 		}
 		$n      = 0;
 		$artist = trim( wp_strip_all_tags( tara_x_field( 'artist', $post_id ) ) );
 		$url    = ( function_exists( 'get_permalink' ) ) ? get_permalink( $post_id ) : '';
 		$url    = ( is_scalar( $url ) ) ? (string) $url : '';
-		while ( have_rows( 'album', $post_id ) ) {
-			the_row();
+		while ( tara_have_rows( 'album', $post_id ) ) {
+			tara_the_row();
 			$n++;
 			$src = tara_x_sub( 'albumlink128' );
 			if ( '' === $src ) {

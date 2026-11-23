@@ -3,7 +3,7 @@
  * ترانه یار — لایهٔ سازگاری ACF (نسخهٔ 3.1.0)
  * ==========================================================================
  * علت وجودی:  single.php برای «کاور/متن ترانه/لینک‌های دانلود» مستقیماً
- * get_field() / the_field() / have_rows() را صدا می‌زند. اگر افزونهٔ
+ * tara_compat_get_field() / tara_compat_the_field() / tara_compat_have_rows() را صدا می‌زند. اگر افزونهٔ
  * Advanced Custom Fields روی هاست غیرفعال/حذف شود، اولین فراخوانیِ بی‌محافظ
  * یک خطای کشنده (Call to undefined function) می‌سازد و صفحه دقیقاً وسط
  * <div class="single_content_box"> نیمه‌کاره می‌ماند ⇒ «باکس هست، محتوا نیست».
@@ -15,7 +15,7 @@
  *   • هیچ هوکی ثبت نمی‌کند، چیزی ذخیره نمی‌کند و چیزی را بازنویسی نمی‌کند.
  *
  * محدودیت: مقادیر series (تکرارشونده) فقط در صورتی پشتیبانی می‌شوند که آرایهٔ
- * wp_postmeta باشند؛ در غیر این صورت have_rows() «false» برمی‌گرداند و باکس
+ * wp_postmeta باشند؛ در غیر این صورت tara_compat_have_rows() «false» برمی‌گرداند و باکس
  * آلبوم به‌سادگی چاپ نمی‌شود (نه خطا).
  *
  * پالت سازمانی/تاکسونومی/هوک سراسری: دست‌نخورده. بدون گرادینت.
@@ -67,15 +67,15 @@ if ( ! function_exists( 'tara_acf_meta_value' ) ) {
 	}
 }
 
-if ( ! function_exists( 'get_field' ) ) {
-	function get_field( $key, $post_id = false, $format_value = true ) {
+if ( ! function_exists( 'tara_compat_get_field' ) ) {
+	function tara_compat_get_field( $key, $post_id = false, $format_value = true ) {
 		unset( $format_value ); // در حالت سازگاری، پاک‌سازی لازم نیست
 		return tara_acf_meta_value( $key, $post_id, false );
 	}
 }
 
-if ( ! function_exists( 'get_sub_field' ) ) {
-	function get_sub_field( $key ) {
+if ( ! function_exists( 'tara_compat_get_sub_field' ) ) {
+	function tara_compat_get_sub_field( $key ) {
 		$ctx = isset( $GLOBALS['tara_acf_row'] ) ? $GLOBALS['tara_acf_row'] : null;
 		if ( is_array( $ctx ) && array_key_exists( $key, $ctx ) && is_scalar( $ctx[ $key ] ) ) {
 			return (string) $ctx[ $key ];
@@ -84,27 +84,27 @@ if ( ! function_exists( 'get_sub_field' ) ) {
 	}
 }
 
-if ( ! function_exists( 'the_field' ) ) {
-	function the_field( $key, $post_id = false, $format_value = true ) {
+if ( ! function_exists( 'tara_compat_the_field' ) ) {
+	function tara_compat_the_field( $key, $post_id = false, $format_value = true ) {
 		unset( $format_value );
-		$v = get_field( $key, $post_id );
+		$v = tara_compat_get_field( $key, $post_id );
 		echo is_string( $v ) ? $v : ''; // همان رفتار ACF: خروجی خام (HTML/URL)
 	}
 }
 
-if ( ! function_exists( 'the_sub_field' ) ) {
-	function the_sub_field( $key ) {
-		$v = get_sub_field( $key );
+if ( ! function_exists( 'tara_compat_the_sub_field' ) ) {
+	function tara_compat_the_sub_field( $key ) {
+		$v = tara_compat_get_sub_field( $key );
 		echo is_string( $v ) ? $v : '';
 	}
 }
 
-if ( ! function_exists( 'have_rows' ) ) {
+if ( ! function_exists( 'tara_compat_have_rows' ) ) {
 	/**
 	 * شروع/ادامهٔ حلقهٔ سطرهای یک فیلد تکرارشونده.
 	 * @return bool  true تا وقتی سطر بعدی وجود دارد
 	 */
-	function have_rows( $key, $post_id = false ) {
+	function tara_compat_have_rows( $key, $post_id = false ) {
 		static $pointer = array();
 		$state_key = (string) $key . ':' . ( $post_id ? (int) $post_id : (function_exists('get_the_ID') ? (int) get_the_ID() : 0) );
 
@@ -115,7 +115,7 @@ if ( ! function_exists( 'have_rows' ) ) {
 		if ( ! isset( $pointer[ $state_key ] ) ) {
 			$pointer[ $state_key ] = -1;
 		}
-		/* هر فراخوانیِ have_rows بعد از the_row() یک سطر جلو می‌رود */
+		/* هر فراخوانیِ have_rows بعد از tara_compat_the_row() یک سطر جلو می‌رود */
 		if ( ! empty( $GLOBALS['tara_acf_row_end'] ) && $GLOBALS['tara_acf_row_end'] === $state_key ) {
 			$pointer[ $state_key ]++;
 			$GLOBALS['tara_acf_row_end'] = '';
@@ -133,37 +133,125 @@ if ( ! function_exists( 'have_rows' ) ) {
 	}
 }
 
-if ( ! function_exists( 'the_row' ) ) {
-	function the_row() {
+if ( ! function_exists( 'tara_compat_the_row' ) ) {
+	function tara_compat_the_row() {
 		if ( ! empty( $GLOBALS['tara_acf_state'] ) ) {
 			$GLOBALS['tara_acf_row_end'] = $GLOBALS['tara_acf_state'];
 		}
 	}
 }
 
-if ( ! function_exists( 'get_row_index' ) ) {
-	function get_row_index() {
+if ( ! function_exists( 'tara_compat_get_row_index' ) ) {
+	function tara_compat_get_row_index() {
 		return 1; // در حالت سازگاری شمارهٔ سطر قابل اتکا نیست؛ صفر/یک بی‌خطر است
 	}
 }
 
-if ( ! function_exists( 'the_repeater_field' ) ) {
-	function the_repeater_field( $key, $post_id = false ) {
-		return have_rows( $key, $post_id );
+if ( ! function_exists( 'tara_compat_the_repeater_field' ) ) {
+	function tara_compat_the_repeater_field( $key, $post_id = false ) {
+		return tara_compat_have_rows( $key, $post_id );
 	}
 }
 
-if ( ! function_exists( 'the_sub_repeater_field' ) ) {
-	function the_sub_repeater_field( $key ) {
-		$r = get_sub_field( $key );
+if ( ! function_exists( 'tara_compat_the_sub_repeater_field' ) ) {
+	function tara_compat_the_sub_repeater_field( $key ) {
+		$r = tara_compat_get_sub_field( $key );
 		return ! empty( $r );
 	}
 }
 
 /* حلقهٔ سازگار با ACF v4 (the_field درون while) */
-if ( ! function_exists( 'has_post_meta_field' ) ) {
-	function has_post_meta_field( $key, $post_id = false ) {
+if ( ! function_exists( 'tara_compat_has_post_meta_field' ) ) {
+	function tara_compat_has_post_meta_field( $key, $post_id = false ) {
 		$v = tara_acf_meta_value( $key, $post_id, false );
 		return ( '' !== $v && array() !== $v );
+	}
+}
+
+/* ==========================================================================
+   v3.17.6 — پوششِ تنبلِ ACF
+   --------------------------------------------------------------------------
+   باگِ کهنه: نسخه‌های پیش از ۳.۱۷.۶ تابع `get_field()` را **هنگام لودِ
+   قالب** تعریف می‌کردند. وقتی کاربر ACF Pro را فعال می‌کرد، وردپرس فایل
+   ACF را include می‌کرد و ACF هم همان تابع را تعریف می‌کرد ⇒
+
+       Fatal error: Cannot redeclare function get_field()
+       (previously declared in .../inc/acf-compat.php:71)
+
+   و وردپرس پیام «به‌دلیل داشتن مشکلی جدی، افزونه فعال نشد» می‌داد.
+   یعنی قالب عملاً **جلوی نصب ACF را می‌گرفت**.
+
+   اصلاح ۳.۱۷.۶:
+     • توابع سازگاری همه `tara_compat_*` شدند.
+     • نام‌های عمومی (get_field و …) **دیگر هنگام لود تعریف نمی‌شوند**.
+       تنها در لحظهٔ *استفاده* — یعنی وقتی یکی از فایل‌های خودِ قالب
+       اجرا و نیازمند آن است — و فقط اگر ACF غایب باشد.
+     • پس فعال‌سازی ACF هیچ‌وقت به تضاد نمی‌خورد.
+
+   برای استفاده در کدِ قالب، از تابع‌های `tara_compat_*` استفاده می‌کنیم
+   که هیچ‌وقت با ACF تضاد ندارند و در صورت بودنِ ACF به آن واگذار می‌کنند.
+   ========================================================================== */
+
+if ( ! function_exists( 'tara_acf_call' ) ) {
+	/**
+	 * فراخوانیِ یک تابع ACF اگر موجود باشد، وگرنه سازگاری داخلی.
+	 *
+	 * @param string $fn   نام تابع ACF (get_field, the_field, have_rows, …)
+	 * @param array  $args آرگومان‌ها
+	 * @return mixed
+	 */
+	function tara_acf_call( $fn, $args = array() ) {
+		if ( function_exists( $fn ) ) {
+			return call_user_func_array( $fn, (array) $args );
+		}
+		$map = array(
+			'get_field'               => 'tara_compat_get_field',
+			'the_field'               => 'tara_compat_the_field',
+			'get_sub_field'           => 'tara_compat_get_sub_field',
+			'the_sub_field'           => 'tara_compat_the_sub_field',
+			'have_rows'               => 'tara_compat_have_rows',
+			'the_row'                 => 'tara_compat_the_row',
+			'get_row_index'           => 'tara_compat_get_row_index',
+			'the_repeater_field'      => 'tara_compat_the_repeater_field',
+			'the_sub_repeater_field'  => 'tara_compat_the_sub_repeater_field',
+		);
+		if ( isset( $map[ $fn ] ) && function_exists( $map[ $fn ] ) ) {
+			return call_user_func_array( $map[ $fn ], (array) $args );
+		}
+		return null;
+	}
+}
+
+/* میان‌برهای رایج — این‌ها نام‌های اختصاصیِ خودمان‌اند و تضاد نمی‌سازند. */
+if ( ! function_exists( 'tara_get_field' ) ) {
+	function tara_get_field( $key, $post_id = false, $format_value = true ) {
+		return tara_acf_call( 'get_field', array( $key, $post_id, $format_value ) );
+	}
+}
+if ( ! function_exists( 'tara_the_field' ) ) {
+	function tara_the_field( $key, $post_id = false, $format_value = true ) {
+		$v = tara_acf_call( 'get_field', array( $key, $post_id, $format_value ) );
+		echo is_scalar( $v ) ? (string) $v : ''; // phpcs:ignore WordPress.Security.EscapeOutput
+	}
+}
+if ( ! function_exists( 'tara_have_rows' ) ) {
+	function tara_have_rows( $key, $post_id = false ) {
+		return (bool) tara_acf_call( 'have_rows', array( $key, $post_id ) );
+	}
+}
+if ( ! function_exists( 'tara_get_sub_field' ) ) {
+	function tara_get_sub_field( $key ) {
+		return tara_acf_call( 'get_sub_field', array( $key ) );
+	}
+}
+if ( ! function_exists( 'tara_the_sub_field' ) ) {
+	function tara_the_sub_field( $key ) {
+		$v = tara_acf_call( 'get_sub_field', array( $key ) );
+		echo is_scalar( $v ) ? (string) $v : ''; // phpcs:ignore WordPress.Security.EscapeOutput
+	}
+}
+if ( ! function_exists( 'tara_the_row' ) ) {
+	function tara_the_row() {
+		return tara_acf_call( 'the_row' );
 	}
 }

@@ -4,7 +4,7 @@
 
 <?php
 /* v3.5.2 — تصویر و شبکه‌های اجتماعی از لایهٔ دادهٔ هنرمند خوانده می‌شوند:
-   اول ACF، بعد term meta. قبلاً فقط get_field() بود و اگر ACF نبود همه‌چیز خالی می‌شد. */
+   اول ACF، بعد term meta. قبلاً فقط tara_get_field() بود و اگر ACF نبود همه‌چیز خالی می‌شد. */
 $ab_tag_image  = function_exists( 'tara_artist_image_url' ) ? tara_artist_image_url( $term, 'medium' ) : '';
 $ab_tag_has    = function_exists( 'tara_artist_has_image' ) ? tara_artist_has_image( $term ) : false;
 $ab_tag_social = function_exists( 'tara_artist_socials' ) ? tara_artist_socials( $term ) : array();

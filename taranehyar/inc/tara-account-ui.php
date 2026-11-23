@@ -832,7 +832,7 @@ if ( ! function_exists( 'tara_acc_artist_cards' ) ) {
 			if ( ! $term || ( function_exists( 'is_wp_error' ) && is_wp_error( $term ) ) ) {
 				continue;
 			}
-			$img = function_exists( 'get_field' ) ? (string) get_field( 'artist_image', $term ) : '';
+			$img = (string) tara_get_field( 'artist_image', $term );
 			if ( '' === $img && function_exists( 'get_term_meta' ) ) {
 				$img = (string) get_term_meta( (int) $term_id, 'artist_image', true );
 			}

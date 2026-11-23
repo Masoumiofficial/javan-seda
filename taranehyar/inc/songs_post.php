@@ -123,7 +123,7 @@ if ( has_post_thumbnail() ) { /* v3.3.8 — دو سایز به WP بدهید ت�
 if ( function_exists( 'tara_media_badge' ) ) { echo tara_media_badge( get_the_ID(), 'card' ); }
 ?><?php if ( ! empty( $GLOBALS['tara_card_play'] ) && function_exists( 'tara_card_play' ) ) { echo tara_card_play(); /* escape شده در تابع */ } ?><?php tara_card_stats(); ?></figure>
 <?php
-/* v3.8.1 — تیتر کارت دیگر چهار بار `get_field()` خام صدا نمی‌زند:
+/* v3.8.1 — تیتر کارت دیگر چهار بار `tara_get_field()` خام صدا نمی‌زند:
    بدون ACF کل صفحه با خطای کشنده می‌افتاد و در هر کارت هم چهار فراخوانی
    جدا بود. `tara_music_field()` هم ACF و هم متای خام را می‌خواند و رشتهٔ
    امن برمی‌گرداند؛ اگر «آهنگ» خالی باشد، <span> خالی هم چاپ نمی‌شود. */

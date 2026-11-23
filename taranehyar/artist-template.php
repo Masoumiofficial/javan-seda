@@ -109,8 +109,8 @@ if ( ! function_exists( 'tara_artists_image' ) ) {
 					$image = $maybe_id;
 				}
 			}
-		} elseif ( function_exists( 'get_field' ) ) {
-			$image = get_field( 'aimg2', $term );
+		} else {
+			$image = tara_get_field( 'aimg2', $term );
 		}
 		$id    = 0;
 		$url   = '';

@@ -74,14 +74,14 @@ if ( '' !== trim( wp_strip_all_tags( $tara_meta_html ) ) ) {
    جست‌وجوی تقریبی با نرمال‌سازی ي/ك/ة و نیم‌فاصله ← برچسب هم‌نام.
    در پایان، فیلتر taranehyar_artist_url می‌تواند نتیجه را بازنویسی کند.
 ------------------------------------------------------------------------------------------------- */
-$taranehyar_song   = function_exists( 'tara_music_field' ) ? tara_music_field( 'song' ) : ( function_exists( 'get_field' ) ? trim( (string) get_field( 'song' ) ) : '' );
-$taranehyar_artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'artist' ) : ( function_exists( 'get_field' ) ? trim( (string) get_field( 'artist' ) ) : '' );
+$taranehyar_song   = function_exists( 'tara_music_field' ) ? tara_music_field( 'song' ) : trim( (string) tara_get_field( 'song' ) );
+$taranehyar_artist = function_exists( 'tara_music_field' ) ? tara_music_field( 'artist' ) : trim( (string) tara_get_field( 'artist' ) );
 if ( '' === $taranehyar_song ) {
 	$taranehyar_song = get_the_title();
 }
 
 /* برچسب نوع (آهنگ/آلبوم/موزیک ویدیو) از فیلد musics_type؛ پیش‌فرض «آهنگ» */
-$taranehyar_type_raw = function_exists( 'get_field' ) ? get_field( 'musics_type' ) : '';
+$taranehyar_type_raw = tara_get_field( 'musics_type' );
 $taranehyar_type     = is_scalar( $taranehyar_type_raw ) ? trim( (string) $taranehyar_type_raw ) : '';
 if ( '' === $taranehyar_type ) {
 	$taranehyar_type = 'آهنگ';
@@ -89,7 +89,7 @@ if ( '' === $taranehyar_type ) {
 
 $taranehyar_artist_url = '';
 if ( '' !== $taranehyar_artist ) {
-	$taranehyar_custom_link = function_exists( 'get_field' ) ? get_field( 'artist_link' ) : '';
+	$taranehyar_custom_link = tara_get_field( 'artist_link' );
 	if ( is_string( $taranehyar_custom_link ) && '' !== trim( $taranehyar_custom_link ) ) {
 		$taranehyar_artist_url = trim( $taranehyar_custom_link );
 	} else {
@@ -175,16 +175,16 @@ $tara_artist_big = $taranehyar_artist;
 $tara_song_big   = $taranehyar_song;
 $tara_link_big   = get_permalink();
 
-if ( function_exists( 'have_rows' ) && have_rows( 'album' ) ) {
+if ( tara_have_rows( 'album' ) ) {
 	$tara_album_index = 0;
-	while ( have_rows( 'album' ) ) {
-		the_row();
+	while ( tara_have_rows( 'album' ) ) {
+		tara_the_row();
 		$tara_album_index++;
-		$tara_album_src = get_sub_field( 'albumlink320' );
+		$tara_album_src = tara_get_sub_field( 'albumlink320' );
 		if ( ! $tara_album_src ) {
-			$tara_album_src = get_sub_field( 'albumlink128' );
+			$tara_album_src = tara_get_sub_field( 'albumlink128' );
 		}
-		$tara_album_name = get_sub_field( 'song_names' );
+		$tara_album_name = tara_get_sub_field( 'song_names' );
 		if ( ! $tara_album_src ) {
 			continue;
 		}
@@ -298,7 +298,7 @@ $taranehyar_lyrics_schema   = true;
 $taranehyar_artist_type     = 'Person';
 
 $taranehyar_lyrics_box = '';
-$taranehyar_lyrics_raw = function_exists( 'tara_music_field' ) ? tara_music_field( 'music_text' ) : ( function_exists( 'get_field' ) ? get_field( 'music_text' ) : '' );
+$taranehyar_lyrics_raw = function_exists( 'tara_music_field' ) ? tara_music_field( 'music_text' ) : tara_get_field( 'music_text' );
 if ( is_string( $taranehyar_lyrics_raw ) && '' !== trim( $taranehyar_lyrics_raw ) ) {
 
 	/* خروجی ایمن: اگر مقدار HTML باشد با wp_kses_post، وگرنه با nl2br + esc_html */
@@ -493,7 +493,7 @@ if ( '' !== $taranehyar_lyrics_box && 'end' !== $taranehyar_lyrics_position ) {
 if ( function_exists( 'tara_video' ) ) {
 	$tara_video_sources = array();
 	foreach ( array( '1080' => 'video1080', '720' => 'video720', '480' => 'video480' ) as $tara_q => $tara_f ) {
-		/* v3.8.1 — از `get_field()` خام به تابعِ قالب: اگر ACF نصب/فعال نباشد
+		/* v3.8.1 — از `tara_get_field()` خام به تابعِ قالب: اگر ACF نصب/فعال نباشد
 		   یا فیلد «فایل» به شکل array برگردد، این‌جا امن است. */
 		$tara_v = function_exists( 'tara_music_value' ) ? tara_music_value( $tara_f ) : '';
 		if ( '' !== $tara_v ) {
@@ -522,7 +522,7 @@ if ( function_exists( 'tara_video' ) ) {
    برای خاموش کردن این تیتر، خط زیر را false کنید. */
 $taranehyar_download_title = true;
 
-/* v3.8.1 — جعبهٔ دانلود دیگر `get_field()` خام صدا نمی‌زند.
+/* v3.8.1 — جعبهٔ دانلود دیگر `tara_get_field()` خام صدا نمی‌زند.
    ------------------------------------------------------------------
    دو مشکلِ واقعی داشت:
      ۱) اگر افزونهٔ ACF خاموش/حذف شود، `get_field` تابعِ تعریف‌نشده است و

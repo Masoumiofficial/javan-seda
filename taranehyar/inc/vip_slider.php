@@ -92,7 +92,7 @@ if ( $tara_fixbvip ) {
 					$tara_srcset = '';
 					$tara_img_id = function_exists( 'tara_vip_banner_id' ) ? (int) tara_vip_banner_id( get_the_ID() ) : 0;
 
-					$tara_custom = ( $tara_img_id || ! function_exists( 'get_field' ) ) ? '' : get_field( 'vip_img' );
+					$tara_custom = $tara_img_id ? '' : tara_get_field( 'vip_img' );
 
 					if ( $tara_img_id ) {
 						$tara_image = (string) wp_get_attachment_image_url( $tara_img_id, 'full' );
@@ -132,7 +132,7 @@ if ( $tara_fixbvip ) {
 						$tara_image = get_template_directory_uri() . '/images/vip_img.jpg';
 					}
 
-					$tara_vip_song   = function_exists( 'get_field' ) ? (string) get_field( 'song' ) : '';
+					$tara_vip_song   = (string) tara_get_field( 'song' );
 					$tara_priority   = ( 1 === $tara_slide ) ? 'high' : 'auto';
 					$tara_loading    = ( 1 === $tara_slide ) ? 'eager' : 'lazy';
 					?>

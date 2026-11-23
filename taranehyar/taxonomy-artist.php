@@ -233,7 +233,7 @@ if ( isset( $_GET['ab_artist_diag'] ) && current_user_can( 'manage_options' ) ) 
 		$taranehyar_lines[] = 'name: ' . $taranehyar_diag_term->name . ' | slug: ' . $taranehyar_diag_term->slug . ' | term_id: ' . $taranehyar_diag_term->term_id;
 		$taranehyar_lines[] = 'count ترم در دیتابیس: ' . $taranehyar_diag_term->count;
 		$taranehyar_lines[] = 'term_link: ' . ( is_wp_error( get_term_link( $taranehyar_diag_term ) ) ? 'خطا: ' . get_term_link( $taranehyar_diag_term )->get_error_message() : get_term_link( $taranehyar_diag_term ) );
-		$taranehyar_lines[] = 'تصویر aimg2: ' . ( '' !== (string) ( function_exists( 'get_field' ) ? get_field( 'aimg2', $taranehyar_diag_term ) : '' ) ? 'دارد' : 'ندارد (تصویر پیش‌فرض قالب)' );
+		$taranehyar_lines[] = 'تصویر aimg2: ' . ( '' !== (string) tara_get_field( 'aimg2', $taranehyar_diag_term ) ? 'دارد' : 'ندارد (تصویر پیش‌فرض قالب)' );
 		$taranehyar_lines[] = 'توضیحات ترم (بیوگرافی): ' . ( '' !== trim( wp_strip_all_tags( (string) get_the_archive_description() ) ) ? 'دارد' : 'خالی است' );
 		$taranehyar_lines[] = '';
 		$taranehyar_lines[] = '--- نوشته‌های این هنرمند و مقدار musics_type آن‌ها (۲۵ مورد اول) ---';
@@ -261,7 +261,7 @@ if ( isset( $_GET['ab_artist_diag'] ) && current_user_can( 'manage_options' ) ) 
 			update_postmeta_cache( $taranehyar_diag_query->posts );
 			foreach ( $taranehyar_diag_query->posts as $taranehyar_diag_id ) {
 				$taranehyar_raw_type = get_post_meta( $taranehyar_diag_id, 'musics_type', true );
-				$taranehyar_lines[]  = '   - ' . get_the_title( $taranehyar_diag_id ) . ' | musics_type: ' . ( is_scalar( $taranehyar_raw_type ) && '' !== (string) $taranehyar_raw_type ? (string) $taranehyar_raw_type : '(خالی)' ) . ' | song: ' . ( function_exists( 'get_field' ) ? (string) get_field( 'song', $taranehyar_diag_id ) : '' );
+				$taranehyar_lines[]  = '   - ' . get_the_title( $taranehyar_diag_id ) . ' | musics_type: ' . ( is_scalar( $taranehyar_raw_type ) && '' !== (string) $taranehyar_raw_type ? (string) $taranehyar_raw_type : '(خالی)' ) . ' | song: ' . (string) tara_get_field( 'song', $taranehyar_diag_id );
 			}
 		}
 	}
@@ -306,7 +306,7 @@ $taranehyar_term_field = function ( $key ) use ( $taranehyar_term ) {
 	if ( function_exists( 'tara_artist_field' ) ) {
 		return tara_artist_field( $taranehyar_term, $key );
 	}
-	return function_exists( 'get_field' ) ? get_field( $key, $taranehyar_term ) : '';
+	return tara_get_field( $key, $taranehyar_term );
 };
 
 $taranehyar_image     = $taranehyar_term_field( 'aimg2' );

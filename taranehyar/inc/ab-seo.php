@@ -129,9 +129,9 @@ if ( ! function_exists( 'tara_seo_song_labels' ) ) {
 		$post_id = $post_id ? (int) $post_id : get_the_ID();
 		$artist  = '';
 		$song    = '';
-		if ( function_exists( 'get_field' ) ) {
-			$artist = (string) get_field( 'artist', $post_id );
-			$song   = (string) get_field( 'song', $post_id );
+		if ( true ) {
+			$artist = (string) tara_get_field( 'artist', $post_id );
+			$song   = (string) tara_get_field( 'song', $post_id );
 		}
 		$title = wp_strip_all_tags( get_the_title( $post_id ) );
 		if ( '' === $song ) {
@@ -283,8 +283,8 @@ if ( ! function_exists( 'tara_seo_head' ) ) {
 			if ( '' === $img ) {
 				$img = get_template_directory_uri() . '/images/nomusics.jpg';
 			}
-			if ( function_exists( 'get_field' ) ) {
-				$audio = (string) get_field( 'music128', $post_id );
+			if ( true ) {
+				$audio = (string) tara_get_field( 'music128', $post_id );
 			}
 		}
 

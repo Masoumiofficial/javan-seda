@@ -117,8 +117,8 @@ if ( ! function_exists( 'tara_credit_value' ) ) {
 			$post_id = get_the_ID();
 		}
 		$val = '';
-		if ( function_exists( 'get_field' ) ) {
-			$got = get_field( $key, $post_id );
+		if ( true ) {
+			$got = tara_get_field( $key, $post_id );
 			if ( is_scalar( $got ) ) {
 				$val = trim( (string) $got );
 			} elseif ( is_array( $got ) ) {

@@ -147,8 +147,8 @@ if ( ! function_exists( 'tara_music_field' ) ) {
 	function tara_music_field( $key, $post_id = null ) {
 		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
 
-		if ( function_exists( 'get_field' ) ) {
-			$value = get_field( $key, $post_id );
+		if ( true ) {
+			$value = tara_get_field( $key, $post_id );
 			if ( is_scalar( $value ) && '' !== trim( (string) $value ) ) {
 				return trim( (string) $value );
 			}
@@ -349,8 +349,8 @@ if ( ! function_exists( 'tara_post_has_video' ) ) {
 		}
 
 		/* فیلدها ممکن است فقط در ACF ذخیره شده باشند (نام فیلد متفاوت) */
-		if ( ! $has && function_exists( 'get_field' ) ) {
-			$value = get_field( 'video720', $id );
+		if ( ! $has ) {
+			$value = tara_get_field( 'video720', $id );
 			$has   = is_scalar( $value ) && '' !== trim( (string) $value );
 		}
 
@@ -481,8 +481,8 @@ if ( ! function_exists( 'tara_music_value' ) ) {
 		}
 
 		$raw = null;
-		if ( function_exists( 'get_field' ) ) {
-			$raw = get_field( $key, $post_id );
+		if ( true ) {
+			$raw = tara_get_field( $key, $post_id );
 		}
 		/* get_field وقتی فیلد وجود ندارد، false هم برمی‌گرداند (نه فقط null). */
 		if ( null === $raw || false === $raw || '' === $raw || array() === $raw ) {

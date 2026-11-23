@@ -11,15 +11,47 @@ function tara_playlist_register() {
 }
 add_action( 'init', 'tara_playlist_register', 15 );
 
-/** Only published audio posts with a usable source; never expose drafts. */
+/**
+ * Only published audio posts with a usable source; never expose drafts.
+ *
+ * v3.17.0 — پرهیز از N+1: پیش از این برای هر شناسه `get_post` صدا زده
+ * می‌شد و در پلی‌لیستِ ۲۰تایی ۲۰ کوئری اضافه می‌ساخت. حالا کلِ فهرست با
+ * یک کوئری یکجا واکشی و همان قواعد روی نتیجه اعمال می‌شود؛ ترتیب و
+ * رفتار (حذف پیش‌نویس/رمزدار/غیرصوتی/بدون منبع) دقیقاً همان قبلی است.
+ */
 function tara_playlist_audio_ids( $ids ) {
-	$out = array();
+	$out  = array();
+	$list = array();
 	foreach ( array_slice( (array) $ids, 0, 1000 ) as $raw ) {
 		if ( ! is_scalar( $raw ) ) { continue; }
 		$id = absint( $raw );
-		$post = $id ? get_post( $id ) : null;
+		if ( ! $id || in_array( $id, $list, true ) ) { continue; }
+		$list[] = $id;
+	}
+	if ( ! $list ) {
+		return $out;
+	}
+	/* واکشیِ دسته‌ای: هر شناسه فقط یک بار (کشِ داخلی WP هم آن را پر می‌کند). */
+	$posts_cache = array();
+	foreach ( array_chunk( $list, 200 ) as $chunk ) {
+		foreach ( (array) get_posts( array(
+			'post__in'            => $chunk,
+			'post_type'           => 'post',
+			'post_status'         => 'publish',
+			'posts_per_page'      => count( $chunk ),
+			'orderby'             => 'post__in',
+			'fields'              => 'all',
+			'no_found_rows'       => true,
+			'ignore_sticky_posts' => true,
+			'suppress_filters'    => false,
+		) ) as $p ) {
+			$posts_cache[ (int) $p->ID ] = $p;
+		}
+	}
+	foreach ( $list as $id ) {
+		$post = isset( $posts_cache[ $id ] ) ? $posts_cache[ $id ] : null;
 		if ( ! $post || ! empty( $post->post_password ) ) { continue; }
-		if ( ! $id || in_array( $id, $out, true ) || 'post' !== get_post_type( $id ) || 'publish' !== get_post_status( $id ) || ! function_exists( 'tara_track_src' ) || '' === tara_track_src( $id ) ) { continue; }
+		if ( 'post' !== $post->post_type || 'publish' !== $post->post_status || ! function_exists( 'tara_track_src' ) || '' === tara_track_src( $id ) ) { continue; }
 		$raw_type = get_post_meta( $id, 'musics_type', true );
 		$type = is_scalar( $raw_type ) ? strtolower( trim( (string) $raw_type ) ) : '';
 		$map = apply_filters( 'tara_artist_type_map', array( '' => 'audio', 'mp3' => 'audio', 'audio' => 'audio', 'ahang' => 'audio', 'آهنگ' => 'audio', 'آهنگ جدید' => 'audio', 'song' => 'audio', 'mp4' => 'video', 'video' => 'video', 'musicvideo' => 'video', 'music-video' => 'video', 'موزیک ویدیو' => 'video', 'موزیک‌ویدیو' => 'video', 'کلیپ' => 'video', 'album' => 'album', 'آلبوم' => 'album' ) );

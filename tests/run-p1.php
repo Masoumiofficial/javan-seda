@@ -59,6 +59,15 @@ if ( ! function_exists( 'get_posts' ) ) {
 			if ( ! empty( $args['post__in'] ) && ! in_array( (int) $id, array_map( 'intval', (array) $args['post__in'] ), true ) ) {
 				continue;
 			}
+			/* فیلترِ نوع/وضعیت مانند WP_Query؛ بدون آن پیش‌نویس‌ها هم
+			   برمی‌گشتند و آزمون «پیش‌نویس عمومی نیست» بی‌معنا می‌شد. */
+			$row_obj = is_object( $row ) ? $row : get_post( $id );
+			if ( ! empty( $args['post_type'] ) && is_object( $row_obj ) && $args['post_type'] !== $row_obj->post_type ) {
+				continue;
+			}
+			if ( ! empty( $args['post_status'] ) && 'any' !== $args['post_status'] && is_object( $row_obj ) && $args['post_status'] !== $row_obj->post_status ) {
+				continue;
+			}
 			$ok = true;
 			if ( ! empty( $args['tax_query'] ) && isset( $args['tax_query'][0] ) ) {
 				$clause = $args['tax_query'][0];
@@ -86,7 +95,15 @@ if ( ! function_exists( 'get_posts' ) ) {
 		if ( $limit > 0 ) {
 			$out = array_slice( $out, 0, $limit );
 		}
-		return ! empty( $args['fields'] ) ? $out : array_map( 'get_post', $out );
+		/* وفاداری به وردپرسِ واقعی: `fields => 'ids'` شناسه می‌دهد و هر
+		   مقدار دیگری (از جمله 'all' که پیش‌فرضِ get_posts است) شیءِ
+		   WP_Post. پیش‌تر 'all' هم شناسه برمی‌گرداند و آزمون‌ها در جهانی
+		   متفاوت با وردپرسِ واقعی سبز می‌شدند. (رفتار واقعی با اجرای
+		   همین سناریوها روی وردپرس ۶.۷.۱ تأیید شده است.) */
+		if ( isset( $args['fields'] ) && 'ids' === $args['fields'] ) {
+			return $out;
+		}
+		return array_map( 'get_post', $out );
 	}
 }
 
@@ -254,6 +271,11 @@ $GLOBALS['__postterms'][105]['artist']      = array( $artist, $other );
 require '/tmp/theme/inc/tara-p0.php';
 require '/tmp/theme/inc/tara-release-date.php';
 require '/tmp/theme/inc/tara-artist-profile.php';
+/* ترتیب مهم است و باید با functions.php یکی باشد: tara-playlists.php
+   تابعِ tara_playlist_audio_ids را بدونِ محافظِ function_exists تعریف
+   می‌کند؛ اگر آخر بارگذاری شود، نسخهٔ بهینهٔ P1 را بی‌صدا بازنویسی
+   می‌کند و آزمون چیز دیگری را می‌سنجد. (همان ترتیبی که در functions.php
+   است: ابتدا نسخهٔ ۳.۱۶.۰، بعد P1.) */
 require '/tmp/theme/inc/tara-playlists.php';
 require '/tmp/theme/inc/tara-playlists-p1.php';
 require '/tmp/theme/inc/tara-related-p1.php';

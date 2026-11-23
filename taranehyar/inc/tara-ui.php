@@ -255,9 +255,46 @@ if ( ! function_exists( 'tara_media_url' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_safe_media_src' ) ) {
+	/**
+	 * آیا این آدرس را می‌توان به `src` پلیر/تصویر داد؟ (v3.17.0)
+	 * ------------------------------------------------------------------
+	 * فقط `http:`، `https:`، `//` و مسیرهای نسبی/بی‌پروتکل پذیرفته
+	 * می‌شوند. `javascript:`، `data:`، `vbscript:` و هر پروتکل ناشناختهٔ
+	 * دیگری رشتهٔ خالی برمی‌گرداند تا هیچ‌گاه به `src` نرسد.
+	 *
+	 * @param string $url آدرس.
+	 * @return string آدرس امن یا رشتهٔ خالی.
+	 */
+	function tara_safe_media_src( $url ) {
+		$url = trim( (string) $url );
+		if ( '' === $url ) {
+			return '';
+		}
+		if ( 0 === strpos( $url, '//' ) ) {
+			return $url;
+		}
+		if ( 0 === strpos( $url, '/' ) ) {
+			return $url;
+		}
+		if ( preg_match( '/^(?:https?):/i', $url ) ) {
+			return $url;
+		}
+		/* مسیر نسبیِ بدون پروتکل (مثل mp3/a.mp3 یا ../a.mp3) مجاز است. */
+		if ( ! preg_match( '/^[a-z][a-z0-9+.\-]*:/i', $url ) ) {
+			return $url;
+		}
+		return '';
+	}
+}
+
 if ( ! function_exists( 'tara_track_src' ) ) {
 	/**
 	 * آدرس فایلِ صوتی یک آهنگ: ۳۲۰ ترجیح دارد، بعد ۱۲۸.
+	 *
+	 * v3.17.0 — تنها پروتکل‌های پخش‌پذیر (`http/https` و مسیر نسبی) عبور
+	 * می‌کنند. پیش‌تر اگر متا مقدار `javascript:...` داشت، همان رشته به
+	 * `src` پلیر می‌رسید. خروجی برای دادهٔ سالم بدون تغییر است.
 	 *
 	 * @param int $post_id شناسهٔ نوشته.
 	 * @return string
@@ -268,7 +305,7 @@ if ( ! function_exists( 'tara_track_src' ) ) {
 		foreach ( array( 'music320', 'music128', 'music' ) as $key ) {
 			$src = tara_music_value( $key, $post_id );
 			if ( '' !== $src ) {
-				return $src;
+				return ( function_exists( 'tara_safe_media_src' ) ) ? tara_safe_media_src( $src ) : $src;
 			}
 		}
 

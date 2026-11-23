@@ -307,6 +307,14 @@ if ( ! function_exists( 'tara_related_by_artist_html' ) ) {
 
 		$title_name = '' !== $artist ? $artist : ( is_array( $terms ) && $terms ? $terms[0]->name : '' );
 
+		/* v3.17.0 — P1: کشِ نوشته/متا/ترم‌ها یک‌جا پر می‌شود. پیش‌تر هر ردیف
+		   فهرست، `get_post` + چند `get_post_meta` + متای تصویر را جدا صدا
+		   می‌زد (کوئری رشدکننده با تعداد نتایج). حالا حداکثر سه کوئریِ
+		   ثابت، مستقل از تعداد ردیف‌ها. خروجی هیچ تغییری نمی‌کند. */
+		if ( function_exists( '_prime_post_caches' ) ) {
+			_prime_post_caches( array_map( 'absint', (array) $ids ), true, true );
+		}
+
 		ob_start();
 		?>
 		<div class="related_posts rel_sing_bbt" data-tara-related="artist">

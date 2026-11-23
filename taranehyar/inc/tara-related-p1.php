@@ -10,6 +10,8 @@
  *   ۱) همان هنرمند        (تاکسونومی، بعد متای `artist`)
  *   ۲) همان ژانر اصلیِ اثر (فقط اگر هنرمند کافی نداد)
  *   ۳) همان حال‌وهوا       (فقط اگر هر دو بالا کافی ندادند)
+ *   ۴) هم‌نشینی در پلی‌لیستِ عمومیِ واقعی (حداکثر سه پلی‌لیست)
+ *   ۵) انتخاب تحریریه      (چسبانِ وردپرس؛ فقط برای تکمیلِ کمبود)
  *
  * قواعد سخت:
  *   • هیچ شناسهٔ تکراری در خروجی نیست (نه بین مراحل، نه داخلِ یک مرحله).
@@ -32,11 +34,13 @@ if ( ! function_exists( 'tara_related_tracks' ) ) {
 	 * @param int   $post_id شناسهٔ اثر.
 	 * @param int   $limit   تعداد (۱..۳۰).
 	 * @param array $exclude شناسه‌های اضافی برای استثنا.
+	 * @param array $args    playlists/editorial را خاموش/روشن می‌کند (پیش‌فرض روشن).
 	 * @return int[]
 	 */
-	function tara_related_tracks( $post_id = 0, $limit = 8, $exclude = array() ) {
+	function tara_related_tracks( $post_id = 0, $limit = 8, $exclude = array(), $args = array() ) {
 		$post_id = $post_id ? (int) $post_id : (int) get_the_ID();
 		$limit   = max( 1, min( 30, (int) $limit ) );
+		$args    = array_merge( array( 'playlists' => true, 'editorial' => true ), (array) $args );
 		if ( ! $post_id ) {
 			return array();
 		}
@@ -113,6 +117,45 @@ if ( ! function_exists( 'tara_related_tracks' ) ) {
 			}
 		}
 
+		/* ۴) پلی‌لیست مرتبط — هم‌نشینی در پلی‌لیستِ عمومیِ واقعی.
+		   فقط تا سه پلی‌لیست خوانده می‌شود (سقفِ خودِ تابع) و ترتیبِ داخلِ
+		   پلی‌لیست حفظ می‌شود؛ هیچ کوئریِ بی‌سقفی اجرا نمی‌شود. */
+		if ( ! empty( $args['playlists'] ) && count( $ids ) < $limit
+			&& function_exists( 'tara_playlist_related_to_track' ) && function_exists( 'tara_playlist_audio_ids' ) ) {
+			foreach ( (array) tara_playlist_related_to_track( $post_id, 3 ) as $pl_id ) {
+				if ( count( $ids ) >= $limit ) {
+					break;
+				}
+				$siblings = tara_playlist_audio_ids( get_post_meta( (int) $pl_id, '_tara_playlist_tracks', true ) );
+				foreach ( (array) $siblings as $id ) {
+					$id = (int) $id;
+					if ( ! $id || in_array( $id, $ids, true ) || in_array( $id, $exclude, true ) ) {
+						continue;
+					}
+					$ids[] = $id;
+					if ( count( $ids ) >= $limit ) {
+						break;
+					}
+				}
+			}
+		}
+
+		/* ۵) انتخاب تحریریه — چسبانِ خودِ وردپرس (تنها سازوکارِ واقعیِ
+		   «انتخاب سردبیر» در این قالب). بدون کوئری اضافه و بدون محتوای
+		   بی‌ربط: فقط اگر سردبیر واقعاً اثری را چسبان کرده باشد. */
+		if ( ! empty( $args['editorial'] ) && count( $ids ) < $limit && function_exists( 'get_option' ) ) {
+			$sticky = array_map( 'absint', (array) get_option( 'sticky_posts', array() ) );
+			foreach ( $sticky as $id ) {
+				if ( ! $id || count( $ids ) >= $limit || in_array( $id, $ids, true ) || in_array( $id, $exclude, true ) ) {
+					continue;
+				}
+				if ( 'post' !== get_post_type( $id ) || 'publish' !== get_post_status( $id ) ) {
+					continue;
+				}
+				$ids[] = $id;
+			}
+		}
+
 		return array_values( array_unique( $ids ) );
 	}
 }
@@ -146,6 +189,11 @@ if ( ! function_exists( 'tara_related_tracks_html' ) ) {
 			return '';
 		}
 		$extras = array_slice( $extras, 0, max( 1, (int) $args['limit'] ) );
+
+		/* همان دلیلِ بلوکِ هنرمند: پرکردنِ یک‌جای کش به‌جای کوئریِ هر ردیف. */
+		if ( function_exists( '_prime_post_caches' ) ) {
+			_prime_post_caches( array_map( 'absint', $extras ), true, true );
+		}
 
 		ob_start();
 		?>

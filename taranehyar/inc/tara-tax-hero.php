@@ -57,6 +57,71 @@ if ( ! function_exists( 'tara_tax_short_number' ) ) {
 	}
 }
 
+if ( ! function_exists( 'tara_time_ago' ) ) {
+	/**
+	 * «۳ روز پیش» / «۲ ساعت پیش» / «همین حالا» — همیشه با واحد.
+	 *
+	 * human_time_diff برای فاصلهٔ کمتر از یک ساعت فقط عدد می‌دهد
+	 * («۱») و واحد را نمی‌آورد؛ روی صفحه «۱ پیش» می‌شد که مفهوم نبود.
+	 * این تابع آستانه‌ها را صریح می‌کند:
+	 *
+	 *   < ۱ دقیقه   → «همین حالا»
+	 *   < ۱ ساعت    → «N دقیقه پیش»
+	 *   < ۱ روز     → «N ساعت پیش»
+	 *   < ۱ هفته    → «N روز پیش»
+	 *   < ۱ ماه     → «N هفته پیش»
+	 *   < ۱ سال     → «N ماه پیش»
+	 *   بیشتر       → «N سال پیش»
+	 *
+	 * @param int $ts      زمان یونیکسِ گذشته.
+	 * @param int $now_ts  «اکنون» (برای آزمون‌پذیری).
+	 * @return string
+	 */
+	function tara_time_ago( $ts, $now_ts = 0 ) {
+		$ts     = (int) $ts;
+		$now_ts = $now_ts ? (int) $now_ts : time();
+		if ( $ts <= 0 ) {
+			return '';
+		}
+		$diff = $now_ts - $ts;
+		if ( $diff < 0 ) {
+			$diff = 0;
+		}
+
+		if ( $diff < MINUTE_IN_SECONDS ) {
+			return 'همین حالا';
+		}
+		if ( $diff < HOUR_IN_SECONDS ) {
+			$n = (int) floor( $diff / MINUTE_IN_SECONDS );
+			$u = 'دقیقه';
+		} elseif ( $diff < DAY_IN_SECONDS ) {
+			$n = (int) floor( $diff / HOUR_IN_SECONDS );
+			$u = 'ساعت';
+		} elseif ( $diff < WEEK_IN_SECONDS ) {
+			$n = (int) floor( $diff / DAY_IN_SECONDS );
+			$u = 'روز';
+		} elseif ( $diff < 30 * DAY_IN_SECONDS ) {
+			$n = (int) floor( $diff / WEEK_IN_SECONDS );
+			$u = 'هفته';
+		} elseif ( $diff < YEAR_IN_SECONDS ) {
+			$n = (int) floor( $diff / ( 30 * DAY_IN_SECONDS ) );
+			$u = 'ماه';
+		} else {
+			$n = (int) floor( $diff / YEAR_IN_SECONDS );
+			$u = 'سال';
+		}
+		if ( $n < 1 ) {
+			$n = 1;
+		}
+
+		$text = $n . ' ' . $u . ' پیش';
+		/* فقط رقم‌ها فارسی می‌شوند. tara_fa_number نباید اینجا صدا زده شود:
+		   آن تابع ورودی را با (int) به عدد تبدیل می‌کند و کلِ متن را
+		   دور می‌ریزد — همین باعث می‌شد «۱ دقیقه پیش» به «۱» تبدیل شود. */
+		return function_exists( 'tara_digits' ) ? tara_digits( $text ) : $text;
+	}
+}
+
 if ( ! function_exists( 'tara_tax_music_ids' ) ) {
 	/**
 	 * شناسهٔ آخرین آهنگ‌های یک ترم (یک کوئری، برای آمار و کاورها).
@@ -163,7 +228,45 @@ if ( ! function_exists( 'tara_tax_stats' ) ) {
 
 		$ids   = tara_tax_music_ids( $term, 240 );
 		$stats = $empty;
-		$stats['tracks'] = (int) $term->count;
+
+		/* v3.17.12 — آمارِ درست:
+		   ------------------------------------------------------------------
+		   «۳ اثر» و «۳ بازدید» هر دو غلط بودند:
+		     • tracks از `$term->count` می‌آمد که وردپرس فقط برای نوشته‌های
+		       منتشرشدهٔ همان ترم می‌شمارد و در سایت‌هایی که شمارنده را
+		       دستی/دیرهنگام به‌روز می‌کنند عقب می‌مانَد.
+		     • views از جمعِ متای `views` فقط برای ۲۴۰ آهنگِ اول می‌آمد،
+		       در حالی که ترم چند هزار آهنگ داشت.
+
+		   حالا هر دو با یک کوئریِ تجمیعی از خودِ دیتابیس خوانده می‌شوند.
+		   هزینه: یک SELECT با SUM، ایندکس‌پذیر، و کش‌شده در transient. */
+		global $wpdb;
+		$tara_tax_ids_sql = "SELECT COUNT(*) FROM {$wpdb->term_relationships} tr
+			INNER JOIN {$wpdb->posts} p ON p.ID = tr.object_id
+			WHERE tr.term_taxonomy_id = %d AND p.post_type = 'post' AND p.post_status = 'publish'";
+		$stats['tracks'] = (int) $wpdb->get_var( $wpdb->prepare( $tara_tax_ids_sql, $term->term_taxonomy_id ) ); // phpcs:ignore
+
+		$tara_sum_views = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'mood_views_sum', true ) : true;
+		if ( $stats['tracks'] > 0 && $tara_sum_views ) {
+			$tara_views_sum = $wpdb->get_var(
+				$wpdb->prepare(
+					"SELECT COALESCE(SUM( CAST( pm.meta_value AS SIGNED ) ), 0)
+					 FROM {$wpdb->postmeta} pm
+					 INNER JOIN {$wpdb->term_relationships} tr ON tr.object_id = pm.post_id
+					 INNER JOIN {$wpdb->posts} p ON p.ID = pm.post_id
+					 WHERE pm.meta_key = 'views'
+					   AND tr.term_taxonomy_id = %d
+					   AND p.post_type = 'post' AND p.post_status = 'publish'",
+					$term->term_taxonomy_id
+				)
+			); // phpcs:ignore
+			$stats['views'] = (int) $tara_views_sum;
+		} elseif ( ! empty( $ids ) ) {
+			/* خاموش: مثل قبل فقط آهنگ‌های داخل فهرست */
+			foreach ( $ids as $tara_vid ) {
+				$stats['views'] += (int) get_post_meta( $tara_vid, 'views', true );
+			}
+		}
 
 		if ( ! empty( $ids ) ) {
 			if ( function_exists( 'update_meta_cache' ) ) {
@@ -174,8 +277,6 @@ if ( ! function_exists( 'tara_tax_stats' ) ) {
 			$latest_id = 0;
 
 			foreach ( $ids as $post_id ) {
-				$stats['views'] += (int) get_post_meta( $post_id, 'views', true );
-
 				$ts = (int) get_post_time( 'U', true, $post_id );
 				if ( $ts > $latest_ts ) {
 					$latest_ts = $ts;
@@ -191,18 +292,14 @@ if ( ! function_exists( 'tara_tax_stats' ) ) {
 			}
 
 			if ( $latest_id ) {
-				/* «۳ روز پیش» از «۱۹۷۰-۰۱-۰۱» خواناتر است و به تقویمِ سایت
-				   وابسته نیست (date_i18n در وردپرسِ فارسی هم همیشه شمسی
-				   برنمی‌گرداند). human_time_diff خودش ترجمه می‌شود. */
-				if ( function_exists( 'human_time_diff' ) ) {
-					$diff = human_time_diff( $latest_ts, time() );
-					$diff = function_exists( 'tara_fa_number' ) ? tara_fa_number( $diff ) : $diff;
-					/* translators: %s: فاصلهٔ زمانی، مثل «۳ روز» */
-					$stats['latest'] = sprintf( '%s پیش', $diff );
-				} else {
-					$date            = function_exists( 'date_i18n' ) ? date_i18n( 'j F Y', $latest_ts ) : gmdate( 'Y-m-d', $latest_ts );
-					$stats['latest'] = function_exists( 'tara_fa_number' ) ? tara_fa_number( $date ) : $date;
-				}
+				/* v3.17.12 — واحدِ زمان همیشه نوشته می‌شود.
+				   پیش از این از human_time_diff استفاده می‌شد؛ آن تابع برای
+				   فاصلهٔ کمتر از یک ساعت فقط «۱» برمی‌گرداند (بدونِ «دقیقه»)،
+				   و روی صفحه «۱ پیش» دیده می‌شد که معنایش معلوم نبود.
+				   تابعِ tara_time_ago همهٔ واحدها را خودش می‌سازد. */
+				$stats['latest'] = function_exists( 'tara_time_ago' )
+					? tara_time_ago( $latest_ts )
+					: sprintf( '%.0f روز پیش', max( 0, ( time() - $latest_ts ) ) / DAY_IN_SECONDS );
 				$stats['has_new'] = ( time() - $latest_ts ) < 45 * DAY_IN_SECONDS;
 			}
 

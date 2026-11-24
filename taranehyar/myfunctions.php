@@ -379,13 +379,51 @@ add_action( 'template_redirect', function () {
 <article id="comment-<?php comment_ID(); ?>" class="comment">
 <div class="comment-content"> 
 <footer>
-<?php printf( '%1$s',sprintf( '<span class="fn">%s</span>', get_comment_author_link() ),
-sprintf( '<a href="%1$s"><time datetime="%2$s">%3$s</time></a>',
-esc_url( get_comment_link( $comment->comment_ID ) ),get_comment_time( 'c' ),
-sprintf( '%1$s ، %2$s', get_comment_date("d M Y"), get_comment_time() ))); ?>
-<div class="tara-comment-like"><div class="comment-date"><?php $d="d F y"; $comment_date = get_comment_date($d,''); echo $comment_date; ?></div>
+<?php
+/* v3.17.12 — تاریخِ دیدگاه قابلِ خاموش‌کردن شد (تنظیمات قالب ← دیدگاه‌ها).
+   نکتهٔ سئو: حذفِ تاریخ هیچ اثری روی ایندکس ندارد — تاریخ در HTML
+   دیده می‌شود ولی schema.org/Comment هیچ‌جا تاریخِ الزامی ندارد و
+   علامت‌گذاری‌ِ ساختاریافتهٔ دیدگاه (اگر افزونه‌ای بسازد) از خودِ
+   دیتابیس می‌خواند، نه از این مارک‌آپ.
+
+   خاموش‌کردن:
+     تنظیمات قالب ← دیدگاه‌ها ← «نمایش تاریخ دیدگاه» = خاموش
+   یا:  add_filter( 'tara_comment_dates', '__return_false' );
+   یا:  define( 'TARA_COMMENT_DATES', false );   در wp-config.php */
+$tara_show_cdate = true;
+if ( defined( 'TARA_COMMENT_DATES' ) ) {
+	$tara_show_cdate = (bool) TARA_COMMENT_DATES;
+} elseif ( function_exists( 'tara_opt_on' ) ) {
+	$tara_show_cdate = tara_opt_on( 'comment_dates', true );
+}
+$tara_show_cdate = (bool) apply_filters( 'tara_comment_dates', $tara_show_cdate );
+
+printf( '%1$s', sprintf( '<span class="fn">%s</span>', get_comment_author_link() ) );
+
+/* v3.17.12 — متنِ تاریخ یک‌بار ساخته می‌شود، بعد در هر دو جا چاپ می‌شود. */
+$tara_cdate_txt = '';
+if ( $tara_show_cdate ) {
+	$tara_reltime = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'comment_reltime', false ) : false;
+	if ( $tara_reltime && function_exists( 'tara_time_ago' ) ) {
+		$tara_cdate_txt = tara_time_ago( (int) get_comment_time( 'U' ) );
+	}
+	if ( '' === $tara_cdate_txt ) {
+		$tara_cdate_txt = sprintf( '%1$s ، %2$s', get_comment_date( 'd M Y' ), get_comment_time() );
+	}
+	printf( '<a href="%1$s"><time datetime="%2$s">%3$s</time></a>',
+		esc_url( get_comment_link( $comment->comment_ID ) ),
+		esc_attr( get_comment_time( 'c' ) ),
+		esc_html( $tara_cdate_txt )
+	);
+}
+?>
+<?php if ( $tara_show_cdate ) : ?>
+<div class="tara-comment-like"><div class="comment-date"><?php
+		echo esc_html( isset( $tara_cdate_txt ) ? $tara_cdate_txt : get_comment_date( 'd F y' ) );
+		?></div>
 <div class="clear"></div>
 </div>
+<?php endif; ?>
 <div class="comment-replay">
 <?php echo comment_reply_link(array('depth' => $depth, 'max_depth' => $args['max_depth'])); ?>
 </div>

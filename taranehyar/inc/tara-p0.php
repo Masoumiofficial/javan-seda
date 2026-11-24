@@ -709,6 +709,33 @@ if ( ! function_exists( 'tara_home_mood_section' ) ) {
 			return '';
 		}
 
+		/* v3.17.12 — شمارشِ واقعی.
+		   `$term->count` را وردپرس در `wp_term_taxonomy` نگه می‌دارد و
+		   در سایت‌هایی که رابطه‌ها را با import/اسکریپت می‌سازند یا
+		   شمارنده بعد از مهاجرت بازشماری نشده، عقب می‌مانَد («۳ اثر»
+		   برای ترمی که ۳٬۶۵۰ آهنگ داشت). اینجا شمارش از خودِ جدولِ
+		   رابطه‌ها خوانده می‌شود — یک کوئری برای همهٔ ترم‌ها، نه یکی
+		   برای هر ترم، و نتیجه ۱۰ دقیقه کش می‌شود. */
+		$tara_use_real = function_exists( 'tara_opt_on' ) ? tara_opt_on( 'mood_real_counts', true ) : true;
+		$real_counts   = $tara_use_real ? get_transient( 'tara_mood_real_counts' ) : array();
+		if ( $tara_use_real && ! is_array( $real_counts ) ) {
+			global $wpdb;
+			$rows = $wpdb->get_results(
+				"SELECT tt.term_id, COUNT(*) AS n
+				 FROM {$wpdb->term_relationships} tr
+				 INNER JOIN {$wpdb->term_taxonomy} tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
+				 INNER JOIN {$wpdb->posts} p ON p.ID = tr.object_id
+				 WHERE tt.taxonomy = 'tara_mood'
+				   AND p.post_type = 'post' AND p.post_status = 'publish'
+				 GROUP BY tt.term_id"
+			); // phpcs:ignore
+			$real_counts = array();
+			foreach ( (array) $rows as $row ) {
+				$real_counts[ (int) $row->term_id ] = (int) $row->n;
+			}
+			set_transient( 'tara_mood_real_counts', $real_counts, 600 );
+		}
+
 		ob_start();
 		?>
 		<section class="song_boxs tara-home-sec tara-home-sec--moods" aria-labelledby="tara-sec-moods">
@@ -720,7 +747,15 @@ if ( ! function_exists( 'tara_home_mood_section' ) ) {
 				<?php foreach ( $terms as $term ) : $term_url = get_term_link( $term ); if ( is_wp_error( $term_url ) ) { continue; } ?>
 					<li><a href="<?php echo esc_url( $term_url ); ?>">
 						<span class="tara-mood-chips__name"><?php echo esc_html( $term->name ); ?></span>
-						<span class="tara-mood-chips__count"><?php echo esc_html( function_exists( 'tara_number_fa' ) ? tara_number_fa( number_format_i18n( (int) $term->count ) ) : number_format_i18n( (int) $term->count ) ); ?> اثر</span>
+						<?php
+						$tara_mc_n = ( is_array( $real_counts ) && isset( $real_counts[ (int) $term->term_id ] ) )
+							? (int) $real_counts[ (int) $term->term_id ]
+							: (int) $term->count;
+						if ( $tara_mc_n < (int) $term->count ) {
+							$tara_mc_n = (int) $term->count; // هرگز کمتر از شمارندهٔ وردپرس نشان نده
+						}
+						?>
+						<span class="tara-mood-chips__count"><?php echo esc_html( function_exists( 'tara_number_fa' ) ? tara_number_fa( number_format_i18n( $tara_mc_n ) ) : number_format_i18n( $tara_mc_n ) ); ?> اثر</span>
 					</a></li>
 				<?php endforeach; ?>
 			</ul>

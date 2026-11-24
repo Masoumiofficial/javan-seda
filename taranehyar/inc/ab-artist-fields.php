@@ -107,12 +107,38 @@ if ( ! function_exists( 'tara_artist_field' ) ) {
 
 		$value = '';
 
-		/* ۱) ACF — اگر نصب و فعال است. برای ترم، WP_Term معتبرترین ورودی است
-		   (ACF 5.5+). برای نسخه‌های قدیمی‌تر، شکل رشتگی «term_<id>» هم امتحان می‌شود. */
+		/* ۱) ACF — اگر نصب و فعال است.
+		   ------------------------------------------------------------------
+		   v3.17.13 — رفعِ خطای کشنده با ACF Pro.
+
+		   پیش از این اینجا `tara_get_field( $key, $term )` بود و یک شیء
+		   WP_Term به ACF داده می‌شد. امضای رسمی ACF:
+
+		       get_field( string $selector, int|string $post_id = false )
+
+		   با ACF نسخه‌های قدیمی (بدون type declaration) این بی‌صدا رد
+		   می‌شد و فقط مقدار برنمی‌گشت. اما ACF Pro 6.x نوع را بررسی
+		   می‌کند و خطای کشنده می‌دهد:
+
+		       TypeError: get_field(): Argument #2 ($post_id) must be of
+		       type int|string, WP_Term given
+
+		   و چون این تابع در سربرگِ هر صفحهٔ ترم (هنرمند/ژانر/حال‌وهوا)
+		   صدا زده می‌شود، با فعال‌کردن ACF Pro آن صفحه‌ها سفید می‌شدند.
+
+		   شکلِ درست برای ترم: رشتهٔ «{taxonomy}_{term_id}» — همان چیزی
+		   که خودِ ACF در مستنداتش می‌گوید (`term_123` برای term_id، و
+		   برای تاکسونومیِ سفارشی `{taxonomy}_{term_id}`). */
 		if ( true ) {
-			$acf = tara_get_field( $key, $term );
+			$acf_ref = ( isset( $term->term_id, $term->taxonomy ) )
+				? (string) $term->taxonomy . '_' . (int) $term->term_id
+				: 0;
+
+			$acf = tara_get_field( $key, $acf_ref );
+
+			/* سازگاری با ACF 5.4 و قدیمی‌تر که شکل `term_<id>` می‌خواست */
 			if ( ( false === $acf || null === $acf || '' === $acf || array() === $acf ) && isset( $term->term_id ) ) {
-				$acf2 = tara_get_field( $key, $term->taxonomy . '_' . $term->term_id );
+				$acf2 = tara_get_field( $key, 'term_' . (int) $term->term_id );
 				if ( false !== $acf2 && null !== $acf2 && '' !== $acf2 && array() !== $acf2 ) {
 					$acf = $acf2;
 				}

@@ -25,146 +25,158 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/* اگر ACF فعال است، هیچ‌چیز تعریف نمی‌کنیم. */
-if ( defined( 'ACF_VERSION' ) || class_exists( 'ACF' ) || function_exists( 'acf_get_value' ) ) {
-	return;
-}
+/* اگر ACF فعال است، بدنهٔ fallback را تعریف نمی‌کنیم — ولی پوستهٔ
+   tara_* را همیشه تعریف می‌کنیم (v3.17.13).
 
-if ( ! function_exists( 'tara_acf_meta_value' ) ) {
-	/** خواندن مقدار فیلد از post meta + fallback به جدول Options برای فیلدهای سراسری. */
-	function tara_acf_meta_value( $key, $post_id = false, $is_array = false ) {
-		if ( false === $post_id || null === $post_id || '' === $post_id ) {
-			if ( function_exists( 'get_the_ID' ) ) {
-				$post_id = get_the_ID();
-			}
-			/* v3.17.2 — در زمینهٔ آرشیوِ تاکسونومی، `get_the_ID()` می‌تواند
-			   شیءِ WP_Term برگرداند (نه شناسهٔ نوشته). کستِ مستقیم به int
-			   در PHP 8.2+ هشدار «Object could not be converted» می‌دهد و
-			   شناسهٔ بی‌معنا می‌سازد؛ پس فقط عددِ واقعی پذیرفته می‌شود. */
-			if ( is_object( $post_id ) ) {
-				$post_id = 0;
-			}
-			if ( ! $post_id && isset( $GLOBALS['post']->ID ) ) {
-				$post_id = (int) $GLOBALS['post']->ID;
-			}
-		}
-		$val = ( $post_id && function_exists( 'get_post_meta' ) ) ? get_post_meta( (int) $post_id, (string) $key, true ) : '';
+   دلیل: در نسخه‌های پیش از ۳.۱۷.۱۳ اینجا `return;` بود و با فعال‌شدن
+   ACF، tara_get_field/tara_acf_call/tara_compat_* اصلاً تعریف نمی‌شدند.
+   اما ۲۴ فراخوانیِ بی‌گاردِ tara_get_field() در قالبِ باقی فایل‌ها هست
+   (artist-template.php، tara-ui.php، ab-seo.php، …). نتیجه:
 
-		/* همان رفتاری که ACF برای گزینهٔ «default_value / options» دارد */
-		if ( ( '' === $val || array() === $val ) && function_exists( 'get_option' ) ) {
-			$alt = get_option( 'acf_options_' . $key, '' );
-			if ( '' !== $alt ) {
-				$val = $alt;
+       Fatal error: Call to undefined function tara_get_field()
+
+   یعنی قالب با فعال‌کردن ACF **سایت را سفید می‌کرد**. این دقیقاً همان
+   چیزی است که کاربر گزارش کرده. */
+$tara_acf_native = defined( 'ACF_VERSION' ) || class_exists( 'ACF' ) || function_exists( 'acf_get_value' );
+
+/* v3.17.13 — بدنهٔ fallback فقط وقتی ACF نیست. پوستهٔ tara_* پایین‌تر همیشه تعریف می‌شود. */
+if ( ! $tara_acf_native ) {
+	if ( ! function_exists( 'tara_acf_meta_value' ) ) {
+		/** خواندن مقدار فیلد از post meta + fallback به جدول Options برای فیلدهای سراسری. */
+		function tara_acf_meta_value( $key, $post_id = false, $is_array = false ) {
+			if ( false === $post_id || null === $post_id || '' === $post_id ) {
+				if ( function_exists( 'get_the_ID' ) ) {
+					$post_id = get_the_ID();
+				}
+				/* v3.17.2 — در زمینهٔ آرشیوِ تاکسونومی، `get_the_ID()` می‌تواند
+				   شیءِ WP_Term برگرداند (نه شناسهٔ نوشته). کستِ مستقیم به int
+				   در PHP 8.2+ هشدار «Object could not be converted» می‌دهد و
+				   شناسهٔ بی‌معنا می‌سازد؛ پس فقط عددِ واقعی پذیرفته می‌شود. */
+				if ( is_object( $post_id ) ) {
+					$post_id = 0;
+				}
+				if ( ! $post_id && isset( $GLOBALS['post']->ID ) ) {
+					$post_id = (int) $GLOBALS['post']->ID;
+				}
 			}
+			$val = ( $post_id && function_exists( 'get_post_meta' ) ) ? get_post_meta( (int) $post_id, (string) $key, true ) : '';
+
+			/* همان رفتاری که ACF برای گزینهٔ «default_value / options» دارد */
+			if ( ( '' === $val || array() === $val ) && function_exists( 'get_option' ) ) {
+				$alt = get_option( 'acf_options_' . $key, '' );
+				if ( '' !== $alt ) {
+					$val = $alt;
+				}
+			}
+			if ( $is_array ) {
+				return is_array( $val ) ? $val : array();
+			}
+			if ( is_array( $val ) ) {
+				return '';
+			}
+			return is_scalar( $val ) ? (string) $val : '';
 		}
-		if ( $is_array ) {
-			return is_array( $val ) ? $val : array();
+	}
+
+	if ( ! function_exists( 'tara_compat_get_field' ) ) {
+		function tara_compat_get_field( $key, $post_id = false, $format_value = true ) {
+			unset( $format_value ); // در حالت سازگاری، پاک‌سازی لازم نیست
+			return tara_acf_meta_value( $key, $post_id, false );
 		}
-		if ( is_array( $val ) ) {
+	}
+
+	if ( ! function_exists( 'tara_compat_get_sub_field' ) ) {
+		function tara_compat_get_sub_field( $key ) {
+			$ctx = isset( $GLOBALS['tara_acf_row'] ) ? $GLOBALS['tara_acf_row'] : null;
+			if ( is_array( $ctx ) && array_key_exists( $key, $ctx ) && is_scalar( $ctx[ $key ] ) ) {
+				return (string) $ctx[ $key ];
+			}
 			return '';
 		}
-		return is_scalar( $val ) ? (string) $val : '';
 	}
-}
 
-if ( ! function_exists( 'tara_compat_get_field' ) ) {
-	function tara_compat_get_field( $key, $post_id = false, $format_value = true ) {
-		unset( $format_value ); // در حالت سازگاری، پاک‌سازی لازم نیست
-		return tara_acf_meta_value( $key, $post_id, false );
-	}
-}
-
-if ( ! function_exists( 'tara_compat_get_sub_field' ) ) {
-	function tara_compat_get_sub_field( $key ) {
-		$ctx = isset( $GLOBALS['tara_acf_row'] ) ? $GLOBALS['tara_acf_row'] : null;
-		if ( is_array( $ctx ) && array_key_exists( $key, $ctx ) && is_scalar( $ctx[ $key ] ) ) {
-			return (string) $ctx[ $key ];
-		}
-		return '';
-	}
-}
-
-if ( ! function_exists( 'tara_compat_the_field' ) ) {
-	function tara_compat_the_field( $key, $post_id = false, $format_value = true ) {
-		unset( $format_value );
-		$v = tara_compat_get_field( $key, $post_id );
-		echo is_string( $v ) ? $v : ''; // همان رفتار ACF: خروجی خام (HTML/URL)
-	}
-}
-
-if ( ! function_exists( 'tara_compat_the_sub_field' ) ) {
-	function tara_compat_the_sub_field( $key ) {
-		$v = tara_compat_get_sub_field( $key );
-		echo is_string( $v ) ? $v : '';
-	}
-}
-
-if ( ! function_exists( 'tara_compat_have_rows' ) ) {
-	/**
-	 * شروع/ادامهٔ حلقهٔ سطرهای یک فیلد تکرارشونده.
-	 * @return bool  true تا وقتی سطر بعدی وجود دارد
-	 */
-	function tara_compat_have_rows( $key, $post_id = false ) {
-		static $pointer = array();
-		$state_key = (string) $key . ':' . ( $post_id ? (int) $post_id : (function_exists('get_the_ID') ? (int) get_the_ID() : 0) );
-
-		$rows = tara_acf_meta_value( $key, $post_id, true );
-		if ( ! $rows ) {
-			return false;
-		}
-		if ( ! isset( $pointer[ $state_key ] ) ) {
-			$pointer[ $state_key ] = -1;
-		}
-		/* هر فراخوانیِ have_rows بعد از tara_compat_the_row() یک سطر جلو می‌رود */
-		if ( ! empty( $GLOBALS['tara_acf_row_end'] ) && $GLOBALS['tara_acf_row_end'] === $state_key ) {
-			$pointer[ $state_key ]++;
-			$GLOBALS['tara_acf_row_end'] = '';
-		} elseif ( -1 === $pointer[ $state_key ] && empty( $GLOBALS['tara_acf_row'] ) ) {
-			$pointer[ $state_key ] = 0;
-		}
-		if ( ! isset( $rows[ $pointer[ $state_key ] ] ) ) {
-			unset( $GLOBALS['tara_acf_row'] );
-			unset( $pointer[ $state_key ] );
-			return false;
-		}
-		$GLOBALS['tara_acf_row']   = is_array( $rows[ $pointer[ $state_key ] ] ) ? $rows[ $pointer[ $state_key ] ] : array();
-		$GLOBALS['tara_acf_state'] = $state_key;
-		return true;
-	}
-}
-
-if ( ! function_exists( 'tara_compat_the_row' ) ) {
-	function tara_compat_the_row() {
-		if ( ! empty( $GLOBALS['tara_acf_state'] ) ) {
-			$GLOBALS['tara_acf_row_end'] = $GLOBALS['tara_acf_state'];
+	if ( ! function_exists( 'tara_compat_the_field' ) ) {
+		function tara_compat_the_field( $key, $post_id = false, $format_value = true ) {
+			unset( $format_value );
+			$v = tara_compat_get_field( $key, $post_id );
+			echo is_string( $v ) ? $v : ''; // همان رفتار ACF: خروجی خام (HTML/URL)
 		}
 	}
-}
 
-if ( ! function_exists( 'tara_compat_get_row_index' ) ) {
-	function tara_compat_get_row_index() {
-		return 1; // در حالت سازگاری شمارهٔ سطر قابل اتکا نیست؛ صفر/یک بی‌خطر است
+	if ( ! function_exists( 'tara_compat_the_sub_field' ) ) {
+		function tara_compat_the_sub_field( $key ) {
+			$v = tara_compat_get_sub_field( $key );
+			echo is_string( $v ) ? $v : '';
+		}
 	}
-}
 
-if ( ! function_exists( 'tara_compat_the_repeater_field' ) ) {
-	function tara_compat_the_repeater_field( $key, $post_id = false ) {
-		return tara_compat_have_rows( $key, $post_id );
+	if ( ! function_exists( 'tara_compat_have_rows' ) ) {
+		/**
+		 * شروع/ادامهٔ حلقهٔ سطرهای یک فیلد تکرارشونده.
+		 * @return bool  true تا وقتی سطر بعدی وجود دارد
+		 */
+		function tara_compat_have_rows( $key, $post_id = false ) {
+			static $pointer = array();
+			$state_key = (string) $key . ':' . ( $post_id ? (int) $post_id : (function_exists('get_the_ID') ? (int) get_the_ID() : 0) );
+
+			$rows = tara_acf_meta_value( $key, $post_id, true );
+			if ( ! $rows ) {
+				return false;
+			}
+			if ( ! isset( $pointer[ $state_key ] ) ) {
+				$pointer[ $state_key ] = -1;
+			}
+			/* هر فراخوانیِ have_rows بعد از tara_compat_the_row() یک سطر جلو می‌رود */
+			if ( ! empty( $GLOBALS['tara_acf_row_end'] ) && $GLOBALS['tara_acf_row_end'] === $state_key ) {
+				$pointer[ $state_key ]++;
+				$GLOBALS['tara_acf_row_end'] = '';
+			} elseif ( -1 === $pointer[ $state_key ] && empty( $GLOBALS['tara_acf_row'] ) ) {
+				$pointer[ $state_key ] = 0;
+			}
+			if ( ! isset( $rows[ $pointer[ $state_key ] ] ) ) {
+				unset( $GLOBALS['tara_acf_row'] );
+				unset( $pointer[ $state_key ] );
+				return false;
+			}
+			$GLOBALS['tara_acf_row']   = is_array( $rows[ $pointer[ $state_key ] ] ) ? $rows[ $pointer[ $state_key ] ] : array();
+			$GLOBALS['tara_acf_state'] = $state_key;
+			return true;
+		}
 	}
-}
 
-if ( ! function_exists( 'tara_compat_the_sub_repeater_field' ) ) {
-	function tara_compat_the_sub_repeater_field( $key ) {
-		$r = tara_compat_get_sub_field( $key );
-		return ! empty( $r );
+	if ( ! function_exists( 'tara_compat_the_row' ) ) {
+		function tara_compat_the_row() {
+			if ( ! empty( $GLOBALS['tara_acf_state'] ) ) {
+				$GLOBALS['tara_acf_row_end'] = $GLOBALS['tara_acf_state'];
+			}
+		}
 	}
-}
 
-/* حلقهٔ سازگار با ACF v4 (the_field درون while) */
-if ( ! function_exists( 'tara_compat_has_post_meta_field' ) ) {
-	function tara_compat_has_post_meta_field( $key, $post_id = false ) {
-		$v = tara_acf_meta_value( $key, $post_id, false );
-		return ( '' !== $v && array() !== $v );
+	if ( ! function_exists( 'tara_compat_get_row_index' ) ) {
+		function tara_compat_get_row_index() {
+			return 1; // در حالت سازگاری شمارهٔ سطر قابل اتکا نیست؛ صفر/یک بی‌خطر است
+		}
+	}
+
+	if ( ! function_exists( 'tara_compat_the_repeater_field' ) ) {
+		function tara_compat_the_repeater_field( $key, $post_id = false ) {
+			return tara_compat_have_rows( $key, $post_id );
+		}
+	}
+
+	if ( ! function_exists( 'tara_compat_the_sub_repeater_field' ) ) {
+		function tara_compat_the_sub_repeater_field( $key ) {
+			$r = tara_compat_get_sub_field( $key );
+			return ! empty( $r );
+		}
+	}
+
+	/* حلقهٔ سازگار با ACF v4 (the_field درون while) */
+	if ( ! function_exists( 'tara_compat_has_post_meta_field' ) ) {
+		function tara_compat_has_post_meta_field( $key, $post_id = false ) {
+			$v = tara_acf_meta_value( $key, $post_id, false );
+			return ( '' !== $v && array() !== $v );
+		}
 	}
 }
 
@@ -223,8 +235,54 @@ if ( ! function_exists( 'tara_acf_call' ) ) {
 }
 
 /* میان‌برهای رایج — این‌ها نام‌های اختصاصیِ خودمان‌اند و تضاد نمی‌سازند. */
+if ( ! function_exists( 'tara_get_field_normalize_id' ) ) {
+	/**
+	 * v3.17.13 — تبدیل هر شیء به شناسهٔ قابل‌قبول برای ACF.
+	 *
+	 * امضای رسمی ACF:
+	 *     get_field( string $selector, int|string $post_id = false )
+	 *
+	 * اگر شیء بدهید (WP_Term، WP_User، WP_Post)، نسخه‌های قدیمی بی‌صدا
+	 * رد می‌کردند ولی ACF Pro 6.x با type declaration خطای کشنده می‌دهد:
+	 *
+	 *     TypeError: get_field(): Argument #2 ($post_id) must be of
+	 *     type int|string, WP_Term given
+	 *
+	 * این تابع شیء را به همان شکلی که ACF می‌فهمد تبدیل می‌کند:
+	 *     WP_Term  → "{taxonomy}_{term_id}"   (مثل tara_mood_72)
+	 *     WP_User  → "user_{ID}"
+	 *     WP_Post  → ID عددی
+	 *
+	 * @param mixed $post_id ورودیِ خام.
+	 * @return int|string
+	 */
+	function tara_get_field_normalize_id( $post_id ) {
+		if ( $post_id instanceof WP_Term ) {
+			return isset( $post_id->term_id, $post_id->taxonomy )
+				? (string) $post_id->taxonomy . '_' . (int) $post_id->term_id
+				: 0;
+		}
+		if ( $post_id instanceof WP_User ) {
+			return 'user_' . (int) $post_id->ID;
+		}
+		if ( $post_id instanceof WP_Post ) {
+			return (int) $post_id->ID;
+		}
+		/* هر شیءِ ناشناخته‌ای که ID دارد */
+		if ( is_object( $post_id ) && isset( $post_id->ID ) ) {
+			return (int) $post_id->ID;
+		}
+		if ( is_object( $post_id ) ) {
+			return 0;
+		}
+		return $post_id;
+	}
+}
+
 if ( ! function_exists( 'tara_get_field' ) ) {
 	function tara_get_field( $key, $post_id = false, $format_value = true ) {
+		/* v3.17.13 — هر شیء پیش از رسیدن به ACF به شناسه تبدیل می‌شود. */
+		$post_id = tara_get_field_normalize_id( $post_id );
 		return tara_acf_call( 'get_field', array( $key, $post_id, $format_value ) );
 	}
 }

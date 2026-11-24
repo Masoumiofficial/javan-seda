@@ -23,7 +23,28 @@ get_header();
 $tara_term  = get_queried_object();
 $tara_tax   = ( $tara_term instanceof WP_Term ) ? $tara_term->taxonomy : '';
 $tara_name  = ( $tara_term instanceof WP_Term ) ? $tara_term->name : 'آرشیو';
-$tara_desc  = get_the_archive_description();
+
+/* v3.17.14 — توضیحاتِ کوتاهِ دسته‌بندی همان‌جا بماند.
+   ----------------------------------------------------------------------
+   صفحهٔ دسته تا ۳.۱۷.۱۳ قالبِ مستقلِ category.php را داشت و «توضیح
+   کوتاه» را از متای `ab_desc_short` می‌خواند. حالا که همان چیدمانِ
+   ژانر را اجرا می‌کند، اگر فقط get_the_archive_description() را
+   بخوانیم، آن توضیحِ ویرایش‌شده در پیشخوان دیده نمی‌شود.
+
+   ترتیب انتخاب (همان ترتیبِ category.php قدیمی):
+     ۱) متای ab_desc_short  ← ویرایشگرِ «توضیح کوتاه»
+     ۲) توضیح دستهٔ وردپرس (get_the_archive_description)
+   اگر هر دو خالی باشند، سربرگ کادرِ خالی چاپ نمی‌کند. */
+$tara_desc = '';
+if ( 'category' === $tara_tax && function_exists( 'tara_category_desc_short_text' ) ) {
+	$tara_short = trim( (string) tara_category_desc_short_text( $tara_term ) );
+	if ( '' !== $tara_short ) {
+		$tara_desc = $tara_short;
+	}
+}
+if ( '' === trim( wp_strip_all_tags( (string) $tara_desc ) ) ) {
+	$tara_desc = get_the_archive_description();
+}
 $tara_icon  = 'icofont-music-note';
 $tara_music = function_exists( 'tara_tax_is_music' ) && tara_tax_is_music( $tara_tax );
 $tara_total = (int) $GLOBALS['wp_query']->found_posts;

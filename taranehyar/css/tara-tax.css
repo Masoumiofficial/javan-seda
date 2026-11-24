@@ -474,6 +474,55 @@ html[data-tara-night="1"] .ty-taxabout {
 
 .ty-taxabout p:last-child { margin-bottom: 0; }
 
+/* v3.17.14 — متنِ کاملِ ویرایش‌شده در پیشخوان (فقط صفحهٔ دسته).
+   این بلوک HTML مجاز دارد (p، ul، a، strong…) پس با فاصلهٔ پاراگراف
+   و پشتیبانی از لینک استایل می‌شود. اگر خالی باشد چاپ نمی‌شود. */
+.ty-taxabout__custom {
+	margin: 0 0 14px;
+	padding-bottom: 14px;
+	border-bottom: 1px solid var(--th-line);
+	font-size: 13px;
+	line-height: 2.15;
+	color: var(--th-text);
+}
+
+.ty-taxabout__custom > :first-child { margin-top: 0; }
+.ty-taxabout__custom > :last-child { margin-bottom: 0; }
+
+.ty-taxabout__custom p,
+.ty-taxabout__custom ul,
+.ty-taxabout__custom ol {
+	margin: 0 0 10px;
+}
+
+.ty-taxabout__custom ul,
+.ty-taxabout__custom ol {
+	padding-inline-start: 20px;
+}
+
+.ty-taxabout__custom li { margin-bottom: 5px; }
+
+.ty-taxabout__custom a {
+	color: var(--th-accent, #c9a227);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
+.ty-taxabout__custom img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 12px;
+}
+
+.ty-taxabout__custom h2,
+.ty-taxabout__custom h3,
+.ty-taxabout__custom h4 {
+	margin: 14px 0 8px;
+	font-size: 14px;
+	font-weight: 700;
+	color: var(--th-ink);
+}
+
 /* =========================================================================
    ۴) واکنش‌گرایی
    ====================================================================== */

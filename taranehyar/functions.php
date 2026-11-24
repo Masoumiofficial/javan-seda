@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * ---------------------------------------------------------------------- */
 if ( ! defined( 'TARANEHYAR_VERSION' ) ) {
 	$taranehyar_theme = function_exists( 'wp_get_theme' ) ? wp_get_theme() : null;
-	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.17.13' );
+	define( 'TARANEHYAR_VERSION', $taranehyar_theme && $taranehyar_theme->get( 'Version' ) ? $taranehyar_theme->get( 'Version' ) : '3.17.14' );
 }
 if ( ! defined( 'TARANEHYAR_DIR' ) ) {
 	define( 'TARANEHYAR_DIR', get_template_directory() );
@@ -244,9 +244,26 @@ if ( ! function_exists( 'taranehyar_assets' ) ) {
 		   v3.7.8 — owl.carousel (۹۰KB) فقط برای ریل هنرمندانِ صفحهٔ اصلی لازم است؛
 		   پیش از این در همهٔ صفحه‌ها دانلود می‌شد. `scripts.js` هم دیگر به آن
 		   وابسته نیست و خودش وجودش را بررسی می‌کند. */
-		if ( tara_page_is_home() && file_exists( TARANEHYAR_DIR . '/js/owl.carousel.js' ) ) {
+		/* v3.17.14 — owl (۹۰KB) فقط اگر ریلِ هنرمندان واقعاً چیزی برای نشان‌دادن
+		   داشته باشد. -----------------------------------------------------------------
+		   پیش از این صرفاً با «صفحهٔ اصلی بودن» بار می‌شد، حتی وقتی:
+		     • گزینهٔ `arti_off` ریل را خاموش کرده بود،
+		     • یا فهرستِ `siing_t` (هنرمندانِ انتخابی) خالی بود.
+		   در آن دو حالت مارک‌آپِ `<div class="artists_slider">` اصلاً چاپ نمی‌شد
+		   ولی ۹۰KB جاوااسکریپت + وابستگی‌اش (jQuery) دانلود و پارس می‌شد. */
+		$tara_owl = tara_page_is_home() && file_exists( TARANEHYAR_DIR . '/js/owl.carousel.js' );
+		if ( $tara_owl && function_exists( 'tara_opt_on' ) ) {
+			$tara_owl = tara_opt_on( 'arti_off' ); /* ریل روشن باشد */
+		}
+		if ( $tara_owl && function_exists( 'ot_get_option' ) ) {
+			$tara_owl_list = ot_get_option( 'siing_t', array() );
+			$tara_owl      = is_array( $tara_owl_list ) && ! empty( $tara_owl_list );
+		}
+		$tara_owl = (bool) apply_filters( 'tara_needs_owl', $tara_owl );
+		if ( $tara_owl ) {
 			wp_enqueue_script( 'owl-carousel', TARANEHYAR_URI . '/js/owl.carousel.js', array( 'jquery' ), '2.3.4', true );
 		}
+		unset( $tara_owl, $tara_owl_list );
 		if ( file_exists( TARANEHYAR_DIR . '/js/scripts.js' ) ) {
 			wp_enqueue_script( 'taranehyar-scripts', TARANEHYAR_URI . '/js/scripts.js', array( 'jquery' ), taranehyar_asset_ver( '/js/scripts.js' ), true );
 		}
@@ -272,9 +289,35 @@ if ( ! function_exists( 'taranehyar_assets' ) ) {
 			wp_enqueue_script( 'taranehyar-search-bounds', TARANEHYAR_URI . '/js/tara-search-bounds.js', array(), taranehyar_asset_ver( '/js/tara-search-bounds.js' ), true );
 		}
 
-		if ( file_exists( TARANEHYAR_DIR . '/js/tara-player.js' ) ) {
+		/* v3.17.14 — پلیر (۵۷KB) فقط جایی که واقعاً آهنگ هست.
+		   ------------------------------------------------------------------
+		   پیش از این این اسکریپت در **همهٔ** صفحات بار می‌شد، از جمله
+		   صفحهٔ ثابت (page.php)، ۴۰۴، جست‌وجو و برچسب — که هیچ‌کدام
+		   `tara_player()` یا ردیفِ آهنگ چاپ نمی‌کنند. نتیجه: ۵۷KB
+		   دانلود و پارسِ بی‌مصرف روی هر بازدید.
+
+		   جاهایی که پلیر لازم است:
+		     • صفحهٔ اصلی        (بخش‌های آهنگ/ویدیو/آلبوم)
+		     • single            (آهنگ تکی + آلبوم)
+		     • آرشیو تاکسونومی   (tax-listing و taxonomy-artist)
+		     • صفحهٔ پلی‌لیست و حساب کاربری
+		     • هر جای دیگری که فیلتر tara_player_context لازم بداند
+
+		   اگر کاربرِ افزونه‌ای جای دیگری پلیر گذاشته باشد، فیلتر
+		   `tara_needs_player` را true برگرداند. */
+		$tara_needs_player = false;
+		if ( tara_page_is_home() || is_singular() || is_tax() || is_category() || is_tag() ) {
+			$tara_needs_player = true;
+		}
+		if ( function_exists( 'is_page' ) && ( is_page( 'playlists' ) || is_page( 'account' ) || is_page( 'radio' ) ) ) {
+			$tara_needs_player = true;
+		}
+		$tara_needs_player = (bool) apply_filters( 'tara_needs_player', $tara_needs_player );
+
+		if ( $tara_needs_player && file_exists( TARANEHYAR_DIR . '/js/tara-player.js' ) ) {
 			wp_enqueue_script( 'taranehyar-player', TARANEHYAR_URI . '/js/tara-player.js', array(), taranehyar_asset_ver( '/js/tara-player.js' ), true );
 		}
+		unset( $tara_needs_player );
 	}
 	add_action( 'wp_enqueue_scripts', 'taranehyar_assets', 5 );
 }

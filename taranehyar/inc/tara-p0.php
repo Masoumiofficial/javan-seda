@@ -830,25 +830,88 @@ if ( ! function_exists( 'tara_home_apex_sections' ) ) {
    این تابع به‌محض انتشار/ویرایش/حذف نوشته کش‌ها را پاک می‌کند.
    ========================================================================== */
 if ( ! function_exists( 'tara_home_caches_flush' ) ) {
-	function tara_home_caches_flush() {
+	/**
+	 * پاک‌کردنِ کشِ بخش‌های خانه.
+	 *
+	 * v3.17.14 — سه ایرادِ کارایی و درستی رفع شد:
+	 * ------------------------------------------------------------------
+	 * ۱) `save_post` با هر ذخیره‌ای صدا زده می‌شود — از جمله **revision**،
+	 *    **auto-draft** و **اتوسِیو**. یعنی هر بار که ویرایشگر یک نسخهٔ
+	 *    خودکار می‌ساخت، چهار DELETE روی کلِ `wp_options` می‌خورد.
+	 *    روی سایت‌های با ۵٬۰۰۰+ ردیف options (که ووکامرس/افزونه‌ها
+	 *    به‌راحتی می‌سازند) این یک جدول‌اسکنِ کامل در مسیرِ ذخیره است.
+	 *    حالا فقط برای نوشته‌های منتشرشده و غیر-revision اجرا می‌شود.
+	 *
+	 * ۲) `*_timeout_*` هم پاک می‌شد، ولی وردپرس خودش آنها را با پاک‌شدنِ
+	 *    `_transient_*` رها می‌کند. حذفشان فقط کارِ اضافه بود.
+	 *
+	 * ۳) شرطِ `edited_term` بی‌قید بود و با ویرایشِ هر ترمی (حتی ترمِ
+	 *    «دستهٔ پیش‌فرض» یا ترم‌های غیرمرتبط) کشِ خانه را دور می‌ریخت.
+	 *    حالا فقط تاکسونومی‌هایی که واقعاً در خانه دیده می‌شوند.
+	 *
+	 * نکته: حذفِ مستقیم از جدول هنوز به `DELETE` نیاز دارد، ولی حالا
+	 * به‌جای ۴ شرطِ LIKE، دو شرط دارد و در مسیرِ درست اجرا می‌شود.
+	 * گزینهٔ بهتر (پاک‌کردن با `delete_transient`) در وردپرس به تعداد
+	 * ردیف‌ها کوئری می‌زند؛ اینجا عکسِ آن درست است: یک DELETE.
+	 *
+	 * @param int          $post_id شناسهٔ نوشته (یا ترم، بسته به هوک).
+	 * @param WP_Post|null $post    شیءِ نوشته در save_post.
+	 * @return void
+	 */
+	function tara_home_caches_flush( $post_id = 0, $post = null ) {
+		/* --- فیلترِ revision / auto-draft / autosave --- */
+		if ( function_exists( 'wp_is_post_revision' ) && wp_is_post_revision( $post_id ) ) {
+			return;
+		}
+		if ( function_exists( 'wp_is_post_autosave' ) && wp_is_post_autosave( $post_id ) ) {
+			return;
+		}
+		/* در save_post، $post داده می‌شود؛ در بقیهٔ هوک‌ها نه. */
+		if ( $post instanceof WP_Post && 'publish' !== $post->post_status && 'future' !== $post->post_status ) {
+			return;
+		}
+
 		global $wpdb;
-		/* حذفِ مستقیم از جدول options سریع‌تر از پیمایشِ کلیدهاست. */
 		$like_hq = $wpdb->esc_like( '_transient_tara_hq_' ) . '%';
 		$like_lr = $wpdb->esc_like( '_transient_tara_lrel_' ) . '%';
-		$like_t  = $wpdb->esc_like( '_transient_timeout_tara_hq_' ) . '%';
-		$like_t2 = $wpdb->esc_like( '_transient_timeout_tara_lrel_' ) . '%';
 		$wpdb->query(
 			$wpdb->prepare(
-				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s OR option_name LIKE %s",
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s OR option_name LIKE %s",
 				$like_hq,
-				$like_lr,
-				$like_t,
-				$like_t2
+				$like_lr
 			)
 		);
+
+		/* حافظهٔ شیء هم باید پاک شود، وگرنه همان مقدار کهنه در همان
+		   درخواست برگردانده می‌شود (تجربهٔ ۳.۱۷.۱۲). */
+		if ( function_exists( 'wp_cache_delete' ) ) {
+			wp_cache_delete( 'alloptions', 'options' );
+		}
 	}
 }
+
+if ( ! function_exists( 'tara_home_caches_flush_term' ) ) {
+	/**
+	 * پاک‌کردنِ کش فقط برای تاکسونومی‌های مرتبط با خانه.
+	 *
+	 * @param int    $term_id  شناسه.
+	 * @param int    $tt_id    شناسهٔ تاکسونومی.
+	 * @param string $taxonomy نامک.
+	 * @return void
+	 */
+	function tara_home_caches_flush_term( $term_id = 0, $tt_id = 0, $taxonomy = '' ) {
+		$relevant = array( 'tara_genre', 'tara_mood', 'category', 'artist' );
+		if ( function_exists( 'tara_artist_tax' ) ) {
+			$relevant[] = tara_artist_tax();
+		}
+		if ( '' !== (string) $taxonomy && ! in_array( (string) $taxonomy, $relevant, true ) ) {
+			return; /* ترمِ بی‌ربط ⇒ کشِ خانه دست نمی‌خورد */
+		}
+		tara_home_caches_flush();
+	}
+}
+
 add_action( 'save_post', 'tara_home_caches_flush', 99 );
 add_action( 'deleted_post', 'tara_home_caches_flush', 99 );
 add_action( 'trashed_post', 'tara_home_caches_flush', 99 );
-add_action( 'edited_term', 'tara_home_caches_flush', 99 );
+add_action( 'edited_term', 'tara_home_caches_flush_term', 99, 3 );

@@ -11,6 +11,8 @@
 require __DIR__ . '/stubs-wp.php';
 
 /* فایل‌های خودِ قالب */
+/* v3.17.14 — acf-compat پیش از هر فایلی که tara_get_field را صدا می‌زند. */
+require '/tmp/theme/inc/acf-compat.php';
 require '/tmp/theme/inc/ab-artist-fields.php';
 require '/tmp/theme/inc/ab-cat-desc.php';
 require '/tmp/theme/inc/ab-terms-admin.php';

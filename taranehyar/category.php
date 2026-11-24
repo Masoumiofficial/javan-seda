@@ -1,54 +1,35 @@
-<?php get_header(''); ?>
-<?php get_template_part('inc/breadcrumbs'); ?>
-<!-- centers_box -->
-<div class="tarlanweb_center">
-<div id="centers_box">
-<!-- song_boxs -->
-<div class="song_boxs">
-<?php if(have_posts()) : ?>
-<div class="songs_title_box">
-<h1><?php echo single_cat_title(''); ?></h1>
-<?php /* v3.3.5 — اگر خانۀ دسته توضیح نداشته باشد، div خالی چاپ نشود:
-   همان «کادر سفیدِ خالی» که زیر عنوان دیده می‌شد (قواعد شیشه به .archive_txt_box
-   پدینگ و مرز می‌دهد، پس یک div بی‌محتوا = یک کادر خالی).
-   v3.5.2 — اول «توضیح کوتاه» ثبت‌شده در پیشخوان؛ اگر خالی بود، همان توضیح دسته. */
-$ab_cat_desc = '';
-if ( function_exists( 'tara_category_desc_short' ) ) {
-	$ab_cat_desc = tara_category_desc_short();
-} else {
-	$ab_cat_legacy = trim( (string) category_description() );
-	if ( '' !== wp_strip_all_tags( $ab_cat_legacy ) ) {
-		$ab_cat_desc = '<div class="archive_txt_box">' . $ab_cat_legacy . '<div class="clear"></div></div>';
-	}
-}
-if ( '' !== $ab_cat_desc ) {
-	echo $ab_cat_desc; // خروجی در تابع، escape شده است
-} ?>
-<div class="clear"></div>
-</div>
-<div class="song_boxs_posts">
-<ul>
-<?php while(have_posts()) : the_post(); ?>
-<li><?php get_template_part('inc/songs_post'); ?></li>
-<?php endwhile; ?>
-</ul>
-<div class="clear"></div>
-</div>
-<?php else: get_template_part('inc/no-content'); endif; ?>
-<div class="clear"></div>
-</div>
-<!-- song_boxs -->
-<?php get_template_part('inc/pagination'); ?>
 <?php
-/* v3.7.8 — «دربارهٔ {نام دسته}» دقیقاً زیر صفحه‌بندی (درخواست صریح).
-   پیش از این بالای صفحه‌بندی و بیرون از `.song_boxs` بود و به‌نظر می‌رسید
-   بخشی از همان فهرست است. */
-if ( function_exists( 'tara_category_desc_full' ) ) {
-	echo tara_category_desc_full(); // خروجی در تابع، wp_kses_post شده است
-}
-?>
-<div class="clear"></div>
-</div>
-</div>
-<!-- centers_box -->
-<?php get_footer(''); ?>
+/**
+ * آرشیو دسته‌بندی — چیدمان مشترک در inc/tax-listing.php
+ * ==========================================================================
+ * v3.17.14 — صفحهٔ دسته دقیقاً مثل صفحهٔ «ژانر» شد (درخواست کاربر).
+ *
+ * پیش از این، این فایل یک قالبِ قدیمیِ مستقل بود: عنوان + کادر توضیح
+ * کوتاه + فهرستِ سادهٔ کارت‌های آهنگ. حالا همان چیدمانِ ژانر را اجرا
+ * می‌کند:
+ *
+ *   ۱) سربرگِ تصویری با کلاژِ کاور + آمارِ واقعی (تعداد اثر، خواننده،
+ *      بازدید، تازه‌ترین اثر) + چیپ‌های دسته‌های دیگر و ژانرها
+ *   ۲) رادیو/دی‌جیِ همان دسته
+ *   ۳) پخش‌کنندهٔ یک‌جای آهنگ‌های همان صفحه
+ *   ۴) فهرست کامل با ردیف‌های یکسانِ تاکسونومی‌های موسیقی + صفحه‌بندی
+ *   ۵) «دربارهٔ این دسته» در انتهای صفحه
+ *
+ * نکتهٔ مهم — توضیحات دسته:
+ *   کاربر صریحاً خواسته «قسمتِ توضیحاتِ کاملِ داخل دسته» سرِ جایش بماند.
+ *   در این پوسته دو فیلد وجود دارد:
+ *       ab_desc_short  → توضیح کوتاه (بالای فهرست)
+ *       ab_desc_full   → توضیح کامل (پایین، برای سئو)
+ *   اگر هیچ‌کدام پر نباشد، همان «توضیح دسته» در پیشخوان وردپرس
+ *   (term_description) به‌عنوان جایگزین خوانده می‌شود.
+ *
+ *   چیدمانِ مشترک هر دو را چاپ می‌کند:
+ *       • کوتاه در سربرگ (کنار عنوان) — با tara_tax_hero
+ *       • کامل در پایین — با tara_tax_about
+ *
+ *   پس هیچ متنی از دست نمی‌رود؛ فقط جای‌گاهش بهتر شده است.
+ *
+ * @package Taranehyar
+ */
+
+get_template_part( 'inc/tax-listing' );

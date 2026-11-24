@@ -33,18 +33,32 @@ if ( ! function_exists( 'tara_css_rel' ) ) {
 		if ( ! is_string( $rel ) || '' === $rel || '.css' !== substr( $rel, -4 ) ) {
 			return $rel;
 		}
+
+		/* v3.17.14 — نتیجه در حافظهٔ همان درخواست کش می‌شود.
+		   این تابع در حلقهٔ استایل‌ها چند بار با همان مسیر صدا زده
+		   می‌شود و هر بار ۲×is_file + ۲×filemtime هزینه دارد.
+		   کشِ استاتیکِ محلی، بدونِ اثرِ ماندگار، سیستم را دست‌نخورده
+		   نگه می‌دارد ولی syscallِ تکراری حذف می‌شود. */
+		static $memo = array();
+		if ( isset( $memo[ $rel ] ) ) {
+			return $memo[ $rel ];
+		}
+
 		$min = substr( $rel, 0, -4 ) . '.min.css';
 		$src = TARANEHYAR_DIR . $rel;
 		$dst = TARANEHYAR_DIR . $min;
 		if ( ! is_file( $dst ) || ! is_file( $src ) ) {
+			$memo[ $rel ] = $rel;
 			return $rel;
 		}
 		$src_time = @filemtime( $src );
 		$dst_time = @filemtime( $dst );
 		if ( ! $src_time || ! $dst_time || $dst_time < $src_time ) {
+			$memo[ $rel ] = $rel;
 			return $rel;
 		}
 
+		$memo[ $rel ] = $min;
 		return $min;
 	}
 }

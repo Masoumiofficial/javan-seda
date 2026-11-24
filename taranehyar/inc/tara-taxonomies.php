@@ -267,6 +267,12 @@ if ( ! function_exists( 'tara_music_taxonomy_label' ) ) {
 	 * @return string
 	 */
 	function tara_music_taxonomy_label( $taxonomy, $which = 'singular' ) {
+		/* v3.17.14 — دسته‌بندی هم مثل ژانر برچسبِ فارسی بگیرد
+		   (پیش از این نامکِ انگلیسیِ «category» چاپ می‌شد). */
+		if ( 'category' === (string) $taxonomy ) {
+			return 'singular' === $which ? 'دسته' : 'دسته‌ها';
+		}
+
 		foreach ( tara_music_taxonomies() as $config ) {
 			if ( $config['taxonomy'] === $taxonomy ) {
 				return (string) $config[ $which ];

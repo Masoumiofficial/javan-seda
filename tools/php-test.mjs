@@ -55,7 +55,10 @@ for (const name of ['tara-ui.css', 'tara-artist.css', 'tara-home.css', 'admin-se
   files.push({ parent: '/tmp/theme/css', name, url: 'file://' + path.join(theme, 'css', name) });
 }
 /* v3.10.0 — حسابِ کاربری، ورودِ پیامکی و ربات */
-for (const name of ['tara-account.php', 'tara-account-ui.php', 'tara-trust.php', 'tara-dm.php', 'tara-artisthub.php']) {
+/* v3.17.14 — acf-compat.php باید در فهرست باشد: tara-ui و دیگران به
+   tara_get_field/tara_music_field تکیه می‌کنند و نبودِ این فایل باعث
+   «Call to undefined function tara_get_field» در آزمون می‌شد. */
+for (const name of ['acf-compat.php', 'tara-account.php', 'tara-account-ui.php', 'tara-trust.php', 'tara-dm.php', 'tara-artisthub.php']) {
   files.push({ parent: '/tmp/theme/inc', name, url: 'file://' + path.join(theme, 'inc', name) });
 }
 for (const name of ['page-account.php', 'page-login.php']) {

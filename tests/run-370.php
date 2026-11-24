@@ -47,6 +47,7 @@ if ( ! function_exists( 'ot_get_option' ) ) {
 	}
 }
 
+require '/tmp/theme/inc/acf-compat.php';
 require '/tmp/theme/inc/tara-taxonomies.php';
 require '/tmp/theme/inc/tara-ui.php';
 require '/tmp/theme/inc/tara-critical.php';
@@ -595,8 +596,15 @@ $admin78 = (string) @file_get_contents( '/tmp/theme/inc/ab-terms-admin.php' );
 t( 'هنرمند: سایز استاندارد بنر در تنظیمات نوشته شده', false !== strpos( $admin78, '۱۲۰۰×۴۰۰' ) && false !== strpos( $admin78, 'tara_artist_banner_group' ) );
 
 $cat78 = (string) @file_get_contents( '/tmp/theme/category.php' );
-t( 'دسته: «دربارهٔ …» دقیقاً زیر صفحه‌بندی', strpos( $cat78, "get_template_part('inc/pagination')" ) < strpos( $cat78, 'tara_category_desc_full()' ) );
-t( 'دسته: تیتر پویا «دربارهٔ نام دسته»', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/ab-cat-desc.php' ), "'دربارهٔ ' . $term_obj->name" ) );
+/* v3.17.14 — صفحهٔ دسته به چیدمانِ مشترکِ ژانر منتقل شد (خواستهٔ صریحِ
+   کاربر). دیگر این فایل خودش فهرست و صفحه‌بندی چاپ نمی‌کند؛ همه در
+   inc/tax-listing.php است. پس به‌جای سنجشِ ترتیب در category.php،
+   همان چیز را در فایلِ مشترک می‌سنجیم. */
+$taxlist78 = (string) @file_get_contents( '/tmp/theme/inc/tax-listing.php' );
+t( 'دسته: از چیدمانِ مشترکِ ژانر استفاده می‌کند', false !== strpos( $cat78, "get_template_part( 'inc/tax-listing' )" ) );
+t( 'دسته: «دربارهٔ …» در انتهای چیدمانِ مشترک', false !== strpos( $taxlist78, 'tara_tax_about' ) );
+t( 'دسته: تیتر پویا «دربارهٔ نام دسته»', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/tara-tax-hero.php' ), "دربارهٔ <?php echo esc_html( \$label )" ) );
+t( 'دسته: توضیحِ کاملِ ویرایش‌شده حفظ می‌شود', false !== strpos( $taxlist78, 'tara_category_desc_short_text' ) && false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/tara-tax-hero.php' ), 'tara_category_desc_full_html' ) );
 
 $songs78 = (string) @file_get_contents( '/tmp/theme/inc/songs_post.php' );
 t( 'کارت: badge فرمت (mp3/mp4) حذف شد', false === strpos( $songs78, 'ft_box_format' ) );

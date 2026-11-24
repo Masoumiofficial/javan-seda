@@ -356,6 +356,34 @@ if ( ! function_exists( 'tara_search_inline_js' ) ) {
 			return;
 		}
 
+		/* v3.17.14 — چاپِ هوشمندترِ اسکریپتِ جست‌وجوی زنده.
+		   ------------------------------------------------------------------
+		   دو حالت که این اسکریپت هیچ کاری نمی‌کند و فقط ~۱۲KB به HTML
+		   اضافه می‌کند:
+
+		     ۱) خودِ SearchWP نصب است ⇒ خطِ اولِ اسکریپت با
+		        `if (window.SearchWP …) return;` بیرون می‌زد، ولی متنش
+		        هنوز دانلود و پارس می‌شد. اگر SearchWP فعال باشد این
+		        اسکریپت اصلاً لازم نیست.
+		     ۲) اگر هدرِ قالب خاموش شده باشد (TARA_HEADER_SEARCH=false)
+		        هیچ `#lsds` ساخته نمی‌شود.
+
+		   در حالت عادی (بدون SearchWP، با هدرِ پیش‌فرض) رفتار
+		   دقیقاً مثل قبل است — چیزی از دست نمی‌رود. با فیلتر
+		   `tara_search_inline_needed` می‌توان اجبار کرد. */
+		$tara_search_needed = true;
+
+		/* اگر SearchWP هست، کارِ این اسکریپت را آن انجام می‌دهد. */
+		if ( defined( 'SEARCHWP_VERSION' ) || class_exists( 'SearchWP' ) ) {
+			$tara_search_needed = false;
+		}
+
+		/* فیلترِ صریح برای خاموش/روشن کردن. */
+		$tara_search_needed = (bool) apply_filters( 'tara_search_inline_needed', $tara_search_needed );
+		if ( ! $tara_search_needed ) {
+			return;
+		}
+
 		$endpoint = admin_url( 'admin-ajax.php' );
 		$nonce    = wp_create_nonce( 'tara_search' );
 		?>

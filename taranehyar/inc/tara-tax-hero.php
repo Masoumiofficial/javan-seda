@@ -31,7 +31,10 @@ if ( ! function_exists( 'tara_tax_is_music' ) ) {
 	 * @return bool
 	 */
 	function tara_tax_is_music( $taxonomy ) {
-		return in_array( (string) $taxonomy, array( 'tara_genre', 'tara_mood' ), true );
+		/* v3.17.14 — دسته‌بندی هم همان چیدمانِ ژانر/حال‌وهوا را می‌گیرد.
+		   دلیل: صفحهٔ دسته با یک قالبِ قدیمی (fهرست سادهٔ آهنگ‌ها) رندر
+		   می‌شد و کاربر می‌خواهد دقیقاً مثل ژانر باشد. */
+		return in_array( (string) $taxonomy, array( 'tara_genre', 'tara_mood', 'category' ), true );
 	}
 }
 
@@ -226,7 +229,21 @@ if ( ! function_exists( 'tara_tax_stats' ) ) {
 			return wp_parse_args( $cached, $empty );
 		}
 
-		$ids   = tara_tax_music_ids( $term, 240 );
+		/* v3.17.14 — فقط چند شناسهٔ اول لازم است، نه ۲۴۰.
+		   ------------------------------------------------------------------
+		   پیش از این `tara_tax_music_ids( $term, 240 )` صدا زده می‌شد و
+		   بعد در یک حلقه برای **هر ۲۴۰** نوشته `get_post_time()` اجرا
+		   می‌شد — یعنی ۲۴۰ مرتبه فراخوانیِ تابع + پرس‌وجوی تاریخ، فقط
+		   برای رسیدن به «تازه‌ترین» و «۳ کاور».
+
+		   ولی خودِ tara_tax_music_ids با `orderby => date, order => DESC`
+		   می‌آید؛ پس **اولین‌ها** تازه‌ترین‌ها هستند و کافی است ۱۲ تا
+		   بگیریم تا با احتمالِ بالایی ۳ کاورِ غیرخالی پیدا شود. اگر
+		   نشد، همان ۱ اثرِ تازه هم درست است (بقیهٔ آمار از کوئریِ
+		   تجمیعی می‌آید و به این فهرست کاری ندارد).
+
+		   سود: از ۲۴۰ → ۱۲ حلقه، بدون هیچ تغییری در عددهای نمایش‌داده‌شده. */
+		$ids   = tara_tax_music_ids( $term, 12 );
 		$stats = $empty;
 
 		/* v3.17.12 — آمارِ درست:
@@ -543,8 +560,14 @@ if ( ! function_exists( 'tara_tax_hero' ) ) {
 		$covers     = (array) $stats['covers'];
 		$link       = get_term_link( $term );
 		$url        = is_wp_error( $link ) ? '' : (string) $link;
-		$icon       = 'tara_genre' === $term->taxonomy ? 'icofont-ui-music' : 'icofont-heart-alt';
-		$icon       = 'tara_genre' === $term->taxonomy ? 'icofont-music-alt' : 'icofont-heart-alt';
+		/* آیکونِ هر تاکسونومی */
+		if ( 'tara_genre' === $term->taxonomy ) {
+			$icon = 'icofont-music-alt';
+		} elseif ( 'category' === $term->taxonomy ) {
+			$icon = 'icofont-folder-open';
+		} else {
+			$icon = 'icofont-heart-alt';
+		}
 
 		ob_start();
 		?>
@@ -689,7 +712,22 @@ if ( ! function_exists( 'tara_tax_about' ) ) {
 		$label     = function_exists( 'tara_music_taxonomy_label' ) ? tara_music_taxonomy_label( $term->taxonomy, 'singular' ) : 'بخش';
 		$intro     = tara_tax_intro( $term, $stats, $spotlight, $cross );
 
-		if ( empty( $intro ) ) {
+		/* v3.17.14 — متنِ کاملِ ویرایش‌شده در پیشخوان، پیش از معرفیِ خودکار.
+		   ------------------------------------------------------------------
+		   صفحهٔ دسته پیش از این با قالبِ مستقلِ category.php رندر می‌شد و
+		   «توضیح کامل» (متای ab_desc_full) را زیرِ صفحه‌بندی چاپ می‌کرد.
+		   حالا که همان چیدمانِ ژانر را اجرا می‌کند، اگر این را نخوانیم
+		   آن متنِ مهم (برای سئو) از صفحه حذف می‌شود — که خلاف خواستهٔ
+		   صریحِ کاربر است («قسمت توضیحات کامل تو دسته بندی هست بمونه»).
+
+		   این متن HTML مجاز دارد، پس با wp_kses_post چاپ می‌شود
+		   (برخلافِ پاراگراف‌های معرفیِ خودکار که esc_html می‌خواهند). */
+		$full_html = '';
+		if ( 'category' === $term->taxonomy && function_exists( 'tara_category_desc_full_html' ) ) {
+			$full_html = (string) tara_category_desc_full_html( $term );
+		}
+
+		if ( empty( $intro ) && '' === $full_html ) {
 			return '';
 		}
 
@@ -697,6 +735,9 @@ if ( ! function_exists( 'tara_tax_about' ) ) {
 		?>
 		<section class="ty-taxabout" aria-labelledby="ty-taxabout-title">
 			<h2 id="ty-taxabout-title">دربارهٔ <?php echo esc_html( $label ); ?> «<?php echo esc_html( $term->name ); ?>»</h2>
+			<?php if ( '' !== $full_html ) : ?>
+				<div class="ty-taxabout__custom"><?php echo $full_html; // phpcs:ignore WordPress.Security.EscapeOutput -- wp_kses_post شده در تابع ?></div>
+			<?php endif; ?>
 			<?php foreach ( $intro as $para ) : ?>
 				<p><?php echo esc_html( (string) $para ); ?></p>
 			<?php endforeach; ?>

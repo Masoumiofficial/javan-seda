@@ -26,19 +26,50 @@ if ( $tara_fixbvip ) {
 		$tara_vip_num = 5; // سقف ۵ اسلاید در DOM: سبک‌تر برای موبایل
 	}
 
+	/* v3.17.11 — دو تغییرِ کارایی، بدون تغییرِ نتیجه:
+	   ۱) `no_found_rows` روشن شد. پیش از این WordPress با
+	      `SQL_CALC_FOUND_ROWS` کلِ تطبیق‌ها را می‌شمرد در حالی که
+	      `post_count` هیچ‌جا استفاده نمی‌شد؛ آن شمارش روی جدولِ
+	      بزرگِ postmeta گران است.
+	   ۲) `compare` از LIKE به `=` تغییر کرد. مقدارِ ذخیره‌شده یا
+	      `1` است یا نیست؛ LIKE با الگوی `%1%` ایندکس را از کار
+	      می‌اندازد و روی MySQL اسکن کامل می‌شود. (در wpdb مقدارِ
+	      درصدها escape می‌شود، پس رفتار عملاً همان تساوی بود.) */
 	$tara_vip_args = array(
-		'post_type'      => 'post',
-		'post_status'    => 'publish',
-		'posts_per_page' => $tara_vip_num,
-		'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+		'post_type'           => 'post',
+		'post_status'         => 'publish',
+		'posts_per_page'      => $tara_vip_num,
+		'no_found_rows'       => true,
+		'ignore_sticky_posts' => true,
+		'meta_query'          => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 			array(
 				'key'     => 'vip_song',
 				'value'   => '1',
-				'compare' => 'LIKE',
+				'compare' => '=',
 			),
 		),
 	);
-	$tara_vip_query = new WP_Query( $tara_vip_args );
+	/* v3.17.11 — نگهبانِ زمانی، مثل بخش‌های خانه.
+	   اگر کوئریِ ویژه روی این سرور از بودجه بگذرد، اسلایدر خالی
+	   می‌شود و ۱۰ دقیقه رد می‌شود — بهتر از کشیدنِ کلِ صفحه. */
+	$tara_vip_budget = (int) apply_filters( 'tara_vip_budget', 2500 );
+	$tara_vip_skip   = false;
+	if ( $tara_vip_budget > 0 ) {
+		$tara_vip_skip = (bool) get_transient( 'tara_vip_slow' );
+	}
+	if ( $tara_vip_skip ) {
+		$tara_vip_query = new WP_Query( array( 'post__in' => array( 0 ), 'post_type' => 'post' ) );
+	} else {
+		$tara_vip_t0    = microtime( true );
+		$tara_vip_query = new WP_Query( $tara_vip_args );
+		if ( $tara_vip_budget > 0 && ( microtime( true ) - $tara_vip_t0 ) * 1000 > $tara_vip_budget ) {
+			set_transient( 'tara_vip_slow', 1, 600 );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( sprintf( '[tara] vip query too slow (budget %dms) — skipped for 10min', $tara_vip_budget ) ); // phpcs:ignore
+			}
+			$tara_vip_query = new WP_Query( array( 'post__in' => array( 0 ), 'post_type' => 'post' ) );
+		}
+	}
 
 	/* v3.16.0 — «هیروِ خالی»: اگر هیچ نوشته‌ای `vip_song` نداشته باشد، اسلایدر
 	   ویژه کاملاً ناپدید می‌شد و صفحهٔ اصلی با یک نوار خالی شروع می‌شد.
@@ -46,7 +77,7 @@ if ( $tara_fixbvip ) {
 	   نوشته‌های منتشرشده پر می‌شود و برچسبش هم صریح است: «تازه‌ترین آثار».
 	   وقتی مدیر برای اثری تیک «ویژه» بزند، دوباره همان حالت قبلی برمی‌گردد. */
 	$tara_vip_fallback = false;
-	if ( ! $tara_vip_query->have_posts() ) {
+	if ( ! $tara_vip_skip && ! $tara_vip_query->have_posts() ) {
 		$tara_vip_fallback = true;
 		$tara_vip_query    = new WP_Query(
 			array(

@@ -402,14 +402,43 @@ if ( ! function_exists( 'tara_home_query' ) ) {
 			return array_map( 'absint', (array) $q->posts );
 		}
 
-		$ck = 'tara_hq_' . md5( wp_json_encode( $args ) );
+		$ck  = 'tara_hq_' . md5( wp_json_encode( $args ) );
 		$hit = get_transient( $ck );
 		if ( is_array( $hit ) ) {
 			return array_map( 'absint', $hit );
 		}
 
+		/* v3.17.11 — نگهبانِ زمانی.
+		   ------------------------------------------------------------------
+		   اگر یک بخش روی این سرور از بودجهٔ زمانی بگذرد، به‌جای کشیدنِ
+		   کل صفحه آن بخش را خالی برمی‌گردانیم و برای ۱۰ دقیقه خاموش
+		   نگه می‌داریم. صفحه باز می‌شود؛ بخش یکی از پنج بخش کم می‌آید
+		   ولی «لودینگ ابدی» تمام می‌شود.
+
+		   بودجه با فیلتر قابل تنظیم است:
+		       add_filter( 'tara_home_query_budget', fn() => 1500 ); // ms
+		   مقدار ۰ یعنی نگهبان خاموش. */
+		$budget = (int) apply_filters( 'tara_home_query_budget', 2500 );
+		$skip   = get_transient( 'tara_hq_skip_' . md5( wp_json_encode( $args ) ) );
+		if ( is_array( $skip ) ) {
+			return array();
+		}
+
+		$t0   = microtime( true );
 		$q    = new WP_Query( $args );
 		$ids  = array_map( 'absint', (array) $q->posts );
+		$took = ( microtime( true ) - $t0 ) * 1000;
+
+		if ( $budget > 0 && $took > $budget ) {
+			/* کش نمی‌کنیم (شاید سرور شلوغ بوده)؛ فقط ۱۰ دقیقه رد می‌شویم */
+			set_transient( $ck . '_slow', array( round( $took ) ), 600 );
+			set_transient( 'tara_hq_skip_' . md5( wp_json_encode( $args ) ), array( 1 ), 600 );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( sprintf( '[tara] home query took %.0fms (budget %dms) — skipped for 10min: %s', $took, $budget, wp_json_encode( $args ) ) ); // phpcs:ignore
+			}
+			return array();
+		}
+
 		/* نتیجهٔ خالی را هم کش می‌کنیم — وگرنه هر بازدید دوباره کوئری می‌زند */
 		set_transient( $ck, $ids, $ttl );
 		return $ids;
@@ -570,22 +599,54 @@ if ( ! function_exists( 'tara_home_video_section' ) ) {
 			return '';
 		}
 
-		$ids = tara_home_query(
-			array(
-				'posts_per_page' => 8,
-				'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					'relation' => 'OR',
-					array( 'key' => 'video720', 'compare' => 'EXISTS' ),
-					array( 'key' => 'video1080', 'compare' => 'EXISTS' ),
-				),
-			)
-		);
+		/* v3.17.11 — کوئریِ گران حذف شد.
+		   ------------------------------------------------------------------
+		   پیش از این یک meta_query با `relation => OR` روی دو کلید و هر
+		   دو `compare => EXISTS` زده می‌شد. MySQL برای چنین کوئری‌ای دو
+		   INNER JOIN روی postmeta می‌سازد، بعد GROUP BY می‌زند تا ردیف‌های
+		   تکراری را جمع کند؛ با این کار ایندکسِ (meta_key, post_id) هم
+		   بی‌فایده می‌شود. روی سایتِ ۶٬۰۶۹ آهنگه این کوئری بخشِ `apex`
+		   را به ۷۹ ثانیه رسانده بود (اندازه‌گیری‌شده روی پروداکشن، ۳.۱۷.۸).
+		   روی staging با ۳۵٬۹۳۴ ردیف متا هم ۲۷۸ms بود در حالی که همهٔ
+		   کوئری‌های دیگرِ همان صفحه زیر ۴۰ms بودند — ۱۰ برابر گران‌تر.
 
-		/* فیلتر دوم روی خودِ متا: EXISTS با مقدار خالی هم می‌آید */
+		   راهِ تازه: جست‌وجو فقط روی «کلید» انجام می‌شود، نه JOIN. هر
+		   `get_posts` تک‌کلیدی است و MySQL می‌تواند از ایندکسِ meta_key
+		   استفاده کند. اتحادِ نتایج در PHP انجام می‌شود (۳ آرایهٔ حداکثر
+		   ۸تایی، هزینه‌اش ناچیز است).
+
+		   نتیجه از نظر محتوا یکی است: تازه‌ترین آثاری که فایل ویدیو دارند. */
+		$ids = array();
 		if ( function_exists( 'tara_post_has_video' ) ) {
+			$buckets = array();
+			foreach ( array( 'video720', 'video1080' ) as $tara_vkey ) {
+				$buckets[] = (array) tara_home_query(
+					array(
+						'posts_per_page' => 8,
+						'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+							array( 'key' => $tara_vkey, 'compare' => 'EXISTS' ),
+						),
+					)
+				);
+			}
+			/* ترتیب: بر اساس تاریخ نوشته، نزولی — مثل قبل.
+			   تاریخ‌ها یک‌بار خوانده می‌شوند تا usort هیچ کوئری‌ای نزند. */
+			$flat = array_values( array_unique( array_merge( ...$buckets ) ) );
+			if ( $flat && count( $buckets ) > 1 ) {
+				$dates = array();
+				foreach ( $flat as $tara_fid ) {
+					$dates[ $tara_fid ] = (string) get_post_field( 'post_date', $tara_fid );
+				}
+				usort(
+					$flat,
+					function ( $a, $b ) use ( $dates ) {
+						return strcmp( (string) $dates[ $b ], (string) $dates[ $a ] );
+					}
+				);
+			}
+			$ids = array_slice( $flat, 0, 8 );
+			/* فیلتر دوم روی خودِ متا: EXISTS با مقدار خالی هم می‌آید */
 			$ids = array_values( array_filter( $ids, 'tara_post_has_video' ) );
-		} else {
-			$ids = array();
 		}
 		if ( ! $ids ) {
 			return '';

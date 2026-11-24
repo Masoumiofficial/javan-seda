@@ -1,0 +1,275 @@
+/* ============================================================================================
+   ترانه یار ۳.۵.۲ — استایلِ پیشخوان (فقط در صفحات ویرایش هنرمند/دسته/نوشته بارگذاری می‌شود)
+   هیچ قاعده‌ای روی سلکتورهای عمومیِ وردپرس نوشته نشده؛ همه با پیشوند .ab- هستند.
+   ============================================================================================ */
+
+.ab-termform .ab-termgroup {
+	margin: 0 0 18px;
+	padding: 0 0 14px;
+	border-bottom: 1px dashed #dcdcde;
+}
+
+.ab-termform .ab-termgroup:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+	margin-bottom: 4px;
+}
+
+.ab-termgroup__title {
+	margin: 4px 0 10px;
+	font-size: 14px;
+	color: #1d2327;
+}
+
+/* v3.7.8 — برچسب «اختیاری» کنار عنوان گروه فیلدهای ترم */
+.ab-termgroup__badge {
+	display: inline-block;
+	margin-inline-start: 6px;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: #eef2ff;
+	color: #4338ca;
+	font-size: 11px;
+	font-weight: 600;
+	vertical-align: middle;
+}
+
+.ab-termgroup__hint {
+	margin: -4px 0 10px;
+}
+
+.ab-field {
+	margin: 0 0 14px;
+}
+
+.ab-field > label {
+	display: block;
+	margin-bottom: 4px;
+}
+
+.ab-social-field {
+	display: grid;
+	grid-template-columns: 150px minmax(180px, 1fr);
+	gap: 8px;
+	align-items: center;
+	margin: 0 0 8px;
+}
+
+.ab-social-field label {
+	margin: 0;
+}
+
+.ab-social-field .icofont-facebook,
+.ab-social-field .icofont-paper-plane,
+.ab-social-field .icofont-instagram,
+.ab-social-field .icofont-twitter,
+.ab-social-field .icofont-youtube-play {
+	margin-inline-end: 4px;
+	color: #185adb;
+}
+
+/* ---------- تصویر ---------- */
+.ab-imgfield {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 16px;
+}
+
+.ab-imgfield__preview img {
+	display: block;
+	width: 96px;
+	height: 96px;
+	object-fit: cover;
+	border-radius: 50%;
+	border: 2px solid #e3e6ee;
+	background: #f6f7f9;
+}
+
+.ab-imgfield__empty {
+	color: #646970;
+}
+
+.ab-imgfield__actions {
+	display: inline-flex;
+	gap: 10px;
+	align-items: center;
+}
+
+.ab-imgfield__clear {
+	color: #b32d2e;
+}
+
+.ab-imgfield > .description {
+	flex-basis: 100%;
+	margin: 0;
+}
+
+/* ---------- انتخاب‌گر (هنرمند/نوشته) ---------- */
+.ab-picker {
+	position: relative;
+	max-width: 640px;
+}
+
+.ab-picker__hint {
+	margin: 0 0 8px;
+	color: #646970;
+	font-size: 12px;
+}
+
+.ab-picker__selected {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 6px 10px;
+	margin-bottom: 6px;
+	background: #f0f6fc;
+	border: 1px solid #c5d9ed;
+	border-radius: 6px;
+}
+
+.ab-picker input[type="search"] {
+	width: 100%;
+}
+
+.ab-picker__results {
+	position: absolute;
+	z-index: 30;
+	inset-inline: 0;
+	max-height: 260px;
+	overflow: auto;
+	margin-top: 2px;
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+}
+
+.ab-picker__item {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 8px 10px;
+	border: 0;
+	border-bottom: 1px solid #f0f0f1;
+	background: transparent;
+	text-align: start;
+	cursor: pointer;
+	font: inherit;
+}
+
+.ab-picker__item:last-child {
+	border-bottom: 0;
+}
+
+.ab-picker__item:hover,
+.ab-picker__item:focus-visible {
+	background: #f0f6fc;
+	outline: none;
+}
+
+.ab-picker__thumb {
+	flex: 0 0 34px;
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	overflow: hidden;
+	background: #f0f0f1;
+}
+
+.ab-picker__thumb img {
+	width: 34px;
+	height: 34px;
+	object-fit: cover;
+	display: block;
+}
+
+.ab-picker__meta {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	line-height: 1.6;
+}
+
+.ab-picker__meta small {
+	color: #646970;
+}
+
+.ab-picker__status {
+	font-style: normal;
+	font-size: 11px;
+	color: #996800;
+}
+
+.ab-picker__none {
+	margin: 0;
+	padding: 10px;
+	color: #646970;
+	font-size: 13px;
+}
+
+.ab-picker__empty {
+	margin: 0 0 8px;
+	color: #646970;
+	font-size: 12px;
+}
+
+.ab-picker__chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 0 0 8px;
+	padding: 0;
+	list-style: none;
+}
+
+.ab-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	max-width: 100%;
+	padding: 3px 8px 3px 4px;
+	background: #eef3fb;
+	border: 1px solid #c8d8ef;
+	border-radius: 999px;
+	font-size: 12px;
+}
+
+.ab-chip__img img {
+	display: block;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	object-fit: cover;
+}
+
+.ab-chip__name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 190px;
+}
+
+.ab-chip__remove {
+	border: 0;
+	background: transparent;
+	color: #8a1f1f;
+	font-size: 15px;
+	line-height: 1;
+	cursor: pointer;
+	padding: 0 2px;
+}
+
+.ab-chip__remove:hover {
+	color: #d63638;
+}
+
+@media (max-width: 782px) {
+	.ab-social-field {
+		grid-template-columns: 1fr;
+		gap: 2px;
+	}
+}

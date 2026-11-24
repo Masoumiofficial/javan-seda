@@ -1,0 +1,609 @@
+@charset "UTF-8";
+/* ============================================================================
+   v3.4.3 — پوستۀ صفحهٔ «تنظیمات قالب» (Option Tree)
+   ----------------------------------------------------------------------------
+   این فایل فقط روی سه صفحۀ ادمینِ Option Tree لود می‌شود (enqueue:
+   inc/ab-admin-ui.php ← قلاب ot_admin_styles_after ⇒ بعد از ot-admin.css، پس
+   هیچ !important لازم نیست). هیچ خروجیِ سمت سایتی ندارد.
+   باز/بسته: «تنظیمات قالب ← کنترل رابط ← پوستۀ مدرِ تنظیمات»
+             یا  define( 'JAVANSEDA_ADMIN_UI', false );  در wp-config.php
+   رنگ‌ها همان پالت قالب: آبی #185ADB، جوهری #111، سفید — بدون گرادینت.
+   ========================================================================== */
+
+/* ---------------------------------------------------------------- توکن‌ها */
+.wrap.settings-wrap {
+  --abadm-surface: #fff;
+  --abadm-line: #e2e6ec;
+  --abadm-line-soft: #eef1f5;
+  --abadm-ink: #1d2327;
+  --abadm-muted: #667085;
+  --abadm-blue: #185ADB;
+  --abadm-blue-soft: #eef3fb;
+  --abadm-radius: 14px;
+  --abadm-radius-s: 9px;
+  --abadm-label-w: 240px;
+}
+
+/* ------------------------------------------------------------------ سرصفحه */
+.wrap.settings-wrap h1 {
+  margin: 12px 0 4px;
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--abadm-ink);
+}
+.wrap.settings-wrap h1:not(:first-of-type) {
+  margin-top: 26px;
+}
+
+/* ------------------------------------------------------ نوار تب‌ها (بخش‌ها) */
+.wrap.settings-wrap .ui-tabs {
+  position: static;
+}
+.wrap.settings-wrap .ui-tabs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  float: none;
+  width: auto;
+  gap: 4px;
+  margin: 18px 0 20px;
+  padding: 6px;
+  position: sticky;
+  top: 32px; /* نوار ابزار مدیریت وردپرس روی دسکتاپ ۳۲px است */
+  scroll-padding-inline-start: 8px;
+  background: var(--abadm-surface);
+  border: 1px solid var(--abadm-line);
+  border-radius: calc(var(--abadm-radius) + 2px);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+}
+body:not(.admin-bar) .wrap.settings-wrap .ui-tabs-nav {
+  top: 0;
+}
+.wrap.settings-wrap .ui-tabs-nav li {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  border: 1px solid transparent;
+  border-radius: var(--abadm-radius-s);
+  background: transparent;
+  -webkit-border-radius: var(--abadm-radius-s);
+  -moz-border-radius: var(--abadm-radius-s);
+}
+.wrap.settings-wrap .ui-tabs-nav li.ui-state-active,
+.wrap.settings-wrap .ui-tabs-nav li.ui-state-focus {
+  background: var(--abadm-blue);
+  border-color: var(--abadm-blue);
+  color: #fff;
+}
+.wrap.settings-wrap .ui-tabs-nav li a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--abadm-radius-s);
+  color: #404a59;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  text-decoration: none;
+  transition: background-color .15s ease, color .15s ease;
+}
+.wrap.settings-wrap .ui-tabs-nav li a:hover {
+  background: var(--abadm-blue-soft);
+  color: var(--abadm-blue);
+}
+.wrap.settings-wrap .ui-tabs-nav li a:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(24, 90, 219, .18);
+}
+.wrap.settings-wrap .ui-tabs-nav li.ui-state-active a,
+.wrap.settings-wrap .ui-tabs-nav li.ui-state-active a:hover {
+  background: transparent;
+  color: #fff;
+}
+.wrap.settings-wrap .ui-tabs-nav li a .ot-icon-ui {
+  margin: 0;
+}
+.wrap.settings-wrap .ui-tabs-panel {
+  clear: both;
+  border: 0;
+  background: transparent;
+}
+.wrap.settings-wrap .ui-tabs-panel.postbox {
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+  margin: 0;
+}
+.wrap.settings-wrap .ui-tabs-panel .inside {
+  margin: 0;
+  padding: 0;
+}
+
+/* -------------------------------------------------- ردیف هر تنظیم (کارت‌ها) */
+.format-settings {
+  width: auto;
+}
+.inside > .format-settings {
+  max-width: 1220px;
+  margin: 0 0 12px;
+  padding: 15px 18px 16px;
+  background: var(--abadm-surface);
+  border: 1px solid var(--abadm-line);
+  border-radius: var(--abadm-radius);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.inside > .format-settings:hover {
+  border-color: #cfd8e6;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, .04);
+}
+.inside > .format-settings > .format-setting-wrap {
+  display: grid;
+  grid-template-columns: var(--abadm-label-w) minmax(0, 1fr);
+  column-gap: 26px;
+  row-gap: 4px;
+  align-items: start;
+  padding: 0;
+}
+.inside > .format-settings > .format-setting-wrap > .format-setting {
+  margin: 0;
+}
+.format-settings .format-setting-label {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  border-bottom: 0;
+}
+.format-settings .format-setting-label .label,
+.format-settings .description h3 {
+  padding: 0;
+  color: var(--abadm-ink);
+  font-size: 13.5px;
+  font-weight: 700;
+  line-height: 1.9;
+  letter-spacing: 0;
+}
+.format-settings .description {
+  max-width: 74ch;
+  margin: 0 0 10px;
+  color: var(--abadm-muted);
+  font-size: 12.5px;
+  line-height: 1.95;
+}
+.format-settings .description p {
+  margin: 0 0 .35em;
+}
+.format-settings .description,
+.format-settings .label {
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.format-settings .description a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.format-settings .format-setting-inner {
+  margin: 0;
+}
+
+/* ردیف‌های وابسته (فقط وقتی فلان گزینه روشن/انتخاب شود) — کمی عقب‌تر */
+.inside > .format-settings.ab-sub-wrap {
+  margin-inline-start: 26px;
+  border-style: dashed;
+  border-color: #dfe5ee;
+  background: #fcfdff;
+}
+
+/* ------------------------------------------- بلوک راهنما و جداکنندهٔ بخش‌ها */
+.inside > .format-settings.ab-guide-wrap {
+  padding: 13px 16px;
+  background: var(--abadm-blue-soft);
+  border-color: #dbe6fb;
+}
+.inside > .format-settings.ab-guide-wrap > .format-setting-wrap {
+  display: block;
+  padding: 0;
+}
+.inside > .format-settings.ab-guide-wrap .format-setting,
+.inside > .format-settings.ab-guide-wrap .description {
+  max-width: 110ch;
+  margin: 0;
+  color: #33415c;
+  font-size: 12.5px;
+  line-height: 2;
+}
+.inside > .format-settings.ab-guide-wrap strong {
+  color: var(--abadm-blue);
+  font-weight: 700;
+}
+.inside > .format-settings.ab-guide-wrap code {
+  padding: 1px 6px;
+  background: #fff;
+  border: 1px solid #d9e4f7;
+  border-radius: 5px;
+  font-size: 11.5px;
+}
+.inside > .format-settings.ab-h-wrap {
+  margin: 28px 0 12px;
+  padding: 0 0 8px;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--abadm-line-soft);
+  border-radius: 0;
+  box-shadow: none;
+}
+.inside > .format-settings.ab-h-wrap:hover {
+  box-shadow: none;
+}
+.inside > .format-settings.ab-h-wrap > .format-setting-wrap {
+  display: block;
+  padding: 0;
+}
+.inside > .format-settings.ab-h-wrap .description {
+  margin: 0;
+  padding: 0;
+  color: var(--abadm-ink);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.8;
+}
+.inside > .format-settings.ab-h-wrap .description span {
+  display: block;
+  margin-top: 2px;
+  color: var(--abadm-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.95;
+}
+.inside > .format-settings:first-child.ab-h-wrap,
+.inside > .format-settings:first-child.ab-guide-wrap {
+  margin-top: 0;
+}
+
+/* ------------------------------------------------------------------ کنترل‌ها */
+.format-settings input[type=text],
+.format-settings input[type=password],
+.format-settings input[type=email],
+.format-settings input[type=url],
+.format-settings input[type=number],
+.format-settings select,
+.format-settings textarea {
+  padding: 7px 10px;
+  background: #fff;
+  border: 1px solid #c8d0da;
+  border-radius: var(--abadm-radius-s);
+  box-shadow: none;
+  color: var(--abadm-ink);
+  font-size: 13px;
+  line-height: 1.7;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.format-settings textarea {
+  min-height: 120px;
+  line-height: 1.9;
+  resize: vertical;
+}
+.format-settings select {
+  max-width: 420px;
+}
+.format-settings input[type=text]:focus,
+.format-settings input[type=password]:focus,
+.format-settings input[type=email]:focus,
+.format-settings input[type=url]:focus,
+.format-settings input[type=number]:focus,
+.format-settings select:focus,
+.format-settings textarea:focus {
+  border-color: var(--abadm-blue);
+  box-shadow: 0 0 0 3px rgba(24, 90, 219, .15);
+  outline: none;
+}
+.format-settings .format-setting-inner input.widefat,
+.format-settings .format-setting-inner textarea.widefat {
+  width: 100%;
+}
+
+/* سوئیچ روشن/خاموش: .on-off-switch + .slide-button را OT خودش می‌سازد و
+   جای دستگیره را با JS جابه‌جا می‌کند ⇒ فقط تایپوگرافی، بدون دست‌زدن به هندسه */
+.format-settings .on-off-switch label {
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+/* چک‌باکس‌ها (ستون‌های فوتر) — ردیفی، با فاصلهٔ ایمن (marginِ خود OT !important است) */
+.format-settings .format-setting.type-checkbox p,
+.format-settings .format-setting.type-page-checkbox p {
+  display: inline-block;
+  vertical-align: middle;
+  padding-inline-end: 24px;
+}
+.format-settings .format-setting.type-checkbox input[type=checkbox],
+.format-settings .format-setting.type-page-checkbox input[type=checkbox] {
+  margin-inline-end: 6px;
+}
+
+/* اسلایدر عددی (numeric-slider) */
+.format-settings .ot-numeric-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 460px;
+  margin: 0;
+}
+.format-settings .ot-numeric-slider-helper-input {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  text-align: center;
+  border: 1px solid #c8d0da;
+  border-radius: 7px;
+}
+.format-settings .ot-numeric-slider-helper-input {
+  font-variant-numeric: tabular-nums;
+}
+.format-settings .ot-numeric-slider-helper-input:focus {
+  border-color: var(--abadm-blue);
+  box-shadow: 0 0 0 3px rgba(24, 90, 219, .15);
+}
+.format-settings .ot-numeric-slider {
+  position: relative;
+  /* مقیاس عددی همیشه چپ‌به‌راست تا دستگیره با مقدار هم‌جهت بماند */
+  direction: ltr;
+  flex: 1 1 auto;
+  height: 6px;
+  margin: 0;
+  background: #e5eaf2;
+  border: 0;
+  border-radius: 999px;
+  box-shadow: none;
+}
+.format-settings .ot-numeric-slider .ui-slider-range {
+  height: 6px;
+  background: var(--abadm-blue);
+  border: 0;
+  border-radius: 999px;
+}
+.format-settings .ot-numeric-slider .ui-slider-handle {
+  top: -7px;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  background: #fff;
+  border: 2px solid var(--abadm-blue);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, .18);
+  cursor: grab;
+}
+.format-settings .ot-numeric-slider .ui-slider-handle:focus,
+.format-settings .ot-numeric-slider .ui-slider-handle.ui-state-active {
+  border-color: var(--abadm-blue);
+  box-shadow: 0 0 0 4px rgba(24, 90, 219, .18);
+  outline: none;
+}
+
+/* ویرایشگر فهرست (list-item) و جدول‌کدها */
+.format-settings .option-tree-setting {
+  margin: 0 0 10px;
+  background: #fff;
+  border: 1px solid var(--abadm-line);
+  border-radius: 12px;
+}
+.format-settings .option-tree-setting.is-open {
+  border-color: #cfd8e6;
+}
+.format-settings .option-tree-setting-toggle {
+  padding: 4px 0;
+}
+.format-settings table.widefat {
+  border-radius: 10px;
+  border-color: var(--abadm-line);
+}
+.format-settings .option-tree-ui-buttons {
+  margin: 0;
+}
+.format-settings ul.ot-composite-sortable,
+.format-settings .list-item-ui .format-settings {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ------------------------------------------------------------------- دکمه‌ها */
+.settings-wrap .option-tree-ui-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 22px 0 46px;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--abadm-line-soft);
+}
+.settings-wrap .option-tree-ui-button {
+  min-height: 38px;
+  padding: 7px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  box-shadow: none;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.settings-wrap .option-tree-ui-button.button-primary {
+  background: var(--abadm-blue);
+  border-color: var(--abadm-blue);
+  color: #fff;
+}
+.settings-wrap .option-tree-ui-button.button-primary:hover,
+.settings-wrap .option-tree-ui-button.button-primary:focus,
+.settings-wrap .option-tree-ui-button.button-primary:active {
+  background: #1248b6;
+  border-color: #1248b6;
+  color: #fff;
+}
+.settings-wrap .option-tree-ui-reset-settings.button {
+  background: transparent;
+  border-color: #c8d0da;
+  color: var(--abadm-muted);
+}
+.settings-wrap .option-tree-ui-reset-settings.button:hover {
+  border-color: #b45f6a;
+  color: #b4232f;
+}
+
+/* پیام‌ها */
+.settings-wrap div.updated,
+.settings-wrap div.settings-filter,
+.settings-wrap .ot-promo,
+.settings-wrap .option-tree-ui-message {
+  border-radius: 10px;
+}
+.settings-wrap div.settings-filter {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  background: #f6f8fb;
+  border: 1px solid var(--abadm-line-soft);
+}
+.settings-wrap .ot-image,
+.settings-wrap .format-settings .screenshot {
+  border-radius: 10px;
+}
+
+/* --------------------------------------------------------------- ریسپانسیو */
+@media screen and (max-width: 1100px) {
+  .inside > .format-settings > .format-setting-wrap {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 8px;
+  }
+  .inside > .format-settings.ab-sub-wrap {
+    margin-inline-start: 0;
+  }
+}
+@media screen and (max-width: 782px) {
+  /* نوار تب به‌جای شکستن خطوط، با انگشت افقی اسکرول می‌شود */
+  .wrap.settings-wrap .ui-tabs-nav {
+    position: static;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    margin: 12px 0 16px;
+    padding: 5px;
+  }
+  .wrap.settings-wrap .ui-tabs-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .wrap.settings-wrap .ui-tabs-nav li {
+    flex: 0 0 auto;
+  }
+  .wrap.settings-wrap .ui-tabs-nav li a {
+    padding: 7px 12px;
+    white-space: nowrap;
+    font-size: 12.5px;
+  }
+  .inside > .format-settings {
+    padding: 13px 14px;
+    border-radius: 12px;
+  }
+  .format-settings .ot-numeric-slider-wrap {
+    max-width: none;
+  }
+  /* ۱۶px = جلوگیری از زوم خودکار iOS هنگام تایپ در فیلد */
+  .format-settings input[type=text],
+  .format-settings input[type=url],
+  .format-settings input[type=email],
+  .format-settings input[type=number],
+  .format-settings select,
+  .format-settings textarea {
+    font-size: 16px;
+    max-width: 100%;
+  }
+  .format-settings select {
+    width: 100%;
+  }
+  .settings-wrap .option-tree-ui-button {
+    flex: 1 1 auto;
+    justify-content: center;
+    text-align: center;
+  }
+}
+@media screen and (max-width: 480px) {
+  .inside > .format-settings {
+    margin-bottom: 10px;
+    padding: 12px;
+  }
+  .settings-wrap .option-tree-ui-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+/* ------------------------------- مصون‌سازی اجزای تودرتو (تایپوگرافی/فهرست/آپلود) */
+/* OT داخل بعضی ردیف‌ها خودش .ui-tabs می‌سازد؛ نوار تبِ بالا برای آن‌ها نیست ⇒ به
+   حالت بلوکی برمی‌گردند تا چیدمانشان به‌هم نریزد. */
+.format-setting-inner .ui-tabs-nav {
+  position: static;
+  display: block;
+  float: none;
+  width: auto;
+  margin: 0 0 8px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+}
+.format-setting-inner .ui-tabs-nav li {
+  display: inline-block;
+  margin: 0 0 4px;
+  background: #fff;
+  border: 1px solid var(--abadm-line);
+  border-radius: 8px;
+}
+.format-setting-inner .ui-tabs-nav li.ui-state-active {
+  background: var(--abadm-blue-soft);
+  border-color: #cfe0fb;
+  color: var(--abadm-ink);
+}
+.format-setting-inner .ui-tabs-nav li a {
+  padding: 5px 10px;
+  color: #404a59;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+/* تصویر/پیش‌نمایش/جدول‌ها هیچ‌وقت از کارت بیرون نمی‌زنند */
+.format-setting-inner img,
+.format-setting-inner .screenshot,
+.format-setting-inner .ot-media-preview,
+.format-setting-inner .widefat,
+.format-setting-inner .option-tree-setting-table {
+  max-width: 100%;
+}
+.format-setting-inner img,
+.format-setting-inner .screenshot {
+  height: auto;
+}
+.format-setting-inner .option-tree-ui-upload-parent,
+.format-setting-inner .ot-upload-setting-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.format-settings .format-setting-inner input[type=text],
+.format-settings .format-setting-inner textarea {
+  min-width: 0;
+}
+@media screen and (prefers-reduced-motion: reduce) {
+  .wrap.settings-wrap .ui-tabs-nav li a,
+  .inside > .format-settings,
+  .format-settings input,
+  .format-settings select,
+  .format-settings textarea,
+  .settings-wrap .option-tree-ui-button {
+    transition: none;
+  }
+}

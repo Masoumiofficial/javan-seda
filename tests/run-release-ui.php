@@ -1,0 +1,30 @@
+<?php
+require __DIR__ . '/stubs-wp.php';
+require '/tmp/theme/inc/tara-release-core.php';
+require '/tmp/theme/inc/tara-release-files.php';
+require '/tmp/theme/inc/tara-release-ui.php';
+$pass=0; $fail=0;
+function ui_release_test($name,$ok){global $pass,$fail;echo ($ok?'PASS ':'FAIL ').$name."\n";if($ok)++$pass;else ++$fail;}
+$GLOBALS['__ot']['release_enabled']='on';
+$GLOBALS['__ot']['release_title']='<script>alert(1)</script>';
+$GLOBALS['__ot']['release_price_song']='1234000';
+$GLOBALS['__ot']['release_service_video']='off';
+$html=tara_release_render_wizard();
+ui_release_test('title escaped',false===strpos($html,'<script>alert(1)</script>'));
+ui_release_test('price from options',false!==strpos($html,'1,234,000'));
+ui_release_test('service disabled',false===strpos($html,'value="video"'));
+ui_release_test('three short stages',3===substr_count($html,'data-release-step'));
+ui_release_test('submit is available when enabled',false!==strpos($html,'data-release-submit>'));
+ui_release_test('international card removed from the fixed-price form',false===strpos($html,'فقط بررسی') && false===strpos($html,'value="international"'));
+ui_release_test('rules and plan details link points to releases',false!==strpos($html,'https://ahangban.ir/releases/') && false!==strpos($html,'قوانین و جزئیات پلن‌ها'));
+$html = tara_release_render_wizard();
+ui_release_test('fixed tariff disclaimer is gone', false === strpos( $html, 'قطعی نیست' ) && false !== strpos( $html, 'تعرفه‌ها ثابت' ));
+ui_release_test('conditions block is gone', false === strpos( $html, 'tara-release__terms' ) && false === strpos( $html, '<details><summary>شرط' ));
+ui_release_test('form-only hides request list', false === strpos( tara_release_render_wizard( 0, 'form' ), 'tara-release__request' ));
+ui_release_test('progress bar present', false !== strpos( $html, 'data-release-progress-bar' ));
+ui_release_test('new release form fields', false !== strpos( $html, 'name="audio128"' ) && false !== strpos( $html, 'name="audio320"' ) && false !== strpos( $html, 'name="title_en"' ) && false !== strpos( $html, 'name="lyrics"' ));
+ui_release_test('english names are required', false !== strpos( $html, 'name="title_en" dir="ltr" maxlength="180" required' ) && false !== strpos( $html, 'name="performer_en" dir="ltr" maxlength="120" required' ));
+ui_release_test('single plan selector lists the exact tariffs', false === strpos( $html, 'name="plan"' ) && false !== strpos( $html, 'آهنگ — 1,234,000 تومان' ) && false !== strpos( $html, 'آلبوم — 4,500,000 تومان' ));
+ui_release_test('submit creates an invoice and pays', false !== strpos( $html, 'ثبت درخواست و پرداخت' ));
+ui_release_test('server upload policy shown', false !== strpos( $html, '۳۰' ) && false !== strpos( $html, '۵ مگابایت' ));
+echo "RESULT pass=$pass fail=$fail\n";

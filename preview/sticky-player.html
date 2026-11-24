@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa-IR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>پیش‌نمایش نوار چسبان پخش — 3.2.4 (حالت شب · کوتاه‌تر · قبلی/بعدی)</title>
+<link rel="stylesheet" href="../javanseda/css/icofont.min.css">
+<link rel="stylesheet" href="../javanseda/style.css">
+<style>
+/* ---- فقط برای همین صفحۀ پیش‌نمایش (در قالب چیزی اضافه نشده) ---- */
+body{background:#fff;padding:0 0 70px}
+.pv{max-width:1040px;margin:0 auto;padding:18px 16px}
+.pv h1{font-size:19px;color:#111;margin:4px 0 6px}
+.pv p.lead{font-size:12.5px;color:#8a92a6;line-height:1.8;margin:0 0 18px}
+.pv h2{font-size:14.5px;color:#111;margin:24px 0 4px}
+.pv small{display:block;font-size:11.5px;color:#8a92a6;margin-bottom:8px;line-height:1.7}
+.pv-stage{position:relative;border:1px solid #e6ebf3;border-radius:14px;padding:16px 12px 12px;background:#fff;overflow:hidden}
+.pv-stage .ab-sticky{position:static;border:1px solid var(--ab-line);border-radius:12px;box-shadow:none}
+.pv-stage .ab-sticky::before{display:none}
+.pv-night{background:#111}
+.pv-btn{display:inline-block;margin-top:14px;padding:7px 12px;border:1px solid #e6ebf3;border-radius:9px;background:#fff;color:#111;font-size:12px}
+.pv-btn:hover{border-color:#185ADB;color:#185ADB}
+.pv-note{margin-top:16px;padding:10px 12px;border:1px dashed #cfd8ea;border-radius:10px;font-size:11.5px;color:#8a92a6;line-height:1.8}
+</style>
+</head>
+<body>
+<div class="pv">
+
+  <h1>نوار چسبانِ پخش — نسخۀ 3.2.4</h1>
+  <p class="lead">همان نشانه‌گذاری و همان CSS قالب (<code>style.css</code> بلوک ۲۴ + <code>inc/ab-post-extras.php</code>).
+  روی دکمۀ پخش بزنید تا اکولایزر، خطِ پرشدنِ پیشرفت و شمارۀ قطعه را ببینید؛ «قبلی/بعدی» هم در همین دمو کار می‌کند.</p>
+
+  <h2>۱) حالت روشن — تک‌آهنگ (قبلی/بعدی = آهنگ‌های سایت)</h2>
+  <small>ارتفاع ≈ ۶۰px · تصویر ۳۴px · چیدمان: تصویر · قبلی · پخش · بعدی · شمارۀ قطعه · عنوان+نوار · دانلود · بستن</small>
+  <div class="pv-stage" data-demo>
+    <div id="ab-sticky-player" class="ab-sticky" role="region" aria-label="پخش آهنگ" data-ab-sp-mode="links" data-ab-sp-index="1">
+      <div class="ab-sp__in">
+        <span class="ab-sp-thumb ab-sp-thumb--none" aria-hidden="true"><i class="icofont-music-note"></i><span class="ab-sp-eq" aria-hidden="true"><i></i><i></i><i></i></span></span>
+        <a class="ab-sp-nav" href="#n" data-ab-sp-go="prev" aria-label="آهنگ قبلی" title="آهنگ قبلی"><i class="icofont-forward" aria-hidden="true"></i></a>
+        <button type="button" class="ab-sp-play" aria-label="پخش"><i class="icofont-play-alt-2" aria-hidden="true"></i></button>
+        <a class="ab-sp-nav" href="#n" data-ab-sp-go="next" aria-label="آهنگ بعدی" title="آهنگ بعدی"><i class="icofont-rewind" aria-hidden="true"></i></a>
+        <span class="ab-sp__no" aria-hidden="true"><b class="ab-sp__now">۲</b>/۳</span>
+        <div class="ab-sp__meta">
+          <a class="ab-sp__title" href="#n" data-ab-sp-link>بوسه آخر</a>
+          <span class="ab-sp__artist">روزبه بمانی</span>
+          <span class="ab-sp__bar">
+            <span class="ab-sp-slide"><span class="ab-sp-track" aria-hidden="true"><span class="ab-sp-fill" data-ab-sp-fill></span></span>
+            <input type="range" class="ab-sp-range" min="0" max="1000" value="0" step="1" aria-label="محل پخش" dir="ltr" /></span>
+            <span class="ab-sp-time"><b class="ab-sp-cur">۰۰:۰۰</b>/<b class="ab-sp-tot">۰۳:۴۲</b></span>
+          </span>
+        </div>
+        <a class="ab-sp__dl" href="#n" data-ab-sp-dl><i class="icofont-download" aria-hidden="true"></i><span>دانلود</span></a>
+        <button type="button" class="ab-sp-close" aria-label="بستن نوار پخش"><i class="icofont-close-line" aria-hidden="true"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <h2>۲) همان نوار در حالت شب (بدنۀ صفحه کلاس <code>night</code> می‌گیرد)</h2>
+  <small>هیچ رنگ سفیدی هارد‌کد نشده؛ همه از <code>--ab-surface</code> / <code>--ab-text</code> / <code>--ab-line</code> می‌آیند ⇒ با همان سوییچِ خودِ قالب تیره می‌شود.</small>
+  <div class="pv-stage pv-night night" data-demo>
+    <div class="ab-sticky" role="region" aria-label="پخش آهنگ" data-ab-sp-mode="album" data-ab-sp-index="2">
+      <div class="ab-sp__in">
+        <span class="ab-sp-thumb ab-sp-thumb--none" aria-hidden="true"><i class="icofont-music-disk"></i><span class="ab-sp-eq" aria-hidden="true"><i></i><i></i><i></i></span></span>
+        <button type="button" class="ab-sp-nav" data-ab-sp-go="prev" aria-label="قطیعۀ قبلی" title="قطیعۀ قبلی"><i class="icofont-forward" aria-hidden="true"></i></button>
+        <button type="button" class="ab-sp-play" aria-label="پخش"><i class="icofont-play-alt-2" aria-hidden="true"></i></button>
+        <button type="button" class="ab-sp-nav" data-ab-sp-go="next" aria-label="قطیعۀ بعدی" title="قطیعۀ بعدی"><i class="icofont-rewind" aria-hidden="true"></i></button>
+        <span class="ab-sp__no" aria-hidden="true"><b class="ab-sp__now">۳</b>/۹</span>
+        <div class="ab-sp__meta">
+          <a class="ab-sp__title" href="#n" data-ab-sp-link> NIGHT - قطعهٔ سوم آلبوم</a>
+          <span class="ab-sp__artist">روزبه بمانی</span>
+          <span class="ab-sp__bar">
+            <span class="ab-sp-slide"><span class="ab-sp-track" aria-hidden="true"><span class="ab-sp-fill" data-ab-sp-fill></span></span>
+            <input type="range" class="ab-sp-range" min="0" max="1000" value="0" step="1" aria-label="محل پخش" dir="ltr" /></span>
+            <span class="ab-sp-time"><b class="ab-sp-cur">۰۱:۱۲</b>/<b class="ab-sp-tot">۰۴:۰۵</b></span>
+          </span>
+        </div>
+        <a class="ab-sp__dl" href="#n" data-ab-sp-dl><i class="icofont-download" aria-hidden="true"></i><span>دانلود</span></a>
+        <button type="button" class="ab-sp-close" aria-label="بستن نوار پخش"><i class="icofont-close-line" aria-hidden="true"></i></button>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="pv-btn" id="pv-night-toggle">حالت روشن/شب را روی کل صفحه امتحان کنید</button>
+
+  <h2>۳) موبایل (عرض کم)</h2>
+  <small>ارتفاع ≈ ۵۰px · تصویر ۳۰px · متن «خواننده» و نوشتهٔ «دانلود» حذف می‌شود تا جا باز بماند.</small>
+  <div class="pv-stage" style="max-width:392px" data-demo>
+    <div class="ab-sticky" role="region" aria-label="پخش آهنگ" data-ab-sp-mode="links" data-ab-sp-index="0">
+      <div class="ab-sp__in">
+        <span class="ab-sp-thumb ab-sp-thumb--none" aria-hidden="true"><i class="icofont-music-note"></i><span class="ab-sp-eq" aria-hidden="true"><i></i><i></i><i></i></span></span>
+        <a class="ab-sp-nav" href="#n" data-ab-sp-go="prev" aria-label="آهنگ قبلی"><i class="icofont-forward"></i></a>
+        <button type="button" class="ab-sp-play" aria-label="پخش"><i class="icofont-play-alt-2"></i></button>
+        <a class="ab-sp-nav" href="#n" data-ab-sp-go="next" aria-label="آهنگ بعدی"><i class="icofont-rewind"></i></a>
+        <div class="ab-sp__meta">
+          <a class="ab-sp__title" href="#n" data-ab-sp-link>شب‌های بی‌تو (نسخۀ آکوستیک)</a>
+          <span class="ab-sp__artist">حامد حسینی</span>
+          <span class="ab-sp__bar">
+            <span class="ab-sp-slide"><span class="ab-sp-track"><span class="ab-sp-fill" data-ab-sp-fill></span></span>
+            <input type="range" class="ab-sp-range" min="0" max="1000" value="620" step="1" aria-label="محل پخش" dir="ltr" /></span>
+            <span class="ab-sp-time"><b class="ab-sp-cur">۰۲:۰۹</b>/<b class="ab-sp-tot">۰۳:۳۱</b></span>
+          </span>
+        </div>
+        <a class="ab-sp__dl" href="#n" data-ab-sp-dl><i class="icofont-download"></i><span>دانلود</span></a>
+        <button type="button" class="ab-sp-close" aria-label="بستن"><i class="icofont-close-line"></i></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="pv-note">
+    <b>روی هاست چه چیزی عوض می‌شود:</b> فایل‌های <code>inc/ab-post-extras.php</code> و <code style="direction:ltr">style.css</code>.
+    پخش/توقف و میلهٔ پیشرفت همان <code>&lt;audio id="audio"&gt;</code> خودِ قالب را کنترل می‌کند (هیچ پلیر تازه‌ای جای آن نمی‌نشیند)؛
+    اگر صفحه پلیر نداشته باشد (مثل صفحۀ اصلی) نوار از <code>#ab-sp-audio</code> خودش استفاده می‌کند.
+    در صفحۀ آلبوم، دکمه‌های قبلی/بعدی روی ردیف‌های خودِ پلیرِ قالب کلیک می‌کنند، پس پلیرِ صفحه و نوار همیشه هم‌خوان می‌مانند.
+    بدون جاوااسکریپت، همان دکمه‌ها لینکِ آدرس آهنگِ قبلی/بعدی هستند.
+  </div>
+</div>
+
+<script>
+/* ---- شبیه‌ساز دمو: فقط برای دیدن ظاهر (روی هاست این اسکریپت وجود ندارد) ---- */
+(function(){
+	var tracks = ['بوسه آخر','شب‌های بی‌تو','عشق یعنی تو','تنها تا صبح','صدای باران'],
+		artists = ['روزبه بمانی','حامد حسینی','ناصر زینعلی','معین حبیبی','آصف آریا'];
+	function fa(n){ var D='۰۱۲۳۴۵۶۷۸۹'; return String(n).replace(/[0-9]/g,function(x){return D.charAt(parseInt(x,10));}); }
+	function clock(s){ var m=Math.floor(s/60), ss=s%60; return (m<10?'0':'')+m+':'+(ss<10?'0':'')+ss; }
+	var stages = document.querySelectorAll('[data-demo]');
+	for (var i=0;i<stages.length;i++){ (function(stage){
+		var bar = stage.querySelector('.ab-sticky'),
+			play = stage.querySelector('.ab-sp-play'),
+			fill = stage.querySelector('[data-ab-sp-fill]'),
+			cur  = stage.querySelector('.ab-sp-cur'),
+			tot  = stage.querySelector('.ab-sp-tot'),
+			non  = stage.querySelector('.ab-sp__now'),
+			tit  = stage.querySelector('[data-ab-sp-link]'),
+			art  = stage.querySelector('.ab-sp__artist'),
+			rng  = stage.querySelector('.ab-sp-range'),
+			idx  = parseInt(bar.getAttribute('data-ab-sp-index')||'0',10) || 0,
+			playing = false, t = 0, total = 222, timer = null;
+		function draw(){
+			var p = total ? t/total : 0;
+			if (fill) fill.style.width = (p*100).toFixed(2)+'%';
+			if (rng) rng.value = Math.round(p*1000);
+			if (cur) cur.innerHTML = fa(clock(t));
+			if (tot) tot.innerHTML = fa(clock(total));
+		}
+		function tick(){
+			if (!playing) return;
+			t += 1; if (t >= total) { t = 0; next(); }
+			draw();
+		}
+		function setPlay(onoff){
+			playing = onoff;
+			if (onoff) { bar.className = (bar.className + ' ab-sp--playing').replace(/\s+/g,' '); play.innerHTML='<i class="icofont-pause"></i>'; if(!timer) timer=setInterval(tick,250); }
+			else { bar.className = bar.className.replace(' ab-sp--playing',''); play.innerHTML='<i class="icofont-play-alt-2"></i>'; if(timer){clearInterval(timer);timer=null;} }
+		}
+		function label(){
+			if (tit) tit.innerHTML = tracks[idx % tracks.length];
+			if (art) art.innerHTML = artists[idx % artists.length];
+			if (non) non.innerHTML = fa((idx % 3) + 1);
+		}
+		function step(d){ var last = tracks.length-1; idx += d; if (idx<0) idx=last; if (idx>last) idx=0; t = 0; label(); draw(); }
+		function next(){ step(1); }
+		play.addEventListener('click', function(){ setPlay(!playing); });
+		var navs = stage.querySelectorAll('[data-ab-sp-go]');
+		for (var k=0;k<navs.length;k++){ navs[k].addEventListener('click', function(e){ e.preventDefault(); step(this.getAttribute('data-ab-sp-go')==='next'?1:-1); }); }
+		if (rng) rng.addEventListener('input', function(){ t = Math.round(total*(parseInt(rng.value,10)/1000)); draw(); });
+		var cl = stage.querySelector('.ab-sp-close');
+		if (cl) cl.addEventListener('click', function(){ setPlay(false); bar.parentNode.removeChild(bar); });
+		draw();
+	})(stages[i]); }
+	var nt = document.getElementById('pv-night-toggle');
+	if (nt) nt.addEventListener('click', function(){
+		var c = document.body.className;
+		document.body.className = (c.indexOf('night')>-1) ? c.replace(' night','').replace('night','') : (c + ' night');
+	});
+})();
+</script>
+</body>
+</html>

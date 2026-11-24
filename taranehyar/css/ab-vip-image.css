@@ -1,0 +1,74 @@
+/*
+ * ab-vip-image.css — جعبهٔ «بنر اسلایدر ویژه» در صفحهٔ ویرایش نوشته (v3.8.3)
+ * ---------------------------------------------------------------------------
+ * فقط پیش‌نمایش و چیدمان است؛ هیچ رنگی از قالب سایت این‌جا نیست تا در
+ * حالت شبِ پیشخوان وردپرس هم خوانا بماند.
+ */
+.tara-vip-box {
+	display: grid;
+	grid-template-columns: 240px minmax(0, 1fr);
+	gap: 16px;
+	align-items: start;
+	padding: 4px 0 2px;
+	direction: rtl;
+	text-align: right;
+}
+
+.tara-vip-box__preview {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 106px;
+	padding: 8px;
+	border: 1px solid #dcdcde;
+	border-radius: 8px;
+	background: #f6f7f7;
+	overflow: hidden;
+}
+
+.tara-vip-box__preview img {
+	display: block;
+	width: 100%;
+	height: auto;
+	max-height: 120px;
+	object-fit: cover;
+	border-radius: 4px;
+	aspect-ratio: 16 / 7;
+}
+
+.tara-vip-box__empty {
+	font-size: 12px;
+	line-height: 1.7;
+	color: #646970;
+	text-align: center;
+}
+
+.tara-vip-box__body { display: grid; gap: 10px; }
+
+.tara-vip-box__hint {
+	margin: 0;
+	font-size: 12.5px;
+	line-height: 1.9;
+	color: #3c434a;
+}
+
+.tara-vip-box__hint--muted { color: #646970; font-size: 11.5px; }
+
+.tara-vip-box__flag {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin: 0;
+	font-size: 12.5px;
+	color: #1d2327;
+}
+
+.tara-vip-box__flag .dashicons { color: #dba617; }
+.tara-vip-box__flag--off .dashicons { color: #a7aaad; }
+
+.tara-vip-box__actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+
+@media (max-width: 782px) {
+	.tara-vip-box { grid-template-columns: minmax(0, 1fr); }
+}

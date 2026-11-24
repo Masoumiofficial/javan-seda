@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {JSDOM} from 'jsdom';
+const css=fs.readFileSync('taranehyar/style.css','utf8');
+const li=css.match(/#left_side \.tarlanweb_side_box li:not\(\.artist_songs_page_li\)\{([^}]*)\}/);
+const a=css.match(/#left_side \.tarlanweb_side_box li:not\(\.artist_songs_page_li\) > a\{([^}]*)\}/);
+assert(li && a, 'sidebar scoped sizing exists');
+const markup='<div id="left_side"><div class="tarlanweb_side_box"><ul><li><a href="/news"><div class="tara-thumb-box"></div>یک خبر با عنوان بسیار طولانی که باید بدون همپوشانی در چند سطر نمایش داده شود</a></li><li><a href="/next">مطلب بعدی</a></li></ul></div></div>';
+const dom=new JSDOM(`<style>.tarlanweb_side_box li{height:80px}.tarlanweb_side_box li a{height:60px} ${li[0]} ${a[0]}</style>${markup}`);
+const w=dom.window, first=w.document.querySelector('li'), link=first.querySelector('a');
+assert.equal(w.getComputedStyle(first).height,'auto');assert.equal(w.getComputedStyle(first).minHeight,'80px');
+assert.equal(w.getComputedStyle(link).height,'auto');assert.equal(w.getComputedStyle(link).minHeight,'60px');assert.equal(w.getComputedStyle(link).overflowWrap,'anywhere');assert.equal(w.getComputedStyle(link).display,'flow-root');
+assert(link.textContent.includes('بدون همپوشانی'),'full title retained');dom.window.close();
+console.log('sidebar title CSS scope, variable height and full title: passed (DOM simulation only)');

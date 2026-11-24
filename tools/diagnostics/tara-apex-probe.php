@@ -267,6 +267,54 @@ if ( 'apex' === $TARGET ) {
  * target=vip
  * ================================================================== */
 if ( 'vip' === $TARGET ) {
+	/* ---- آیا fallbackِ ۳.۱۶.۰ فعال است؟ این پاسخِ «چرا ۳.۱۵.۰ سالم بود» است ---- */
+	say( '--- vip: چرا ۳.۱۵.۰ سالم بود؟ ---' );
+	$vn = function_exists( 'ot_get_option' ) ? ot_get_option( 'vip_num' ) : '(ot نیست)';
+	say( '  vip_num = ' . var_export( $vn, true ) . ' → مؤثر: ' . ( ! empty( $vn ) ? (int) $vn : 5 ) );
+	$t = microtime( true );
+	$vq = new WP_Query(
+		array(
+			'post_type'      => 'post',
+			'post_status'    => 'publish',
+			'posts_per_page' => 5,
+			'meta_query'     => array( // phpcs:ignore WordPress.DB.SlowDBQuery
+				array( 'key' => 'vip_song', 'value' => '1', 'compare' => 'LIKE' ),
+			),
+		)
+	);
+	say( '  کوئریِ vip_song: ' . $vq->post_count . ' نتیجه در ' . el( $t ) . 'ms' );
+	if ( $vq->have_posts() ) {
+		say( '  ✓ vip_song پر است → در ۳.۱۵.۰ هم همین ۵ اسلاید رندر می‌شد.' );
+		say( '     پس کندیِ vip از fallback نیست؛ از خودِ حلقه است.' );
+	} else {
+		say( '  ✗ vip_song خالی است → fallback فعال می‌شود.' );
+		say( '     در ۳.۱۵.۰: هیچ اسلایدی چاپ نمی‌شد (صفر کار).' );
+		say( '     از ۳.۱۶.۰: ۵ اسلاید کامل رندر می‌شود ← این تفاوتِ اصلی است.' );
+		$t = microtime( true );
+		$fq = new WP_Query( array( 'post_type' => 'post', 'post_status' => 'publish', 'posts_per_page' => 5, 'ignore_sticky_posts' => true ) );
+		say( '     کوئریِ fallback: ' . $fq->post_count . ' نتیجه در ' . el( $t ) . 'ms' );
+		/* هزینهٔ هر اسلاید: همان چیزی که حلقه انجام می‌دهد */
+		if ( $fq->have_posts() ) {
+			$t   = microtime( true );
+			$got = 0;
+			foreach ( $fq->posts as $fp ) {
+				get_post_meta( $fp->ID, 'video1080', true );
+				get_post_meta( $fp->ID, 'video720', true );
+				get_post_meta( $fp->ID, 'video480', true );
+				if ( function_exists( 'tara_post_has_video' ) ) {
+					tara_post_has_video( $fp->ID );
+				}
+				$thumb = (int) get_post_thumbnail_id( $fp->ID );
+				if ( $thumb ) {
+					wp_get_attachment_image_url( $thumb, 'full' );
+					wp_get_attachment_image_srcset( $thumb, 'full' );
+				}
+				++$got;
+			}
+			say( '     هزینهٔ متا/تصویرِ ' . $got . ' اسلاید: ' . el( $t ) . 'ms' );
+		}
+	}
+	say( '' );
 	say( '--- vip_slider: گام‌به‌گام ---' );
 	say( '' );
 

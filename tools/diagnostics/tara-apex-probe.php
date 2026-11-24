@@ -323,11 +323,22 @@ if ( 'db' === $TARGET ) {
 			$have = ( 'meta_key' === $cols[0] || 0 === strpos( $cols[0], 'meta_key' ) );
 			say( '  ' . str_pad( $name, 34 ) . implode( ', ', $cols ) . ( $have ? '  ✓ با meta_key' : '' ) );
 		}
-		$k = isset( $by['meta_key'] ) ? $by['meta_key'] : array();
-		if ( ! $k || 'meta_key' !== $k[0] ) {
-			say( '  ⚠⚠⚠ ایندکسِ `meta_key` تنها وجود ندارد! هر meta_query یک اسکن کامل است.' );
-		} elseif ( 2 === count( $k ) && false !== strpos( $k[1], 'post_id' ) ) {
-			say( '  ✓ meta_key+post_id هست — کوئری‌های تک‌کلیدی باید سریع باشند.' );
+		/* ایندکسی که ستونِ اولش meta_key است (نامش ممکن است meta_key یا meta_key_2 باشد) */
+		$mk = array();
+		foreach ( $by as $name => $cols ) {
+			if ( 'meta_key' === substr( (string) $cols[0], 0, 8 ) ) {
+				$mk = $cols;
+				break;
+			}
+		}
+		if ( ! $mk ) {
+			say( '  ⚠⚠⚠ هیچ ایندکسی با ستونِ اولِ meta_key نیست! هر meta_query = اسکن کاملِ جدول.' );
+			say( '     ↑ این به‌تنهایی می‌تواند ۷۹ ثانیه را توضیح دهد.' );
+		} elseif ( count( $mk ) >= 2 && false !== strpos( (string) $mk[1], 'post_id' ) ) {
+			say( '  ✓ meta_key+post_id هست — کوئری‌های تک‌کلیدی باید از ایندکس بروند.' );
+			say( '     اگر باز هم کند است، گلوگاه JOIN/GROUP BY روی دو meta_query است، نه اسکن.' );
+		} else {
+			say( '  ⚠ ایندکس meta_key هست ولی post_id همراهش نیست — نیمه‌کارآمد.' );
 		}
 	} else {
 		say( '  ✗ SHOW INDEX خالی برگشت.' );

@@ -751,6 +751,31 @@ if ( ! function_exists( 'tara_radio_is_tax_page' ) ) {
 			return false;
 		}
 
+		/* v3.17.15 — دسته‌بندی هم صفحهٔ تاکسونومیِ دارای سربرگ است.
+		   ------------------------------------------------------------------
+		   از ۳.۱۷.۱۴ صفحهٔ دسته همان چیدمانِ ژانر را اجرا می‌کند
+		   (inc/tax-listing.php → tara_tax_hero/tara_tax_about)، ولی این
+		   تابع فقط ژانر و حال‌وهوا را می‌شناخت. نتیجه: css/tara-tax.css
+		   در صفحهٔ دسته بارگذاری نمی‌شد و سربرگ، چیپ‌ها، آمار و بلوکِ
+		   «دربارهٔ» **بدونِ استایل** رندر می‌شدند — همان «بد نمایش داده
+		   می‌شود» که کاربر گزارش کرد.
+
+		   حالا هر تاکسونومی‌ای که tara_tax_is_music آن را می‌شناسد
+		   (ژانر، حال‌وهوا، دسته) اینجا هم پذیرفته می‌شود؛ اگر روزی
+		   تاکسونومیِ تازه‌ای اضافه شد، خودکار پوشش می‌گیرد. */
+		if ( function_exists( 'is_category' ) && is_category() && function_exists( 'tara_tax_is_music' ) ) {
+			return tara_tax_is_music( 'category' );
+		}
+
+		if ( function_exists( 'tara_tax_is_music' ) ) {
+			foreach ( array( 'tara_genre', 'tara_mood' ) as $tara_rt ) {
+				if ( is_tax( $tara_rt ) ) {
+					return tara_tax_is_music( $tara_rt );
+				}
+			}
+			return false;
+		}
+
 		return is_tax( 'tara_genre' ) || is_tax( 'tara_mood' );
 	}
 }

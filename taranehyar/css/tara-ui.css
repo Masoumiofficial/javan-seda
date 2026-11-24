@@ -1054,14 +1054,31 @@ body.has-tara-dock { padding-bottom: 76px; }
 /* =========================================================================
    ۴) ردیف آهنگ (فهرست‌های عمومی)
    ====================================================================== */
+/* v3.17.15 — فهرستِ آهنگ‌ها چندستونه شد (خواستهٔ کاربر).
+   ------------------------------------------------------------------------
+   پیش از این `.ty-tracklist` یک gridِ تک‌ستونه بود و هر ردیف تمامِ عرضِ
+   صفحه را می‌گرفت. روی دسکتاپ نتیجه: کاور در راست، عنوان در چپ، و
+   فاصلهٔ خالیِ چند صد پیکسلی بینشان — هم شلخته، هم فقط ۱۰ آهنگ در
+   یک دید. حالا هر ستون یک «کارت» است و صفحه ۲ تا ۳ ستون می‌گیرد.
+
+   چرا auto-fill با minmax(320px, 1fr)؟
+     • دسکتاپ عریض (≥1200px)  → ۳ ستون
+     • لپ‌تاپ/تبلت افقی       → ۲ ستون
+     • موبایل                 → ۱ ستون (همان ردیفِ آشنای قبلی)
+   هیچ breakpointِ دستی لازم نیست و روی هر عرضی خودش جا می‌افتد. */
 .ty-tracklist {
 	display: grid;
-	gap: 4px;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+	gap: 8px 12px;
 	margin: 0;
 	padding: 0;
 	list-style: none;
+	align-items: start;
 }
 
+/* در چندستونه شدن، ستون‌های `auto` (تاریخ/دکمه) ممکن است عرضِ کارت را
+   به‌هم بزنند. ستونِ عنوان minmax(0,1fr) می‌ماند تا متن با ellipsis
+   کوتاه شود و کارت‌ها هم‌عرض بمانند. */
 .ty-track {
 	display: grid;
 	grid-template-columns: 38px 48px minmax(0, 1fr) auto auto;
@@ -1070,6 +1087,55 @@ body.has-tara-dock { padding-bottom: 76px; }
 	padding: 8px 10px;
 	border-radius: 12px;
 	transition: background 0.15s ease;
+	min-width: 0;
+}
+
+/* تاریخ روی کارت‌های باریک جا نمی‌شود؛ زیر ۱۰۸۰px پنهان می‌شود تا
+   عنوان فضا داشته باشد. (تاریخ در data-tara-date برای مرتب‌سازی
+   و برای صفحهٔ آهنگ باقی است.) */
+/* li خودش گریدِ داخلی ندارد؛ فقط نباید چیزی به کارت اضافه کند. */
+.ty-tracklist > li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	min-width: 0;
+}
+
+/* هر کارت یک قابِ ملایم بگیرد تا در چیدمانِ چندستونه، ستون‌ها از هم
+   قابل تشخیص باشند (بدون قاب، ردیف‌ها با gap = 4px به هم می‌چسبند و
+   دوباره شلخته به‌نظر می‌رسند). در تک‌ستونه (موبایل) قاب برداشته
+   می‌شود تا همان ردیفِ تمیزِ قبلی بماند. */
+.ty-tracklist--cards > li .ty-track,
+.ty-archive__list > li .ty-track {
+	border: 1px solid var(--ty-line);
+	background: var(--ty-surface);
+}
+
+.ty-tracklist--cards > li .ty-track:hover,
+.ty-archive__list > li .ty-track:hover {
+	border-color: color-mix(in srgb, var(--ty-accent) 34%, var(--ty-line));
+}
+
+@media (max-width: 560px) {
+	.ty-tracklist--cards > li .ty-track,
+	.ty-archive__list > li .ty-track {
+		border-color: transparent;
+		background: transparent;
+	}
+}
+
+@media (max-width: 1100px) and (min-width: 561px) {
+	.ty-track__date { display: none; }
+}
+
+/* در تک‌ستونه (موبایل) تاریخ برمی‌گردد.
+   آستانهٔ ۵۶۰px: تبلتِ عمودی (~۷۶۸px) دو ستون می‌گیرد و موبایلِ بزرگ
+   (~۴۳۰px) تک‌ستونه می‌ماند. */
+@media (max-width: 560px) {
+	.ty-tracklist {
+		grid-template-columns: 1fr;
+	}
+	.ty-track__date { display: inline; }
 }
 
 .ty-track:hover { background: var(--ty-accent-soft); }

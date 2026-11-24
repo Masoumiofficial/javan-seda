@@ -176,7 +176,12 @@ echo "\n=== ۶) بخش «دربارهٔ» برای دسته متن کامل را
 ttrue( "function_exists tara_tax_about", function_exists( 'tara_tax_about' ) );
 $about = tara_tax_about( $cat );
 ttrue( "درباره خالی نیست", '' !== trim( (string) $about ) );
-ttrue( "درباره کلاس ty-taxabout__custom دارد", false !== strpos( (string) $about, 'ty-taxabout__custom' ) );
+/* v3.17.15 — به‌جای بلوکِ خام، مارک‌آپِ ab-cat-desc با دکمهٔ بیشتر/کمتر */
+ttrue( "درباره کلاس ab-cat-desc دارد", false !== strpos( (string) $about, 'class="ab-cat-desc"' ) );
+ttrue( "درباره data-ab-desc دارد", false !== strpos( (string) $about, 'data-ab-desc>' ) );
+ttrue( "درباره دکمهٔ نمایش بیشتر دارد", false !== strpos( (string) $about, 'data-ab-desc-toggle' ) );
+ttrue( "درباره متن دکمه «نمایش بیشتر» دارد", false !== strpos( (string) $about, 'نمایش بیشتر' ) );
+ttrue( "درباره پوشش ty-taxabout-wrap دارد", false !== strpos( (string) $about, 'ty-taxabout-wrap' ) );
 ttrue( "درباره متن کامل را دارد", false !== strpos( (string) $about, 'بهترین' ) );
 ttrue( "درباره strong را حفظ کرده", false !== strpos( (string) $about, '<strong>' ) );
 
@@ -186,8 +191,8 @@ $GLOBALS['__terms'][31]  = $genre;
 
 $about_genre = tara_tax_about( $genre );
 ttrue(
-	"دربارهٔ ژانر کلاس custom ندارد",
-	false === strpos( (string) $about_genre, 'ty-taxabout__custom' )
+	"دربارهٔ ژانر بلوکِ ab-cat-desc ندارد (فقط دسته)",
+	false === strpos( (string) $about_genre, 'data-ab-desc>' )
 );
 
 echo "\n";

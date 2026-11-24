@@ -712,36 +712,51 @@ if ( ! function_exists( 'tara_tax_about' ) ) {
 		$label     = function_exists( 'tara_music_taxonomy_label' ) ? tara_music_taxonomy_label( $term->taxonomy, 'singular' ) : 'بخش';
 		$intro     = tara_tax_intro( $term, $stats, $spotlight, $cross );
 
-		/* v3.17.14 — متنِ کاملِ ویرایش‌شده در پیشخوان، پیش از معرفیِ خودکار.
+		/* v3.17.15 — متنِ کاملِ ویرایش‌شده، با دکمهٔ «نمایش بیشتر / کمتر».
 		   ------------------------------------------------------------------
-		   صفحهٔ دسته پیش از این با قالبِ مستقلِ category.php رندر می‌شد و
-		   «توضیح کامل» (متای ab_desc_full) را زیرِ صفحه‌بندی چاپ می‌کرد.
-		   حالا که همان چیدمانِ ژانر را اجرا می‌کند، اگر این را نخوانیم
-		   آن متنِ مهم (برای سئو) از صفحه حذف می‌شود — که خلاف خواستهٔ
-		   صریحِ کاربر است («قسمت توضیحات کامل تو دسته بندی هست بمونه»).
+		   v3.17.14 این متن را با wp_kses_post خام چاپ می‌کرد: محتوا کامل
+		   بود ولی یک بلوکِ بلندِ پیوسته می‌شد و کاربر گفت «قسمت توضیحات
+		   کامل هم باید مثل قبل بیشتر بخوانید و کمتر بخوانید داشته باشد».
 
-		   این متن HTML مجاز دارد، پس با wp_kses_post چاپ می‌شود
-		   (برخلافِ پاراگراف‌های معرفیِ خودکار که esc_html می‌خواهند). */
-		$full_html = '';
-		if ( 'category' === $term->taxonomy && function_exists( 'tara_category_desc_full_html' ) ) {
-			$full_html = (string) tara_category_desc_full_html( $term );
+		   قالب از نسخهٔ ۳.۵.۲ یک تابعِ آمادهٔ همین کار دارد:
+		       tara_category_desc_full()
+		   که مارک‌آپِ data-ab-desc + دکمهٔ data-ab-desc-toggle را
+		   می‌سازد و js/ab-cat-desc.js آن را زنده می‌کند:
+		     • متن از ابتدا کامل در HTML است (برای گوگل و بدونِ JS)
+		     • اگر از ۱۹۰px بلندتر باشد، جمع می‌شود و دکمه ظاهر می‌شود
+		     • اگر کوتاه باشد، هیچ دکمه‌ای ساخته نمی‌شود (کادرِ خالی نه)
+		     • aria-expanded / aria-controls دارند
+
+		   پس همان تابع را صدا می‌زنیم، نه نسخهٔ خام. خروجی‌اش از قبل
+		   escape/kses شده است. */
+		$full_block = '';
+		if ( 'category' === $term->taxonomy && function_exists( 'tara_category_desc_full' ) ) {
+			$full_block = (string) tara_category_desc_full( $term );
 		}
 
-		if ( empty( $intro ) && '' === $full_html ) {
+		if ( empty( $intro ) && '' === $full_block ) {
 			return '';
 		}
 
 		ob_start();
 		?>
-		<section class="ty-taxabout" aria-labelledby="ty-taxabout-title">
-			<h2 id="ty-taxabout-title">دربارهٔ <?php echo esc_html( $label ); ?> «<?php echo esc_html( $term->name ); ?>»</h2>
-			<?php if ( '' !== $full_html ) : ?>
-				<div class="ty-taxabout__custom"><?php echo $full_html; // phpcs:ignore WordPress.Security.EscapeOutput -- wp_kses_post شده در تابع ?></div>
+		<div class="ty-taxabout-wrap">
+			<?php
+			/* بلوکِ کاملِ دسته، خودش <section> و تیتر دارد؛ جدا چاپ می‌شود
+			   تا تیترِ «دربارهٔ دستهٔ …» دوباره روی آن نیفتد. */
+			if ( '' !== $full_block ) {
+				echo $full_block; // phpcs:ignore WordPress.Security.EscapeOutput -- در تابع escape شده
+			}
+			?>
+			<?php if ( ! empty( $intro ) ) : ?>
+				<section class="ty-taxabout" aria-labelledby="ty-taxabout-title">
+					<h2 id="ty-taxabout-title">دربارهٔ <?php echo esc_html( $label ); ?> «<?php echo esc_html( $term->name ); ?>»</h2>
+					<?php foreach ( $intro as $para ) : ?>
+						<p><?php echo esc_html( (string) $para ); ?></p>
+					<?php endforeach; ?>
+				</section>
 			<?php endif; ?>
-			<?php foreach ( $intro as $para ) : ?>
-				<p><?php echo esc_html( (string) $para ); ?></p>
-			<?php endforeach; ?>
-		</section>
+		</div>
 		<?php
 
 		return trim( (string) ob_get_clean() );

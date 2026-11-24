@@ -474,54 +474,130 @@ html[data-tara-night="1"] .ty-taxabout {
 
 .ty-taxabout p:last-child { margin-bottom: 0; }
 
-/* v3.17.14 — متنِ کاملِ ویرایش‌شده در پیشخوان (فقط صفحهٔ دسته).
-   این بلوک HTML مجاز دارد (p، ul، a، strong…) پس با فاصلهٔ پاراگراف
-   و پشتیبانی از لینک استایل می‌شود. اگر خالی باشد چاپ نمی‌شود. */
-.ty-taxabout__custom {
+/* v3.17.15 — بلوکِ «دربارهٔ دسته» با دکمهٔ نمایش بیشتر/کمتر.
+   ------------------------------------------------------------------------
+   مارک‌آپ از tara_category_desc_full() می‌آید و کلاس‌هایش ab-cat-desc*
+   است (همان چیزی که در style.css/ab-352.css هم استایل دارد). اینجا فقط
+   آن را با زبانِ بصریِ صفحهٔ تاکسونومی (--th-*) هم‌رنگ می‌کنیم تا
+   وصله‌پینه به‌نظر نرسد. اگر ab-352.css هم بار شود، قواعدِ اینجا
+   دقیق‌ترند و برنده می‌شوند.
+
+   چرا هر دو نام؟ `.ty-taxabout__custom` از ۳.۱۷.۱۴ می‌ماند تا اگر
+   کشِ صفحه نسخهٔ قدیمی را نگه داشته، چیزی نشکند. */
+.ty-taxabout-wrap {
+	margin: 28px 0 10px;
+}
+
+.ty-taxabout-wrap .ab-cat-desc,
+.ty-taxabout-wrap .ty-taxabout {
 	margin: 0 0 14px;
-	padding-bottom: 14px;
-	border-bottom: 1px solid var(--th-line);
+	padding: 20px 22px;
+	border-radius: 20px;
+	border: 1px solid var(--th-line);
+	background: var(--th-surface);
+}
+
+.ty-taxabout-wrap .ab-cat-desc:last-child,
+.ty-taxabout-wrap .ty-taxabout:last-child {
+	margin-bottom: 0;
+}
+
+.ty-taxabout-wrap .ab-cat-desc__title,
+.ty-taxabout h2 {
+	margin: 0 0 10px;
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--th-ink);
+}
+
+.ty-taxabout-wrap .ab-cat-desc__body,
+.ty-taxabout__custom {
 	font-size: 13px;
 	line-height: 2.15;
 	color: var(--th-text);
 }
 
-.ty-taxabout__custom > :first-child { margin-top: 0; }
-.ty-taxabout__custom > :last-child { margin-bottom: 0; }
-
+.ty-taxabout-wrap .ab-cat-desc__body p,
 .ty-taxabout__custom p,
-.ty-taxabout__custom ul,
-.ty-taxabout__custom ol {
+.ty-taxabout p {
 	margin: 0 0 10px;
+	font-size: 13px;
+	line-height: 2.15;
+	color: var(--th-text);
 }
 
-.ty-taxabout__custom ul,
-.ty-taxabout__custom ol {
-	padding-inline-start: 20px;
+.ty-taxabout-wrap .ab-cat-desc__body p:last-child,
+.ty-taxabout__custom p:last-child,
+.ty-taxabout p:last-child {
+	margin-bottom: 0;
 }
 
-.ty-taxabout__custom li { margin-bottom: 5px; }
+/* دکمهٔ «نمایش بیشتر / کمتر» — هم‌خانوادهٔ دکمه‌های سربرگ */
+.ty-taxabout-wrap .ab-cat-desc__actions {
+	margin: 12px 0 0;
+	text-align: center;
+}
 
+.ty-taxabout-wrap .ab-cat-desc__toggle {
+	appearance: none;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 9px 22px;
+	border-radius: 999px;
+	border: 1px solid var(--th-line);
+	background: var(--th-surface);
+	color: var(--th-accent, #c9a227);
+	font-size: 12.5px;
+	font-weight: 700;
+	line-height: 1.6;
+	transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+}
+
+.ty-taxabout-wrap .ab-cat-desc__toggle:hover,
+.ty-taxabout-wrap .ab-cat-desc__toggle:focus-visible {
+	background: var(--th-accent, #c9a227);
+	border-color: var(--th-accent, #c9a227);
+	color: #fff;
+	outline: none;
+}
+
+.ty-taxabout-wrap .ab-cat-desc__toggle[hidden] {
+	display: none;
+}
+
+/* گرادیانِ محو‌شدن در حالتِ جمع‌شده با پس‌زمینهٔ همین کادر هم‌رنگ باشد
+   (ab-352.css آن را با --ab-surface می‌کشد که در این صفحه تعریف نشده). */
+.ty-taxabout-wrap .ab-cat-desc__body.is-clamped::after {
+	background: linear-gradient(to bottom, transparent, var(--th-surface));
+}
+
+/* لینک‌ها داخل متن */
+.ty-taxabout-wrap .ab-cat-desc__body a[href],
 .ty-taxabout__custom a {
 	color: var(--th-accent, #c9a227);
 	text-decoration: underline;
 	text-underline-offset: 3px;
 }
 
+.ty-taxabout-wrap .ab-cat-desc__body img,
 .ty-taxabout__custom img {
 	max-width: 100%;
 	height: auto;
 	border-radius: 12px;
 }
 
-.ty-taxabout__custom h2,
-.ty-taxabout__custom h3,
-.ty-taxabout__custom h4 {
+.ty-taxabout-wrap .ab-cat-desc__body h2,
+.ty-taxabout-wrap .ab-cat-desc__body h3,
+.ty-taxabout-wrap .ab-cat-desc__body h4 {
 	margin: 14px 0 8px;
 	font-size: 14px;
 	font-weight: 700;
 	color: var(--th-ink);
 }
+
+/* شب — همین متغیرها با تم عوض می‌شوند؛ نیازی به قاعدهٔ جدا نیست. */
 
 /* =========================================================================
    ۴) واکنش‌گرایی
@@ -585,6 +661,25 @@ html[data-tara-night="1"] .ty-taxabout {
 .ty-archive__anchor {
 	height: 0;
 	scroll-margin-top: 96px;
+}
+
+/* v3.17.15 — فاصلهٔ فهرست از عنوان.
+   `.ty-archive__list` فقط در tara-artist.css استایل داشت و آن فایل در
+   صفحهٔ ژانر/حال‌وهوا/دسته بار نمی‌شود؛ یعنی فهرست به عنوان می‌چسبید. */
+.ty-archive__list {
+	margin-top: 10px;
+}
+
+/* در صفحهٔ دسته، فهرستِ آهنگ‌ها کارت‌های قاب‌دار می‌گیرد تا ستون‌ها
+   از هم distinguishable باشند (چیدمانِ گرید در tara-ui.css است). */
+.ty-archive__list > li .ty-track {
+	border: 1px solid var(--th-line);
+	background: var(--th-surface);
+}
+
+.ty-archive__list > li .ty-track:hover {
+	border-color: color-mix(in srgb, var(--th-accent, #c9a227) 36%, var(--th-line));
+	background: var(--th-surface);
 }
 
 .ty-archive__radio {

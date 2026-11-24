@@ -44,7 +44,7 @@ for (const name of ['admin-panel.php', 'admin-panel-views.php', 'ab-admin-ui.php
 for (const css of ['admin-panel.css']) {
   files.push({ parent: '/tmp/theme/css', name: css, url: 'file://' + path.join(theme, 'css', css) });
 }
-for (const js of ['admin-panel.js']) {
+for (const js of ['admin-panel.js', 'ab-cat-desc.js']) {
   files.push({ parent: '/tmp/theme/js', name: js, url: 'file://' + path.join(theme, 'js', js) });
 }
 /* فایل‌های تازهٔ ۳.۷.۰ — آزمون run-370 */

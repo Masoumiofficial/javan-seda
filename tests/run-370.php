@@ -604,7 +604,11 @@ $taxlist78 = (string) @file_get_contents( '/tmp/theme/inc/tax-listing.php' );
 t( 'دسته: از چیدمانِ مشترکِ ژانر استفاده می‌کند', false !== strpos( $cat78, "get_template_part( 'inc/tax-listing' )" ) );
 t( 'دسته: «دربارهٔ …» در انتهای چیدمانِ مشترک', false !== strpos( $taxlist78, 'tara_tax_about' ) );
 t( 'دسته: تیتر پویا «دربارهٔ نام دسته»', false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/tara-tax-hero.php' ), "دربارهٔ <?php echo esc_html( \$label )" ) );
-t( 'دسته: توضیحِ کاملِ ویرایش‌شده حفظ می‌شود', false !== strpos( $taxlist78, 'tara_category_desc_short_text' ) && false !== strpos( (string) @file_get_contents( '/tmp/theme/inc/tara-tax-hero.php' ), 'tara_category_desc_full_html' ) );
+t( 'دسته: توضیحِ کوتاهِ ویرایش‌شده حفظ می‌شود', false !== strpos( $taxlist78, 'tara_category_desc_short_text' ) );
+/* v3.17.15 — توضیح کامل با دکمهٔ نمایش بیشتر/کمتر چاپ می‌شود */
+$taxhero81 = (string) @file_get_contents( '/tmp/theme/inc/tara-tax-hero.php' );
+t( 'دسته: توضیحِ کامل با دکمهٔ بیشتر/کمتر', false !== strpos( $taxhero81, 'tara_category_desc_full(' ) );
+t( 'دسته: توضیحِ کامل بدونِ چاپِ خام', false === strpos( $taxhero81, "tara_category_desc_full_html( \$term )" ) );
 
 $songs78 = (string) @file_get_contents( '/tmp/theme/inc/songs_post.php' );
 t( 'کارت: badge فرمت (mp3/mp4) حذف شد', false === strpos( $songs78, 'ft_box_format' ) );

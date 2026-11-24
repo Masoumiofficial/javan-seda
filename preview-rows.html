@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="fa"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>پیش‌نمایش چیدمان جدید</title>
+<style>
+body{font-family:Vazir,Tahoma,sans-serif;background:#eef1f6;margin:0;padding:18px;color:#1f2937}
+h1{font-size:16px;margin:0 0 4px} .sub{font-size:12px;color:#6b7280;margin-bottom:16px}
+.card{background:#fff;border-radius:16px;padding:16px;margin:0 auto 18px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.cols{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:900px){.cols{grid-template-columns:1fr 1fr}}
+.lbl{font-size:11px;color:#9ca3af;margin:0 0 8px;font-weight:700}
+.ty-track__play{appearance:none;width:34px;height:34px;border-radius:50%;border:1px solid var(--ty-line);background:#fff;color:var(--ty-accent);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px}
+.ty-track__cover img{width:48px;height:48px;border-radius:8px;display:block;object-fit:cover}
+.ty-track__body{min-width:0}
+.ty-track__title{display:block;font-size:12.5px;font-weight:700;color:var(--ty-ink);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ty-track__artist{font-size:11px;color:var(--ty-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.ty-track__date{font-size:10.5px;color:var(--ty-muted);white-space:nowrap}
+
+/* v3.17.15 — فهرستِ آهنگ‌ها چندستونه شد (خواستهٔ کاربر).
+   ------------------------------------------------------------------------
+   پیش از این `.ty-tracklist` یک gridِ تک‌ستونه بود و هر ردیف تمامِ عرضِ
+   صفحه را می‌گرفت. روی دسکتاپ نتیجه: کاور در راست، عنوان در چپ، و
+   فاصلهٔ خالیِ چند صد پیکسلی بینشان — هم شلخته، هم فقط ۱۰ آهنگ در
+   یک دید. حالا هر ستون یک «کارت» است و صفحه ۲ تا ۳ ستون می‌گیرد.
+
+   چرا auto-fill با minmax(320px, 1fr)؟
+     • دسکتاپ عریض (≥1200px)  → ۳ ستون
+     • لپ‌تاپ/تبلت افقی       → ۲ ستون
+     • موبایل                 → ۱ ستون (همان ردیفِ آشنای قبلی)
+   هیچ breakpointِ دستی لازم نیست و روی هر عرضی خودش جا می‌افتد. */
+.ty-tracklist {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+	gap: 8px 12px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	align-items: start;
+}
+
+/* در چندستونه شدن، ستون‌های `auto` (تاریخ/دکمه) ممکن است عرضِ کارت را
+   به‌هم بزنند. ستونِ عنوان minmax(0,1fr) می‌ماند تا متن با ellipsis
+   کوتاه شود و کارت‌ها هم‌عرض بمانند. */
+.ty-track {
+	display: grid;
+	grid-template-columns: 38px 48px minmax(0, 1fr) auto auto;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 10px;
+	border-radius: 12px;
+	transition: background 0.15s ease;
+	min-width: 0;
+}
+
+/* تاریخ روی کارت‌های باریک جا نمی‌شود؛ زیر ۱۰۸۰px پنهان می‌شود تا
+   عنوان فضا داشته باشد. (تاریخ در data-tara-date برای مرتب‌سازی
+   و برای صفحهٔ آهنگ باقی است.) */
+/* li خودش گریدِ داخلی ندارد؛ فقط نباید چیزی به کارت اضافه کند. */
+.ty-tracklist > li {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	min-width: 0;
+}
+
+/* هر کارت یک قابِ ملایم بگیرد تا در چیدمانِ چندستونه، ستون‌ها از هم
+   قابل تشخیص باشند (بدون قاب، ردیف‌ها با gap = 4px به هم می‌چسبند و
+   دوباره شلخته به‌نظر می‌رسند). در تک‌ستونه (موبایل) قاب برداشته
+   می‌شود تا همان ردیفِ تمیزِ قبلی بماند. */
+.ty-tracklist--cards > li .ty-track,
+.ty-archive__list > li .ty-track {
+	border: 1px solid var(--ty-line);
+	background: var(--ty-surface);
+}
+
+.ty-tracklist--cards > li .ty-track:hover,
+.ty-archive__list > li .ty-track:hover {
+	border-color: color-mix(in srgb, var(--ty-accent) 34%, var(--ty-line));
+}
+
+@media (max-width: 560px) {
+	.ty-tracklist--cards > li .ty-track,
+	.ty-archive__list > li .ty-track {
+		border-color: transparent;
+		background: transparent;
+	}
+}
+.ty-archive__list {
+	margin-top: 10px;
+}
+
+/* در صفحهٔ دسته، فهرستِ آهنگ‌ها کارت‌های قاب‌دار می‌گیرد تا ستون‌ها
+   از هم distinguishable باشند (چیدمانِ گرید در tara-ui.css است). */
+.ty-archive__list > li .ty-track {
+	border: 1px solid var(--th-line);
+	background: var(--th-surface);
+}
+
+.ty-archive__list > li .ty-track:hover {
+	border-color: color-mix(in srgb, var(--th-accent, #c9a227) 36%, var(--th-line));
+	background: var(--th-surface);
+}
+</style></head><body>
+<h1>پیش‌نمایش ردیف چندستونهٔ آهنگ‌ها</h1>
+<div class="sub">همان CSS واقعی قالب — این فقط برای دیدنِ چیدمان است.</div>
+<div class="cols">
+  <div class="card"><p class="lbl">۱۲۰۰px (لپ‌تاپ) → ۳ ستون</p>
+    <ul class="ty-tracklist ty-archive__list"><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%232aabee'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">دیوانه 1</a><span class="ty-track__artist">آریانا</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23185adb'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">بی‌نفس 2</a><span class="ty-track__artist">بهنام</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%237c3aed'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">عشق ممنوع 3</a><span class="ty-track__artist">سینا</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23db2777'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">شب‌های تهران 4</a><span class="ty-track__artist">مهدی</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23059669'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">تنها 5</a><span class="ty-track__artist">رها</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23ea580c'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">باران 6</a><span class="ty-track__artist">کیان</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%232aabee'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">قسم 7</a><span class="ty-track__artist">نازنین</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23185adb'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">آرزو 8</a><span class="ty-track__artist">پارسا</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%237c3aed'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">پرواز 9</a><span class="ty-track__artist">آریانا</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23db2777'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">خاطره 10</a><span class="ty-track__artist">بهنام</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23059669'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">دلتنگی 11</a><span class="ty-track__artist">سینا</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23ea580c'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">همیشه 12</a><span class="ty-track__artist">مهدی</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li></ul></div>
+  <div class="card" style="max-width:390px"><p class="lbl">۳۹۰px (موبایل) → ۱ ستون، بدون قاب</p>
+    <ul class="ty-tracklist ty-archive__list"><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%232aabee'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">دیوانه 1</a><span class="ty-track__artist">آریانا</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23185adb'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">بی‌نفس 2</a><span class="ty-track__artist">بهنام</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%237c3aed'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">عشق ممنوع 3</a><span class="ty-track__artist">سینا</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23db2777'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">شب‌های تهران 4</a><span class="ty-track__artist">مهدی</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23059669'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">تنها 5</a><span class="ty-track__artist">رها</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li><li><div class="ty-track">
+<button class="ty-track__play" type="button">▶</button>
+<a class="ty-track__cover" href="#"><img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23ea580c'/%3E%3C/svg%3E" width="48" height="48" alt=""></a>
+<div class="ty-track__body"><a class="ty-track__title" href="#">باران 6</a><span class="ty-track__artist">کیان</span></div>
+<span class="ty-track__date">۱۴۰۵/۰۸/۰۲</span>
+</div></li></ul></div>
+</div>
+</body></html>

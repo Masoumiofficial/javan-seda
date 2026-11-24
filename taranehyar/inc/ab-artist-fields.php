@@ -663,9 +663,28 @@ if ( ! function_exists( 'tara_352_assets' ) ) {
 			wp_enqueue_style( 'tara-352', trailingslashit( $uri ) . 'css/ab-352.css', array(), $ver );
 		}
 
-		if ( function_exists( 'is_category' ) && is_category() && $dir && is_readable( trailingslashit( $dir ) . 'js/ab-cat-desc.js' ) ) {
+		/* v3.17.15 — اسکریپتِ «نمایش بیشتر / کمتر» فقط برای دسته بار می‌شد.
+		   ------------------------------------------------------------------
+		   از ۳.۱۷.۱۵ همان دکمه در صفحهٔ ژانر و حال‌وهوا هم چاپ می‌شود
+		   (tara_tax_about → tara_category_desc_full)، ولی این اسکریپت
+		   آنجا بار نمی‌شد ⇒ دکمه ظاهر می‌شد و کاری نمی‌کرد.
+
+		   حالا در هر صفحه‌ای که یکی از تاکسونومی‌های دارای سربرگ است
+		   بار می‌شود. شرط با همان تابعی است که هیرو را می‌سازد
+		   (tara_tax_is_music) تا اگر روزی تاکسونومیِ تازه‌ای اضافه شد،
+		   این‌جا هم خودکار پوشش بگیرد. */
+		$tara_desc_js_needed = false;
+		if ( function_exists( 'is_category' ) && is_category() ) {
+			$tara_desc_js_needed = true;
+		} elseif ( function_exists( 'is_tax' ) && is_tax() && function_exists( 'tara_tax_is_music' ) ) {
+			$tara_desc_js_needed = tara_tax_is_music( (string) get_query_var( 'taxonomy' ) );
+		}
+		$tara_desc_js_needed = (bool) apply_filters( 'tara_enqueue_desc_toggle', $tara_desc_js_needed );
+
+		if ( $tara_desc_js_needed && $dir && is_readable( trailingslashit( $dir ) . 'js/ab-cat-desc.js' ) ) {
 			wp_enqueue_script( 'tara-cat-desc', trailingslashit( $uri ) . 'js/ab-cat-desc.js', array(), $ver, true );
 		}
+		unset( $tara_desc_js_needed );
 	}
 	add_action( 'wp_enqueue_scripts', 'tara_352_assets', 30 );
 }
